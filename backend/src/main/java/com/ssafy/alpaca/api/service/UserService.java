@@ -6,6 +6,7 @@ import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
 import com.ssafy.alpaca.common.jwt.RefreshToken;
+import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
@@ -16,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.DuplicateFormatFlagsException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME;
@@ -33,19 +37,53 @@ public class UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
 
+    private Map<String, String> getMessage(String returnMessage) {
+        Map<String, String> map = new HashMap<>();
+        map.put("message", returnMessage);
+        return map;
+    }
 
-    public String signup(SignupReq signupReq) {
+    public Map<String, String> checkUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+        }
+        return getMessage("사용할 수 있는 ID입니다.");
+    }
+
+    public Map<String, String> checkNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
+        }
+        return getMessage("사용할 수 있는 닉네임입니다.");
+    }
+
+    public Map<String, String> signup(SignupReq signupReq) throws IllegalAccessException {
+        if (signupReq.getBojId().isEmpty()) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+        }
+
         if (!signupReq.getPassword().equals(signupReq.getPasswordCheck())) {
-            throw new IllegalArgumentException("ExceptionUtil.USER_PW_INVALID");
+            throw new IllegalArgumentException(ExceptionUtil.USER_PW_INVALID);
+        }
+
+        if (userRepository.existsByUsername(signupReq.getUsername())) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+        }
+
+        if (userRepository.existsByNickname(signupReq.getNickname())) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
 
         User user = userRepository.save(
                 User.builder()
                         .username(signupReq.getUsername())
                         .password(passwordEncoder.encode(signupReq.getPassword()))
+                        .nickname(signupReq.getNickname())
+                        .theme("default")
+                        .bojId(signupReq.getBojId())
                         .build());
 
-        return "가입성공";
+        return getMessage("성공적으로 가입되었습니다.");
     }
 
     public TokenRes login(LoginReq loginReq) {
