@@ -57,7 +57,11 @@ public class UserService {
         return getMessage("사용할 수 있는 닉네임입니다.");
     }
 
-    public Map<String, String> signup(SignupReq signupReq) {
+    public Map<String, String> signup(SignupReq signupReq) throws IllegalAccessException {
+        if (signupReq.getBojId().isEmpty()) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+        }
+
         if (!signupReq.getPassword().equals(signupReq.getPasswordCheck())) {
             throw new IllegalArgumentException(ExceptionUtil.USER_PW_INVALID);
         }
@@ -76,6 +80,7 @@ public class UserService {
                         .password(passwordEncoder.encode(signupReq.getPassword()))
                         .nickname(signupReq.getNickname())
                         .theme("default")
+                        .bojId(signupReq.getBojId())
                         .build());
 
         return getMessage("성공적으로 가입되었습니다.");

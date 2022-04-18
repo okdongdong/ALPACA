@@ -32,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestBody SignupReq signupReq) {
+    public ResponseEntity<Map<String, String>> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
         return ResponseEntity.ok(userService.signup(signupReq));
     }
 
