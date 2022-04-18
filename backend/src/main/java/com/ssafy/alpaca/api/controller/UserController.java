@@ -26,4 +26,13 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, userUpdateReq));
     }
 
+    @ApiOperation(
+            value = "회원정보 삭제",
+            notes = "요청 회원을 탈퇴처리한다."
+    )
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+    }
+
 }

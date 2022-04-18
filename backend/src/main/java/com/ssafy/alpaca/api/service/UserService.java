@@ -171,5 +171,15 @@ public class UserService {
         userRepository.save(changedUser);
         return getMessage("성공적으로 수정되었습니다.");
     }
+
+    public void deleteUser(String id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        }
+        User deleteUser = user.get();
+        userRepository.delete(deleteUser);
+    }
+
 }
 

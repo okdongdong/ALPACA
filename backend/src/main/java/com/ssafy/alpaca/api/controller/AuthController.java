@@ -72,4 +72,5 @@ public class AuthController {
     public ResponseEntity<TokenRes> reissue(@RequestHeader("RefreshToken") String refreshToken) {
         return ResponseEntity.ok(userService.reissue(refreshToken));
     }
+
 }
