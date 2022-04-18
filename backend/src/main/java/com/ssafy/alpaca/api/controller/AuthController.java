@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -19,8 +21,18 @@ public class AuthController {
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
 
+    @GetMapping("/duplicated/username")
+    public ResponseEntity<Map<String, String>> checkUsername(@RequestParam String username) {
+        return ResponseEntity.ok(userService.checkUsername(username));
+    }
+
+    @GetMapping("/duplicated/nickname")
+    public ResponseEntity<Map<String, String>> checkNickname(@RequestParam String nickname) {
+        return ResponseEntity.ok(userService.checkNickname(nickname));
+    }
+
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupReq signupReq) {
+    public ResponseEntity<Map<String, String>> signup(@RequestBody SignupReq signupReq) {
         return ResponseEntity.ok(userService.signup(signupReq));
     }
 
