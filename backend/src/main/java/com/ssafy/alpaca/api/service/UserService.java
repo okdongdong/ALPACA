@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
+import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
@@ -17,10 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.DuplicateFormatFlagsException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME;
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_TIME;
@@ -157,6 +155,21 @@ public class UserService {
 
     private boolean lessThanReissueExpirationTimesLeft(String refreshToken) {
         return jwtTokenUtil.getRemainMilliSeconds(refreshToken) < REISSUE_EXPIRATION_TIME.getValue();
+    }
+
+    // 아래부터 UserController
+    public Map<String, String> updateUser(String id, UserUpdateReq userUpdateReq) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        }
+        User changedUser = user.get();
+        changedUser.setNickname(userUpdateReq.getNickname());
+        changedUser.setInfo(userUpdateReq.getInfo());
+        changedUser.setTheme(userUpdateReq.getTheme());
+        changedUser.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
+        userRepository.save(changedUser);
+        return getMessage("성공적으로 수정되었습니다.");
     }
 }
 
