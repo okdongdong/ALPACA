@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.ScheduleModifyReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
@@ -46,5 +47,22 @@ public class ScheduleService {
                         .toSolveProblems(problems)
                         .build());
         return getMessage(schedule.getId());
+    }
+
+    public Map<String, String> modifySchedule(String id, ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+//      스터디장만 수정 가능
+        List<Problem> problems = new ArrayList<>();
+        for(String problemNum:scheduleModifyReq.getToSolveProblems())
+        {
+            problems.add(problemRepository.findByNumber(
+                            problemNum
+                    )
+            );
+        };
+        schedule.setStartedAt(scheduleModifyReq.getStartedAt());
+        schedule.setToSolveProblems(problems);
+        scheduleRepository.save(schedule);
+        return getMessage("성공적으로 수정되었습니다.");
     }
 }
