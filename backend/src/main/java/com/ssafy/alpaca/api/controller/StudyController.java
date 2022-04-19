@@ -43,6 +43,9 @@ public class StudyController {
             notes = "특정 스터디를 삭제한다."
     )
     @DeleteMapping("/{id}")
-    public void deleteStudy(@PathVariable String id) { studyService.deleteStudy(id);}
+    public void deleteStudy(@PathVariable String id) {
+        String username = userService.getCurrentUsername();
+        studyService.deleteStudy(username, id);
+    }
 
 }

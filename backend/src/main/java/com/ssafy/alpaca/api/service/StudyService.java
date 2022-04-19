@@ -58,12 +58,19 @@ public class StudyService {
         userRepository.save(user);
     }
 
-    public void deleteStudy(String id){
-        Optional<Study> study = studyRepository.findById(id);
-        if (study.isEmpty()) {
-            throw new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND);
+    public void deleteStudy(String username, String id){
+        Study study = studyRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        if (!study.getRoomMaker().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        Study deleteStudy = study.get();
-        studyRepository.delete(deleteStudy);
+
+        studyRepository.delete(study);
     }
 }
