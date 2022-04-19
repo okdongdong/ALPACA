@@ -14,6 +14,9 @@ import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,12 @@ public class UserService {
         return map;
     }
 
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        return principal.getUsername();
+    }
+
     public Map<String, String> checkUsername(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
@@ -53,6 +62,16 @@ public class UserService {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
         return getMessage("사용할 수 있는 닉네임입니다.");
+    }
+
+    public Map<String, String> checkBojId(String bojId) {
+        String message;
+        if (userRepository.existsByBojId(bojId)) {
+            message = "해당 계정으로 이미 연동된 ID가 있습니다.";
+        } else {
+            message = "해당 계정으로 연동된 ID가 없습니다.";
+        }
+        return getMessage(message);
     }
 
     public Map<String, String> signup(SignupReq signupReq) throws IllegalAccessException {
@@ -158,27 +177,27 @@ public class UserService {
     }
 
     // 아래부터 UserController
-    public Map<String, String> updateUser(String id, UserUpdateReq userUpdateReq) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+    public Map<String, String> updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        String username = getCurrentUsername();
+        if (!user.getUsername().equals(username)) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
-        User changedUser = user.get();
-        changedUser.setNickname(userUpdateReq.getNickname());
-        changedUser.setInfo(userUpdateReq.getInfo());
-        changedUser.setTheme(userUpdateReq.getTheme());
-        changedUser.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
-        userRepository.save(changedUser);
+        user.setNickname(userUpdateReq.getNickname());
+        user.setInfo(userUpdateReq.getInfo());
+        user.setTheme(userUpdateReq.getTheme());
+        user.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
+        userRepository.save(user);
         return getMessage("성공적으로 수정되었습니다.");
     }
 
-    public void deleteUser(String id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+    public void deleteUser(String id) throws IllegalAccessException {
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        String username = getCurrentUsername();
+        if (!user.getUsername().equals(username)) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
-        User deleteUser = user.get();
-        userRepository.delete(deleteUser);
+        userRepository.delete(user);
     }
 
 }

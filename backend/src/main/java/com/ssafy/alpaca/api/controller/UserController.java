@@ -22,7 +22,7 @@ public class UserController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateUser(
-            @PathVariable String id, @RequestBody UserUpdateReq userUpdateReq) {
+            @PathVariable String id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
         return ResponseEntity.ok(userService.updateUser(id, userUpdateReq));
     }
 
@@ -31,7 +31,7 @@ public class UserController {
             notes = "요청 회원을 탈퇴처리한다."
     )
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable String id) {
+    public void deleteUser(@PathVariable String id) throws IllegalAccessException {
         userService.deleteUser(id);
     }
 
