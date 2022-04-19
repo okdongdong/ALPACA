@@ -46,6 +46,16 @@ public class AuthController {
     }
 
     @ApiOperation(
+            value = "백준 연동 중복 검사",
+            notes = "백준 계정 연동시, 이미 등록된 계정인지 확인해준다."
+    )
+    @ApiImplicitParam( name = "bojId", value = "연동 계정")
+    @GetMapping("/duplicated/bojId")
+    public ResponseEntity<Map<String, String>> checkBojId(@RequestParam String bojId) {
+        return ResponseEntity.ok(userService.checkBojId(bojId));
+    }
+
+    @ApiOperation(
             value = "회원가입",
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )

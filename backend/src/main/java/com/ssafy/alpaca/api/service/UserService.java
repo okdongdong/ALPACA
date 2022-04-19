@@ -55,6 +55,16 @@ public class UserService {
         return getMessage("사용할 수 있는 닉네임입니다.");
     }
 
+    public Map<String, String> checkBojId(String bojId) {
+        String message;
+        if (userRepository.existsByBojId(bojId)) {
+            message = "해당 계정으로 이미 연동된 ID가 있습니다.";
+        } else {
+            message = "해당 계정으로 연동된 ID가 없습니다.";
+        }
+        return getMessage(message);
+    }
+
     public Map<String, String> signup(SignupReq signupReq) throws IllegalAccessException {
         if (signupReq.getBojId().isEmpty()) {
             throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
