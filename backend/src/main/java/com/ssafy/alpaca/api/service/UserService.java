@@ -12,6 +12,7 @@ import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
+import com.ssafy.alpaca.db.repository.StudyRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -33,10 +34,11 @@ import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StudyRepository studyRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
 
     private Map<String, String> getMessage(String returnMessage) {
         Map<String, String> map = new HashMap<>();
@@ -44,7 +46,7 @@ public class UserService {
         return map;
     }
 
-    private String getCurrentUsername() {
+    public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails principal = (UserDetails) authentication.getPrincipal();
         return principal.getUsername();
@@ -91,7 +93,7 @@ public class UserService {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
 
-        User user = userRepository.save(
+        userRepository.save(
                 User.builder()
                         .username(signupReq.getUsername())
                         .password(passwordEncoder.encode(signupReq.getPassword()))
@@ -196,6 +198,10 @@ public class UserService {
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+        }
+
+        if (studyRepository.existsByRoomMaker(user)) {
+            throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
         userRepository.delete(user);
     }
