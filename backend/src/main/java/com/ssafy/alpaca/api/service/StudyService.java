@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.request.StudyRoomMakerUpdateReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Study;
@@ -56,6 +57,31 @@ public class StudyService {
 
         user.setStudies(studies);
         userRepository.save(user);
+    }
+
+    public void updateRoomMaker(String username, StudyRoomMakerUpdateReq studyRoomMakerUpdateReq) {
+        Study study = studyRepository.findById(studyRoomMakerUpdateReq.getStudyId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        if (!study.getRoomMaker().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+
+        User member = userRepository.findById(studyRoomMakerUpdateReq.getInheritorId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        if (!study.getMembers().contains(member)) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        }
+
+        study.setRoomMaker(member);
+        studyRepository.save(study);
     }
 
     public void deleteStudy(String username, String id){
