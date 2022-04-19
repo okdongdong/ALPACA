@@ -4,6 +4,7 @@ import com.ssafy.alpaca.db.document.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     Boolean existsByNickname(String nickname);
 
     Boolean existsByBojId(String bojId);
+
+    List<User> findAllByNickname(String nickname);
 }

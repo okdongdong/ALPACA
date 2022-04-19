@@ -5,6 +5,7 @@ import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
+import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
 import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME;
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_TIME;
@@ -102,7 +104,8 @@ public class UserService {
                         .username(signupReq.getUsername())
                         .password(passwordEncoder.encode(signupReq.getPassword()))
                         .nickname(signupReq.getNickname())
-                        .theme("default")
+                        .info("자신에 대한 정보를 입력해주세요.")
+                        .theme("basic")
                         .bojId(signupReq.getBojId())
                         .build());
 
@@ -232,6 +235,17 @@ public class UserService {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
         userRepository.delete(user);
+    }
+
+    public List<UserListRes> getByNickname(String nickname) {
+        List<User> userList = userRepository.findAllByNickname(nickname);
+
+        return userList.stream().map(user -> UserListRes.builder()
+                .id(user.getId())
+                .nickname(user.getNickname())
+                .profileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                .build())
+                .collect(Collectors.toList());
     }
 
 }
