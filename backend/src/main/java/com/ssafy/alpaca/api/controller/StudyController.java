@@ -6,6 +6,7 @@ import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,7 @@ public class StudyController {
             value = "스터디 방장 권한 위임",
             notes = "요청 유저에게 방장 권한을 넘겨준다."
     )
+    @ApiImplicitParam( name = "id", value = "이임할 스터디의 id")
     @PutMapping("/member/{id}")
     public void updateRoomMaker(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
@@ -53,6 +55,7 @@ public class StudyController {
             value = "스터디원 강퇴",
             notes = "방장의 요청에 의해, 소속된 스터디원을 강퇴한다."
     )
+    @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id")
     @DeleteMapping("/member/{id}")
     public void deleteMember(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
@@ -63,6 +66,7 @@ public class StudyController {
             value = "스터디 탈퇴",
             notes = "요청한 스터디의 방장이 아닐 경우, 스터디에서 탈퇴한다."
     )
+    @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id")
     @DeleteMapping("/exit/{id}")
     public void deleteMeFromStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
@@ -73,6 +77,7 @@ public class StudyController {
             value = "Study 삭제",
             notes = "특정 스터디를 삭제한다."
     )
+    @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
     @DeleteMapping("/{id}")
     public void deleteStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
