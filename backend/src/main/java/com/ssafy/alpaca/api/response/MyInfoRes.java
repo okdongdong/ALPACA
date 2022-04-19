@@ -11,5 +11,5 @@ public class MyInfoRes {
     private String userId;
     private String username;
     private String nickname;
-//    private String profileImg;
+    private String profileImg;
 }

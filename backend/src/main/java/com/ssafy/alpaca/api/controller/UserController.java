@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -35,4 +37,8 @@ public class UserController {
         userService.deleteUser(id);
     }
 
+    @PostMapping("/{id}/profile")
+    public ResponseEntity<Map<String,String>> updateProfileImg(@PathVariable String id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
+        return ResponseEntity.ok(userService.updateProfileImg(id, file));
+    }
 }
