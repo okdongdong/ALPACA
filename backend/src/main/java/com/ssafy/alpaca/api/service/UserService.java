@@ -178,34 +178,26 @@ public class UserService {
 
     // 아래부터 UserController
     public Map<String, String> updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
-        User changedUser = user.get();
-        if (!changedUser.getUsername().equals(username)) {
+        if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
-        changedUser.setNickname(userUpdateReq.getNickname());
-        changedUser.setInfo(userUpdateReq.getInfo());
-        changedUser.setTheme(userUpdateReq.getTheme());
-        changedUser.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
-        userRepository.save(changedUser);
+        user.setNickname(userUpdateReq.getNickname());
+        user.setInfo(userUpdateReq.getInfo());
+        user.setTheme(userUpdateReq.getTheme());
+        user.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
+        userRepository.save(user);
         return getMessage("성공적으로 수정되었습니다.");
     }
 
     public void deleteUser(String id) throws IllegalAccessException {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
-        User deleteUser = user.get();
-        if (!deleteUser.getUsername().equals(username)) {
+        if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
-        userRepository.delete(deleteUser);
+        userRepository.delete(user);
     }
 
 }
