@@ -1,13 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import logo from "./logo.svg";
+import GlobalStyles from "./Theme/GlobalStyles";
 import Router from './router';
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <div>알파카~</div>
+    <>
+      <GlobalStyles />
       <Router></Router>
-    </div>
+    </>
   );
 }
 
