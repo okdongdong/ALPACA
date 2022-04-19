@@ -1,4 +1,4 @@
-import theme from './Lib/Theme'
+import theme from './Lib/theme'
 
 interface Props {
   themeId : 'basic' | 'dark' | 'olivegreen' | 'peachpink';
@@ -7,7 +7,7 @@ interface Props {
 function Testbtn({themeId}:Props) {
   return (
     <div>
-      <button style={{backgroundColor: theme[themeId].background}}>
+      <button style={{backgroundColor: theme[themeId].warning}}>
       testcolor
       </button>
       </div>
