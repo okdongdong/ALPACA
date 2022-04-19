@@ -1,11 +1,18 @@
 import { useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
+import { ThemeProvider } from '@emotion/react'
+import theme from './Lib/Theme'
+import Testbtn from "./Testbtn";
 
 function App() {
   const [count, setCount] = useState(0);
-
-  return <div className="App">알파카~</div>;
+  return (
+    <ThemeProvider theme={theme}>
+      <div className="App">알파카~
+        <Testbtn themeId="peachpink" />
+      </div>
+    </ThemeProvider>
+  )
 }
 
 export default App;
