@@ -50,6 +50,16 @@ public class StudyController {
     }
 
     @ApiOperation(
+            value = "스터디 탈퇴",
+            notes = "요청한 스터디의 방장이 아닐 경우, 스터디에서 탈퇴한다."
+    )
+    @DeleteMapping("/exit/{id}")
+    public void deleteMeFromStudy(@PathVariable String id) {
+        String username = userService.getCurrentUsername();
+        studyService.deleteMeFromStudy(username, id);
+    }
+
+    @ApiOperation(
             value = "Study 삭제",
             notes = "특정 스터디를 삭제한다."
     )
