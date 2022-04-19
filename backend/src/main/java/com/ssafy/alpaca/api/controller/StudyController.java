@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.controller;
 
 
+import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.request.StudyRoomMakerUpdateReq;
 import com.ssafy.alpaca.api.response.StudyRes;
@@ -47,6 +48,16 @@ public class StudyController {
     public void updateRoomMaker(@RequestBody StudyRoomMakerUpdateReq studyRoomMakerUpdateReq) {
         String username = userService.getCurrentUsername();
         studyService.updateRoomMaker(username, studyRoomMakerUpdateReq);
+    }
+
+    @ApiOperation(
+            value = "스터디원 강퇴",
+            notes = "방장의 요청에 의해, 소속된 스터디원을 강퇴한다."
+    )
+    @DeleteMapping("/member/{id}")
+    public void deleteMember(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
+        String username = userService.getCurrentUsername();
+        studyService.deleteMember(username, id, studyMemberReq);
     }
 
     @ApiOperation(
