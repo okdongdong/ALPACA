@@ -3,7 +3,6 @@ package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
-import com.ssafy.alpaca.api.request.StudyRoomMakerUpdateReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
@@ -44,10 +43,10 @@ public class StudyController {
             value = "스터디 방장 권한 위임",
             notes = "요청 유저에게 방장 권한을 넘겨준다."
     )
-    @PutMapping("/roomMaker")
-    public void updateRoomMaker(@RequestBody StudyRoomMakerUpdateReq studyRoomMakerUpdateReq) {
+    @PutMapping("/member/{id}")
+    public void updateRoomMaker(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
-        studyService.updateRoomMaker(username, studyRoomMakerUpdateReq);
+        studyService.updateRoomMaker(username, id, studyMemberReq);
     }
 
     @ApiOperation(

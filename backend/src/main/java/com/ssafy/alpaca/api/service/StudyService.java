@@ -2,7 +2,6 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
-import com.ssafy.alpaca.api.request.StudyRoomMakerUpdateReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Study;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,8 +58,8 @@ public class StudyService {
         userRepository.save(user);
     }
 
-    public void updateRoomMaker(String username, StudyRoomMakerUpdateReq studyRoomMakerUpdateReq) {
-        Study study = studyRepository.findById(studyRoomMakerUpdateReq.getStudyId()).orElseThrow(
+    public void updateRoomMaker(String username, String id, StudyMemberReq studyMemberReq) {
+        Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
@@ -73,7 +71,7 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        User member = userRepository.findById(studyRoomMakerUpdateReq.getInheritorId()).orElseThrow(
+        User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
 
