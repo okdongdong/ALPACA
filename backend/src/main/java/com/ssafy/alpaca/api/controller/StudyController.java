@@ -21,13 +21,13 @@ public class StudyController {
     private final StudyService studyService;
 
     @ApiOperation(
-            value = "Study 조회",
-            notes = "특정 스터디를 조회한다."
+            value = "스터디 조회",
+            notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRes> getStudy(
-            @PathVariable String id) {
-        return ResponseEntity.ok(studyService.getStudy(id));
+    public ResponseEntity<StudyRes> getStudy(@PathVariable String id) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getStudy(username, id));
     }
 
     @ApiOperation(
@@ -74,8 +74,8 @@ public class StudyController {
     }
 
     @ApiOperation(
-            value = "Study 삭제",
-            notes = "특정 스터디를 삭제한다."
+            value = "스터디 삭제",
+            notes = "요청한 스터디 id에 따라 스터디를 삭제한다."
     )
     @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
+import com.ssafy.alpaca.db.document.Schedule;
 import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.StudyRepository;
@@ -24,12 +25,22 @@ public class StudyService {
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
 
-    public StudyRes getStudy(String id){
+    public StudyRes getStudy(String username, String id){
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+
+        if (!study.getMembers().contains(user)) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+
         return StudyRes.builder()
                 .title(study.getTitle())
                 .info(study.getInfo())
+                .members(study.getMembers())
+                .schedules(study.getSchedules())
                 .build();
     }
 
