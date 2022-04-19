@@ -238,7 +238,7 @@ public class UserService {
     }
 
     public List<UserListRes> getByNickname(String nickname) {
-        List<User> userList = userRepository.findAllByNickname(nickname);
+        List<User> userList = userRepository.findAllByNicknameContains(nickname);
 
         return userList.stream().map(user -> UserListRes.builder()
                 .id(user.getId())

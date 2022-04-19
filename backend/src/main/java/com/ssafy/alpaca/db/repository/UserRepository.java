@@ -17,5 +17,5 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     Boolean existsByBojId(String bojId);
 
-    List<User> findAllByNickname(String nickname);
+    List<User> findAllByNicknameContains(String nickname);
 }
