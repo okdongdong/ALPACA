@@ -1,11 +1,16 @@
 import { useState } from "react";
 import logo from "./logo.svg";
+import GlobalStyles from "./Theme/GlobalStyles";
+import Router from './router';
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <div className="App">알파카~</div>;
+  return (
+    <>
+      <GlobalStyles />
+      <Router></Router>
+    </>
+  );
 }
 
 export default App;
