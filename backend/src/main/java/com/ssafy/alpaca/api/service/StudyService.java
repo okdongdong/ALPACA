@@ -25,12 +25,27 @@ public class StudyService {
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
 
-    public StudyRes getStudy(String username, String id){
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
+    private Study checkStudyById(String id) {
+        return studyRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+    }
 
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+    private User checkUserById(String id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+    }
+
+    private User checkUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+    }
+
+    public StudyRes getStudy(String username, String id){
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
 
         if (!study.getMembers().contains(user)) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
@@ -45,13 +60,11 @@ public class StudyService {
     }
 
     public void createStudy(String username, StudyReq studyReq) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        User user = checkUserByUsername(username);
 
         List<User> members = new ArrayList<>();
         for (String member : studyReq.getMembers()) {
-            members.add(userRepository.findById(member).orElseThrow(
-                            () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)));
+            members.add(checkUserById(member));
         }
 
         Study study = Study.builder()
@@ -70,21 +83,13 @@ public class StudyService {
     }
 
     public void updateRoomMaker(String username, String id, StudyMemberReq studyMemberReq) {
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        User member = checkUserById(studyMemberReq.getMemberId());
 
         if (!study.getRoomMaker().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-
-        User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
 
         if (!study.getMembers().contains(member)) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
@@ -95,17 +100,9 @@ public class StudyService {
     }
 
     public void deleteMember(String username, String id, StudyMemberReq studyMemberReq) {
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
-        User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        User member = checkUserById(studyMemberReq.getMemberId());
 
         if (!study.getRoomMaker().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
@@ -118,13 +115,8 @@ public class StudyService {
     }
 
     public void deleteMeFromStudy(String username, String id) {
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
 
         if (study.getRoomMaker().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
@@ -137,13 +129,8 @@ public class StudyService {
     }
 
     public void deleteStudy(String username, String id){
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
 
         if (!study.getRoomMaker().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
