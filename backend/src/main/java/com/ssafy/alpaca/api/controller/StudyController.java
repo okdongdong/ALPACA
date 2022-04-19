@@ -1,8 +1,10 @@
 package com.ssafy.alpaca.api.controller;
 
 
+import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
+import com.ssafy.alpaca.api.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class StudyController {
 
+    private final UserService userService;
     private final StudyService studyService;
 
     @ApiOperation(
@@ -23,6 +26,16 @@ public class StudyController {
     public ResponseEntity<StudyRes> getStudy(
             @PathVariable String id) {
         return ResponseEntity.ok(studyService.getStudy(id));
+    }
+
+    @ApiOperation(
+            value = "스터디 개설",
+            notes = "입력 정보에 따라 새로운 스터디를 생성한다."
+    )
+    @PostMapping()
+    public void createStudy(@RequestBody StudyReq studyReq) {
+        String username = userService.getCurrentUsername();
+        studyService.createStudy(username, studyReq);
     }
 
     @ApiOperation(
