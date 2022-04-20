@@ -7,8 +7,9 @@ interface CContainerWithLogoProps {
 }
 
 const CustomContainer = styled(Container)(({ theme }) => ({
-  backgroundColor: '#eee',
+  backgroundColor: theme.palette.bg,
   padding: theme.spacing(4, 8),
+  textAlign: 'center',
 }));
 
 function CContainerWithLogo({ children }: CContainerWithLogoProps) {
@@ -18,7 +19,7 @@ function CContainerWithLogo({ children }: CContainerWithLogoProps) {
         <div>
           <img src={Logo} alt="Logo" />
         </div>
-        <Stack sx={{ width: '100%' }}>{children}</Stack>
+        <Stack>{children}</Stack>
       </Stack>
     </CustomContainer>
   );

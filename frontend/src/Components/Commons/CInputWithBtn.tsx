@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, Grid, Input, InputAdornment } from '@mui/material';
+import { FormControl, FormHelperText, Grid, Input, InputAdornment, styled } from '@mui/material';
 import React from 'react';
 import CBtn from './CBtn';
 
@@ -11,6 +11,15 @@ interface CInputWithBtnProps {
   onChange: React.Dispatch<React.SetStateAction<string>>;
   onButtonClick: () => void;
 }
+
+const CustomGridContainer = styled(Grid)(({ theme }) => ({
+  color: theme.palette.txt,
+  height: 80,
+}));
+
+const CustomInput = styled(Input)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
 
 function CInputWithBtn({
   label,
@@ -30,13 +39,13 @@ function CInputWithBtn({
   };
 
   return (
-    <Grid container sx={{ height: 80 }}>
+    <CustomGridContainer container>
       <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
         <label htmlFor={`${label}-label`}>{label}</label>
       </Grid>
       <Grid item xs={8}>
         <FormControl variant="standard" error={!!helperText} fullWidth>
-          <Input
+          <CustomInput
             id={`${label}-label`}
             onChange={onChangeHandler}
             placeholder={placeholder}
@@ -51,7 +60,7 @@ function CInputWithBtn({
           <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
       </Grid>
-    </Grid>
+    </CustomGridContainer>
   );
 }
 

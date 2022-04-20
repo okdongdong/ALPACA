@@ -1,4 +1,4 @@
-import { FormControl, Grid, TextField } from '@mui/material';
+import { FormControl, FormHelperText, Grid, Input, styled } from '@mui/material';
 import React from 'react';
 
 interface CInputProps {
@@ -8,6 +8,15 @@ interface CInputProps {
   helperText?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
 }
+
+const CustomGridContainer = styled(Grid)(({ theme }) => ({
+  color: theme.palette.txt,
+  height: 80,
+}));
+
+const CustomInput = styled(Input)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
 
 function CInput({
   label,
@@ -21,25 +30,23 @@ function CInput({
   };
 
   return (
-    <Grid container sx={{ height: 80 }}>
+    <CustomGridContainer container>
       <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
         <label htmlFor={`${label}-label`}>{label}</label>
       </Grid>
       <Grid item xs={8}>
-        <FormControl fullWidth>
-          <TextField
+        <FormControl variant="standard" error={!!helperText} fullWidth>
+          <CustomInput
             id={`${label}-label`}
-            type={type}
             onChange={onChangeHandler}
+            type={type}
             placeholder={placeholder}
-            variant="standard"
-            helperText={helperText}
-            error={!!helperText}
             fullWidth
           />
+          <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
       </Grid>
-    </Grid>
+    </CustomGridContainer>
   );
 }
 
