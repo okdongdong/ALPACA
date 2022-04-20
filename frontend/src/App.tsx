@@ -1,19 +1,21 @@
-import GlobalStyles from "./Theme/GlobalStyles";
+import GlobalStyles from './Theme/GlobalStyles';
 import Router from './router';
-import "./App.css";
-import { ThemeProvider } from '@emotion/react'
-import theme from './Lib/theme'
-import Testbtn from './Testbtn'
+import './App.css';
+import { useSelector } from 'react-redux';
+import { ThemeProvider } from '@mui/material';
+import Testbtn from './Testbtn';
 
 function App() {
+  const theme = useSelector((state: any) => state.themeReducer.theme);
+
   return (
-      <>
-      <Testbtn themeId="peachpink"/>
-      <GlobalStyles />
-      <Router></Router>
-      </>
-    // </ThemeProvider>
-    // <ThemeProvider theme={theme}>
+    <>
+      <ThemeProvider theme={theme}>
+        {/* <Testbtn></Testbtn> */}
+        <GlobalStyles />
+        <Router></Router>
+      </ThemeProvider>
+    </>
   );
 }
 
