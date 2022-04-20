@@ -53,20 +53,20 @@ public class UserService {
     }
 
     public void checkUsername(String username) {
-        if (userRepository.existsByUsername(username)) {
+        if (Boolean.TRUE.equals(userRepository.existsByUsername(username))) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
     }
 
     public void checkNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
+        if (Boolean.TRUE.equals(userRepository.existsByNickname(nickname))) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
     }
 
     public String checkBojId(String bojId) {
         String message;
-        if (userRepository.existsByBojId(bojId)) {
+        if (Boolean.TRUE.equals(userRepository.existsByBojId(bojId))) {
             message = "해당 계정으로 이미 연동된 ID가 있습니다.";
         } else {
             message = "해당 계정으로 연동된 ID가 없습니다.";
@@ -83,11 +83,11 @@ public class UserService {
             throw new IllegalArgumentException(ExceptionUtil.USER_PW_INVALID);
         }
 
-        if (userRepository.existsByUsername(signupReq.getUsername())) {
+        if (Boolean.TRUE.equals(userRepository.existsByUsername(signupReq.getUsername()))) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
 
-        if (userRepository.existsByNickname(signupReq.getNickname())) {
+        if (Boolean.TRUE.equals(userRepository.existsByNickname(signupReq.getNickname()))) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
 
@@ -217,7 +217,7 @@ public class UserService {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
 
-        if (studyRepository.existsByRoomMaker(user)) {
+        if (Boolean.TRUE.equals(studyRepository.existsByRoomMaker(user))) {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
         userRepository.delete(user);
