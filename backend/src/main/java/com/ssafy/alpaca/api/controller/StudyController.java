@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
@@ -10,8 +11,14 @@ import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/study")
@@ -29,6 +36,17 @@ public class StudyController {
     public ResponseEntity<StudyRes> getStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getStudy(username, id));
+    }
+
+    @ApiOperation(
+            value = "스터디 추가 조회",
+            notes = "pagealbe에 해당하는 스터디를 3개단위로 조회한다."
+    )
+    @GetMapping()
+    public ResponseEntity<Page<StudyListRes>> getMoreStudy(
+            @PageableDefault(size = 3, sort = "pinned", direction = Sort.Direction.DESC)Pageable pageable) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
     }
 
     @ApiOperation(

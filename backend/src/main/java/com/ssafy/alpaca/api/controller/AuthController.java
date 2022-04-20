@@ -68,7 +68,7 @@ public class AuthController {
     public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         TokenRes tokenRes = userService.login(loginReq);
         LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
-        return ResponseEntity.ok(LoginRes.ofHasToken(tokenRes, loginRes));
+        return ResponseEntity.ok(LoginRes.of(tokenRes, loginRes));
     }
 
     @PostMapping("/logout")

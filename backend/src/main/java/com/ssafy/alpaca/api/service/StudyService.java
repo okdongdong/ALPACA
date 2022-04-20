@@ -2,7 +2,9 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
+import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Schedule;
 import com.ssafy.alpaca.db.document.Study;
@@ -10,6 +12,8 @@ import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.StudyRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +21,7 @@ import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,7 @@ public class StudyService {
 
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
+    private final ConvertUtil convertUtil;
 
     private Study checkStudyById(String id) {
         return studyRepository.findById(id).orElseThrow(
@@ -52,12 +58,25 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        return StudyRes.builder()
+        return StudyRes.of(study);
+    }
+
+    public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
+        User user = checkUserByUsername(username);
+        Page<Study> studies = studyRepository.findAllByMembersContainsOrderByPinnedDesc(user, pageable);
+
+        for (Study study : studies) {
+            System.out.println(study.getId());
+        }
+
+        return studies.map(study -> StudyListRes.builder()
+                .id(study.getId())
                 .title(study.getTitle())
-                .info(study.getInfo())
-                .members(study.getMembers())
-                .schedules(study.getSchedules())
-                .build();
+                .pinned(study.getPinned())
+                .profileImgList(study.getMembers().stream().map(
+                                member -> convertUtil.convertByteArrayToString(member.getProfileImg()))
+                        .collect(Collectors.toList()))
+                .build());
     }
 
     public String createStudy(String username, StudyReq studyReq) {
@@ -71,12 +90,12 @@ public class StudyService {
         Study study = StudyReq.of(studyReq, user, members);
         studyRepository.save(study);
 
-        for (User member : members) {
-            List<Study> studies = member.getStudies();
-            studies.add(study);
-            member.setStudies(studies);
-        }
-        userRepository.saveAll(members);
+//        for (User member : members) {
+//            List<Study> studies = member.getStudies();
+//            studies.add(study);
+//            member.setStudies(studies);
+//        }
+//        userRepository.saveAll(members);
         return study.getId();
     }
 
@@ -115,12 +134,12 @@ public class StudyService {
         members.removeIf(m -> m.getId().equals(member.getId()));
         study.setMembers(members);
 
-        List<Study> studies = member.getStudies();
-        studies.removeIf(s -> s.getId().equals(study.getId()));
-        member.setStudies(studies);
+//        List<Study> studies = member.getStudies();
+//        studies.removeIf(s -> s.getId().equals(study.getId()));
+//        member.setStudies(studies);
 
         studyRepository.save(study);
-        userRepository.save(member);
+//        userRepository.save(member);
     }
 
     public void deleteMeFromStudy(String username, String id) {
@@ -135,12 +154,12 @@ public class StudyService {
         users.removeIf(u -> u.getId().equals(user.getId()));
         study.setMembers(users);
 
-        List<Study> studies = user.getStudies();
-        studies.removeIf(s -> s.getId().equals(study.getId()));
-        user.setStudies(studies);
+//        List<Study> studies = user.getStudies();
+//        studies.removeIf(s -> s.getId().equals(study.getId()));
+//        user.setStudies(studies);
 
         studyRepository.save(study);
-        userRepository.save(user);
+//        userRepository.save(user);
     }
 
     public void deleteStudy(String username, String id){
@@ -151,14 +170,14 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        List<User> members = study.getMembers();
-        for (User member : members) {
-            List<Study> studies = member.getStudies();
-            studies.removeIf(s -> s.getId().equals(study.getId()));
-            member.setStudies(studies);
-        }
+//        List<User> members = study.getMembers();
+//        for (User member : members) {
+//            List<Study> studies = member.getStudies();
+//            studies.removeIf(s -> s.getId().equals(study.getId()));
+//            member.setStudies(studies);
+//        }
 
-        userRepository.saveAll(members);
+//        userRepository.saveAll(members);
         studyRepository.delete(study);
     }
 }

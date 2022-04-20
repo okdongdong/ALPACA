@@ -41,8 +41,8 @@ public class Study {
     @DBRef(lazy = true)
     private List<User> members;
 
-    @JsonIgnore
-    @DBRef(lazy = true)
-    private List<Schedule> schedules;
+//    @JsonIgnore
+//    @DBRef(lazy = true)
+//    private List<Schedule> schedules;
 
 }

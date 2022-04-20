@@ -33,9 +33,9 @@ public class LoginRes extends TokenRes{
 
     private String preferredLanguage;
 
-    private List<Study> studies;
+    private List<StudyListRes> studies;
 
-    public static LoginRes ofHasToken(TokenRes tokenRes, LoginRes loginRes) {
+    public static LoginRes of(TokenRes tokenRes, LoginRes loginRes) {
         return LoginRes.builder()
                 .grantType(tokenRes.getGrantType())
                 .accessToken(tokenRes.getAccessToken())

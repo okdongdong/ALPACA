@@ -37,14 +37,15 @@ public class User {
 
     private String preferredLanguage;
 
+    @JsonIgnore
     private Byte[] profileImg;
 
-    @JsonIgnore
-    @DBRef(lazy = true)
-    private List<Problem> solvedProblems;
-
-    @JsonIgnore
-    @DBRef(lazy = true)
-    private List<Study> studies;
+//    @JsonIgnore
+//    @DBRef(lazy = true)
+//    private List<Problem> solvedProblems;
+//
+//    @JsonIgnore
+//    @DBRef(lazy = true)
+//    private List<Study> studies;
 
 }

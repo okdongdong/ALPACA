@@ -31,11 +31,11 @@ public class StudyReq {
                 .title(studyReq.getTitle())
                 .info(studyReq.getInfo())
                 .pinned(LocalDateTime.of(0, 1, 1, 6, 0))
-                .inviteCode(null)
-                .sessionId(null)
+//                .inviteCode(null)
+//                .sessionId(null)
                 .roomMaker(user)
                 .members(members)
-                .schedules(new ArrayList<>())
+//                .schedules(new ArrayList<>())
                 .build();
 
 

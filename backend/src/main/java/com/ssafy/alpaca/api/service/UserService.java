@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.LoginRes;
+import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
@@ -101,8 +102,8 @@ public class UserService {
                         .bojId(signupReq.getBojId())
                         .theme("basic")
                         .preferredLanguage("default")
-                        .solvedProblems(new ArrayList<>())
-                        .studies(new ArrayList<>())
+//                        .solvedProblems(new ArrayList<>())
+//                        .studies(new ArrayList<>())
                         .build());
     }
 
@@ -120,6 +121,17 @@ public class UserService {
     public LoginRes getMyInfo(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+
+        List<StudyListRes> studyListRes = studyRepository.findTop3ByMembersContainsOrderByPinnedDesc(user)
+                .stream().map(study -> StudyListRes.builder()
+                        .id(study.getId())
+                        .title(study.getTitle())
+                        .pinned(study.getPinned())
+                        .profileImgList(study.getMembers().stream().map(
+                                member -> convertUtil.convertByteArrayToString(member.getProfileImg()))
+                                .collect(Collectors.toList()))
+                        .build()).collect(Collectors.toList());
+
         return LoginRes.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -129,7 +141,7 @@ public class UserService {
                 .bojId(user.getBojId())
                 .theme(user.getTheme())
                 .preferredLanguage(user.getPreferredLanguage())
-                .studies(user.getStudies())
+                .studies(studyListRes)
                 .build();
     }
 
