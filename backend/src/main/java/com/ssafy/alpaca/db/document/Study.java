@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.db.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -29,12 +30,15 @@ public class Study {
 
     private String sessionId;
 
+    @JsonIgnore
     @DBRef(lazy = true)
     private User roomMaker;
 
+//    @JsonIgnore
     @DBRef(lazy = true)
     private List<User> members;
 
+    @JsonIgnore
     @DBRef(lazy = true)
     private List<Schedule> schedules;
 

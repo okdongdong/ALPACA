@@ -59,7 +59,7 @@ public class StudyService {
                 .build();
     }
 
-    public void createStudy(String username, StudyReq studyReq) {
+    public String createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
 
         List<User> members = new ArrayList<>();
@@ -67,19 +67,16 @@ public class StudyService {
             members.add(checkUserById(member));
         }
 
-        Study study = Study.builder()
-                .title(studyReq.getTitle())
-                .info(studyReq.getInfo())
-                .roomMaker(user)
-                .members(members)
-                .build();
+        Study study = StudyReq.of(studyReq, user, members);
         studyRepository.save(study);
 
-        List<Study> studies = user.getStudies();
-        studies.add(study);
-
-        user.setStudies(studies);
-        userRepository.save(user);
+        for (User member : members) {
+            List<Study> studies = member.getStudies();
+            studies.add(study);
+            member.setStudies(studies);
+        }
+        userRepository.saveAll(members);
+        return study.getId();
     }
 
     public void updateRoomMaker(String username, String id, StudyMemberReq studyMemberReq) {

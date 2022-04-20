@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.db.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -22,6 +23,7 @@ public class User {
     @Indexed(unique = true)
     private String username;
 
+    @JsonIgnore
     private String password;
 
     @Indexed(unique = true)
@@ -37,9 +39,11 @@ public class User {
 
     private Byte[] profileImg;
 
+    @JsonIgnore
     @DBRef(lazy = true)
     private List<Problem> solvedProblems;
 
+    @JsonIgnore
     @DBRef(lazy = true)
     private List<Study> studies;
 

@@ -38,8 +38,7 @@ public class StudyController {
     @PostMapping()
     public ResponseEntity<? extends BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
-        studyService.createStudy(username, studyReq);
-        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.createStudy(username, studyReq)));
     }
 
     @ApiOperation(
