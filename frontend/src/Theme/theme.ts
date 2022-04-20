@@ -1,3 +1,5 @@
+import { createTheme } from '@mui/material';
+
 const palette = {
   /* backgruond*/
   basic_backgruond: '#FFFFFF',
@@ -9,7 +11,7 @@ const palette = {
   dark_main: '#2D2D2D',
   olivegreen_main: '#AAC1AA',
   peachpink_main: '#FFC2C0',
-  /* text*/
+  /* txt*/
   basic_text: '#14181F',
   dark_text: '#FFFFFF',
   olivegreen_text: '#14181F',
@@ -34,51 +36,82 @@ const palette = {
   dark_component_accent: '#E3DC31',
   olivegreen_component_accent: '#E06C6C',
   peachpink_component_accent: '#E06C6C',
-  /* warning*/
-  warning: '#FF6B6B'
+  /* warn*/
+  warn: '#FF6B6B',
 };
 
-const theme = {
-  basic: {
-    background: palette.basic_backgruond,
+declare module '@mui/material/styles' {
+  interface Palette {
+    bg: string;
+    main: string;
+    txt: string;
+    icon: string;
+    accent: string;
+    component: string;
+    component_accent: string;
+    warn: string;
+  }
+
+  interface PaletteOptions {
+    bg: string;
+    main: string;
+    txt: string;
+    icon: string;
+    accent: string;
+    component: string;
+    component_accent: string;
+    warn: string;
+  }
+}
+
+export const basic = createTheme({
+  palette: {
+    bg: palette.basic_backgruond,
     main: palette.basic_main,
-    text: palette.basic_text,
+    txt: palette.basic_text,
     icon: palette.basic_icon,
     accent: palette.basic_accent,
     component: palette.basic_component,
     component_accent: palette.basic_component_accent,
-    warning: palette.warning,
+    warn: palette.warn,
   },
-  dark: {
-    background: palette.dark_backgruond,
+});
+
+export const dark = createTheme({
+  palette: {
+    bg: palette.dark_backgruond,
     main: palette.dark_main,
-    text: palette.dark_text,
+    txt: palette.dark_text,
     icon: palette.dark_icon,
     accent: palette.dark_accent,
     component: palette.dark_component,
     component_accent: palette.dark_component_accent,
-    warning: palette.warning,
+    warn: palette.warn,
   },
-  olivegreen: {
-    background: palette.olivegreen_backgruond,
+});
+
+export const olivegreen = createTheme({
+  palette: {
+    bg: palette.olivegreen_backgruond,
     main: palette.olivegreen_main,
-    text: palette.olivegreen_text,
+    txt: palette.olivegreen_text,
     icon: palette.olivegreen_icon,
     accent: palette.olivegreen_accent,
     component: palette.olivegreen_component,
     component_accent: palette.olivegreen_component_accent,
-    warning: palette.warning
+    warn: palette.warn,
   },
-  peachpink: {
-    background: palette.peachpink_backgruond,
+});
+
+export const peachpink = createTheme({
+  palette: {
+    bg: palette.peachpink_backgruond,
     main: palette.peachpink_main,
-    text: palette.peachpink_text,
+    txt: palette.peachpink_text,
     icon: palette.peachpink_icon,
     accent: palette.peachpink_accent,
     component: palette.peachpink_component,
     component_accent: palette.peachpink_component_accent,
-    warning: palette.warning
-  }  
-}
-
-export default theme;
+    warn: palette.warn,
+  },
+});
