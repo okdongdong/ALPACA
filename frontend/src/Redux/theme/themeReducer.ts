@@ -22,7 +22,7 @@ const themeReducer = (state = initialState, { type, payload }: AnyAction) => {
       };
 
     default:
-      return initialState;
+      return state;
   }
 };
 

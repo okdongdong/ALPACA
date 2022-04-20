@@ -1,5 +1,6 @@
 import { Button, styled } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import { setLoading } from './Redux/common/commonAction';
 import { setTheme } from './Redux/theme/themeActions';
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -17,6 +18,7 @@ function Testbtn() {
       <Button onClick={() => dispatch(setTheme('dark'))}>2</Button>
       <Button onClick={() => dispatch(setTheme('olivegreen'))}>3</Button>
       <Button onClick={() => dispatch(setTheme('peachpink'))}>4</Button>
+      <Button onClick={() => dispatch(setLoading(true))}>5</Button>
     </div>
   );
 }

@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
 import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import CInput from '../../Components/Commons/CInput';
 import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
-import { customAxios } from '../../Lib/customAxios';
+import BojIdSearch from '../../Components/Dialogs/BojIdSearch';
+import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
+import { setLoading } from '../../Redux/common/commonAction';
 
 function Signup() {
+  // 사용할 hook 선언
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   // 회원가입에 필요한 유저정보 정의
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -17,19 +25,119 @@ function Signup() {
   const [isUsernameChecked, setIsUsernameChecked] = useState<boolean>(false);
   const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(false);
 
-  // 백준인증 여부 체크
-  const [isBojIdChecked, setIsBojIdChecked] = useState<boolean>(false);
+  // 백준인증 dialog open
+  const [open, setOpen] = useState<boolean>(false);
 
   // 유효성 검사 실패 메시지
   const [usernameMessage, setUsernameMessage] = useState<string>('');
   const [passwordMessage, setPasswordMessage] = useState<string>('');
   const [passwordCheckMessage, setPasswordCheckMessage] = useState<string>('');
   const [nicknameMessage, setNicknameMessage] = useState<string>('');
-  const [bojIdMessage, setBojIdMessage] = useState<string>('');
 
   // 유저정보 입력 및 유효성 검사 정보
   const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,30}$/;
   const usernameRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,20}$/;
+
+  // 아이디 중복체크
+  const usernameDuplicateCheck = async () => {
+    dispatch(setLoading(true));
+
+    if (isUsernameChecked) {
+      setIsUsernameChecked(false);
+      return;
+    }
+
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/auth/duplicated/username`,
+        params: { username },
+      });
+      console.log(res);
+      setIsUsernameChecked(true);
+    } catch (e) {
+      console.log(e);
+      setIsUsernameChecked(false);
+      setUsernameMessage('아이디 중복검사에 실패했습니다.');
+    }
+
+    dispatch(setLoading(false));
+  };
+
+  // 닉네임 중복체크
+  const nicknameDuplicateCheck = async () => {
+    dispatch(setLoading(true));
+
+    if (isNicknameChecked) {
+      setIsUsernameChecked(false);
+      return;
+    }
+
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/auth/duplicated/nickname`,
+        params: { nickname },
+      });
+      console.log(res);
+      setIsNicknameChecked(true);
+    } catch (e) {
+      console.log(e);
+      setIsNicknameChecked(false);
+      setNicknameMessage('닉네임 중복검사에 실패했습니다.');
+    }
+
+    dispatch(setLoading(false));
+  };
+
+  // 백준연결
+  const bojConnect = async () => {
+    try {
+      const res = await solvedAcAxios({
+        method: 'get',
+        url: '/user/solved',
+        params: { handle: 'jer0618' },
+      });
+      console.log(res);
+      setIsBojIdChecked(true);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // 회원가입
+  const signup = async () => {
+    dispatch(setLoading(true));
+
+    const userInfo = {
+      username,
+      password,
+      passwordCheck,
+      nickname,
+      bojId,
+    };
+    try {
+      console.log(userInfo);
+      const res = await customAxios({
+        method: 'post',
+        url: '/auth/signup',
+        data: userInfo,
+      });
+      console.log(res);
+      navigate('/login');
+    } catch (e) {
+      console.log(e);
+    }
+
+    dispatch(setLoading(false));
+  };
+
+  // 엔터키 눌렀을 때 => 엔터키 인식부분은 CContainerWithLogo에 선언되어있음
+  const onkeyPressHandler = () => {
+    if (!!username && !!password && !!passwordCheck && !!nickname && !!bojId) {
+      signup();
+    }
+  };
 
   // 비밀번호 유효성검사
   useEffect(() => {
@@ -67,85 +175,15 @@ function Signup() {
     }
   }, [nickname]);
 
-  // 아이디 중복체크
-  const usernameDuplicateCheck = async () => {
-    if (isUsernameChecked) {
-      setIsUsernameChecked(false);
-      return;
-    }
-
-    try {
-      const res = await customAxios({ method: 'get', url: `/auth/duplicated/${username}` });
-      console.log(res);
-      setIsUsernameChecked(true);
-    } catch (e) {
-      console.log(e);
-      setIsUsernameChecked(false);
-      setUsernameMessage('아이디 중복검사에 실패했습니다.');
-    }
-  };
-
-  // 닉네임 중복체크
-  const nicknameDuplicateCheck = async () => {
-    if (isNicknameChecked) {
-      setIsUsernameChecked(false);
-      return;
-    }
-
-    try {
-      const res = await customAxios({ method: 'get', url: `/auth/duplicated/${nickname}` });
-      console.log(res);
-      setIsNicknameChecked(true);
-    } catch (e) {
-      console.log(e);
-      setIsNicknameChecked(false);
-      setNicknameMessage('닉네임 중복검사에 실패했습니다.');
-    }
-  };
-
-  // 백준연결
-  const bojConnect = async () => {
-    // try {
-    //   const res = await customAxios({
-    //     method:
-    //     url:
-    //   })
-    // setIsBojIdChecked(true)
-    // } catch(e) {
-    //   console.log(e)
-    // }
-  };
-
-  // 회원가입
-  const signup = async () => {
-    const userInfo = {
-      username,
-      password,
-      passwordCheck,
-      nickname,
-      bojId,
-    };
-    try {
-      console.log(userInfo);
-      const res = await customAxios({
-        method: 'post',
-        url: '/auth/signup',
-        data: userInfo,
-      });
-      console.log(res);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   return (
-    <CContainerWithLogo>
+    <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+      <BojIdSearch open={open} setOpen={setOpen} setBojId={setBojId} />
       <CInputWithBtn
         onChange={setUsername}
         label="ID"
         buttonContent={isUsernameChecked ? '수정하기' : '중복확인'}
         onButtonClick={usernameDuplicateCheck}
-        disabled={isUsernameChecked}
+        readOnly={isUsernameChecked}
         helperText={usernameMessage}
       />
       <CInput
@@ -165,32 +203,36 @@ function Signup() {
         label="NICKNAME"
         buttonContent={isNicknameChecked ? '수정하기' : '중복확인'}
         onButtonClick={nicknameDuplicateCheck}
-        disabled={isNicknameChecked}
+        readOnly={isNicknameChecked}
         helperText={nicknameMessage}
       />
       <CInputWithBtn
         onChange={setBojId}
         label="BOJ ID"
-        buttonContent="연동하기"
-        onButtonClick={bojConnect}
-        disabled={true}
-        helperText={bojIdMessage}
+        buttonContent="아이디 검색"
+        onButtonClick={() => setOpen(true)}
+        readOnly={true}
+        value={bojId}
       />
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
         <CBtn
-          width="50%"
+          width="30%"
+          content="뒤로가기"
+          onClick={() => navigate(-1)}
+          backgroundColor="rgba(0,0,0,0)"
+        />
+        <CBtn
+          width="30%"
           content="회원가입"
           onClick={signup}
           // 회원가입 유효성 검사 통과시에만 활성화
           disabled={
-            usernameMessage === '' ||
-            passwordMessage === '' ||
-            passwordCheckMessage === '' ||
-            nicknameMessage === '' ||
-            bojIdMessage === '' ||
+            !!usernameMessage ||
+            !!passwordMessage ||
+            !!passwordCheckMessage ||
+            !!nicknameMessage ||
             isUsernameChecked === false ||
-            isNicknameChecked === false ||
-            isBojIdChecked === false
+            isNicknameChecked === false
           }
         />
       </div>

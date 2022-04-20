@@ -1,8 +1,9 @@
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { Button, styled } from '@mui/material';
 import React from 'react';
 
 interface CBtnProps {
-  content: string;
+  content: string | ReactJSXElement;
   backgroundColor?: string;
   color?: string;
   disabled?: boolean;

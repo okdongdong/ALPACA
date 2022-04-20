@@ -42,6 +42,7 @@ function CInput({
             type={type}
             placeholder={placeholder}
             fullWidth
+            autoComplete={label}
           />
           <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
