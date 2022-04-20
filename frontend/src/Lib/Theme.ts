@@ -35,7 +35,7 @@ const palette = {
   olivegreen_component_accent: '#E06C6C',
   peachpink_component_accent: '#E06C6C',
   /* warning*/
-  warning: '#FF6B6B'
+  warning: '#FF6B6B',
 };
 
 const theme = {
@@ -67,7 +67,7 @@ const theme = {
     accent: palette.olivegreen_accent,
     component: palette.olivegreen_component,
     component_accent: palette.olivegreen_component_accent,
-    warning: palette.warning
+    warning: palette.warning,
   },
   peachpink: {
     background: palette.peachpink_backgruond,
@@ -77,8 +77,8 @@ const theme = {
     accent: palette.peachpink_accent,
     component: palette.peachpink_component,
     component_accent: palette.peachpink_component_accent,
-    warning: palette.warning
-  }  
-}
+    warning: palette.warning,
+  },
+};
 
 export default theme;
