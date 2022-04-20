@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.ScheduleModifyReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
+import com.ssafy.alpaca.api.response.ScheduleInfoRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.Schedule;
@@ -33,11 +34,10 @@ public class ScheduleService {
 //            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
 //        }
         List<Problem> problems = new ArrayList<>();
-        for(String problemNum:scheduleReq.getToSolveProblems())
+        for(String id:scheduleReq.getToSolveProblems())
         {
-            problems.add(problemRepository.findByNumber(
-                    problemNum
-                )
+            problems.add(
+                    problemRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
             );
         };
         Schedule schedule = scheduleRepository.save(
@@ -50,19 +50,26 @@ public class ScheduleService {
     }
 
     public Map<String, String> modifySchedule(String id, ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
 //      스터디장만 수정 가능
         List<Problem> problems = new ArrayList<>();
-        for(String problemNum:scheduleModifyReq.getToSolveProblems())
+        for(String problemId:scheduleModifyReq.getToSolveProblems())
         {
-            problems.add(problemRepository.findByNumber(
-                            problemNum
-                    )
+            problems.add(
+                    problemRepository.findById(problemId).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
             );
         };
         schedule.setStartedAt(scheduleModifyReq.getStartedAt());
         schedule.setToSolveProblems(problems);
         scheduleRepository.save(schedule);
         return getMessage("성공적으로 수정되었습니다.");
+    }
+
+    public ScheduleInfoRes getSchedule(String id) throws IllegalAccessException {
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        return ScheduleInfoRes.builder()
+                .startedAt(schedule.getStartedAt())
+                .toSolveProblems(schedule.getToSolveProblems())
+                .build();
     }
 }

@@ -8,5 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface ProblemRepository extends MongoRepository<Problem,String> {
-    Problem findByNumber(String problemNumber);
 }

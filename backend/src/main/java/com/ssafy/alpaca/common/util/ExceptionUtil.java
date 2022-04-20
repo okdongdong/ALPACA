@@ -18,6 +18,8 @@ public class ExceptionUtil {
 
     /* 404 NOT_FOUND : Resource를 찾을 수 없음 */
     public static final String USER_NOT_FOUND = "회원이 없습니다.";
+    public static final String SCHEDULE_NOT_FOUND = "스케쥴이 없습니다.";
+    public static final String PROBLEM_NOT_FOUND = "스케쥴이 없습니다.";
 
     /* 409 CONFLICT : Resource의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     public static final String USER_NICKNAME_DUPLICATE = "중복된 사용자 닉네임입니다.";

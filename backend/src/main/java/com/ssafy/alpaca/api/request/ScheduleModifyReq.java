@@ -16,6 +16,6 @@ public class ScheduleModifyReq {
     @ApiModelProperty( name = "startedAt", example = "2019-11-12T12:32:44")
     private LocalDateTime startedAt;
 
-    @ApiModelProperty( name = "toSolveProblems", example = "[]")
+    @ApiModelProperty( name = "toSolveProblems", example = "['625f62ad9319670330d4993e']")
     private List<String> toSolveProblems;
 }
