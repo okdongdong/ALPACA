@@ -3,7 +3,6 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.response.LoginRes;
-import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -68,8 +67,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         TokenRes tokenRes = userService.login(loginReq);
-        MyInfoRes myInfoRes = userService.getMyInfo(loginReq.getUsername());
-        return ResponseEntity.ok(LoginRes.of(tokenRes, myInfoRes));
+        LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
+        return ResponseEntity.ok(LoginRes.ofHasToken(tokenRes, loginRes));
     }
 
     @PostMapping("/logout")

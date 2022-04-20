@@ -35,20 +35,20 @@ public class LoginRes extends TokenRes{
 
     private List<Study> studies;
 
-    public static LoginRes of(TokenRes tokenRes, MyInfoRes myInfoRes) {
+    public static LoginRes ofHasToken(TokenRes tokenRes, LoginRes loginRes) {
         return LoginRes.builder()
                 .grantType(tokenRes.getGrantType())
                 .accessToken(tokenRes.getAccessToken())
                 .refreshToken(tokenRes.getRefreshToken())
-                .userId(myInfoRes.getUserId())
-                .username(myInfoRes.getUsername())
-                .nickname(myInfoRes.getNickname())
-                .info(myInfoRes.getInfo())
-                .profileImg(myInfoRes.getProfileImg())
-                .bojId(myInfoRes.getBojId())
-                .theme(myInfoRes.getTheme())
-                .preferredLanguage(myInfoRes.getPreferredLanguage())
-                .studies(myInfoRes.getStudies())
+                .userId(loginRes.getUserId())
+                .username(loginRes.getUsername())
+                .nickname(loginRes.getNickname())
+                .info(loginRes.getInfo())
+                .profileImg(loginRes.getProfileImg())
+                .bojId(loginRes.getBojId())
+                .theme(loginRes.getTheme())
+                .preferredLanguage(loginRes.getPreferredLanguage())
+                .studies(loginRes.getStudies())
                 .build();
     }
 }

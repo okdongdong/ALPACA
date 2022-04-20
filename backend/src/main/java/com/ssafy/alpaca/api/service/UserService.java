@@ -3,7 +3,7 @@ package com.ssafy.alpaca.api.service;
 import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
-import com.ssafy.alpaca.api.response.MyInfoRes;
+import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
@@ -11,6 +11,7 @@ import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
+import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
@@ -116,10 +117,10 @@ public class UserService {
         return TokenRes.of(accessToken, refreshToken.getToken());
     }
 
-    public MyInfoRes getMyInfo(String username) {
+    public LoginRes getMyInfo(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
-        return MyInfoRes.builder()
+        return LoginRes.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())

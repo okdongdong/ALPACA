@@ -5,6 +5,7 @@ import com.ssafy.alpaca.db.document.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class StudyReq {
         return Study.builder()
                 .title(studyReq.getTitle())
                 .info(studyReq.getInfo())
+                .pinned(LocalDateTime.of(0, 1, 1, 6, 0))
                 .inviteCode(null)
                 .sessionId(null)
                 .roomMaker(user)
