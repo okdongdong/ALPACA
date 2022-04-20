@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -88,12 +89,13 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        if (!study.getMembers().contains(member)) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        for (User studyMember : study.getMembers()) {
+            if (studyMember.getId().equals(member.getId())) {
+                study.setRoomMaker(studyMember);
+                studyRepository.save(study);
+                break;
+            }
         }
-
-        study.setRoomMaker(member);
-        studyRepository.save(study);
     }
 
     public void deleteMember(String username, String id, StudyMemberReq studyMemberReq) {
@@ -105,8 +107,18 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        study.getMembers().remove(member);
-        member.getStudies().remove(study);
+        if (user.getId().equals(member.getId())) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+        }
+
+        List<User> members = study.getMembers();
+        members.removeIf(m -> m.getId().equals(member.getId()));
+        study.setMembers(members);
+
+        List<Study> studies = member.getStudies();
+        studies.removeIf(s -> s.getId().equals(study.getId()));
+        member.setStudies(studies);
+
         studyRepository.save(study);
         userRepository.save(member);
     }
@@ -119,8 +131,14 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        study.getMembers().remove(user);
-        user.getStudies().remove(study);
+        List<User> users = study.getMembers();
+        users.removeIf(u -> u.getId().equals(user.getId()));
+        study.setMembers(users);
+
+        List<Study> studies = user.getStudies();
+        studies.removeIf(s -> s.getId().equals(study.getId()));
+        user.setStudies(studies);
+
         studyRepository.save(study);
         userRepository.save(user);
     }
@@ -133,6 +151,14 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
+        List<User> members = study.getMembers();
+        for (User member : members) {
+            List<Study> studies = member.getStudies();
+            studies.removeIf(s -> s.getId().equals(study.getId()));
+            member.setStudies(studies);
+        }
+
+        userRepository.saveAll(members);
         studyRepository.delete(study);
     }
 }
