@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.api.service.UserService;
+import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,10 @@ public class UserController {
             notes = "사용자 입력 정보에 따라 회원정보를 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, String>> updateUser(
+    public ResponseEntity<? extends BaseResponseBody> updateUser(
             @PathVariable String id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.updateUser(id, userUpdateReq));
+        userService.updateUser(id, userUpdateReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -41,8 +43,9 @@ public class UserController {
     }
 
     @PostMapping("/{id}/profile")
-    public ResponseEntity<Map<String,String>> updateProfileImg(@PathVariable String id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
-        return ResponseEntity.ok(userService.updateProfileImg(id, file));
+    public ResponseEntity<? extends BaseResponseBody> updateProfileImg(
+            @PathVariable String id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
+        return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
 
     @GetMapping("/search")

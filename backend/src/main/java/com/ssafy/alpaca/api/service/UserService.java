@@ -46,43 +46,35 @@ public class UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final ConvertUtil convertUtil;
 
-    private Map<String, String> getMessage(String message) {
-        Map<String, String> map = new HashMap<>();
-        map.put("message", message);
-        return map;
-    }
-
     public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails principal = (UserDetails) authentication.getPrincipal();
         return principal.getUsername();
     }
 
-    public Map<String, String> checkUsername(String username) {
+    public void checkUsername(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
-        return getMessage("사용할 수 있는 ID입니다.");
     }
 
-    public Map<String, String> checkNickname(String nickname) {
+    public void checkNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
-        return getMessage("사용할 수 있는 닉네임입니다.");
     }
 
-    public Map<String, String> checkBojId(String bojId) {
+    public String checkBojId(String bojId) {
         String message;
         if (userRepository.existsByBojId(bojId)) {
             message = "해당 계정으로 이미 연동된 ID가 있습니다.";
         } else {
             message = "해당 계정으로 연동된 ID가 없습니다.";
         }
-        return getMessage(message);
+        return message;
     }
 
-    public Map<String, String> signup(SignupReq signupReq) throws IllegalAccessException {
+    public void signup(SignupReq signupReq) throws IllegalAccessException {
         if (signupReq.getBojId().isEmpty()) {
             throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
         }
@@ -108,8 +100,6 @@ public class UserService {
                         .theme("basic")
                         .bojId(signupReq.getBojId())
                         .build());
-
-        return getMessage("성공적으로 가입되었습니다.");
     }
 
     public TokenRes login(LoginReq loginReq) {
@@ -186,7 +176,7 @@ public class UserService {
     }
 
     // 아래부터 UserController
-    public Map<String, String> updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
+    public void updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
@@ -197,10 +187,9 @@ public class UserService {
         user.setTheme(userUpdateReq.getTheme());
         user.setPreferredLanguage(userUpdateReq.getPreferredLanguage());
         userRepository.save(user);
-        return getMessage("성공적으로 수정되었습니다.");
     }
 
-    public Map<String,String> updateProfileImg(String id, MultipartFile file) throws IllegalAccessException, IOException {
+    public String updateProfileImg(String id, MultipartFile file) throws IllegalAccessException, IOException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
@@ -217,10 +206,7 @@ public class UserService {
         user.setProfileImg(bytes);
         userRepository.save(user);
 
-
-        Map<String, String> map = new HashMap<>();
-        map.put("profileImg", convertUtil.convertByteArrayToString(user.getProfileImg()));
-        return map;
+        return convertUtil.convertByteArrayToString(user.getProfileImg());
 
     }
 

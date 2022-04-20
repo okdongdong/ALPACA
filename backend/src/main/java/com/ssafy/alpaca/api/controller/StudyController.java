@@ -6,6 +6,7 @@ import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
+import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,10 @@ public class StudyController {
             notes = "입력 정보에 따라 새로운 스터디를 생성한다."
     )
     @PostMapping()
-    public void createStudy(@RequestBody StudyReq studyReq) {
+    public ResponseEntity<? extends BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
         studyService.createStudy(username, studyReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -46,9 +48,10 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "이임할 스터디의 id")
     @PutMapping("/member/{id}")
-    public void updateRoomMaker(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<? extends BaseResponseBody> updateRoomMaker(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.updateRoomMaker(username, id, studyMemberReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -57,9 +60,10 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id")
     @DeleteMapping("/member/{id}")
-    public void deleteMember(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<? extends BaseResponseBody> deleteMember(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.deleteMember(username, id, studyMemberReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -68,9 +72,10 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id")
     @DeleteMapping("/exit/{id}")
-    public void deleteMeFromStudy(@PathVariable String id) {
+    public ResponseEntity<? extends BaseResponseBody> deleteMeFromStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
         studyService.deleteMeFromStudy(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -79,9 +84,10 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
     @DeleteMapping("/{id}")
-    public void deleteStudy(@PathVariable String id) {
+    public ResponseEntity<? extends BaseResponseBody> deleteStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
         studyService.deleteStudy(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
 }

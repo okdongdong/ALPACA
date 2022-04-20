@@ -6,6 +6,7 @@ import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.service.UserService;
+import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -31,8 +32,9 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "username", value = "가입 ID" )
     @GetMapping("/duplicated/username")
-    public ResponseEntity<Map<String, String>> checkUsername(@RequestParam String username) {
-        return ResponseEntity.ok(userService.checkUsername(username));
+    public ResponseEntity<? extends BaseResponseBody> checkUsername(@RequestParam String username) {
+        userService.checkUsername(username);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -41,8 +43,9 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "nickname", value = "가입 닉네임" )
     @GetMapping("/duplicated/nickname")
-    public ResponseEntity<Map<String, String>> checkNickname(@RequestParam String nickname) {
-        return ResponseEntity.ok(userService.checkNickname(nickname));
+    public ResponseEntity<? extends BaseResponseBody> checkNickname(@RequestParam String nickname) {
+        userService.checkNickname(nickname);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -51,8 +54,8 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "bojId", value = "연동 계정")
     @GetMapping("/duplicated/bojId")
-    public ResponseEntity<Map<String, String>> checkBojId(@RequestParam String bojId) {
-        return ResponseEntity.ok(userService.checkBojId(bojId));
+    public ResponseEntity<? extends BaseResponseBody> checkBojId(@RequestParam String bojId) {
+        return ResponseEntity.ok(BaseResponseBody.of(200, userService.checkBojId(bojId)));
     }
 
     @ApiOperation(
@@ -60,8 +63,9 @@ public class AuthController {
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.signup(signupReq));
+    public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
+        userService.signup(signupReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @PostMapping("/login")
