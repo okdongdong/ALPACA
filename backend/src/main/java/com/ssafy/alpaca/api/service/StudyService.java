@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
@@ -9,6 +10,7 @@ import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Schedule;
 import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.repository.ScheduleRepository;
 import com.ssafy.alpaca.db.repository.StudyRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
@@ -30,6 +33,7 @@ public class StudyService {
 
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
+    private final ScheduleRepository scheduleRepository;
     private final ConvertUtil convertUtil;
 
     private Study checkStudyById(String id) {
@@ -58,7 +62,10 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        return StudyRes.of(study);
+        List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(
+                study, LocalDateTime.now().getMonth());
+
+        return StudyRes.of(study, ScheduleListRes.of(schedules));
     }
 
     public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {

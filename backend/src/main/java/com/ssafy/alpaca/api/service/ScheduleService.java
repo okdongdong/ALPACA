@@ -6,8 +6,10 @@ import com.ssafy.alpaca.api.response.ScheduleInfoRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.Schedule;
+import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.ScheduleRepository;
+import com.ssafy.alpaca.db.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.*;
 @Transactional
 public class ScheduleService {
 
+    private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ProblemRepository problemRepository;
 
@@ -30,9 +33,9 @@ public class ScheduleService {
     }
 
     public Map<String, String> createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
-//        if (scheduleReq.getStudyId().isEmpty()) {
-//            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
-//        }
+        Study study = studyRepository.findById(scheduleReq.getStudyId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
         List<Problem> problems = new ArrayList<>();
         for(String id:scheduleReq.getToSolveProblems())
         {
@@ -42,7 +45,7 @@ public class ScheduleService {
         };
         Schedule schedule = scheduleRepository.save(
                 Schedule.builder()
-                        .studyId(scheduleReq.getStudyId())
+                        .study(study)
                         .startedAt(scheduleReq.getStartedAt())
                         .toSolveProblems(problems)
                         .build());

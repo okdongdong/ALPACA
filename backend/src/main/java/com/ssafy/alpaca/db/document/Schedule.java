@@ -19,7 +19,7 @@ public class Schedule {
     @Id
     private String id;
 
-    private String studyId;
+    private Study study;
 
     private LocalDateTime startedAt;
 
