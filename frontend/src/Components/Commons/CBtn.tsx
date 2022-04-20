@@ -1,8 +1,9 @@
-import { Button } from '@mui/material';
+import { Button, styled } from '@mui/material';
 import React from 'react';
 
 interface CBtnProps {
   content: string;
+  backgroundColor?: string;
   color?: string;
   disabled?: boolean;
   width?: string | number;
@@ -10,27 +11,35 @@ interface CBtnProps {
   onClick: () => void;
 }
 
+const CustomButton = styled(Button)(({ theme }) => ({
+  borderRadius: '10px',
+  width: '100%',
+  height: '100%',
+  backgroundColor: theme.palette.main,
+  color: theme.palette.txt,
+}));
+
 function CBtn({
   content,
-  color = '#97B2E1',
+  backgroundColor = '',
+  color = '',
   disabled = false,
-  width = '100%',
-  height = '100%',
+  width = '',
+  height = '',
   onClick,
 }: CBtnProps) {
   return (
-    <Button
+    <CustomButton
       sx={{
-        backgroundColor: color,
-        borderRadius: '10px',
-        color: '#000',
+        backgroundColor: backgroundColor,
+        color: color,
         width: width,
         height: height,
       }}
       disabled={disabled}
       onClick={onClick}>
       {content}
-    </Button>
+    </CustomButton>
   );
 }
 

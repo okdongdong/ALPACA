@@ -176,21 +176,24 @@ function Signup() {
         disabled={true}
         helperText={bojIdMessage}
       />
-      <CBtn
-        content="회원가입"
-        onClick={signup}
-        // 회원가입 유효성 검사 통과시에만 활성화
-        disabled={
-          usernameMessage === '' ||
-          passwordMessage === '' ||
-          passwordCheckMessage === '' ||
-          nicknameMessage === '' ||
-          bojIdMessage === '' ||
-          isUsernameChecked === false ||
-          isNicknameChecked === false ||
-          isBojIdChecked === false
-        }
-      />
+      <div style={{ width: '100%' }}>
+        <CBtn
+          width="50%"
+          content="회원가입"
+          onClick={signup}
+          // 회원가입 유효성 검사 통과시에만 활성화
+          disabled={
+            usernameMessage === '' ||
+            passwordMessage === '' ||
+            passwordCheckMessage === '' ||
+            nicknameMessage === '' ||
+            bojIdMessage === '' ||
+            isUsernameChecked === false ||
+            isNicknameChecked === false ||
+            isBojIdChecked === false
+          }
+        />
+      </div>
     </CContainerWithLogo>
   );
 }
