@@ -36,16 +36,25 @@ public class UserController {
             notes = "요청 회원을 탈퇴처리한다."
     )
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable String id) throws IllegalAccessException {
+    public ResponseEntity<? extends BaseResponseBody> deleteUser(@PathVariable String id) throws IllegalAccessException {
         userService.deleteUser(id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
-    @PostMapping("/{id}/profile")
+    @ApiOperation(
+            value = "프로필 이미지 변경",
+            notes = "요청한 회원의 프로필 이미지를 변경한다."
+    )
+    @PostMapping("/profile/{id}")
     public ResponseEntity<? extends BaseResponseBody> updateProfileImg(
             @PathVariable String id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
 
+    @ApiOperation(
+            value = "닉네임으로 회원 검색",
+            notes = "요청 키워드로 시작하는 닉네임의 회원들을 모두 보여준다."
+    )
     @GetMapping("/search")
     public ResponseEntity<List<UserListRes>> getUserListByNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(userService.getByNickname(nickname));

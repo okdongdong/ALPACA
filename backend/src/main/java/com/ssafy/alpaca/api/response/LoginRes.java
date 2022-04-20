@@ -41,8 +41,14 @@ public class LoginRes extends TokenRes{
                 .accessToken(tokenRes.getAccessToken())
                 .refreshToken(tokenRes.getRefreshToken())
                 .userId(myInfoRes.getUserId())
+                .username(myInfoRes.getUsername())
                 .nickname(myInfoRes.getNickname())
+                .info(myInfoRes.getInfo())
                 .profileImg(myInfoRes.getProfileImg())
+                .bojId(myInfoRes.getBojId())
+                .theme(myInfoRes.getTheme())
+                .preferredLanguage(myInfoRes.getPreferredLanguage())
+                .studies(myInfoRes.getStudies())
                 .build();
     }
 }

@@ -232,6 +232,10 @@ public class UserService {
     }
 
     public List<UserListRes> getByNickname(String nickname) {
+        if (nickname.equals("")) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        }
+
         List<User> userList = userRepository.findAllByNicknameContains(nickname);
 
         return userList.stream().map(user -> UserListRes.builder()
