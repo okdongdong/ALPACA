@@ -1,11 +1,14 @@
 package com.ssafy.alpaca.api.response;
 
 
+import com.ssafy.alpaca.db.document.Study;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,10 +18,22 @@ import lombok.experimental.SuperBuilder;
 public class LoginRes extends TokenRes{
 
     private String userId;
+
+    private String username;
+
     private String nickname;
+
+    private String info;
+
     private String profileImg;
 
+    private String bojId;
 
+    private String theme;
+
+    private String preferredLanguage;
+
+    private List<Study> studies;
 
     public static LoginRes of(TokenRes tokenRes, MyInfoRes myInfoRes) {
         return LoginRes.builder()

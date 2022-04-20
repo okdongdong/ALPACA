@@ -96,9 +96,12 @@ public class UserService {
                         .username(signupReq.getUsername())
                         .password(passwordEncoder.encode(signupReq.getPassword()))
                         .nickname(signupReq.getNickname())
-                        .info("자신에 대한 정보를 입력해주세요.")
-                        .theme("basic")
+                        .info(signupReq.getNickname() + "님을 소개해주세요.")
                         .bojId(signupReq.getBojId())
+                        .theme("basic")
+                        .preferredLanguage("default")
+                        .solvedProblems(new ArrayList<>())
+                        .studies(new ArrayList<>())
                         .build());
     }
 
@@ -120,7 +123,12 @@ public class UserService {
                 .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
+                .info(user.getInfo())
                 .profileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                .bojId(user.getBojId())
+                .theme(user.getTheme())
+                .preferredLanguage(user.getPreferredLanguage())
+                .studies(user.getStudies())
                 .build();
     }
 
