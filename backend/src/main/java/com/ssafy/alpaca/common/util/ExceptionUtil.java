@@ -9,6 +9,7 @@ public class ExceptionUtil {
     public static final String USER_PW_INVALID = "비밀번호가 일치하지 않습니다."; //NOSONAR
     public static final String NOT_MYSELF = "본인이 아닙니다.";
     public static final String NOT_VALID_VALUE = "존재하지 않거나, 유효하지 않는 요청 값이 있습니다.";
+    public static final String ROOMMAKER_CANNOT_RESIGN = "스터디에서 방장을 맡고 있으면 탈퇴할 수 없습니다.";
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     public static final String INVALID_REFRESH_TOKEN = "리프레시 토큰이 유효하지 않습니다";

@@ -5,13 +5,16 @@ import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.MyInfoRes;
 import com.ssafy.alpaca.api.response.TokenRes;
+import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
 import com.ssafy.alpaca.common.jwt.RefreshToken;
+import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.document.User;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
+import com.ssafy.alpaca.db.repository.StudyRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -20,8 +23,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME;
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_TIME;
@@ -33,18 +39,20 @@ import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StudyRepository studyRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
+    private final ConvertUtil convertUtil;
 
-    private Map<String, String> getMessage(String returnMessage) {
+    private Map<String, String> getMessage(String message) {
         Map<String, String> map = new HashMap<>();
-        map.put("message", returnMessage);
+        map.put("message", message);
         return map;
     }
 
-    private String getCurrentUsername() {
+    public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails principal = (UserDetails) authentication.getPrincipal();
         return principal.getUsername();
@@ -91,12 +99,13 @@ public class UserService {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
 
-        User user = userRepository.save(
+        userRepository.save(
                 User.builder()
                         .username(signupReq.getUsername())
                         .password(passwordEncoder.encode(signupReq.getPassword()))
                         .nickname(signupReq.getNickname())
-                        .theme("default")
+                        .info("자신에 대한 정보를 입력해주세요.")
+                        .theme("basic")
                         .bojId(signupReq.getBojId())
                         .build());
 
@@ -105,7 +114,7 @@ public class UserService {
 
     public TokenRes login(LoginReq loginReq) {
         User user = userRepository.findByUsername(loginReq.getUsername())
-                .orElseThrow(() -> new NoSuchElementException("ExceptionUtil.USER_NOT_FOUND"));
+                .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         checkPassword(loginReq.getPassword(), user.getPassword());
 
         String username = user.getUsername();
@@ -116,12 +125,12 @@ public class UserService {
 
     public MyInfoRes getMyInfo(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("ExceptionUtil.USER_NOT_FOUND"));
+                .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         return MyInfoRes.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
-//                .profileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                .profileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                 .build();
     }
 
@@ -154,11 +163,11 @@ public class UserService {
 //        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
 //                .orElseThrow(()->new IllegalArgumentException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
-                .orElseThrow(()->new IllegalArgumentException("ExceptionUtil.INVALID_REFRESH_TOKEN"));
+                .orElseThrow(()->new IllegalArgumentException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         if (refreshToken.equals(redisRefreshToken.getToken())) {
             return reissueRefreshToken(refreshToken, username);
         }
-        throw new IllegalArgumentException("ExceptionUtil.MISMATCH_REFRESH_TOKEN");
+        throw new IllegalArgumentException(ExceptionUtil.MISMATCH_REFRESH_TOKEN);
     }
 
     private TokenRes reissueRefreshToken(String refreshToken, String username) {
@@ -191,13 +200,52 @@ public class UserService {
         return getMessage("성공적으로 수정되었습니다.");
     }
 
+    public Map<String,String> updateProfileImg(String id, MultipartFile file) throws IllegalAccessException, IOException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        String username = getCurrentUsername();
+        if (!username.equals(user.getUsername())) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+        }
+        Byte[] bytes = new Byte[file.getBytes().length];
+
+        int i = 0;
+
+        for (byte b : file.getBytes()) {
+            bytes[i++] = b;
+        }
+        user.setProfileImg(bytes);
+        userRepository.save(user);
+
+
+        Map<String, String> map = new HashMap<>();
+        map.put("profileImg", convertUtil.convertByteArrayToString(user.getProfileImg()));
+        return map;
+
+    }
+
     public void deleteUser(String id) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
+
+        if (studyRepository.existsByRoomMaker(user)) {
+            throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
+        }
         userRepository.delete(user);
+    }
+
+    public List<UserListRes> getByNickname(String nickname) {
+        List<User> userList = userRepository.findAllByNicknameContains(nickname);
+
+        return userList.stream().map(user -> UserListRes.builder()
+                .id(user.getId())
+                .nickname(user.getNickname())
+                .profileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                .build())
+                .collect(Collectors.toList());
     }
 
 }
