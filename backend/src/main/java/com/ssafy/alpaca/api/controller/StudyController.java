@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.request.StudyUpdateReq;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
@@ -107,4 +108,14 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
+    @ApiOperation(
+            value = "스터디 수정",
+            notes = "스터디 제목과 정보를 수정한다."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<? extends BaseResponseBody> updateStudy(@PathVariable String id, @RequestBody StudyUpdateReq studyUpdateReq) {
+        String username = userService.getCurrentUsername();
+        studyService.updateStudy(username, id, studyUpdateReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
 }

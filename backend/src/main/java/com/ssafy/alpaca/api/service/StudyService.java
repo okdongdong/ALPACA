@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
+import com.ssafy.alpaca.api.request.StudyUpdateReq;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
@@ -179,5 +180,18 @@ public class StudyService {
 
 //        userRepository.saveAll(members);
         studyRepository.delete(study);
+    }
+
+    public void updateStudy(String username, String id, StudyUpdateReq studyUpdateReq){
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+
+        if (!study.getRoomMaker().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+
+        study.setTitle(studyUpdateReq.getTitle());
+        study.setInfo(studyUpdateReq.getInfo());
+        studyRepository.save(study);
     }
 }
