@@ -20,7 +20,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @ApiOperation(
-            value = "스케쥴 (스터디 일정) 추가",
+            value = "스터디 일정 추가",
             notes = "스터디룸에서 일정을 추가한다."
     )
     @PostMapping()
@@ -29,8 +29,8 @@ public class ScheduleController {
     }
 
     @ApiOperation(
-            value = "스케쥴 수정",
-            notes = "스케쥴 일정을 수정한다."
+            value = "스터디 일정 추가 수정",
+            notes = "스터디 일정을 수정한다."
     )
     @PutMapping("/{id}")
     public ResponseEntity<? extends BaseResponseBody> updateSchedule(@PathVariable String id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
@@ -39,11 +39,22 @@ public class ScheduleController {
     }
 
     @ApiOperation(
-            value = "스케쥴 조회",
-            notes = "스케쥴 일정을 조회한다."
+            value = "스터디 일정 조회",
+            notes = "스터디 일정을 조회한다."
     )
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleInfoRes> getSchedule(@PathVariable String id) throws IllegalAccessException {
         return ResponseEntity.ok(scheduleService.getSchedule(id));
     }
+
+    @ApiOperation(
+            value = "스터디 일정 삭제",
+            notes = "스터디 일정을 삭제한다."
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<? extends BaseResponseBody> deleteSchedule(@PathVariable String id) {
+        scheduleService.deleteSchedule(id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
+
 }

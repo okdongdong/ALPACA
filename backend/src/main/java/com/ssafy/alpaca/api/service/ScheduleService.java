@@ -109,4 +109,9 @@ public class ScheduleService {
                 .toSolveProblems(schedule.getToSolveProblems())
                 .build();
     }
+
+    public void deleteSchedule(String id) {
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        scheduleRepository.delete(schedule);
+    }
 }

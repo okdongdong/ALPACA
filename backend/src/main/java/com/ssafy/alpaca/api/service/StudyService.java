@@ -122,6 +122,8 @@ public class StudyService {
                 break;
             }
         }
+
+        throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
     }
 
     public void deleteMember(String username, String id, StudyMemberReq studyMemberReq) {
