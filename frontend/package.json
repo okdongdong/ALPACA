@@ -19,6 +19,7 @@
     "react-dom": "^18.0.0",
     "react-redux": "^8.0.0",
     "react-router-dom": "^6.3.0",
+    "reaviz": "^13.0.8",
     "redux-devtools-extension": "^2.13.9"
   },
   "devDependencies": {
