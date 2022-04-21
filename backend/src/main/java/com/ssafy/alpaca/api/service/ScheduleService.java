@@ -3,7 +3,7 @@ package com.ssafy.alpaca.api.service;
 import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
-import com.ssafy.alpaca.api.response.ScheduleInfoRes;
+import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 
@@ -106,10 +105,11 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
-    public ScheduleInfoRes getSchedule(String id) throws IllegalAccessException {
+    public ScheduleRes getSchedule(String id) throws IllegalAccessException {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        return ScheduleInfoRes.builder()
+        return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
+                .finishedAt(schedule.getFinishedAt())
                 .toSolveProblems(schedule.getToSolveProblems())
                 .build();
     }

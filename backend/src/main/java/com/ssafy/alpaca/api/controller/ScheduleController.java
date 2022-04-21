@@ -3,7 +3,7 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
-import com.ssafy.alpaca.api.response.ScheduleInfoRes;
+import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/schedule")
@@ -46,7 +45,7 @@ public class ScheduleController {
             notes = "스터디 일정을 조회한다."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleInfoRes> getSchedule(@PathVariable String id) throws IllegalAccessException {
+    public ResponseEntity<ScheduleRes> getSchedule(@PathVariable String id) throws IllegalAccessException {
         return ResponseEntity.ok(scheduleService.getSchedule(id));
     }
 
