@@ -1,6 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
-import com.ssafy.alpaca.api.request.ScheduleModifyReq;
+import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleInfoRes;
 import com.ssafy.alpaca.api.service.ScheduleService;
@@ -33,8 +33,9 @@ public class ScheduleController {
             notes = "스케쥴 일정을 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, String>> modifySchedule(@PathVariable String id, @RequestBody ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {
-        return ResponseEntity.ok(scheduleService.modifySchedule(id, scheduleModifyReq));
+    public ResponseEntity<? extends BaseResponseBody> updateSchedule(@PathVariable String id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+        scheduleService.updateSchedule(id, scheduleUpdateReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(

@@ -1,6 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.ScheduleModifyReq;
+import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleInfoRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
@@ -11,7 +11,6 @@ import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.ScheduleRepository;
 import com.ssafy.alpaca.db.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,20 +68,38 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public Map<String, String> modifySchedule(String id, ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {
+    public void updateSchedule(String id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+        if (scheduleUpdateReq.getFinishedAt().isAfter(scheduleUpdateReq.getStartedAt()) ||
+                scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
+            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+        }
+
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        Study study = studyRepository.findById(schedule.getStudy().getId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        if (scheduleRepository.existsByStudyAndStartedAtDate(
+                study, LocalDate.of(
+                        scheduleUpdateReq.getStartedAt().getYear(),
+                        scheduleUpdateReq.getStartedAt().getMonth(),
+                        scheduleUpdateReq.getStartedAt().getDayOfMonth())
+        )) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        }
+
 //      스터디장만 수정 가능
         List<Problem> problems = new ArrayList<>();
-        for(String problemId:scheduleModifyReq.getToSolveProblems())
+        for(String problemId: scheduleUpdateReq.getToSolveProblems())
         {
             problems.add(
                     problemRepository.findById(problemId).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
             );
         };
-        schedule.setStartedAt(scheduleModifyReq.getStartedAt());
+        schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
+        schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         schedule.setToSolveProblems(problems);
         scheduleRepository.save(schedule);
-        return getMessage("성공적으로 수정되었습니다.");
     }
 
     public ScheduleInfoRes getSchedule(String id) throws IllegalAccessException {
