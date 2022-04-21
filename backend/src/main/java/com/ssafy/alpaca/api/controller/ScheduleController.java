@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.ScheduleModifyReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleInfoRes;
 import com.ssafy.alpaca.api.service.ScheduleService;
+import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @ApiOperation(
-            value = "스터디 일정 추가",
+            value = "스케쥴 (스터디 일정) 추가",
             notes = "스터디룸에서 일정을 추가한다."
     )
     @PostMapping()
-    public ResponseEntity<Map<String, String>> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException{
-        return ResponseEntity.ok(scheduleService.createSchedule(scheduleReq));
+    public ResponseEntity<? extends BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
+        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(scheduleReq)));
     }
 
     @ApiOperation(

@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -32,10 +33,25 @@ public class ScheduleService {
         return map;
     }
 
-    public Map<String, String> createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+    public String createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+        if (scheduleReq.getFinishedAt().isAfter(scheduleReq.getStartedAt()) ||
+        scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
+            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+        }
+
         Study study = studyRepository.findById(scheduleReq.getStudyId()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
+
+        if (scheduleRepository.existsByStudyAndStartedAtDate(
+                study, LocalDate.of(
+                        scheduleReq.getStartedAt().getYear(),
+                        scheduleReq.getStartedAt().getMonth(),
+                        scheduleReq.getStartedAt().getDayOfMonth())
+        )) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        }
+
         List<Problem> problems = new ArrayList<>();
         for(String id:scheduleReq.getToSolveProblems())
         {
@@ -47,9 +63,10 @@ public class ScheduleService {
                 Schedule.builder()
                         .study(study)
                         .startedAt(scheduleReq.getStartedAt())
+                        .finishedAt(scheduleReq.getFinishedAt())
                         .toSolveProblems(problems)
                         .build());
-        return getMessage(schedule.getId());
+        return schedule.getId();
     }
 
     public Map<String, String> modifySchedule(String id, ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {

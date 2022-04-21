@@ -23,6 +23,8 @@ public class Schedule {
 
     private LocalDateTime startedAt;
 
+    private LocalDateTime finishedAt;
+
     @DBRef(lazy = true)
     private List<Problem> toSolveProblems;
 
