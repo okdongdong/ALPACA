@@ -4,12 +4,16 @@ import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.request.StudyUpdateReq;
 import com.ssafy.alpaca.api.response.StudyListRes;
+import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
+import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.Schedule;
 import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.repository.ProblemRepository;
+import com.ssafy.alpaca.db.repository.ScheduleRepository;
 import com.ssafy.alpaca.db.repository.StudyRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,8 @@ public class StudyService {
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
     private final ConvertUtil convertUtil;
+    private final ScheduleRepository scheduleRepository;
+    private final ProblemRepository problemRepository;
 
     private Study checkStudyById(String id) {
         return studyRepository.findById(id).orElseThrow(
@@ -193,5 +199,14 @@ public class StudyService {
         study.setTitle(studyUpdateReq.getTitle());
         study.setInfo(studyUpdateReq.getInfo());
         studyRepository.save(study);
+    }
+
+    public List<ProblemListRes> getStudyProblem(String id){
+        List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
+        List<Problem> problemList = new ArrayList<>();
+        for(Schedule schedule:scheduleList){
+            problemList.addAll(schedule.getToSolveProblems());
+        }
+        return ProblemListRes.of(problemList);
     }
 }
