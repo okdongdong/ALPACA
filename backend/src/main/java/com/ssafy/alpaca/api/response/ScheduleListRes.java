@@ -18,11 +18,14 @@ public class ScheduleListRes {
 
     private LocalDateTime startedAt;
 
+    private LocalDateTime finishedAt;
+
     public static List<ScheduleListRes> of(List<Schedule> schedules) {
         return schedules.stream().map(
                 schedule -> ScheduleListRes.builder()
                         .id(schedule.getId())
                         .startedAt(schedule.getStartedAt())
+                        .finishedAt(schedule.getFinishedAt())
                         .build()).collect(Collectors.toList());
     }
 }

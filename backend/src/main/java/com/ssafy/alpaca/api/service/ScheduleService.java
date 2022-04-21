@@ -1,8 +1,10 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleInfoRes;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.Schedule;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -108,6 +112,16 @@ public class ScheduleService {
                 .startedAt(schedule.getStartedAt())
                 .toSolveProblems(schedule.getToSolveProblems())
                 .build();
+    }
+
+    public List<ScheduleListRes> getScheduleMonthList(ScheduleListReq scheduleListReq) {
+        Study study = studyRepository.findById(scheduleListReq.getStudyId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAt_YearAndStartedAt_MonthOrderByStartedAtAsc(
+                study, scheduleListReq.getYear(), Month.of(scheduleListReq.getMonth())
+        ));
     }
 
     public void deleteSchedule(String id) {

@@ -1,8 +1,10 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleInfoRes;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,6 +48,15 @@ public class ScheduleController {
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleInfoRes> getSchedule(@PathVariable String id) throws IllegalAccessException {
         return ResponseEntity.ok(scheduleService.getSchedule(id));
+    }
+
+    @ApiOperation(
+            value = "스터디 일정 리스트 조회",
+            notes = "특정 기간 (year, month)의 스터디 일정을 조회한다."
+    )
+    @GetMapping("/monthly")
+    public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(@RequestBody ScheduleListReq scheduleListReq) {
+        return ResponseEntity.ok(scheduleService.getScheduleMonthList(scheduleListReq));
     }
 
     @ApiOperation(

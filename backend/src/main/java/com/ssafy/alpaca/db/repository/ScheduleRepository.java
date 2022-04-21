@@ -14,6 +14,8 @@ public interface ScheduleRepository extends MongoRepository<Schedule, String> {
 
     List<Schedule> findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(Study study, Month month);
 
+    List<Schedule> findAllByStudyAndStartedAt_YearAndStartedAt_MonthOrderByStartedAtAsc(Study study, Integer year, Month month);
+
     Boolean existsByStudyAndStartedAtDate(Study study, LocalDate localDate);
 
 }
