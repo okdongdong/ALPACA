@@ -1,19 +1,19 @@
 import { GlobalStyles as GlobalThemeStyles } from '@mui/material';
-
+import { useTheme } from '@mui/material/styles';
 export default function GlobalStyles() {
+  const theme = useTheme();
   return (
     <GlobalThemeStyles
       styles={{
-        
         '*': {
           margin: 0,
           padding: 0,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
         },
         html: {
           width: '100%',
           height: '100%',
-          background: "#97B2E1",
+          background: theme.palette.main,
           // WebkitOverflowScrolling: 'touch',
           // "&::-webkit-scrollbar": {
           //   width: "0.5vw"
@@ -26,11 +26,11 @@ export default function GlobalStyles() {
         },
         body: {
           width: '100%',
-          height: '100%'
+          height: '100%',
         },
         '#root': {
           width: '100%',
-          height: '100%'
+          height: '100%',
         },
       }}
     />

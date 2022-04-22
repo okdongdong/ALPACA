@@ -8,7 +8,7 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   '& .MuiInputBase-input': {
     borderRadius: 4,
     position: 'relative',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.palette.bg,
     padding: '10px 12px',
     transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow']),
     fontFamily: 'Pretendard-Regular',
