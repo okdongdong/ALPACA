@@ -12,4 +12,6 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
 
     List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
 
+    Boolean existsByUserAndIsRoomMaker(User user, Boolean isRoomMaker);
+
 }

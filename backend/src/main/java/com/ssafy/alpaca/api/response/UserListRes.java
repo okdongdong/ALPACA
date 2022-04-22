@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserListRes {
-    private String id;
+    private Long id;
     private String nickname;
     private String profileImg;
 }

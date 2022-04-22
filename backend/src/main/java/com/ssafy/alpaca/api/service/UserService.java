@@ -13,9 +13,6 @@ import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
-import com.ssafy.alpaca.db.document.Study;
-import com.ssafy.alpaca.db.document.User;
-import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -189,7 +186,7 @@ public class UserService {
     }
 
     // 아래부터 UserController
-    public void updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
+    public void updateUser(Long id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
@@ -202,7 +199,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String updateProfileImg(String id, MultipartFile file) throws IllegalAccessException, IOException {
+    public String updateProfileImg(Long id, MultipartFile file) throws IllegalAccessException, IOException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
@@ -223,21 +220,21 @@ public class UserService {
 
     }
 
-    public void deleteUser(String id) throws IllegalAccessException {
+    public void deleteUser(Long id) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
 
-        if (Boolean.TRUE.equals(studyRepository.existsByRoomMaker(user))) {
+        if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndIsRoomMaker(user, true))) {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
         userRepository.delete(user);
     }
 
     public List<UserListRes> getByNickname(String nickname) {
-        if (nickname.equals("")) {
+        if (nickname.isEmpty()) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
 
@@ -251,7 +248,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void updatePassword(String id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+    public void updatePassword(Long id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();

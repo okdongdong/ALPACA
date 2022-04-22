@@ -14,9 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface StudyRepository extends MongoRepository<Study, String> {
-    Boolean existsByRoomMaker(User user);
-
-    List<Study> findTop3ByMembersContainsOrderByPinnedDesc(User user);
 
     Page<Study> findAllByMembersContainsOrderByPinnedDesc(User user, Pageable pageable);
 
