@@ -51,7 +51,8 @@ public class AuthController {
     @ApiImplicitParam( name = "bojId", value = "연동 계정")
     @GetMapping("/duplicated/bojId")
     public ResponseEntity<? extends BaseResponseBody> checkBojId(@RequestParam String bojId) {
-        return ResponseEntity.ok(BaseResponseBody.of(200, userService.checkBojId(bojId)));
+        userService.checkBojId(bojId);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(

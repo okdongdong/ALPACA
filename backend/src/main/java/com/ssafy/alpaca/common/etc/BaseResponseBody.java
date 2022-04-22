@@ -16,18 +16,16 @@ public class BaseResponseBody {
 
     public BaseResponseBody() {}
 
-    public BaseResponseBody(Integer statusCode){
-        this.statusCode = statusCode;
-    }
-
-    public BaseResponseBody(Integer statusCode, String message){
-        this.statusCode = statusCode;
-        this.message = message;
-    }
-
     public static BaseResponseBody of(Integer statusCode, String message) {
         BaseResponseBody body = new BaseResponseBody();
         body.message = message;
+        body.statusCode = statusCode;
+        return body;
+    }
+
+    public static BaseResponseBody of(Integer statusCode, Long message) {
+        BaseResponseBody body = new BaseResponseBody();
+        body.message = String.valueOf(message);
         body.statusCode = statusCode;
         return body;
     }

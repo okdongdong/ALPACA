@@ -1,7 +1,6 @@
 package com.ssafy.alpaca.api.response;
 
 
-import com.ssafy.alpaca.db.document.Study;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.List;
 @SuperBuilder
 public class LoginRes extends TokenRes{
 
-    private String userId;
+    private Long userId;
 
     private String username;
 

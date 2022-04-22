@@ -27,7 +27,7 @@ public class UserController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<? extends BaseResponseBody> updateUser(
-            @PathVariable String id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
+            @PathVariable Long id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
         userService.updateUser(id, userUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -37,7 +37,7 @@ public class UserController {
             notes = "요청 회원을 탈퇴처리한다."
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteUser(@PathVariable String id) throws IllegalAccessException {
+    public ResponseEntity<? extends BaseResponseBody> deleteUser(@PathVariable Long id) throws IllegalAccessException {
         userService.deleteUser(id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -48,7 +48,7 @@ public class UserController {
     )
     @PostMapping("/profile/{id}")
     public ResponseEntity<? extends BaseResponseBody> updateProfileImg(
-            @PathVariable String id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
+            @PathVariable Long id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
 
@@ -65,9 +65,9 @@ public class UserController {
             value = "비밀번호 변경",
             notes = "사용자의 비밀번호를 변경한다."
     )
-    @PutMapping("/changepassword/{id}")
+    @PutMapping("/changePassword/{id}")
     public ResponseEntity<? extends BaseResponseBody> updatePassword(
-            @PathVariable String id,@RequestBody PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+            @PathVariable Long id,@RequestBody PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
         userService.updatePassword(id, passwordUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }

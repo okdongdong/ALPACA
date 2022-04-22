@@ -13,12 +13,8 @@ import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
-import com.ssafy.alpaca.db.document.Study;
-import com.ssafy.alpaca.db.document.User;
-import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
-import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
-import com.ssafy.alpaca.db.repository.StudyRepository;
-import com.ssafy.alpaca.db.repository.UserRepository;
+import com.ssafy.alpaca.db.entity.User;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +39,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
+    private final MyStudyRepository myStudyRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
@@ -67,14 +64,11 @@ public class UserService {
         }
     }
 
-    public String checkBojId(String bojId) {
+    public void checkBojId(String bojId) {
         String message;
         if (Boolean.TRUE.equals(userRepository.existsByBojId(bojId))) {
-            message = "해당 계정으로 이미 연동된 ID가 있습니다.";
-        } else {
-            message = "해당 계정으로 연동된 ID가 없습니다.";
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
-        return message;
     }
 
     public void signup(SignupReq signupReq) throws IllegalAccessException {
@@ -101,10 +95,6 @@ public class UserService {
                         .nickname(signupReq.getNickname())
                         .info(signupReq.getNickname() + "님을 소개해주세요.")
                         .bojId(signupReq.getBojId())
-                        .theme("basic")
-                        .preferredLanguage("default")
-//                        .solvedProblems(new ArrayList<>())
-//                        .studies(new ArrayList<>())
                         .build());
     }
 
@@ -123,14 +113,12 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
-        List<StudyListRes> studyListRes = studyRepository.findTop3ByMembersContainsOrderByPinnedDesc(user)
-                .stream().map(study -> StudyListRes.builder()
-                        .id(study.getId())
-                        .title(study.getTitle())
-                        .pinned(study.getPinned())
-                        .profileImgList(study.getMembers().stream().map(
-                                member -> convertUtil.convertByteArrayToString(member.getProfileImg()))
-                                .collect(Collectors.toList()))
+        List<StudyListRes> studyListRes = myStudyRepository.findTop3ByUserOrderByPinnedTimeDesc(user)
+                .stream().map(myStudy -> StudyListRes.builder()
+                        .id(myStudy.getStudy().getId())
+                        .title(myStudy.getStudy().getTitle())
+//                        프로필이미지 추가해야합니다.
+                        .profileImgList(new ArrayList<>())
                         .build()).collect(Collectors.toList());
 
         return LoginRes.builder()
@@ -198,7 +186,7 @@ public class UserService {
     }
 
     // 아래부터 UserController
-    public void updateUser(String id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
+    public void updateUser(Long id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
@@ -211,7 +199,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String updateProfileImg(String id, MultipartFile file) throws IllegalAccessException, IOException {
+    public String updateProfileImg(Long id, MultipartFile file) throws IllegalAccessException, IOException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
@@ -232,21 +220,21 @@ public class UserService {
 
     }
 
-    public void deleteUser(String id) throws IllegalAccessException {
+    public void deleteUser(Long id) throws IllegalAccessException {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
 
-        if (Boolean.TRUE.equals(studyRepository.existsByRoomMaker(user))) {
+        if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndIsRoomMaker(user, true))) {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
         userRepository.delete(user);
     }
 
     public List<UserListRes> getByNickname(String nickname) {
-        if (nickname.equals("")) {
+        if (nickname.isEmpty()) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
 
@@ -260,7 +248,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void updatePassword(String id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+    public void updatePassword(Long id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
