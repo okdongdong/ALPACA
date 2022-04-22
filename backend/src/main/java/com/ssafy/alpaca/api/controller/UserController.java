@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.request.PasswordUpdateReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.api.service.UserService;
@@ -58,5 +59,16 @@ public class UserController {
     @GetMapping("/search")
     public ResponseEntity<List<UserListRes>> getUserListByNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(userService.getByNickname(nickname));
+    }
+
+    @ApiOperation(
+            value = "비밀번호 변경",
+            notes = "사용자의 비밀번호를 변경한다."
+    )
+    @PutMapping("/changepassword/{id}")
+    public ResponseEntity<? extends BaseResponseBody> updatePassword(
+            @PathVariable String id,@RequestBody PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+        userService.updatePassword(id, passwordUpdateReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 }

@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.LoginReq;
+import com.ssafy.alpaca.api.request.PasswordUpdateReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.LoginRes;
@@ -259,5 +260,21 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public void updatePassword(String id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        String username = getCurrentUsername();
+        if (!user.getUsername().equals(username)) {
+            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+        }
+        if (!passwordUpdateReq.getChangedPassword().equals(passwordUpdateReq.getChangedPasswordCheck())){
+            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+        }
+        if (passwordUpdateReq.getChangedPassword().equals(passwordUpdateReq.getPassword())){
+            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+        }
+        user.setPassword(passwordEncoder.encode(passwordUpdateReq.getChangedPassword()));
+        userRepository.save(user);
+    }
 }
 
