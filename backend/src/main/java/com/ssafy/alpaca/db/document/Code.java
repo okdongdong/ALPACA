@@ -17,6 +17,8 @@ public class Code {
 
     private Long userId;
 
+    private Long studyId;
+
     private Long scheduleId;
 
     private String problemId;

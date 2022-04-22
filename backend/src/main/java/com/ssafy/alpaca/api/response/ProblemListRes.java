@@ -1,8 +1,10 @@
 package com.ssafy.alpaca.api.response;
 
-import com.ssafy.alpaca.db.document.Problem;
+import com.ssafy.alpaca.db.entity.SolvedProblem;
+import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,13 +23,11 @@ public class ProblemListRes {
 
     private Integer level;
 
-    public static List<ProblemListRes> of (List<Problem> list){
-        return list.stream().map(problem -> ProblemListRes.builder()
-                        .id(problem.getId())
-                        .number(problem.getNumber())
-                        .title(problem.getTitle())
-                        .level(problem.getLevel())
-                        .build())
-                .collect(Collectors.toList());
+    private LocalDateTime startedAt;
+
+    private List<User> solvedMemberList;
+
+    public static List<User> of (List<SolvedProblem> list) {
+        return list.stream().map(SolvedProblem::getUser).collect(Collectors.toList());
     }
 }

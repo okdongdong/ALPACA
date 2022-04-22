@@ -16,6 +16,8 @@ public class StudyListRes {
 
     private String title;
 
+    private LocalDateTime pinnedTime;
+
     private List<String> profileImgList;
 
 }

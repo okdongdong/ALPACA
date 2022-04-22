@@ -1,12 +1,10 @@
 package com.ssafy.alpaca.api.request;
 
-import com.ssafy.alpaca.db.document.Study;
-import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.entity.Study;
+import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,22 +18,18 @@ public class StudyReq {
     private String title;
 
     @ApiModelProperty( name = "info",
-            example = "Find the latest breaking news and information on the weather, entertainment, and more." )
+            example = "스터디에 관한 정보를 입력해주세요." )
     private String info;
 
     @ApiModelProperty( name = "members" )
-    private List<String> members;
+    private List<Long> memberIdList;
 
-    public static Study of(StudyReq studyReq, User user, List<User> members) {
+    public static Study of(StudyReq studyReq, User user) {
         return Study.builder()
                 .title(studyReq.getTitle())
                 .info(studyReq.getInfo())
-                .pinned(LocalDateTime.of(0, 1, 1, 6, 0))
 //                .inviteCode(null)
 //                .sessionId(null)
-                .roomMaker(user)
-                .members(members)
-//                .schedules(new ArrayList<>())
                 .build();
 
 

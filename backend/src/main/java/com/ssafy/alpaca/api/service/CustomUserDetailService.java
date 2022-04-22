@@ -2,7 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.common.etc.CacheKey;
 import com.ssafy.alpaca.common.etc.CustomUserDetails;
-import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;

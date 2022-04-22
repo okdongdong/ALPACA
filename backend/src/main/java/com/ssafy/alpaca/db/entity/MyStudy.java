@@ -21,8 +21,9 @@ public class MyStudy {
     @Column(name = "is_room_maker")
     private Boolean isRoomMaker;
 
+    @Builder.Default
     @Column(name = "pinned_time")
-    private LocalDateTime pinnedTime;
+    private LocalDateTime pinnedTime = LocalDateTime.of(0, 1, 1, 6, 0);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
