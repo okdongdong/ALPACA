@@ -2,6 +2,8 @@ package com.ssafy.alpaca.db.repository;
 
 import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.entity.MyStudy;
+import com.ssafy.alpaca.db.entity.Study;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

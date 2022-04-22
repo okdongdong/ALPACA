@@ -15,10 +15,9 @@ import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.document.User;
-import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
-import com.ssafy.alpaca.db.repository.RefreshTokenRedisRepository;
-import com.ssafy.alpaca.db.repository.StudyRepository;
-import com.ssafy.alpaca.db.repository.UserRepository;
+import com.ssafy.alpaca.db.entity.MyStudy;
+import com.ssafy.alpaca.db.entity.User;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +42,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
+    private final MyStudyRepository myStudyRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
@@ -67,14 +67,11 @@ public class UserService {
         }
     }
 
-    public String checkBojId(String bojId) {
+    public void checkBojId(String bojId) {
         String message;
         if (Boolean.TRUE.equals(userRepository.existsByBojId(bojId))) {
-            message = "해당 계정으로 이미 연동된 ID가 있습니다.";
-        } else {
-            message = "해당 계정으로 연동된 ID가 없습니다.";
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
-        return message;
     }
 
     public void signup(SignupReq signupReq) throws IllegalAccessException {
@@ -101,10 +98,6 @@ public class UserService {
                         .nickname(signupReq.getNickname())
                         .info(signupReq.getNickname() + "님을 소개해주세요.")
                         .bojId(signupReq.getBojId())
-                        .theme("basic")
-                        .preferredLanguage("default")
-//                        .solvedProblems(new ArrayList<>())
-//                        .studies(new ArrayList<>())
                         .build());
     }
 
@@ -123,14 +116,12 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
-        List<StudyListRes> studyListRes = studyRepository.findTop3ByMembersContainsOrderByPinnedDesc(user)
-                .stream().map(study -> StudyListRes.builder()
-                        .id(study.getId())
-                        .title(study.getTitle())
-                        .pinned(study.getPinned())
-                        .profileImgList(study.getMembers().stream().map(
-                                member -> convertUtil.convertByteArrayToString(member.getProfileImg()))
-                                .collect(Collectors.toList()))
+        List<StudyListRes> studyListRes = myStudyRepository.findTop3ByUserOrderByPinnedTimeDesc(user)
+                .stream().map(myStudy -> StudyListRes.builder()
+                        .id(myStudy.getStudy().getId())
+                        .title(myStudy.getStudy().getTitle())
+//                        프로필이미지 추가해야합니다.
+                        .profileImgList(new ArrayList<>())
                         .build()).collect(Collectors.toList());
 
         return LoginRes.builder()
