@@ -26,10 +26,8 @@ public class Problem {
 
     private Integer level;
 
-    @DBRef(lazy = true)
     private List<String> inputs;
 
-    @DBRef(lazy = true)
     private List<String> outputs;
 
 }
