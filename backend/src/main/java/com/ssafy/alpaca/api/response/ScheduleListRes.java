@@ -1,6 +1,6 @@
 package com.ssafy.alpaca.api.response;
 
-import com.ssafy.alpaca.db.document.Schedule;
+import com.ssafy.alpaca.db.entity.Schedule;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Builder
 public class ScheduleListRes {
 
-    private String id;
+    private Long id;
 
     private LocalDateTime startedAt;
 

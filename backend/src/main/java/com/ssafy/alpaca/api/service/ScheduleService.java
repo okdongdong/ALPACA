@@ -6,12 +6,12 @@ import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
+import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.document.Problem;
-import com.ssafy.alpaca.db.document.Schedule;
-import com.ssafy.alpaca.db.document.Study;
-import com.ssafy.alpaca.db.repository.ProblemRepository;
-import com.ssafy.alpaca.db.repository.ScheduleRepository;
-import com.ssafy.alpaca.db.repository.StudyRepository;
+import com.ssafy.alpaca.db.entity.Schedule;
+import com.ssafy.alpaca.db.entity.Study;
+import com.ssafy.alpaca.db.entity.ToSolveProblem;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +28,8 @@ public class ScheduleService {
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ProblemRepository problemRepository;
+    private final ToSolveProblemRepository toSolveProblemRepository;
+    private final CodeRepository codeRepository;
 
     private Map<String, String> getMessage(String returnMessage){
         Map<String, String> map = new HashMap<>();
@@ -54,24 +56,26 @@ public class ScheduleService {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
 
-        List<Problem> problems = new ArrayList<>();
-        for(String id:scheduleReq.getToSolveProblems())
-        {
-            problems.add(
-                    problemRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
-            );
-        };
         Schedule schedule = scheduleRepository.save(
                 Schedule.builder()
                         .study(study)
                         .startedAt(scheduleReq.getStartedAt())
                         .finishedAt(scheduleReq.getFinishedAt())
-                        .toSolveProblems(problems)
                         .build());
-        return schedule.getId();
+        for(String id:scheduleReq.getToSolveProblems())
+        {
+                ToSolveProblem toSolveProblem = toSolveProblemRepository.save(
+                        ToSolveProblem.builder()
+                                .isSolved(false)
+                                .schedule(schedule)
+                                .problemId(id)
+                                .build());
+        };
+
+        return String.valueOf(schedule.getId());
     }
 
-    public void updateSchedule(String id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
         if (scheduleUpdateReq.getFinishedAt().isAfter(scheduleUpdateReq.getStartedAt()) ||
                 scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
@@ -92,25 +96,25 @@ public class ScheduleService {
         }
 
 //      스터디장만 수정 가능
-        List<Problem> problems = new ArrayList<>();
-        for(String problemId: scheduleUpdateReq.getToSolveProblems())
-        {
-            problems.add(
-                    problemRepository.findById(problemId).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
-            );
-        };
         schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
         schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
-        schedule.setToSolveProblems(problems);
         scheduleRepository.save(schedule);
+        for(String problemid:scheduleUpdateReq.getToSolveProblems())
+        {
+            ToSolveProblem toSolveProblem = toSolveProblemRepository.save(
+                    ToSolveProblem.builder()
+                            .isSolved(false)
+                            .schedule(schedule)
+                            .problemId(problemid)
+                            .build());
+        };
     }
 
     public ScheduleRes getSchedule(String id) throws IllegalAccessException {
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        Schedule schedule = scheduleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
-                .toSolveProblems(schedule.getToSolveProblems())
                 .build();
     }
 
@@ -124,8 +128,10 @@ public class ScheduleService {
         ));
     }
 
-    public void deleteSchedule(String id) {
+    public void deleteSchedule(Long id) {
+        List<Code> codes = codeRepository.findByUserId(id);
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
         scheduleRepository.delete(schedule);
+        codeRepository.deleteAll(codes);
     }
 }
