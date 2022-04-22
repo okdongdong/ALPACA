@@ -1,7 +1,6 @@
 package com.ssafy.alpaca.api.response;
 
 
-import com.ssafy.alpaca.db.document.Study;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

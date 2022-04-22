@@ -11,6 +11,6 @@ import lombok.*;
 public class StudyMemberReq {
 
     @ApiModelProperty( name = "memberId", example = "testuser2" )
-    private String memberId;
+    private Long memberId;
 
 }

@@ -1,7 +1,7 @@
 package com.ssafy.alpaca.common.etc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ssafy.alpaca.db.document.User;
+import com.ssafy.alpaca.db.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

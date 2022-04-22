@@ -9,14 +9,13 @@ import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
-import com.ssafy.alpaca.db.document.Problem;
-import com.ssafy.alpaca.db.document.Schedule;
-import com.ssafy.alpaca.db.document.Study;
-import com.ssafy.alpaca.db.document.User;
-import com.ssafy.alpaca.db.repository.ProblemRepository;
-import com.ssafy.alpaca.db.repository.ScheduleRepository;
-import com.ssafy.alpaca.db.repository.StudyRepository;
-import com.ssafy.alpaca.db.repository.UserRepository;
+import com.ssafy.alpaca.db.document.Code;
+import com.ssafy.alpaca.db.entity.MyStudy;
+import com.ssafy.alpaca.db.entity.Schedule;
+import com.ssafy.alpaca.db.entity.Study;
+import com.ssafy.alpaca.db.entity.ToSolveProblem;
+import com.ssafy.alpaca.db.entity.User;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.DuplicateFormatFlagsException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,15 +35,18 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final ConvertUtil convertUtil;
     private final ScheduleRepository scheduleRepository;
+    private final MyStudyRepository myStudyRepository;
+    private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final CodeRepository codeRepository;
 
-    private Study checkStudyById(String id) {
+    private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
     }
 
-    private User checkUserById(String id) {
+    private User checkUserById(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
@@ -59,153 +58,128 @@ public class StudyService {
         );
     }
 
-    public StudyRes getStudy(String username, String id){
+    public StudyRes getStudy(String username, Long id){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-        boolean isMember = false;
-        for (User studyMember : study.getMembers()) {
-            if (studyMember.getId().equals(user.getId())) {
-                isMember=true;
-                break;
-            }
-        }
-        if (!isMember) {
+
+        Optional<MyStudy> optionalMyStudy = myStudyRepository.findByUserAndStudy(user, study);
+        if (optionalMyStudy.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        } else {
+            List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(
+                    study, LocalDateTime.now().getMonth());
+            List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+            return StudyRes.builder()
+                    .title(study.getTitle())
+                    .info(study.getTitle())
+                    .members(StudyRes.Member.of(myStudies))
+                    .scheduleListRes(ScheduleListRes.of(schedules))
+                    .build();
         }
 
-        List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(
-                study, LocalDateTime.now().getMonth());
-
-        return StudyRes.of(study, ScheduleListRes.of(schedules));
     }
 
     public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
         User user = checkUserByUsername(username);
-        Page<Study> studies = studyRepository.findAllByMembersContainsOrderByPinnedDesc(user, pageable);
+        Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);
 
-        for (Study study : studies) {
-            System.out.println(study.getId());
-        }
-
-        return studies.map(study -> StudyListRes.builder()
-                .id(study.getId())
-                .title(study.getTitle())
-                .pinned(study.getPinned())
-                .profileImgList(study.getMembers().stream().map(
-                                member -> convertUtil.convertByteArrayToString(member.getProfileImg()))
-                        .collect(Collectors.toList()))
+        return myStudyList.map(myStudy -> StudyListRes.builder()
+                .id(myStudy.getStudy().getId())
+                .title(myStudy.getStudy().getTitle())
+                .pinnedTime(myStudy.getPinnedTime())
+                .profileImgList(
+                        myStudyRepository.findAllByStudy(myStudy.getStudy())
+                                .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
+                                .collect(Collectors.toList()))
                 .build());
     }
 
-    public String createStudy(String username, StudyReq studyReq) {
+    public Long createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
 
-        List<User> members = new ArrayList<>();
-        for (String member : studyReq.getMembers()) {
-            members.add(checkUserById(member));
-        }
-
-        Study study = StudyReq.of(studyReq, user, members);
+        Study study = StudyReq.of(studyReq, user);
         studyRepository.save(study);
 
-//        for (User member : members) {
-//            List<Study> studies = member.getStudies();
-//            studies.add(study);
-//            member.setStudies(studies);
-//        }
-//        userRepository.saveAll(members);
+        List<MyStudy> myStudyList = new ArrayList<>();
+        for (Long userId : studyReq.getMemberIdList()) {
+            myStudyList.add(MyStudy.builder()
+                            .isRoomMaker(user.getId().equals(userId))
+                            .pinnedTime(LocalDateTime.of(0, 1, 1, 6, 0))
+                            .user(checkUserById(userId))
+                            .study(study)
+                    .build());
+        }
+        myStudyRepository.saveAll(myStudyList);
+
         return study.getId();
     }
 
-    public void updateRoomMaker(String username, String id, StudyMemberReq studyMemberReq) {
+    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
-
-        if (!study.getRoomMaker().getId().equals(user.getId())) {
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-
-        for (User studyMember : study.getMembers()) {
-            if (studyMember.getId().equals(member.getId())) {
-                study.setRoomMaker(studyMember);
-                studyRepository.save(study);
-                break;
-            }
-        }
-
-        throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        userStudy.setIsRoomMaker(false);
+        memberStudy.setIsRoomMaker(true);
+        myStudyRepository.save(userStudy);
+        myStudyRepository.save(memberStudy);
     }
 
-    public void deleteMember(String username, String id, StudyMemberReq studyMemberReq) {
+    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
 
-        if (!study.getRoomMaker().getId().equals(user.getId())) {
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         if (user.getId().equals(member.getId())) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
-
-        List<User> members = study.getMembers();
-        members.removeIf(m -> m.getId().equals(member.getId()));
-        study.setMembers(members);
-
-//        List<Study> studies = member.getStudies();
-//        studies.removeIf(s -> s.getId().equals(study.getId()));
-//        member.setStudies(studies);
-
-        studyRepository.save(study);
-//        userRepository.save(member);
+        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        myStudyRepository.delete(memberStudy);
     }
 
-    public void deleteMeFromStudy(String username, String id) {
+    public void deleteMeFromStudy(String username, Long id) {
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        if (myStudy.getIsRoomMaker()) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+        List<Code> codes = codeRepository.findAllByStudyId(study.getId());
+
+        codeRepository.deleteAll(codes);
+        myStudyRepository.delete(myStudy);
+    }
+
+    public void deleteStudy(String username, Long id){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
-        if (study.getRoomMaker().getId().equals(user.getId())) {
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        List<User> users = study.getMembers();
-        users.removeIf(u -> u.getId().equals(user.getId()));
-        study.setMembers(users);
-
-//        List<Study> studies = user.getStudies();
-//        studies.removeIf(s -> s.getId().equals(study.getId()));
-//        user.setStudies(studies);
-
-        studyRepository.save(study);
-//        userRepository.save(user);
-    }
-
-    public void deleteStudy(String username, String id){
-        Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
-
-        if (!study.getRoomMaker().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
-
-//        List<User> members = study.getMembers();
-//        for (User member : members) {
-//            List<Study> studies = member.getStudies();
-//            studies.removeIf(s -> s.getId().equals(study.getId()));
-//            member.setStudies(studies);
-//        }
-
-//        userRepository.saveAll(members);
         studyRepository.delete(study);
     }
 
-    public void updateStudy(String username, String id, StudyUpdateReq studyUpdateReq){
+    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
-        if (!study.getRoomMaker().getId().equals(user.getId())) {
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
@@ -214,12 +188,20 @@ public class StudyService {
         studyRepository.save(study);
     }
 
-    public List<ProblemListRes> getStudyProblem(String id){
+    public List<ProblemListRes> getStudyProblem(Long id){
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
-        List<Problem> problemList = new ArrayList<>();
+        List<ToSolveProblem> problemList = new ArrayList<>();
         for(Schedule schedule:scheduleList){
+
             problemList.addAll(schedule.getToSolveProblems());
         }
-        return ProblemListRes.of(problemList);
+        return problemList.stream().map(toSolveProblem -> ProblemListRes.builder()
+                .id(toSolveProblem.getProblemId())
+                .number(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
+                .title(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getTitle())
+                .level(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
+                .startedAt(toSolveProblem.getSchedule().getStartedAt())
+                .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
+                .build()).collect(Collectors.toList());
     }
 }

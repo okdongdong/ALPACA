@@ -12,11 +12,11 @@ import java.util.List;
 @Builder
 public class StudyListRes {
 
-    private String id;
+    private Long id;
 
     private String title;
 
-    private LocalDateTime pinned;
+    private LocalDateTime pinnedTime;
 
     private List<String> profileImgList;
 

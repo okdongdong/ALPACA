@@ -10,7 +10,6 @@ import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
-import com.ssafy.alpaca.db.document.Problem;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +35,18 @@ public class StudyController {
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRes> getStudy(@PathVariable String id) {
+    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getStudy(username, id));
     }
 
     @ApiOperation(
             value = "스터디 추가 조회",
-            notes = "pagealbe에 해당하는 스터디를 3개단위로 조회한다."
+            notes = "pageable에 해당하는 스터디를 3개단위로 조회한다."
     )
     @GetMapping()
     public ResponseEntity<Page<StudyListRes>> getMoreStudy(
-            @PageableDefault(size = 3, sort = "pinned", direction = Sort.Direction.DESC)Pageable pageable) {
+            @PageableDefault(size = 3, sort = "{pinnedTime, id}", direction = Sort.Direction.DESC)Pageable pageable) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
     }
@@ -68,7 +67,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "이임할 스터디의 id")
     @PutMapping("/member/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateRoomMaker(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<? extends BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.updateRoomMaker(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -80,7 +79,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id")
     @DeleteMapping("/member/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteMember(@PathVariable String id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<? extends BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.deleteMember(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -92,7 +91,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id")
     @DeleteMapping("/exit/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteMeFromStudy(@PathVariable String id) {
+    public ResponseEntity<? extends BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteMeFromStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -104,7 +103,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteStudy(@PathVariable String id) {
+    public ResponseEntity<? extends BaseResponseBody> deleteStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -115,7 +114,7 @@ public class StudyController {
             notes = "스터디 제목과 정보를 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateStudy(@PathVariable String id, @RequestBody StudyUpdateReq studyUpdateReq) {
+    public ResponseEntity<? extends BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
         String username = userService.getCurrentUsername();
         studyService.updateStudy(username, id, studyUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
@@ -126,7 +125,7 @@ public class StudyController {
             notes = "스터디 일정에 등록된 모든 문제를 조회한다."
     )
     @GetMapping("/{id}/problems")
-    public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable String id){
+    public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
         return ResponseEntity.ok(studyService.getStudyProblem(id));
     }
 
