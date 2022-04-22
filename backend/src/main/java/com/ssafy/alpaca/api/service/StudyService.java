@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.service;
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.request.StudyUpdateReq;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
@@ -71,7 +73,10 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        return StudyRes.of(study);
+        List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(
+                study, LocalDateTime.now().getMonth());
+
+        return StudyRes.of(study, ScheduleListRes.of(schedules));
     }
 
     public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
@@ -128,6 +133,8 @@ public class StudyService {
                 break;
             }
         }
+
+        throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
     }
 
     public void deleteMember(String username, String id, StudyMemberReq studyMemberReq) {

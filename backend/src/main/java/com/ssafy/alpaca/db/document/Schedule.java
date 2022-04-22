@@ -19,9 +19,11 @@ public class Schedule {
     @Id
     private String id;
 
-    private String studyId;
+    private Study study;
 
     private LocalDateTime startedAt;
+
+    private LocalDateTime finishedAt;
 
     @DBRef(lazy = true)
     private List<Problem> toSolveProblems;

@@ -1,18 +1,23 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.ScheduleModifyReq;
+import com.ssafy.alpaca.api.request.ScheduleListReq;
+import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
-import com.ssafy.alpaca.api.response.ScheduleInfoRes;
+import com.ssafy.alpaca.api.response.ScheduleRes;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.Schedule;
+import com.ssafy.alpaca.db.document.Study;
 import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.ScheduleRepository;
+import com.ssafy.alpaca.db.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -20,6 +25,7 @@ import java.util.*;
 @Transactional
 public class ScheduleService {
 
+    private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ProblemRepository problemRepository;
 
@@ -29,10 +35,25 @@ public class ScheduleService {
         return map;
     }
 
-    public Map<String, String> createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
-//        if (scheduleReq.getStudyId().isEmpty()) {
-//            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
-//        }
+    public String createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+        if (scheduleReq.getFinishedAt().isAfter(scheduleReq.getStartedAt()) ||
+        scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
+            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+        }
+
+        Study study = studyRepository.findById(scheduleReq.getStudyId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        if (scheduleRepository.existsByStudyAndStartedAtDate(
+                study, LocalDate.of(
+                        scheduleReq.getStartedAt().getYear(),
+                        scheduleReq.getStartedAt().getMonth(),
+                        scheduleReq.getStartedAt().getDayOfMonth())
+        )) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        }
+
         List<Problem> problems = new ArrayList<>();
         for(String id:scheduleReq.getToSolveProblems())
         {
@@ -42,34 +63,69 @@ public class ScheduleService {
         };
         Schedule schedule = scheduleRepository.save(
                 Schedule.builder()
-                        .studyId(scheduleReq.getStudyId())
+                        .study(study)
                         .startedAt(scheduleReq.getStartedAt())
+                        .finishedAt(scheduleReq.getFinishedAt())
                         .toSolveProblems(problems)
                         .build());
-        return getMessage(schedule.getId());
+        return schedule.getId();
     }
 
-    public Map<String, String> modifySchedule(String id, ScheduleModifyReq scheduleModifyReq) throws IllegalAccessException {
+    public void updateSchedule(String id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+        if (scheduleUpdateReq.getFinishedAt().isAfter(scheduleUpdateReq.getStartedAt()) ||
+                scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
+            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+        }
+
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        Study study = studyRepository.findById(schedule.getStudy().getId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        if (scheduleRepository.existsByStudyAndStartedAtDate(
+                study, LocalDate.of(
+                        scheduleUpdateReq.getStartedAt().getYear(),
+                        scheduleUpdateReq.getStartedAt().getMonth(),
+                        scheduleUpdateReq.getStartedAt().getDayOfMonth())
+        )) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        }
+
 //      스터디장만 수정 가능
         List<Problem> problems = new ArrayList<>();
-        for(String problemId:scheduleModifyReq.getToSolveProblems())
+        for(String problemId: scheduleUpdateReq.getToSolveProblems())
         {
             problems.add(
                     problemRepository.findById(problemId).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND))
             );
         };
-        schedule.setStartedAt(scheduleModifyReq.getStartedAt());
+        schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
+        schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         schedule.setToSolveProblems(problems);
         scheduleRepository.save(schedule);
-        return getMessage("성공적으로 수정되었습니다.");
     }
 
-    public ScheduleInfoRes getSchedule(String id) throws IllegalAccessException {
+    public ScheduleRes getSchedule(String id) throws IllegalAccessException {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        return ScheduleInfoRes.builder()
+        return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
+                .finishedAt(schedule.getFinishedAt())
                 .toSolveProblems(schedule.getToSolveProblems())
                 .build();
+    }
+
+    public List<ScheduleListRes> getScheduleMonthList(ScheduleListReq scheduleListReq) {
+        Study study = studyRepository.findById(scheduleListReq.getStudyId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAt_YearAndStartedAt_MonthOrderByStartedAtAsc(
+                study, scheduleListReq.getYear(), Month.of(scheduleListReq.getMonth())
+        ));
+    }
+
+    public void deleteSchedule(String id) {
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        scheduleRepository.delete(schedule);
     }
 }

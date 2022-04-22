@@ -22,15 +22,15 @@ public class StudyRes {
 
     private List<User> members;
 
-//    private List<Schedule> schedules;
+    private List<ScheduleListRes> scheduleListRes;
 
-    public static StudyRes of(Study study) {
+    public static StudyRes of(Study study, List<ScheduleListRes> scheduleListRes) {
         return StudyRes.builder()
                 .title(study.getTitle())
                 .info(study.getInfo())
                 .roomMaker(study.getRoomMaker())
                 .members(study.getMembers())
-//                .schedules(study.getSchedules())
+                .scheduleListRes(scheduleListRes)
                 .build();
     }
 

@@ -11,7 +11,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleInfoRes {
+public class ScheduleRes {
+
     private LocalDateTime startedAt;
+
+    private LocalDateTime finishedAt;
+
     private List<Problem> toSolveProblems;
+
 }

@@ -15,11 +15,14 @@ import java.util.List;
 @Builder
 public class ScheduleReq {
 
-    @ApiModelProperty( name = "studyId", example = "study1" )
+    @ApiModelProperty( name = "studyId", example = "awey35yhaezth" )
     private String studyId;
 
-    @ApiModelProperty( name = "startedAt", example = "2019-11-12T12:32:44")
+    @ApiModelProperty( name = "startedAt", example = "2022-04-12T12:32:44")
     private LocalDateTime startedAt;
+
+    @ApiModelProperty( name = "finishedAt", example = "2022-04-15T12:32:44")
+    private LocalDateTime finishedAt;
 
     @ApiModelProperty( name = "toSolveProblems", example = "['625f62ad9319670330d4993e']")
     private List<String> toSolveProblems;
