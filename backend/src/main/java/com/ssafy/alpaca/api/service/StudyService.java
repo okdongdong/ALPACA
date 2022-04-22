@@ -53,8 +53,14 @@ public class StudyService {
     public StudyRes getStudy(String username, String id){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-
-        if (!study.getMembers().contains(user)) {
+        boolean isMember = false;
+        for (User studyMember : study.getMembers()) {
+            if (studyMember.getId().equals(user.getId())) {
+                isMember=true;
+                break;
+            }
+        }
+        if (!isMember) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
