@@ -6,10 +6,12 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 import { useParams } from 'react-router-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Grid } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 type Monaco = typeof monaco;
 
 function Compile() {
+  const theme = useTheme();
   const { problemId } = useParams();
   const [language, setLanguage] = useState<string>('python');
   const [code, setCode] = useState<string>('');
@@ -18,15 +20,15 @@ function Compile() {
   monaco?.editor.defineTheme('myTheme', {
     base: 'vs',
     inherit: true,
-    rules: [{ token: '', background: 'F2F2F2' }],
+    rules: [{ token: '', background: theme.palette.component }],
     colors: {
-      'editor.foreground': '#000000',
-      'editor.background': '#F2F2F2',
-      'editorCursor.foreground': '#000000' + '99',
-      'editor.lineHighlightBackground': '#FFFFFF' + '99',
-      'editorLineNumber.foreground': '#3C5FAE',
-      'editor.selectionBackground': '#97B2E1' + '30',
-      'editor.inactiveSelectionBackground': '#97B2E1' + '15',
+      'editor.foreground': theme.palette.txt,
+      'editor.background': theme.palette.component,
+      'editorCursor.foreground': theme.palette.txt + '99',
+      'editor.lineHighlightBackground': theme.palette.bg + '99',
+      'editorLineNumber.foreground': theme.palette.accent,
+      'editor.selectionBackground': theme.palette.main + '30',
+      'editor.inactiveSelectionBackground': theme.palette.main + '15',
     },
   });
   useEffect(() => {

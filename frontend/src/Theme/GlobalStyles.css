@@ -1,0 +1,20 @@
+.align_center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.align_column_center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.w_100 {
+  width: 100%;
+}
+
+.h_100 {
+  height: 100%;
+}

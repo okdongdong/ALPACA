@@ -1,9 +1,10 @@
 import { Outlet } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import SideBar from '../../Components/Bars/SideBar';
 
 const MainLayout = () => {
+  const theme = useTheme();
   const APP_BAR_DESKTOP = 30;
   const location = useLocation();
   console.log(location.pathname.indexOf('compile'));
@@ -24,7 +25,7 @@ const MainLayout = () => {
   const MainDiv = styled('div')({
     height: '100%',
     width: '100%',
-    background: '#FFFFFF',
+    background: theme.palette.bg,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -33,7 +34,9 @@ const MainLayout = () => {
 
   return (
     <RootStyle>
-      {location.pathname.indexOf('compile') !== -1 ? null : <SideBar />}
+      {location.pathname.indexOf('compile') !== -1 || location.pathname === '/404' ? null : (
+        <SideBar />
+      )}
 
       <MainStyle>
         <MainDiv>
