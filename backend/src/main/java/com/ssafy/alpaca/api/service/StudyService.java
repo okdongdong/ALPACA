@@ -98,21 +98,31 @@ public class StudyService {
                 .build());
     }
 
-    public Long createStudy(String username, StudyReq studyReq) {
+    public Long createStudy(String username, StudyReq studyReq) throws IllegalAccessException {
         User user = checkUserByUsername(username);
-
         Study study = StudyReq.of(studyReq, user);
-        studyRepository.save(study);
 
+        if (12 < studyReq.getMemberIdList().size()) {
+            throw new IllegalAccessException(ExceptionUtil.TOO_MANY_MEMBERS);
+        }
+
+        HashSet<Long> hashSet = new HashSet<>();
         List<MyStudy> myStudyList = new ArrayList<>();
         for (Long userId : studyReq.getMemberIdList()) {
+            if (hashSet.contains(userId)) {
+                continue;
+            }
+            hashSet.add(userId);
+
             myStudyList.add(MyStudy.builder()
                             .isRoomMaker(user.getId().equals(userId))
-                            .pinnedTime(LocalDateTime.of(0, 1, 1, 6, 0))
+//                            .pinnedTime(LocalDateTime.of(0, 1, 1, 6, 0))
                             .user(checkUserById(userId))
                             .study(study)
                     .build());
         }
+
+        studyRepository.save(study);
         myStudyRepository.saveAll(myStudyList);
 
         return study.getId();
@@ -122,11 +132,18 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
-        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (user.getId().equals(member.getId())) {
+            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+        }
+
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
         if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
+
         userStudy.setIsRoomMaker(false);
         memberStudy.setIsRoomMaker(true);
         myStudyRepository.save(userStudy);
