@@ -13,6 +13,7 @@ import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
+import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MyStudyRepository myStudyRepository;
+    private final CodeRepository codeRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
@@ -226,6 +228,8 @@ public class UserService {
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndIsRoomMaker(user, true))) {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
+
+        codeRepository.deleteAll(codeRepository.findByUserId(id));
         userRepository.delete(user);
     }
 
@@ -247,6 +251,8 @@ public class UserService {
     public void updatePassword(Long id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        checkPassword(passwordUpdateReq.getPassword(), user.getPassword());
+
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);

@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @ApiOperation(
-            value = "회원정보 삭제",
+            value = "회원정보 삭제(탈퇴)",
             notes = "요청 회원을 탈퇴처리한다."
     )
     @DeleteMapping("/{id}")
