@@ -60,7 +60,7 @@ public class AuthController {
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )
     @PostMapping("/signup")
-    public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
+    public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody SignupReq signupReq) {
         userService.signup(signupReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -74,9 +74,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     public void logout(@RequestHeader("Authorization") String accessToken, 
-                       @RequestHeader("RefreshToken") String refreToken) {
+                       @RequestHeader("RefreshToken") String refreshToken) {
         String username = jwtTokenUtil.getUsername(accessToken.substring(7));
-        userService.logout(TokenRes.of(accessToken, refreToken), username);
+        userService.logout(TokenRes.of(accessToken, refreshToken), username);
     }
 
     @PostMapping("/reissue")

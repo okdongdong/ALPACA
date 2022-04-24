@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "user")
@@ -18,17 +19,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(unique = true)
     private String username;
 
+    @NotBlank
     @JsonIgnore
     private String password;
 
+    @NotBlank
     @Column(unique = true)
     private String nickname;
 
     private String info;
 
+    @NotBlank
     @Column(name = "boj_id", unique = true)
     private String bojId;
 
