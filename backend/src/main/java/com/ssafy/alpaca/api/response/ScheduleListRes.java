@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Builder
 public class ScheduleListRes {
 
-    private String id;
+    private Long id;
 
     private LocalDateTime startedAt;
 

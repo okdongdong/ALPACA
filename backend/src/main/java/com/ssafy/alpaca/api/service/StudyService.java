@@ -66,8 +66,12 @@ public class StudyService {
         if (optionalMyStudy.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         } else {
-            List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtMonthOrderByStartedAtAsc(
-                    study, LocalDateTime.now().getMonth());
+            LocalDateTime localDateTime = LocalDateTime.now();
+            List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
+                    study,
+                    LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0),
+                    LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue()+1, 1, 0, 0)
+            );
             List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
             return StudyRes.builder()
                     .title(study.getTitle())

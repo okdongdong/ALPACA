@@ -10,4 +10,7 @@ import java.util.List;
 public interface CodeRepository extends MongoRepository<Code, String> {
 
     List<Code> findAllByStudyId(Long studyId);
+
+    List<Code> findByUserId(Long userId);
+
 }

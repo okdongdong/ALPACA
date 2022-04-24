@@ -16,7 +16,7 @@ import java.util.List;
 public class ScheduleReq {
 
     @ApiModelProperty( name = "studyId", example = "awey35yhaezth" )
-    private String studyId;
+    private Long studyId;
 
     @ApiModelProperty( name = "startedAt", example = "2022-04-12T12:32:44")
     private LocalDateTime startedAt;

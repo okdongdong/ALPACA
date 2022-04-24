@@ -38,7 +38,6 @@ import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REISSUE_EXPIRATION_
 public class UserService {
 
     private final UserRepository userRepository;
-    private final StudyRepository studyRepository;
     private final MyStudyRepository myStudyRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final LogoutAccessTokenRedisRepository logoutAccessTokenRedisRepository;
