@@ -70,11 +70,7 @@ public class UserService {
         }
     }
 
-    public void signup(SignupReq signupReq) throws IllegalAccessException {
-        if (signupReq.getBojId().isEmpty()) {
-            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
-        }
-
+    public void signup(SignupReq signupReq) {
         if (!signupReq.getPassword().equals(signupReq.getPasswordCheck())) {
             throw new IllegalArgumentException(ExceptionUtil.USER_PW_INVALID);
         }
@@ -116,8 +112,9 @@ public class UserService {
                 .stream().map(myStudy -> StudyListRes.builder()
                         .id(myStudy.getStudy().getId())
                         .title(myStudy.getStudy().getTitle())
-//                        프로필이미지 추가해야합니다.
-                        .profileImgList(new ArrayList<>())
+                        .profileImgList(myStudyRepository.findAllByStudy(myStudy.getStudy()).stream().map(
+                                anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+                                .collect(Collectors.toList()))
                         .build()).collect(Collectors.toList());
 
         return LoginRes.builder()
