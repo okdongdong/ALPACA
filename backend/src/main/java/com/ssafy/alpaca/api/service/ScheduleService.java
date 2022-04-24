@@ -126,9 +126,9 @@ public class ScheduleService {
     }
 
     public void deleteSchedule(Long id) {
-        List<Code> codes = codeRepository.findByUserId(id);
+        List<Code> codes = codeRepository.findAllByScheduleId(id);
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        scheduleRepository.delete(schedule);
         codeRepository.deleteAll(codes);
+        scheduleRepository.delete(schedule);
     }
 }

@@ -116,7 +116,6 @@ public class StudyService {
 
             myStudyList.add(MyStudy.builder()
                             .isRoomMaker(user.getId().equals(userId))
-//                            .pinnedTime(LocalDateTime.of(0, 1, 1, 6, 0))
                             .user(checkUserById(userId))
                             .study(study)
                     .build());
@@ -155,15 +154,19 @@ public class StudyService {
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
 
-        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
         if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-
         if (user.getId().equals(member.getId())) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
-        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        List<Code> codes = codeRepository.findAllByUserIdAndStudyId(member.getId(), study.getId());
+        
+        codeRepository.deleteAll(codes);
         myStudyRepository.delete(memberStudy);
     }
 
