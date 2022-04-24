@@ -165,7 +165,7 @@ public class StudyService {
         MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
         List<Code> codes = codeRepository.findAllByUserIdAndStudyId(member.getId(), study.getId());
-        
+
         codeRepository.deleteAll(codes);
         myStudyRepository.delete(memberStudy);
     }
@@ -174,8 +174,7 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
 
         if (myStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
@@ -190,11 +189,13 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
-        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
         if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-
+        List<Code> codes = codeRepository.findAllByStudyId(study.getId());
+        codeRepository.deleteAll(codes);
         studyRepository.delete(study);
     }
 
@@ -202,7 +203,8 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
-        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
         if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
@@ -216,7 +218,6 @@ public class StudyService {
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
         List<ToSolveProblem> problemList = new ArrayList<>();
         for(Schedule schedule:scheduleList){
-
             problemList.addAll(schedule.getToSolveProblems());
         }
         return problemList.stream().map(toSolveProblem -> ProblemListRes.builder()
