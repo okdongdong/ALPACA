@@ -1,6 +1,5 @@
 package com.ssafy.alpaca.api.response;
 
-import com.ssafy.alpaca.db.document.Problem;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,6 +16,6 @@ public class ScheduleRes {
 
     private LocalDateTime finishedAt;
 
-    private List<Problem> toSolveProblems;
+    private List<ProblemListRes> problemListRes;
 
 }
