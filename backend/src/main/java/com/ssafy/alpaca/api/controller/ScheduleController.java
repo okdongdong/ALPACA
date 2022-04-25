@@ -45,7 +45,7 @@ public class ScheduleController {
             notes = "스터디 일정을 조회한다."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleRes> getSchedule(@PathVariable String id) throws IllegalAccessException {
+    public ResponseEntity<ScheduleRes> getSchedule(@PathVariable Long id) throws IllegalAccessException {
         return ResponseEntity.ok(scheduleService.getSchedule(id));
     }
 

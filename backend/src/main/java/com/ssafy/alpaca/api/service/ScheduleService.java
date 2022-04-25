@@ -27,8 +27,12 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final CodeRepository codeRepository;
-    private final MyStudyRepository myStudyRepository;
 
+    private Schedule checkScheduleById(Long id) {
+        return scheduleRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND)
+        );
+    }
 
     public Long createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
         if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
@@ -76,7 +80,7 @@ public class ScheduleService {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        Schedule schedule = checkScheduleById(id);
         Study study = studyRepository.findById(schedule.getStudy().getId()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -106,8 +110,8 @@ public class ScheduleService {
         }
     }
 
-    public ScheduleRes getSchedule(String id) {
-        Schedule schedule = scheduleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+    public ScheduleRes getSchedule(Long id) {
+        Schedule schedule = checkScheduleById(id);
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
@@ -119,16 +123,14 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
+        LocalDateTime localDateTime = LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth(), 1, 0, 0);
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study,
-                LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth(), 1, 0, 0),
-                LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth() + 1, 1, 0, 0))
-        );
+                study, localDateTime.minusWeeks(1), localDateTime.plusWeeks(2)));
     }
 
     public void deleteSchedule(Long id) {
         List<Code> codes = codeRepository.findAllByScheduleId(id);
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
+        Schedule schedule = checkScheduleById(id);
         codeRepository.deleteAll(codes);
         scheduleRepository.delete(schedule);
     }
