@@ -6,8 +6,7 @@ import SideBar from '../../Components/Bars/SideBar';
 const MainLayout = () => {
   const theme = useTheme();
   const APP_BAR_DESKTOP = 30;
-  const location = useLocation();
-  console.log(location.pathname.indexOf('compile'));
+  const { pathname } = useLocation();
   const RootStyle = styled('div')({
     height: '100%',
     display: 'flex',
@@ -34,9 +33,7 @@ const MainLayout = () => {
 
   return (
     <RootStyle>
-      {location.pathname.indexOf('compile') !== -1 || location.pathname === '/404' ? null : (
-        <SideBar />
-      )}
+      {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
 
       <MainStyle>
         <MainDiv>

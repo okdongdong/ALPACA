@@ -36,7 +36,7 @@ const CustomDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
 );
 
 function SideBar() {
-  const location = useLocation();
+  const { pathname } = useLocation();
   const theme = useTheme();
   const icon: iconObjType = {
     Home: <Home />,
@@ -46,9 +46,7 @@ function SideBar() {
   };
 
   const iconList =
-    location.pathname.indexOf('room') === -1
-      ? ['Home', 'Problem', 'Logout', 'Noti']
-      : ['Logout', 'Noti'];
+    pathname.indexOf('room') === -1 ? ['Logout', 'Noti'] : ['Home', 'Problem', 'Logout', 'Noti'];
   return (
     <CustomDrawer variant="permanent">
       <DrawerHeader>

@@ -10,6 +10,7 @@ import Compile from './Pages/Room/Compile';
 import Invite from './Pages/Room/Invite';
 import ProblemManage from './Pages/Room/ProblemManage';
 import RoomMain from './Pages/Room/RoomMain';
+import StudyLive from './Pages/Room/StudyLive';
 
 function Router() {
   return useRoutes([
@@ -25,6 +26,10 @@ function Router() {
             {
               path: 'problem-manage',
               element: <ProblemManage />,
+            },
+            {
+              path: 'live',
+              element: <StudyLive />,
             },
           ],
         },
