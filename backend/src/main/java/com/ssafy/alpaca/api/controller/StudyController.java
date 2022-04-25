@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.controller;
 
 
+import com.ssafy.alpaca.api.request.StudyInviteReq;
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.request.StudyUpdateReq;
@@ -129,4 +130,35 @@ public class StudyController {
         return ResponseEntity.ok(studyService.getStudyProblem(id));
     }
 
+    @ApiOperation(
+            value = "스터디 초대 ",
+            notes = "방장이 스터디에 사용자를 초대한다."
+    )
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<? extends BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq){
+        String username = userService.getCurrentUsername();
+        studyService.inviteStudy(username, id, studyMemberReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
+
+    @ApiOperation(
+            value = "초대코드 생성 ",
+            notes = "초대코드를 생성한다."
+    )
+    @GetMapping("/{id}/inviteCode")
+    public ResponseEntity<? extends BaseResponseBody> createInviteCode(@PathVariable Long id){
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
+    }
+
+    @ApiOperation(
+            value = "초대코드로 스터디 등록 ",
+            notes = "초대코드로 스터디에 등록한다."
+    )
+    @PostMapping("/{id}/inviteCode")
+    public ResponseEntity<? extends BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq){
+        String username = userService.getCurrentUsername();
+        studyService.inviteUserCode(username, id, studyInviteReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
 }
