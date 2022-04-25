@@ -7,7 +7,6 @@ import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
-import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
@@ -31,7 +30,7 @@ public class ScheduleService {
     private final MyStudyRepository myStudyRepository;
 
 
-    public String createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+    public Long createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
         if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
                 scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
@@ -41,29 +40,34 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
+        LocalDateTime localDateTime = LocalDateTime.of(
+                scheduleReq.getStartedAt().getYear(),
+                scheduleReq.getStartedAt().getMonth(),
+                scheduleReq.getStartedAt().getDayOfMonth(), 0, 0);
         if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study,
-                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth() + 1, 0, 0))
+                study, localDateTime, localDateTime.plusDays(1))
         ) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
 
-        Schedule schedule = scheduleRepository.save(
-                Schedule.builder()
+        Schedule schedule = Schedule.builder()
                         .study(study)
                         .startedAt(scheduleReq.getStartedAt())
                         .finishedAt(scheduleReq.getFinishedAt())
-                        .build());
+                        .build();
+        List<ToSolveProblem> toSolveProblems = new ArrayList<>();
         for (String id : scheduleReq.getToSolveProblems()) {
-            toSolveProblemRepository.save(
+            toSolveProblems.add(
                     ToSolveProblem.builder()
                             .schedule(schedule)
                             .problemId(id)
-                            .build());
+                            .build()
+            );
         }
 
-        return String.valueOf(schedule.getId());
+        scheduleRepository.save(schedule);
+        toSolveProblemRepository.saveAll(toSolveProblems);
+        return schedule.getId();
     }
 
     public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
@@ -77,14 +81,15 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
-        List<MyStudy> MyStudyList = myStudyRepository.findAllByStudy(study);
+        LocalDateTime localDateTime = LocalDateTime.of(
+                scheduleUpdateReq.getStartedAt().getYear(),
+                scheduleUpdateReq.getStartedAt().getMonth(),
+                scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0);
+        Schedule checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                study, localDateTime, localDateTime.plusDays(1));
 
-        if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study,
-                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth() + 1, 0, 0))
-        ) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        if (!schedule.getId().equals(checkSchedule.getId())) {
+            throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
 //      스터디장만 수정 가능

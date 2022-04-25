@@ -25,6 +25,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
 //    Boolean existsByStudyAndStartedAtYearAndStartedAtMonthAndStartedAtDayOfMonth(Study study, Integer year, Month month, Integer day);
 
+    Schedule findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
+
     Boolean existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
 
 }
