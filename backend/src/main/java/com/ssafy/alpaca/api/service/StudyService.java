@@ -75,7 +75,12 @@ public class StudyService {
             return StudyRes.builder()
                     .title(study.getTitle())
                     .info(study.getTitle())
-                    .members(StudyRes.Member.of(myStudies))
+                    .members(myStudies.stream().map(myStudy -> StudyRes.Member.builder()
+                                    .userId(myStudy.getUser().getId())
+                                    .nickname(myStudy.getUser().getNickname())
+                                    .isRoomMaker(myStudy.getIsRoomMaker())
+                                    .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                                    .build()).collect(Collectors.toList()))
                     .scheduleListRes(ScheduleListRes.of(schedules))
                     .build();
         }

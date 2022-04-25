@@ -28,6 +28,7 @@ public class StudyRes {
         private Long userId;
         private String nickname;
         private boolean isRoomMaker;
+        private String profileImg;
 
         public static List<Member> of(List<MyStudy> list) {
             return  list.stream().map(
