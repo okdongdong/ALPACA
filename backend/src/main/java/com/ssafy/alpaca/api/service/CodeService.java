@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -20,21 +21,21 @@ public class CodeService {
     private final ScheduleRepository scheduleRepository;
     private final CodeRepository codeRepository;
 
-    public void saveCode(CodeSaveReq codeSaveReq) throws IllegalAccessException {
-        Schedule schedule = scheduleRepository.findById(codeSaveReq.getScheduleId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        if (!schedule.getStudy().getId().equals(codeSaveReq.getStudyId())){
-            throw new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND);
-        }
-
+    public void createCode(CodeSaveReq codeSaveReq) throws IllegalAccessException {
         if (codeSaveReq.getCode().isEmpty()){
             throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
         }
+
+        List<Code> codes = codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtAsc(
+                codeSaveReq.getUserId(), codeSaveReq.getProblemId());
+        if (10 <= codes.size()) {
+            Code code = codes.get(0);
+            codeRepository.delete(code);
+        }
+
         codeRepository.save(
                 Code.builder()
                         .userId(codeSaveReq.getUserId())
-                        .studyId(codeSaveReq.getStudyId())
-                        .scheduleId(codeSaveReq.getScheduleId())
                         .problemId(codeSaveReq.getProblemId())
                         .code(codeSaveReq.getCode())
                         .build()

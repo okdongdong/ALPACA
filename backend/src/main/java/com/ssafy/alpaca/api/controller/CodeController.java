@@ -20,8 +20,8 @@ public class CodeController {
             notes = "컴파일한 코드를 저장한다."
     )
     @PostMapping()
-    public ResponseEntity<? extends BaseResponseBody> saveCode(@RequestBody CodeSaveReq codeSaveReq) throws IllegalAccessException{
-        codeService.saveCode(codeSaveReq);
+    public ResponseEntity<? extends BaseResponseBody> createCode(@RequestBody CodeSaveReq codeSaveReq) throws IllegalAccessException{
+        codeService.createCode(codeSaveReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 }

@@ -21,7 +21,7 @@ public class ProblemListRes {
 
     private String title;
 
-    private String level;
+    private Integer level;
 
     private LocalDateTime startedAt;
 

@@ -19,4 +19,5 @@ public interface CodeRepository extends MongoRepository<Code, String> {
 
     Code findByProblemIdAndUserId(String problemId, Long userId);
 
+    List<Code> findAllByUserIdAndProblemIdOrderBySubmittedAtAsc(Long userId, String problemId);
 }
