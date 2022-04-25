@@ -11,6 +11,7 @@ public class ExceptionUtil {
     public static final String NOT_VALID_VALUE = "존재하지 않거나, 유효하지 않는 요청 값이 있습니다.";
     public static final String ROOMMAKER_CANNOT_RESIGN = "스터디에서 방장을 맡고 있으면 탈퇴할 수 없습니다.";
     public static final String INVALID_DATE_VALUE = "종료시간이 더 빠를 수 없습니다.";
+    public static final String TOO_MANY_MEMBERS = "스터디 멤버는 12명을 초과할 수 없습니다.";
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     public static final String INVALID_REFRESH_TOKEN = "리프레시 토큰이 유효하지 않습니다";

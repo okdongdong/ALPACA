@@ -21,7 +21,7 @@ public class StudyReq {
             example = "스터디에 관한 정보를 입력해주세요." )
     private String info;
 
-    @ApiModelProperty( name = "members" )
+    @ApiModelProperty( name = "memberIdList" )
     private List<Long> memberIdList;
 
     public static Study of(StudyReq studyReq, User user) {

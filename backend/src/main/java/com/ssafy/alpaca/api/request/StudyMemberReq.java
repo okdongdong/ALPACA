@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class StudyMemberReq {
 
-    @ApiModelProperty( name = "memberId", example = "testuser2" )
+    @ApiModelProperty( name = "memberId", example = "1" )
     private Long memberId;
 
 }

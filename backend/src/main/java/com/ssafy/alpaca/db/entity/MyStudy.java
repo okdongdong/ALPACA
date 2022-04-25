@@ -25,11 +25,11 @@ public class MyStudy {
     @Column(name = "pinned_time")
     private LocalDateTime pinnedTime = LocalDateTime.of(0, 1, 1, 6, 0);
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "study_id", nullable = false)
     private Study study;
 

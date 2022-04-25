@@ -19,7 +19,7 @@ public class UserUpdateReq {
     @ApiModelProperty( name = "theme", example = "dark" )
     private String theme;
 
-    @ApiModelProperty( name = "preferredLanguage", example = "python" )
+    @ApiModelProperty( name = "preferredLanguage", example = "java" )
     private String preferredLanguage;
 
 }
