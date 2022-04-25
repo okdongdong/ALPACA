@@ -3,7 +3,8 @@ import { Button, styled } from '@mui/material';
 import React from 'react';
 
 interface CBtnProps {
-  content: string | ReactJSXElement;
+  content?: string | ReactJSXElement;
+  children?: string | ReactJSXElement;
   backgroundColor?: string;
   color?: string;
   disabled?: boolean;
@@ -27,6 +28,7 @@ function CBtn({
   disabled = false,
   width = '',
   height = '',
+  children,
   onClick,
 }: CBtnProps) {
   return (
@@ -40,6 +42,7 @@ function CBtn({
       disabled={disabled}
       onClick={onClick}>
       {content}
+      {children}
     </CustomButton>
   );
 }
