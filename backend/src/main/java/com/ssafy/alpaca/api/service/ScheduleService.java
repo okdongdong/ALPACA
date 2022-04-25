@@ -100,7 +100,6 @@ public class ScheduleService {
         schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
         schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         scheduleRepository.save(schedule);
-        codeRepository.deleteAll(codeRepository.findAllByScheduleId(schedule.getId()));
         for (String problemId : scheduleUpdateReq.getToSolveProblems()) {
             toSolveProblemRepository.save(
                     ToSolveProblem.builder()
@@ -129,9 +128,7 @@ public class ScheduleService {
     }
 
     public void deleteSchedule(Long id) {
-        List<Code> codes = codeRepository.findAllByScheduleId(id);
         Schedule schedule = checkScheduleById(id);
-        codeRepository.deleteAll(codes);
         scheduleRepository.delete(schedule);
     }
 }

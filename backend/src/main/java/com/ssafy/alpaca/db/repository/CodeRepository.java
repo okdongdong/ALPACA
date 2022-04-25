@@ -9,13 +9,7 @@ import java.util.List;
 @Repository
 public interface CodeRepository extends MongoRepository<Code, String> {
 
-    List<Code> findAllByStudyId(Long studyId);
-
     List<Code> findAllByUserId(Long userId);
-
-    List<Code> findAllByUserIdAndStudyId(Long userId, Long studyId);
-
-    List<Code> findAllByScheduleId(Long scheduleId);
 
     Code findByProblemIdAndUserId(String problemId, Long userId);
 
