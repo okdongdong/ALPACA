@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class ScheduleListReq {
 
-    @ApiModelProperty( name = "studyId", example = "135aetgw46t35y" )
+    @ApiModelProperty( name = "studyId", example = "1" )
     private Long studyId;
 
     @ApiModelProperty( name = "year", example = "2022")
