@@ -67,11 +67,10 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         } else {
             LocalDateTime localDateTime = LocalDateTime.now();
+            LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).minusWeeks(1);
+            LocalDateTime nextMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).plusWeeks(2);
             List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                    study,
-                    LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0),
-                    LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue()+1, 1, 0, 0)
-            );
+                    study, thisMonth, nextMonth);
             List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
             return StudyRes.builder()
                     .title(study.getTitle())
