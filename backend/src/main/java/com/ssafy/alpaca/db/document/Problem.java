@@ -20,7 +20,7 @@ public class Problem {
     private String id;
 
     @Indexed(unique = true)
-    private Integer number;
+    private String number;
 
     private String title;
 

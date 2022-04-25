@@ -17,11 +17,11 @@ public class ProblemListRes {
 
     private String id;
 
-    private Integer number;
+    private String number;
 
     private String title;
 
-    private Integer level;
+    private String level;
 
     private LocalDateTime startedAt;
 
