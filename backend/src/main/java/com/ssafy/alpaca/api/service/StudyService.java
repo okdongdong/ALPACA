@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.StudyInviteReq;
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.api.request.StudyReq;
 import com.ssafy.alpaca.api.request.StudyUpdateReq;
@@ -9,6 +10,7 @@ import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
+import com.ssafy.alpaca.common.util.RandomCodeUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
@@ -233,4 +235,55 @@ public class StudyService {
                 .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
                 .build()).collect(Collectors.toList());
     }
+
+    public void inviteStudy(String username, Long id, StudyMemberReq studyMemberReq){
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+        myStudyRepository.save(
+                MyStudy.builder()
+                        .isRoomMaker(false)
+                        .user(member)
+                        .study(study)
+                        .build()
+        );
+    }
+
+    public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq){
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        if (study.getInviteCode().isEmpty()){
+            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
+        }
+        if (!studyInviteReq.getInviteCode().equals(study.getInviteCode())){
+            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
+        }
+
+        myStudyRepository.save(
+                MyStudy.builder()
+                        .isRoomMaker(false)
+                        .user(user)
+                        .study(study)
+                        .build()
+        );
+    }
+
+    public String createInviteCode(String username, Long id){
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        MyStudy userStudy = myStudyRepository.findByUserAndStudy(user,study).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
+        if (!userStudy.getIsRoomMaker()) {
+            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+        String inviteCode = RandomCodeUtil.getRandomCode();
+        study.setInviteCode(inviteCode);
+        return inviteCode;
+    }
+
 }

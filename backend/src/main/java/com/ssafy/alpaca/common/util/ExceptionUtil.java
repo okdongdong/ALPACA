@@ -12,6 +12,8 @@ public class ExceptionUtil {
     public static final String ROOMMAKER_CANNOT_RESIGN = "스터디에서 방장을 맡고 있으면 탈퇴할 수 없습니다.";
     public static final String INVALID_DATE_VALUE = "종료시간이 더 빠를 수 없습니다.";
     public static final String TOO_MANY_MEMBERS = "스터디 멤버는 12명을 초과할 수 없습니다.";
+    public static final String INVITE_CODE_INVALID = "초대코드가 일치하지 않습니다.";
+    public static final String INVITE_CODE_NOT_EXISTS = "초대코드가 존재하지 않습니다.";
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     public static final String INVALID_REFRESH_TOKEN = "리프레시 토큰이 유효하지 않습니다";
