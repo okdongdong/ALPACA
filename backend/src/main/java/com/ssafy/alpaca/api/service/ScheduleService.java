@@ -30,13 +30,7 @@ public class ScheduleService {
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final CodeRepository codeRepository;
 
-    private Map<String, String> getMessage(String returnMessage){
-        Map<String, String> map = new HashMap<>();
-        map.put("message", returnMessage);
-        return map;
-    }
-
-    public String createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+    public Long createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
         if (scheduleReq.getFinishedAt().isAfter(scheduleReq.getStartedAt()) ||
         scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
@@ -46,30 +40,36 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
+        LocalDateTime localDateTime = LocalDateTime.of(
+                scheduleReq.getStartedAt().getYear(),
+                scheduleReq.getStartedAt().getMonth(),
+                scheduleReq.getStartedAt().getDayOfMonth(), 0, 0);
         if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study,
-                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth()+1, 0, 0))
+                study, localDateTime, localDateTime.plusDays(1))
         ) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
 
-        Schedule schedule = scheduleRepository.save(
-                Schedule.builder()
+        Schedule schedule = Schedule.builder()
                         .study(study)
                         .startedAt(scheduleReq.getStartedAt())
                         .finishedAt(scheduleReq.getFinishedAt())
-                        .build());
+                        .build();
+
+        List<ToSolveProblem> toSolveProblems = new ArrayList<>();
         for(String id:scheduleReq.getToSolveProblems())
         {
-                ToSolveProblem toSolveProblem = toSolveProblemRepository.save(
-                        ToSolveProblem.builder()
-                                .schedule(schedule)
-                                .problemId(id)
-                                .build());
-        };
+            toSolveProblems.add(
+                    ToSolveProblem.builder()
+                            .schedule(schedule)
+                            .problemId(id)
+                            .build()
+            );
+        }
 
-        return String.valueOf(schedule.getId());
+        scheduleRepository.save(schedule);
+        toSolveProblemRepository.saveAll(toSolveProblems);
+        return schedule.getId();
     }
 
     public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
