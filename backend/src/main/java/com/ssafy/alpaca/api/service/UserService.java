@@ -229,7 +229,7 @@ public class UserService {
             throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
 
-        codeRepository.deleteAll(codeRepository.findByUserId(id));
+        codeRepository.deleteAll(codeRepository.findAllByUserId(id));
         userRepository.delete(user);
     }
 
