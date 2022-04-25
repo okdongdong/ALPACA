@@ -83,12 +83,15 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
-        if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study,
-                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth()+1, 0, 0))
-        ) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+        LocalDateTime localDateTime = LocalDateTime.of(
+                scheduleUpdateReq.getStartedAt().getYear(),
+                scheduleUpdateReq.getStartedAt().getMonth(),
+                scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0);
+        Schedule checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                study, localDateTime, localDateTime.plusDays(1));
+
+        if (!schedule.getId().equals(checkSchedule.getId())) {
+            throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
 //      스터디장만 수정 가능
