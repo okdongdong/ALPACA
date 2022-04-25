@@ -17,4 +17,6 @@ public interface CodeRepository extends MongoRepository<Code, String> {
 
     List<Code> findAllByScheduleId(Long scheduleId);
 
+    Code findByProblemIdAndUserId(String problemId, Long userId);
+
 }

@@ -7,6 +7,7 @@ import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
+import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
@@ -15,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 
 @Service
@@ -29,16 +28,12 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final CodeRepository codeRepository;
+    private final MyStudyRepository myStudyRepository;
 
-    private Map<String, String> getMessage(String returnMessage){
-        Map<String, String> map = new HashMap<>();
-        map.put("message", returnMessage);
-        return map;
-    }
 
     public String createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
-        if (scheduleReq.getFinishedAt().isAfter(scheduleReq.getStartedAt()) ||
-        scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
+        if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
+                scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
@@ -49,7 +44,7 @@ public class ScheduleService {
         if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study,
                 LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth()+1, 0, 0))
+                LocalDateTime.of(scheduleReq.getStartedAt().getYear(), scheduleReq.getStartedAt().getMonth(), scheduleReq.getStartedAt().getDayOfMonth() + 1, 0, 0))
         ) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
@@ -60,20 +55,19 @@ public class ScheduleService {
                         .startedAt(scheduleReq.getStartedAt())
                         .finishedAt(scheduleReq.getFinishedAt())
                         .build());
-        for(String id:scheduleReq.getToSolveProblems())
-        {
-                ToSolveProblem toSolveProblem = toSolveProblemRepository.save(
-                        ToSolveProblem.builder()
-                                .schedule(schedule)
-                                .problemId(id)
-                                .build());
-        };
+        for (String id : scheduleReq.getToSolveProblems()) {
+            toSolveProblemRepository.save(
+                    ToSolveProblem.builder()
+                            .schedule(schedule)
+                            .problemId(id)
+                            .build());
+        }
 
         return String.valueOf(schedule.getId());
     }
 
     public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
-        if (scheduleUpdateReq.getFinishedAt().isAfter(scheduleUpdateReq.getStartedAt()) ||
+        if (scheduleUpdateReq.getFinishedAt().isBefore(scheduleUpdateReq.getStartedAt()) ||
                 scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
             throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
         }
@@ -83,10 +77,12 @@ public class ScheduleService {
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
+        List<MyStudy> MyStudyList = myStudyRepository.findAllByStudy(study);
+
         if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study,
                 LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0),
-                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth()+1, 0, 0))
+                LocalDateTime.of(scheduleUpdateReq.getStartedAt().getYear(), scheduleUpdateReq.getStartedAt().getMonth(), scheduleUpdateReq.getStartedAt().getDayOfMonth() + 1, 0, 0))
         ) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
@@ -95,17 +91,17 @@ public class ScheduleService {
         schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
         schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         scheduleRepository.save(schedule);
-        for(String problemid:scheduleUpdateReq.getToSolveProblems())
-        {
-            ToSolveProblem toSolveProblem = toSolveProblemRepository.save(
+        codeRepository.deleteAll(codeRepository.findAllByScheduleId(schedule.getId()));
+        for (String problemId : scheduleUpdateReq.getToSolveProblems()) {
+            toSolveProblemRepository.save(
                     ToSolveProblem.builder()
                             .schedule(schedule)
-                            .problemId(problemid)
+                            .problemId(problemId)
                             .build());
-        };
+        }
     }
 
-    public ScheduleRes getSchedule(String id) throws IllegalAccessException {
+    public ScheduleRes getSchedule(String id) {
         Schedule schedule = scheduleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
@@ -121,7 +117,7 @@ public class ScheduleService {
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
                 study,
                 LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth(), 1, 0, 0),
-                LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth()+1, 1, 0, 0))
+                LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth() + 1, 1, 0, 0))
         );
     }
 
