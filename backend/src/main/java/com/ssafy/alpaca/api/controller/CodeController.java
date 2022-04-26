@@ -3,8 +3,8 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.CodeUpdateReq;
 import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
-import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Code;
+import com.ssafy.alpaca.api.response.CodeSaveRes;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +22,12 @@ public class CodeController {
 
     @ApiOperation(
             value = "코드 등록",
-            notes = "컴파일한 코드를 저장한다."
+            notes = "코드를 저장하고 컴파일한다."
     )
     @PostMapping()
-    public ResponseEntity<BaseResponseBody> createCode(
+    public ResponseEntity<CodeSaveRes> createCode(
             @RequestBody CodeUpdateReq codeUpdateReq) throws IllegalAccessException{
-        codeService.createCode(codeUpdateReq);
-        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+        return ResponseEntity.ok(codeService.createCode(codeUpdateReq));
     }
 
     @ApiOperation(
