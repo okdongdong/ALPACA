@@ -24,10 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -54,7 +51,6 @@ public class ProblemService {
 
         try {
             while (true) {
-                System.out.println(page);
                 URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + bojId + "&page=" + page);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
@@ -70,7 +66,6 @@ public class ProblemService {
                 bufferedReader.close();
                 String response = stringBuffer.toString();
                 JSONParser jsonParser = new JSONParser();
-                System.out.println(response);
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
                 long total_count = (long) jsonObject.get("count");
                 List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
@@ -95,10 +90,13 @@ public class ProblemService {
         solvedProblemList.removeAll(solvedProblemsInAlpaca);
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
-            Problem problem = problemRepository.findByNumber(solvedProblem);
+            Optional<Problem> problem = problemRepository.findByNumber(solvedProblem);
+            if (problem.isEmpty()) {
+                continue;
+            }
             newSolvedProblem.add(
                     SolvedProblem.builder()
-                            .problemId(problem.getId())
+                            .problemId(problem.get().getId())
                             .number(solvedProblem)
                             .user(user)
                             .build()
