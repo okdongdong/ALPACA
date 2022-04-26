@@ -1,9 +1,8 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
-import theme from '../../Lib/theme';
 
-function MainIntroductionContent() {
-  const [nickname, setNickname] = React.useState('ssafy');
+function MainIntroductionContent(props) {
+  const [nickName, setNickName] = React.useState('ssafy');
   const [introduction, setIntroduction] = React.useState('hello');
 
   return (
@@ -15,7 +14,7 @@ function MainIntroductionContent() {
         id="filled-read-only-input"
         multiline
         maxRows={4}
-        value={nickname}
+        value={nickName}
         sx={{
           width: 500,
           background: '#F2F2F2',
