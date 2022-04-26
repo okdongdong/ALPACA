@@ -21,7 +21,7 @@ public class Problem {
     private String id;
 
     @Indexed(unique = true)
-    private String number;
+    private Long number;
 
     private String title;
 
