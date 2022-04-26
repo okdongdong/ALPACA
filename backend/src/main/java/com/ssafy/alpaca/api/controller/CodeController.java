@@ -1,8 +1,10 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeUpdateReq;
 import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
+import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeSaveRes;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,17 @@ public class CodeController {
     public ResponseEntity<CodeSaveRes> createCode(
             @RequestBody CodeUpdateReq codeUpdateReq) throws IllegalAccessException{
         return ResponseEntity.ok(codeService.createCode(codeUpdateReq));
+    }
+
+    @ApiOperation(
+            value = "코드 등록",
+            notes = "현재 코드를 저장한다."
+    )
+    @PostMapping()
+    public ResponseEntity<BaseResponseBody> createCode2(@RequestBody CodeReq codeReq) {
+        String username = userService.getCurrentUsername();
+        codeService.createCode2(username, codeReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(

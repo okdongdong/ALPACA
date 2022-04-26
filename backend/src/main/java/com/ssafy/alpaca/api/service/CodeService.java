@@ -1,14 +1,17 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeUpdateReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeSaveRes;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.Schedule;
+import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.CodeRepository;
 import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.ScheduleRepository;
+import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ import java.util.NoSuchElementException;
 @Transactional
 public class CodeService {
 
+    private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final CodeRepository codeRepository;
     private final ProblemRepository problemRepository;
@@ -55,6 +59,18 @@ public class CodeService {
         );
 
         return doodleCompile(code.getSubmittedCode(),codeUpdateReq.getLanguage(),codeUpdateReq.getVersionIndex(),problem.getInputs(),problem.getOutputs());
+    }
+
+    public void createCode2(String username, CodeReq codeReq) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        codeRepository.save(Code.builder()
+                        .userId(user.getId())
+                        .problemId(codeReq.getProblemId())
+                        .submittedCode(codeReq.getCode())
+                        .build());
     }
 
     public List<Code> getCode(String username, Long id, String problemId) {
