@@ -26,6 +26,7 @@ public class ExceptionUtil {
     public static final String STUDY_NOT_FOUND = "존재하지 않는 스터디입니다.";
     public static final String SCHEDULE_NOT_FOUND = "존재하지 않는 일정입니다.";
     public static final String PROBLEM_NOT_FOUND = "존재하지 않는 문제 번호입니다.";
+    public static final String LANGUAGE_NOT_FOUND = "지원하지 않는 언어입니다.";
 
     /* 409 CONFLICT : Resource의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     public static final String USER_NICKNAME_DUPLICATE = "중복된 사용자 닉네임입니다.";

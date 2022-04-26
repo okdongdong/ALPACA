@@ -1,7 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.CodeReq;
-import com.ssafy.alpaca.api.request.CodeUpdateReq;
+import com.ssafy.alpaca.api.request.CodeCompileReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeSaveRes;
@@ -33,35 +33,37 @@ import java.util.NoSuchElementException;
 public class CodeService {
 
     private final UserRepository userRepository;
-    private final ScheduleRepository scheduleRepository;
     private final CodeRepository codeRepository;
     private final ProblemRepository problemRepository;
 
-    public CodeSaveRes createCode(CodeUpdateReq codeUpdateReq) throws IllegalAccessException {
-        Schedule schedule = scheduleRepository.findById(codeUpdateReq.getScheduleId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        Problem problem = problemRepository.findById(codeUpdateReq.getProblemId()).orElseThrow(
+    private String compileVersion(String language) {
+        switch (language) {
+            case "python3": return "4";
+            case "java": return "3";
+            case "cpp":
+            case "c":
+                return "5";
+            default: throw new NoSuchElementException(ExceptionUtil.LANGUAGE_NOT_FOUND);
+        }
+    }
+
+    public CodeSaveRes compileCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
 
-        if (!schedule.getStudy().getId().equals(codeUpdateReq.getStudyId())){
-            throw new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND);
-        }
-        if (codeUpdateReq.getCode().isEmpty()){
+        if (codeCompileReq.getCode().isEmpty()){
             throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
         }
 
-        Code code = codeRepository.save(
-                Code.builder()
-                        .userId(codeUpdateReq.getUserId())
-                        .problemId(codeUpdateReq.getProblemId())
-                        .submittedCode(codeUpdateReq.getCode())
-                        .build()
-        );
-
-        return doodleCompile(code.getSubmittedCode(),codeUpdateReq.getLanguage(),codeUpdateReq.getVersionIndex(),problem.getInputs(),problem.getOutputs());
+        return doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
+                compileVersion(codeCompileReq.getLanguage()), problem.getInputs(),problem.getOutputs());
     }
 
-    public void createCode2(String username, CodeReq codeReq) {
+    public void createCode(String username, CodeReq codeReq) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
