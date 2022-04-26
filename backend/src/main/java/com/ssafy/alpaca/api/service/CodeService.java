@@ -7,7 +7,6 @@ import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeSaveRes;
 import com.ssafy.alpaca.db.document.Problem;
-import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -50,29 +48,39 @@ public class CodeService {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
 
-        if (Boolean.TRUE.equals(!problemRepository.existsById(codeCompileWithInputReq.getProblemId()))) {
-            throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
-        }
-
         return doodleCompile(codeCompileWithInputReq.getCode(), codeCompileWithInputReq.getLanguage(),
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-//    public CodeSaveRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
-//        User user = userRepository.findByUsername(username).orElseThrow(
-//                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-//        );
-//
-//        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
-//                () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
-//
-//        if (codeCompileReq.getCode().isEmpty()){
-//            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
-//        }
-//
-//        return doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
-//                compileVersion(codeCompileReq.getLanguage()), problem.getInputs(),problem.getOutputs());
-//    }
+    public CodeSaveRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+        }
+
+        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
+
+        if (codeCompileReq.getCode().isEmpty()){
+            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+        }
+
+
+        List<String> resultList = new ArrayList<>();
+        List<String> outputList = new ArrayList<>();
+        String nowResult;
+        for (int i=0; i<problem.getInputs().size(); i++) {
+            nowResult = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
+                    compileVersion(codeCompileReq.getLanguage()), problem.getInputs().get(i));
+            // 컴파일 실패할 경우 continue 해주는 조건문 필요
+            resultList.add(nowResult);
+            outputList.add(problem.getOutputs().get(i));
+        }
+
+        return CodeSaveRes.builder()
+                .answerList(resultList)
+                .outputList(outputList)
+                .build();
+    }
 
     public void createCode(String username, CodeReq codeReq) {
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -118,6 +126,11 @@ public class CodeService {
                     "\",\"versionIndex\":\"" + versionIndex +
                     "\"} ";
 
+            System.out.println(script);
+            System.out.println(stdin);
+            System.out.println(language);
+            System.out.println(versionIndex);
+
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(input.getBytes());
             outputStream.flush();
@@ -149,6 +162,7 @@ public class CodeService {
 //                .outputList(outputList)
 //                .answerList(answerList)
 //                .build();
-    };
+        return null;
+    }
 
 }

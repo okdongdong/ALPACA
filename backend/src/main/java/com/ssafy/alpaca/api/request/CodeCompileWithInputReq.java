@@ -8,9 +8,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CodeCompileWithInputReq extends CodeCompileReq{
+public class CodeCompileWithInputReq {
 
     @ApiModelProperty( name = "input", example = "" )
     private String input;
+
+    @ApiModelProperty( name = "code", example = "print(list(map(int,input().split())))" )
+    private String code;
+
+    @ApiModelProperty( name = "language", example = "python3" )
+    private String language;
 
 }

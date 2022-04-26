@@ -34,16 +34,16 @@ public class CodeController {
         return ResponseEntity.ok(BaseResponseBody.of(200, codeService.compileCode(username, codeCompileWithInputReq)));
     }
 
-//    @ApiOperation(
-//            value = "예제코드 컴파일",
-//            notes = "BOJ 예제 입력으로 코드를 컴파일한다."
-//    )
-//    @PostMapping("/bojCompile")
-//    public ResponseEntity<CodeSaveRes> compileBojCode(
-//            @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
-//        String username = userService.getCurrentUsername();
-//        return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));
-//    }
+    @ApiOperation(
+            value = "예제코드 컴파일",
+            notes = "BOJ 예제 입력으로 코드를 컴파일한다."
+    )
+    @PostMapping("/bojCompile")
+    public ResponseEntity<CodeSaveRes> compileBojCode(
+            @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));
+    }
 
     @ApiOperation(
             value = "코드 등록",
