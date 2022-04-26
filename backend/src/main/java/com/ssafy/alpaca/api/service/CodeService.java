@@ -68,6 +68,15 @@ public class CodeService {
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
 
+        if (Boolean.TRUE.equals(!problemRepository.existsById(codeReq.getProblemId()))) {
+            throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
+        }
+
+        List<Code> codes = codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(user.getId(), codeReq.getProblemId());
+        if (10 <= codes.size()) {
+            codeRepository.delete(codes.get(codes.size()-1));
+        }
+
         codeRepository.save(Code.builder()
                         .userId(user.getId())
                         .problemId(codeReq.getProblemId())
@@ -77,7 +86,7 @@ public class CodeService {
 
     public List<Code> getCode(String username, Long id, String problemId) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtAsc(id, problemId);
+        return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(id, problemId);
     }
 
     public CodeSaveRes doodleCompile(String script, String language ,String versionIndex ,List<String> stdinList,List<String> answerList) {

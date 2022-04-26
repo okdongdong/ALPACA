@@ -48,7 +48,7 @@ public class CodeController {
             value = "코드 조회",
             notes = "유저가 푼 특정 문제의 모든 코드를 조회한다."
     )
-    @GetMapping("/{userId/studyId/}")
+    @GetMapping("/{userId}/{studyId}")
     public ResponseEntity<List<Code>> getCode(
             @PathVariable Long userId, @RequestParam String problemId) {
         String username = userService.getCurrentUsername();
