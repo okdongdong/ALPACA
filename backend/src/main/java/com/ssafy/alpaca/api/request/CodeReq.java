@@ -8,14 +8,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CodeSaveReq {
+public class CodeReq {
 
     @ApiModelProperty( name = "userId", example = "1" )
     private Long userId;
 
-    @ApiModelProperty( name = "problemId", example = "625f5c065395d55f786b4138" )
+    @ApiModelProperty( name = "problemId", example = "1000" )
     private String problemId;
 
-    @ApiModelProperty( name = "code", example = "code" )
-    private String code;
 }
