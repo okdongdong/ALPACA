@@ -1,6 +1,5 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeUpdateReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
@@ -41,9 +40,9 @@ public class CodeService {
         );
     }
 
-    public List<Code> getCode(CodeReq codeReq) {
-        return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtAsc(
-                codeReq.getUserId(), codeReq.getProblemId());
+    public List<Code> getCode(String username, Long id, String problemId) {
+        // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
+        return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtAsc(id, problemId);
     }
 
 }
