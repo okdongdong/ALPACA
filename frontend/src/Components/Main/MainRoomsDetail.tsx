@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { IconButton, Button } from '@mui/material';
+import { styled, IconButton, Button, Grid, Stack } from '@mui/material';
 import ProfileImg from '../../Assets/Img/Img.png';
 import styles from './MainRoomsDetail.module.css';
 import PushPinIcon from '@mui/icons-material/PushPin';
+
+const NameLabel = styled('label')(({ theme }) => ({
+  color: theme.palette.txt,
+  textAlign: 'center',
+}));
+
 function MainRoomsDetail(props) {
+  //핀고정
   const [pincolor, setPincolor] = useState('#FFFFFF');
   const changeColor = () => {
     if (pincolor === '#FFFFFF') setPincolor('#FFCD29');
     else setPincolor('#FFFFFF');
   };
+
   return (
     <div>
       <Button
         sx={{
           minHeight: 48,
+          display: 'Grid',
           justifyContent: 'center',
           alignItems: 'center',
           mx: '10px',
@@ -40,10 +49,17 @@ function MainRoomsDetail(props) {
             width: '35px',
           }}
           onClick={changeColor}></PushPinIcon>
-
-        {props.detail}
-        <img src={ProfileImg} className={styles.profileimg_mini} alt="" />
-        <img src={ProfileImg} className={styles.profileimg_mini} alt="" />
+        <Grid container sx={{ padding: 3 }}>
+          {props.detail[2].map((member, i) => {
+            return (
+              <Grid item xs={6} key={i}>
+                <img src={ProfileImg} className={styles.profileimg_mini} alt="" />
+                {member.nickname}
+              </Grid>
+            );
+          })}
+        </Grid>
+        <NameLabel>{props.detail[0]}</NameLabel>
       </Button>
     </div>
   );

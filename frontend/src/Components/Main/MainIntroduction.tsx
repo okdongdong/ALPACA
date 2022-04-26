@@ -10,10 +10,12 @@ const MainIntroductionDiv = styled('div')({
 });
 
 function MainIntroduction() {
+  const [userData, setUserData] = React.useState<any[]>();
+  console.log(userData);
   return (
     <MainIntroductionDiv>
-      <MainIntroductionProfile />
-      <MainIntroductionContent />
+      <MainIntroductionProfile callback={setUserData} />
+      <MainIntroductionContent userdata={userData} />
     </MainIntroductionDiv>
   );
 }

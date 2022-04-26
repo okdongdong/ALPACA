@@ -7,11 +7,12 @@ import PaginationItem from '@mui/material/PaginationItem';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
+import StudyCreate from '../Dialogs/StudyCreate';
 
 function MainRooms() {
   let [page, setPage] = useState(1);
   const PER_PAGE = 3;
-  const [data, setData] = useState([1, 2, 3, 4, 5, 6, 7]);
+  const [data, setData] = useState<any[]>([]);
   const count = Math.ceil(data.length / PER_PAGE);
   const _DATA = usePagination(data, PER_PAGE);
   const handleChange = (e, p) => {
@@ -19,29 +20,29 @@ function MainRooms() {
     _DATA.jump(p);
   };
 
-  //create
-  const onAddDetailDiv = () => {
-    let datalist = [...data];
-    let counter = datalist.slice(-1)[0];
+  const addStudyData = (studyData: any) => {
+    setData((data) => {
+      return [...data, studyData];
+    });
+  };
 
-    // 나중에 여기를 스터디이름으로 변경
-    counter += 1;
-    datalist.push(counter);
-    setData(datalist);
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
   return (
     <Box p="5">
       <Grid container spacing={2} direction="row">
-        {_DATA.currentData().map((item, i) => {
+        {_DATA.currentData().map((study, i) => {
+          console.log(study);
           return (
             <Stack key={i}>
-              <MainRoomsDetail detail={item} />
+              <MainRoomsDetail detail={study} />
             </Stack>
           );
         })}
         <IconButton
-          aria-label="EditIcon"
           sx={{
             mx: '10px',
             my: '10px',
@@ -54,7 +55,7 @@ function MainRooms() {
               background: '#97B2E1' + '90',
             },
           }}
-          onClick={onAddDetailDiv}>
+          onClick={handleClickOpen}>
           <AddIcon
             sx={{
               minWidth: 0,
@@ -65,6 +66,13 @@ function MainRooms() {
             }}
           />
         </IconButton>
+        <StudyCreate
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+          callback={addStudyData}
+        />
       </Grid>
       <Pagination
         count={count}
