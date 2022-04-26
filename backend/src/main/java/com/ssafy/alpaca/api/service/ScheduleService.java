@@ -1,6 +1,5 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ProblemListRes;
@@ -8,15 +7,14 @@ import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
-import com.ssafy.alpaca.db.entity.Schedule;
-import com.ssafy.alpaca.db.entity.Study;
-import com.ssafy.alpaca.db.entity.ToSolveProblem;
+import com.ssafy.alpaca.db.entity.*;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -24,6 +22,8 @@ import java.util.*;
 @Transactional
 public class ScheduleService {
 
+    private final UserRepository userRepository;
+    private final MyStudyRepository myStudyRepository;
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
@@ -131,14 +131,19 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(ScheduleListReq scheduleListReq) {
-        Study study = studyRepository.findById(scheduleListReq.getStudyId()).orElseThrow(
+    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) throws IllegalAccessException {
+        Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
 
-        LocalDateTime localDateTime = LocalDateTime.of(scheduleListReq.getYear(), scheduleListReq.getMonth(), 1, 0, 0);
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
+                () -> new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER));
+
+        LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, localDateTime.minusWeeks(1), localDateTime.plusWeeks(2)));
+                study, localDateTime.minusWeeks(1), localDateTime.plusMonths(1).plusWeeks(2)));
     }
 
     public void deleteSchedule(Long id) {

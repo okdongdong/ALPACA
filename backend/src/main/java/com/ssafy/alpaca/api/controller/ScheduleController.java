@@ -1,17 +1,18 @@
 package com.ssafy.alpaca.api.controller;
 
-import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.service.ScheduleService;
+import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Month;
 import java.util.List;
 
 @RestController
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleController {
 
+    private final UserService userService;
     private final ScheduleService scheduleService;
 
     @ApiOperation(
@@ -53,9 +55,11 @@ public class ScheduleController {
             value = "스터디 일정 리스트 조회",
             notes = "특정 기간 (year, month)의 스터디 일정을 조회한다."
     )
-    @GetMapping("/monthly")
-    public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(@RequestBody ScheduleListReq scheduleListReq) {
-        return ResponseEntity.ok(scheduleService.getScheduleMonthList(scheduleListReq));
+    @GetMapping("/{id}/monthly")
+    public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(
+            @PathVariable Long id, @RequestParam Integer year, @RequestParam Month month) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(scheduleService.getScheduleMonthList(username, id, year, month));
     }
 
     @ApiOperation(

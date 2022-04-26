@@ -73,7 +73,7 @@ public class StudyService {
             Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                     study, today, tomorrow);
             LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).minusWeeks(1);
-            LocalDateTime nextMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).plusWeeks(2);
+            LocalDateTime nextMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).plusMonths(1).plusWeeks(2);
             List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
                     study, thisMonth, nextMonth);
             List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
