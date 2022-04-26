@@ -8,7 +8,8 @@ import NowLoading from './Components/Commons/NowLoading';
 
 function App() {
   const theme = useSelector((state: any) => state.themeReducer.theme);
-  const isLogin = useSelector((state: any) => state.accountReducer.isLogin);
+  // const isLogin = useSelector((state: any) => state.accountReducer.isLogin);
+  const isLogin = true;
   return (
     <>
       <ThemeProvider theme={theme}>
