@@ -2,7 +2,7 @@ import { Dialog, DialogTitle, Stack, styled } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
-import { setLoading } from '../../Redux/common/commonAction';
+import { setLoading } from '../../Redux/commonReducer';
 import CBtn from '../Commons/CBtn';
 import CSearchBar from '../Commons/CSearchBar';
 import ConfirmationWindow from './ConfirmationWindow';

@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
 import { OpenVidu, Session } from 'openvidu-browser';
 import { useParams } from 'react-router-dom';
 import { getToken } from '../../Lib/openvidu';
-import { setSession, setOV } from '../../Redux/openvidu/openviduActions';
 import { useSelector } from 'react-redux';
 import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
+import { setOV, setSession } from '../../Redux/openviduReducer';
 
 function StudyLive() {
   const dispatch = useDispatch();

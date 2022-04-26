@@ -1,7 +1,7 @@
 import { Button, styled } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { setLoading } from './Redux/common/commonAction';
-import { setTheme } from './Redux/theme/themeActions';
+import { setLoading } from './Redux/commonReducer';
+import { setTheme } from './Redux/themeReducer';
 
 const CustomButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.bg,

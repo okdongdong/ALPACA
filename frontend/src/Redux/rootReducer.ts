@@ -1,14 +1,22 @@
 import { combineReducers } from 'redux';
-import themeReducer from './theme/themeReducer';
-import accountReducer from './account/accountReducer';
-import commonReducer from './common/commonReducer';
-import openviduReducer from './openvidu/openviduReducer';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import themeReducer from './themeReducer';
+import accountReducer from './accountReducer';
+import commonReducer from './commonReducer';
+import openviduReducer from './openviduReducer';
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['account'],
+};
 
 const rootReducer = combineReducers({
-  themeReducer,
-  accountReducer,
-  commonReducer,
-  openviduReducer,
+  theme: themeReducer,
+  account: accountReducer,
+  common: commonReducer,
+  openvidu: openviduReducer,
 });
 
-export default rootReducer;
+export default persistReducer(persistConfig, rootReducer);
