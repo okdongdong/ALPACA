@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const getToken = (mySessionId: string) => {
-  return createSession(mySessionId).then((sessionId) => createToken(sessionId));
+  return createSession(mySessionId).then((sessionId) => createToken(String(sessionId)));
 };
 
 const createSession = (sessionId: string) => {
@@ -43,7 +43,7 @@ const createSession = (sessionId: string) => {
   });
 };
 
-const createToken = (sessionId: unknown) => {
+const createToken = (sessionId: string) => {
   return new Promise((resolve, reject) => {
     let data = JSON.stringify({});
     axios
