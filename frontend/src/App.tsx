@@ -8,14 +8,14 @@ import NowLoading from './Components/Commons/NowLoading';
 
 function App() {
   const theme = useSelector((state: any) => state.themeReducer.theme);
-
+  const isLogin = useSelector((state: any) => state.accountReducer.isLogin);
   return (
     <>
       <ThemeProvider theme={theme}>
         {/* <Testbtn></Testbtn> */}
         <NowLoading />
         <GlobalStyles />
-        <Router></Router>
+        <Router isLogin={isLogin} />
       </ThemeProvider>
     </>
   );

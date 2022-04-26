@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
@@ -6,7 +6,7 @@ import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import CInput from '../../Components/Commons/CInput';
 import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
 import BojIdSearch from '../../Components/Dialogs/BojIdSearch';
-import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
+import { customAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/common/commonAction';
 
 function Signup() {
@@ -25,7 +25,7 @@ function Signup() {
   const [isUsernameChecked, setIsUsernameChecked] = useState<boolean>(false);
   const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(false);
 
-  // 백준인증 dialog open
+  // 백준id검색 dialog open
   const [open, setOpen] = useState<boolean>(false);
 
   // 유효성 검사 실패 메시지
@@ -88,21 +88,6 @@ function Signup() {
     }
 
     dispatch(setLoading(false));
-  };
-
-  // 백준연결
-  const bojConnect = async () => {
-    try {
-      const res = await solvedAcAxios({
-        method: 'get',
-        url: '/user/solved',
-        params: { handle: 'jer0618' },
-      });
-      console.log(res);
-      setIsBojIdChecked(true);
-    } catch (e) {
-      console.log(e);
-    }
   };
 
   // 회원가입

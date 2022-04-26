@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
@@ -42,6 +42,7 @@ function Login() {
         bojId: res.data.bojId,
         preferredLanguage: res.data.preferredLanguage,
         studies: res.data.studies,
+        isLogin: true,
       };
 
       console.log(resUserInfo);
