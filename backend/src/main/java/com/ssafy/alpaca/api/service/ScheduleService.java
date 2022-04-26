@@ -3,9 +3,11 @@ package com.ssafy.alpaca.api.service;
 import com.ssafy.alpaca.api.request.ScheduleListReq;
 import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
+import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
+import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
@@ -25,7 +27,7 @@ public class ScheduleService {
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
-    private final CodeRepository codeRepository;
+    private final ProblemRepository problemRepository;
 
     private Schedule checkScheduleById(Long id) {
         return scheduleRepository.findById(id).orElseThrow(
@@ -110,9 +112,22 @@ public class ScheduleService {
 
     public ScheduleRes getSchedule(Long id) {
         Schedule schedule = checkScheduleById(id);
+        List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(schedule);
+        List<ProblemListRes> problemListRes = new ArrayList<>();
+        for (ToSolveProblem solveProblem : toSolveProblem) {
+            Problem problem = problemRepository.findById(solveProblem.getProblemId()).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
+            problemListRes.add(ProblemListRes.builder()
+                            .id(problem.getId())
+                            .number(problem.getNumber())
+                            .title(problem.getTitle())
+                            .level(problem.getLevel())
+                            .build());
+        }
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
+                .problemListRes(problemListRes)
                 .build();
     }
 

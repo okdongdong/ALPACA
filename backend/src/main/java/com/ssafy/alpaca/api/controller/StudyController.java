@@ -47,7 +47,7 @@ public class StudyController {
     )
     @GetMapping()
     public ResponseEntity<Page<StudyListRes>> getMoreStudy(
-            @PageableDefault(size = 3, sort = "{pinnedTime, id}", direction = Sort.Direction.DESC)Pageable pageable) {
+            @PageableDefault(size = 3, sort = "pinnedTime", direction = Sort.Direction.DESC)Pageable pageable) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
     }
