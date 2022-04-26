@@ -170,9 +170,6 @@ public class StudyService {
         }
         MyStudy memberStudy = myStudyRepository.findByUserAndStudy(member,study).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));;
-        List<Code> codes = codeRepository.findAllByUserIdAndStudyId(member.getId(), study.getId());
-
-        codeRepository.deleteAll(codes);
         myStudyRepository.delete(memberStudy);
     }
 
@@ -185,9 +182,7 @@ public class StudyService {
         if (myStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        List<Code> codes = codeRepository.findAllByStudyId(study.getId());
 
-        codeRepository.deleteAll(codes);
         myStudyRepository.delete(myStudy);
     }
 
@@ -200,8 +195,6 @@ public class StudyService {
         if (!userStudy.getIsRoomMaker()) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        List<Code> codes = codeRepository.findAllByStudyId(study.getId());
-        codeRepository.deleteAll(codes);
         studyRepository.delete(study);
     }
 
@@ -230,7 +223,7 @@ public class StudyService {
                 .id(toSolveProblem.getProblemId())
                 .number(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
                 .title(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getTitle())
-                .level(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
+                .level(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getLevel())
                 .startedAt(toSolveProblem.getSchedule().getStartedAt())
                 .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
                 .build()).collect(Collectors.toList());

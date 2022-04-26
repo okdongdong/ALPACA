@@ -3,6 +3,10 @@ package com.ssafy.alpaca.db.document;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+
+import java.time.LocalDateTime;
 
 @Document(collection = "code")
 @Getter
@@ -15,13 +19,20 @@ public class Code {
     @Id
     private String id;
 
+    @Field(targetType = FieldType.INT64)
     private Long userId;
 
-    private Long studyId;
-
-    private Long scheduleId;
+//    @Field(targetType = FieldType.INT64)
+//    private Long studyId;
+//
+//    @Field(targetType = FieldType.INT64)
+//    private Long scheduleId;
 
     private String problemId;
+
+    @Builder.Default
+    @Field(targetType = FieldType.DATE_TIME)
+    private LocalDateTime submittedAt = LocalDateTime.now();
 
     private String code;
 
