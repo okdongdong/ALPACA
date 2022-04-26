@@ -8,24 +8,18 @@ import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.SolvedProblemRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.json.JsonObject;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import springfox.documentation.spring.web.json.Json;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -83,11 +77,9 @@ public class ProblemService {
         }
 
         List<SolvedProblem> solvedProblems = solvedProblemRepository.findAllByUser(user);
-        HashSet<Long> solvedProblemsInAlpaca = new HashSet<>();
         for (SolvedProblem solvedProblem : solvedProblems) {
-            solvedProblemsInAlpaca.add(solvedProblem.getNumber());
+            solvedProblemList.remove(solvedProblem.getNumber());
         }
-        solvedProblemList.removeAll(solvedProblemsInAlpaca);
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
             Optional<Problem> problem = problemRepository.findByNumber(solvedProblem);
