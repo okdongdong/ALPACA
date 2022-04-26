@@ -24,7 +24,7 @@ public class ProblemController {
             notes = "데이터베이스에 등록된 문제를 검색한다."
     )
     @GetMapping()
-    public ResponseEntity<List<Problem>> searchProblems(@RequestParam Integer searchWord) {
+    public ResponseEntity<List<Problem>> searchProblems(@RequestParam Long searchWord) {
         return ResponseEntity.ok(problemService.searchProblems(searchWord));
     }
 

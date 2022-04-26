@@ -9,5 +9,8 @@ import java.util.List;
 @Repository
 public interface ProblemRepository extends MongoRepository<Problem,String> {
 
-    List<Problem> findTop10ByNumberStartingWithOrderByNumberAsc(Integer searchWord);
+    List<Problem> findTop10ByNumberStartingWithOrderByNumberAsc(Long searchWord);
+
+    Problem findByNumber(Long number);
+
 }

@@ -24,4 +24,6 @@ public class SolvedProblem {
     @Column(name = "problem_id")
     private String problemId;
 
+    private Long number;
+
 }

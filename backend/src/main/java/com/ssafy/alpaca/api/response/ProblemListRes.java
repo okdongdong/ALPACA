@@ -17,7 +17,7 @@ public class ProblemListRes {
 
     private String id;
 
-    private Integer number;
+    private Long number;
 
     private String title;
 

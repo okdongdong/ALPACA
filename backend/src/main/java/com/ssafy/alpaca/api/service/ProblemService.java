@@ -2,8 +2,10 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
+import com.ssafy.alpaca.db.entity.SolvedProblem;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.ProblemRepository;
+import com.ssafy.alpaca.db.repository.SolvedProblemRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.json.JsonObject;
@@ -22,6 +24,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
@@ -33,8 +37,9 @@ public class ProblemService {
 
     private final UserRepository userRepository;
     private final ProblemRepository problemRepository;
+    private final SolvedProblemRepository solvedProblemRepository;
 
-    public List<Problem> searchProblems(Integer searchWord){
+    public List<Problem> searchProblems(Long searchWord){
         return problemRepository.findTop10ByNumberStartingWithOrderByNumberAsc(searchWord);
     }
 
@@ -45,6 +50,7 @@ public class ProblemService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
         int page = 1;
+        HashSet<Long> solvedProblemList = new HashSet<>();
 
         try {
             while (true) {
@@ -53,34 +59,24 @@ public class ProblemService {
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setDoOutput(true);
-
                 BufferedReader bufferedReader = new BufferedReader(
                         new InputStreamReader(httpURLConnection.getInputStream())
                 );
-
                 StringBuffer stringBuffer = new StringBuffer();
                 String inputLine;
-
                 while ((inputLine = bufferedReader.readLine()) != null) {
                     stringBuffer.append(inputLine);
                 }
                 bufferedReader.close();
                 String response = stringBuffer.toString();
-
                 JSONParser jsonParser = new JSONParser();
-
                 System.out.println(response);
-
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
-
-                System.out.println(jsonObject.get("count"));
                 long total_count = (long) jsonObject.get("count");
                 List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
-                System.out.println(jsonObjects.size());
-//                for (JSONObject j : jsonObjects) {
-//                    System.out.println(j.get("problemId"));
-//                    System.out.println(j.get("problemId").getClass().getName());
-//                }
+                for (JSONObject j : jsonObjects) {
+                    solvedProblemList.add((Long) j.get("problemId"));
+                }
 
                 if (1 + total_count / 100 <= page) {
                     break;
@@ -90,6 +86,25 @@ public class ProblemService {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+
+        List<SolvedProblem> solvedProblems = solvedProblemRepository.findAllByUser(user);
+        HashSet<Long> solvedProblemsInAlpaca = new HashSet<>();
+        for (SolvedProblem solvedProblem : solvedProblems) {
+            solvedProblemsInAlpaca.add(solvedProblem.getNumber());
+        }
+        solvedProblemList.removeAll(solvedProblemsInAlpaca);
+        List<SolvedProblem> newSolvedProblem = new ArrayList<>();
+        for (Long solvedProblem : solvedProblemList) {
+            Problem problem = problemRepository.findByNumber(solvedProblem);
+            newSolvedProblem.add(
+                    SolvedProblem.builder()
+                            .problemId(problem.getId())
+                            .number(solvedProblem)
+                            .user(user)
+                            .build()
+            );
+        }
+        solvedProblemRepository.saveAll(newSolvedProblem);
     }
 
 }
