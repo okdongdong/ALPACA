@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByBojId(String bojId);
 
-    List<User> findAllByNicknameContains(String nickname);
+    List<User> findAllByNicknameStartingWithAndIdNotOrderByNicknameAsc(String nickname, Long userId);
 }

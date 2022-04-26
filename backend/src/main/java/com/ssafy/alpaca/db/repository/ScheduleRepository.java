@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
@@ -25,7 +26,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
 //    Boolean existsByStudyAndStartedAtYearAndStartedAtMonthAndStartedAtDayOfMonth(Study study, Integer year, Month month, Integer day);
 
-    Schedule findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
+    Optional<Schedule> findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
 
     Boolean existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
 

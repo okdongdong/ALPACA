@@ -69,6 +69,10 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         } else {
             LocalDateTime localDateTime = LocalDateTime.now();
+            LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
+            LocalDateTime tomorrow = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0).plusDays(1);
+            Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                    study, today, tomorrow);
             LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).minusWeeks(1);
             LocalDateTime nextMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).plusWeeks(2);
             List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
@@ -77,6 +81,7 @@ public class StudyService {
             return StudyRes.builder()
                     .title(study.getTitle())
                     .info(study.getTitle())
+                    .schedule(schedule.orElse(null))
                     .members(myStudies.stream().map(myStudy -> StudyRes.Member.builder()
                                     .userId(myStudy.getUser().getId())
                                     .nickname(myStudy.getUser().getNickname())

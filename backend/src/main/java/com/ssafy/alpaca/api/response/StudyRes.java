@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.response;
 
 import com.ssafy.alpaca.db.entity.MyStudy;
+import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
@@ -19,16 +20,18 @@ public class StudyRes {
 
     private String info;
 
+    private Schedule schedule;
+
     private List<Member> members;
 
     private List<ScheduleListRes> scheduleListRes;
 
     @Builder
     public static class Member {
-        private Long userId;
-        private String nickname;
-        private boolean isRoomMaker;
-        private String profileImg;
+        public Long userId;
+        public String nickname;
+        public boolean isRoomMaker;
+        public String profileImg;
 
         public static List<Member> of(List<MyStudy> list) {
             return  list.stream().map(

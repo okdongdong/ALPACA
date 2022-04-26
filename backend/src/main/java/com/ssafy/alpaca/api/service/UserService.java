@@ -234,11 +234,13 @@ public class UserService {
     }
 
     public List<UserListRes> getByNickname(String nickname) {
-        if (nickname.isEmpty()) {
+        String username = getCurrentUsername();
+        User me = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        if (nickname.isBlank()) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
-
-        List<User> userList = userRepository.findAllByNicknameContains(nickname);
+        List<User> userList = userRepository.findAllByNicknameStartingWithAndIdNotOrderByNicknameAsc(nickname, me.getId());
 
         return userList.stream().map(user -> UserListRes.builder()
                 .id(user.getId())
