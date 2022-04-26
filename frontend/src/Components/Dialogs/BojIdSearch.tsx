@@ -1,11 +1,11 @@
 import { Dialog, DialogTitle, Stack, styled } from '@mui/material';
-import { useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { solvedAcAxios } from '../../Lib/customAxios';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/common/commonAction';
 import CBtn from '../Commons/CBtn';
-import CInputWithBtn from '../Commons/CInputWithBtn';
 import CSearchBar from '../Commons/CSearchBar';
+import ConfirmationWindow from './ConfirmationWindow';
 
 interface BojIdSearchProps {
   open: boolean;
@@ -34,20 +34,11 @@ const CustomContent = styled('div')(({ theme }) => ({
 function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
   const dispatch = useDispatch();
 
-  // 인피니티 스크롤 확인용
-  const interSectRef = useRef<HTMLDivElement>(null);
-  const nowLoading = useSelector((state: any) => state.commonReducer.nowLoading);
-
-  const [page, setPage] = useState<number>(1);
-  const [isFinished, setIsFinished] = useState<boolean>(true);
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState<boolean>(false);
   const [idList, setIdList] = useState<BojUserInfo[]>([]);
   const [searchId, setSearchId] = useState<string>('');
-
-  const onChangeHandler = () => {};
-
-  const infiniteHandler = () => {
-    getBojIdList();
-  };
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 
   const getBojIdList = async () => {
     dispatch(setLoading(true));
@@ -58,7 +49,6 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
         url: '/search/user',
         params: {
           query: searchId,
-          page: page,
         },
       });
       const resInfoList: BojUserInfo[] = [];
@@ -83,8 +73,53 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
     dispatch(setLoading(false));
   };
 
+  const onClickHandler = (bojId: string) => {
+    setSelectedId(bojId);
+    bojDuplicateCheck();
+  };
+
+  // 백준연결
+  const bojDuplicateCheck = async () => {
+    dispatch(setLoading(true));
+
+    // 중복 x
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: '/auth/duplicated/bojId',
+        params: { bojId: selectedId },
+      });
+      console.log(res);
+      setBojId(selectedId);
+      setIsDuplicate(false);
+
+      // 중복 o
+    } catch (e) {
+      console.log(e);
+      setIsDuplicate(true);
+    }
+    setDuplicateDialogOpen(true);
+    dispatch(setLoading(false));
+  };
+
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
+      <ConfirmationWindow
+        open={duplicateDialogOpen}
+        setOpen={setDuplicateDialogOpen}
+        confirm={() => {
+          setBojId(selectedId);
+          setOpen(false);
+        }}>
+        {isDuplicate ? (
+          <>
+            <div>{selectedId}의 연결기록이 이미 존재합니다.</div>
+            <div>연결하시겠습니까?</div>
+          </>
+        ) : (
+          <div>{selectedId}를 연결하시겠습니까?</div>
+        )}
+      </ConfirmationWindow>
       <CustomBox>
         <DialogTitle>BOJ 아이디 검색</DialogTitle>
         <CSearchBar onSearch={getBojIdList} onChange={setSearchId} />
@@ -97,13 +132,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
                 <span>tier :{item.tier}</span>
                 <span>solvedCount :{item.solvedCount}</span>
                 <span>rank :{item.rank}</span>
-                <CBtn
-                  content="선택"
-                  onClick={() => {
-                    setBojId(item.bojId);
-                    setOpen(false);
-                  }}
-                />
+                <CBtn content="선택" onClick={() => onClickHandler(item.bojId)} />
               </div>
             ))}
           </Stack>
