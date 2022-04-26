@@ -131,7 +131,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) throws IllegalAccessException {
+    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -139,7 +139,7 @@ public class ScheduleService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
-                () -> new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER));
+                () -> new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER));
 
         LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(

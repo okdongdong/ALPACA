@@ -57,7 +57,7 @@ public class ScheduleController {
     )
     @GetMapping("/{id}/monthly")
     public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(
-            @PathVariable Long id, @RequestParam Integer year, @RequestParam Month month) throws IllegalAccessException {
+            @PathVariable Long id, @RequestParam Integer year, @RequestParam Month month) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(scheduleService.getScheduleMonthList(username, id, year, month));
     }
