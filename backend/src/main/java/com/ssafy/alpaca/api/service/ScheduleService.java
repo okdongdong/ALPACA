@@ -89,10 +89,10 @@ public class ScheduleService {
                 scheduleUpdateReq.getStartedAt().getYear(),
                 scheduleUpdateReq.getStartedAt().getMonth(),
                 scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0);
-        Schedule checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+        Optional<Schedule> checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, localDateTime, localDateTime.plusDays(1));
 
-        if (!schedule.getId().equals(checkSchedule.getId())) {
+        if (checkSchedule.isEmpty() || !schedule.getId().equals(checkSchedule.get().getId())) {
             throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
