@@ -6,7 +6,6 @@ import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
-import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
@@ -48,8 +47,8 @@ public class ScheduleService {
                 scheduleReq.getStartedAt().getYear(),
                 scheduleReq.getStartedAt().getMonth(),
                 scheduleReq.getStartedAt().getDayOfMonth(), 0, 0);
-        if (scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, localDateTime, localDateTime.plusDays(1))
+        if (Boolean.TRUE.equals(scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                study, localDateTime, localDateTime.plusDays(1)))
         ) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }

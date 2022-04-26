@@ -1,7 +1,6 @@
 package com.ssafy.alpaca.api.request;
 
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
 import lombok.*;
 
 @Getter

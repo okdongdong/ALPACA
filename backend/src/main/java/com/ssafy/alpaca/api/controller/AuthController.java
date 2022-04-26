@@ -28,7 +28,7 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "username", value = "가입 ID" )
     @GetMapping("/duplicated/username")
-    public ResponseEntity<? extends BaseResponseBody> checkUsername(@RequestParam String username) {
+    public ResponseEntity<BaseResponseBody> checkUsername(@RequestParam String username) {
         userService.checkUsername(username);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -39,7 +39,7 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "nickname", value = "가입 닉네임" )
     @GetMapping("/duplicated/nickname")
-    public ResponseEntity<? extends BaseResponseBody> checkNickname(@RequestParam String nickname) {
+    public ResponseEntity<BaseResponseBody> checkNickname(@RequestParam String nickname) {
         userService.checkNickname(nickname);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -50,7 +50,7 @@ public class AuthController {
     )
     @ApiImplicitParam( name = "bojId", value = "연동 계정")
     @GetMapping("/duplicated/bojId")
-    public ResponseEntity<? extends BaseResponseBody> checkBojId(@RequestParam String bojId) {
+    public ResponseEntity<BaseResponseBody> checkBojId(@RequestParam String bojId) {
         userService.checkBojId(bojId);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -60,7 +60,7 @@ public class AuthController {
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )
     @PostMapping("/signup")
-    public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody SignupReq signupReq) {
+    public ResponseEntity<BaseResponseBody> signup(@RequestBody SignupReq signupReq) {
         userService.signup(signupReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }

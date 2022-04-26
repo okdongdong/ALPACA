@@ -22,18 +22,12 @@ public class Code {
     @Field(targetType = FieldType.INT64)
     private Long userId;
 
-//    @Field(targetType = FieldType.INT64)
-//    private Long studyId;
-//
-//    @Field(targetType = FieldType.INT64)
-//    private Long scheduleId;
-
     private String problemId;
 
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)
     private LocalDateTime submittedAt = LocalDateTime.now();
 
-    private String code;
+    private String submittedCode;
 
 }

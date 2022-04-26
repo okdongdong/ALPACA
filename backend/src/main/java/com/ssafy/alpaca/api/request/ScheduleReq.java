@@ -1,9 +1,7 @@
 package com.ssafy.alpaca.api.request;
 
-import com.ssafy.alpaca.db.document.Problem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -36,7 +36,7 @@ public class CodeService {
                 Code.builder()
                         .userId(codeUpdateReq.getUserId())
                         .problemId(codeUpdateReq.getProblemId())
-                        .code(codeUpdateReq.getCode())
+                        .submittedCode(codeUpdateReq.getCode())
                         .build()
         );
     }

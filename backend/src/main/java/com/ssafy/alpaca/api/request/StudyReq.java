@@ -24,7 +24,7 @@ public class StudyReq {
     @ApiModelProperty( name = "memberIdList" )
     private List<Long> memberIdList;
 
-    public static Study of(StudyReq studyReq, User user) {
+    public static Study of(StudyReq studyReq) {
         return Study.builder()
                 .title(studyReq.getTitle())
                 .info(studyReq.getInfo())

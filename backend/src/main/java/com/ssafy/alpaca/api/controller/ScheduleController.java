@@ -26,7 +26,7 @@ public class ScheduleController {
             notes = "스터디룸에서 일정을 추가한다."
     )
     @PostMapping()
-    public ResponseEntity<? extends BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
         return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(scheduleReq)));
     }
 
@@ -35,7 +35,7 @@ public class ScheduleController {
             notes = "스터디 일정을 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
         scheduleService.updateSchedule(id, scheduleUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -45,7 +45,7 @@ public class ScheduleController {
             notes = "스터디 일정을 조회한다."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleRes> getSchedule(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<ScheduleRes> getSchedule(@PathVariable Long id) {
         return ResponseEntity.ok(scheduleService.getSchedule(id));
     }
 
@@ -63,7 +63,7 @@ public class ScheduleController {
             notes = "스터디 일정을 삭제한다."
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }

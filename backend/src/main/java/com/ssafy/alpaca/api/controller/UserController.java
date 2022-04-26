@@ -26,7 +26,7 @@ public class UserController {
             notes = "사용자 입력 정보에 따라 회원정보를 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateUser(
+    public ResponseEntity<BaseResponseBody> updateUser(
             @PathVariable Long id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
         userService.updateUser(id, userUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -37,7 +37,7 @@ public class UserController {
             notes = "요청 회원을 탈퇴처리한다."
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteUser(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteUser(@PathVariable Long id) throws IllegalAccessException {
         userService.deleteUser(id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -47,7 +47,7 @@ public class UserController {
             notes = "요청한 회원의 프로필 이미지를 변경한다."
     )
     @PostMapping("/profile/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateProfileImg(
+    public ResponseEntity<BaseResponseBody> updateProfileImg(
             @PathVariable Long id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
@@ -66,7 +66,7 @@ public class UserController {
             notes = "사용자의 비밀번호를 변경한다."
     )
     @PutMapping("/changePassword/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updatePassword(
+    public ResponseEntity<BaseResponseBody> updatePassword(
             @PathVariable Long id,@RequestBody PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
         userService.updatePassword(id, passwordUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));

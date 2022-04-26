@@ -57,7 +57,7 @@ public class StudyController {
             notes = "입력 정보에 따라 새로운 스터디를 생성한다."
     )
     @PostMapping()
-    public ResponseEntity<? extends BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(BaseResponseBody.of(200, studyService.createStudy(username, studyReq)));
     }
@@ -68,7 +68,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "이임할 스터디의 id")
     @PutMapping("/member/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.updateRoomMaker(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -80,7 +80,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id")
     @DeleteMapping("/member/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.deleteMember(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -92,7 +92,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id")
     @DeleteMapping("/exit/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) {
+    public ResponseEntity<BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteMeFromStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -104,7 +104,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> deleteStudy(@PathVariable Long id) {
+    public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -115,7 +115,7 @@ public class StudyController {
             notes = "스터디 제목과 정보를 수정한다."
     )
     @PutMapping("/{id}")
-    public ResponseEntity<? extends BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
+    public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
         String username = userService.getCurrentUsername();
         studyService.updateStudy(username, id, studyUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
@@ -135,7 +135,7 @@ public class StudyController {
             notes = "방장이 스터디에 사용자를 초대한다."
     )
     @PostMapping("/{id}/invite")
-    public ResponseEntity<? extends BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq){
+    public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq){
         String username = userService.getCurrentUsername();
         studyService.inviteStudy(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
@@ -146,7 +146,7 @@ public class StudyController {
             notes = "초대코드를 생성한다."
     )
     @GetMapping("/{id}/inviteCode")
-    public ResponseEntity<? extends BaseResponseBody> createInviteCode(@PathVariable Long id){
+    public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id){
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
     }
@@ -156,7 +156,7 @@ public class StudyController {
             notes = "초대코드로 스터디에 등록한다."
     )
     @PostMapping("/{id}/inviteCode")
-    public ResponseEntity<? extends BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq){
+    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq){
         String username = userService.getCurrentUsername();
         studyService.inviteUserCode(username, id, studyInviteReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));

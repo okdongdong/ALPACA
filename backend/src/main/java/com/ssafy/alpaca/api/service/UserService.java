@@ -13,7 +13,6 @@ import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
-import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +65,6 @@ public class UserService {
     }
 
     public void checkBojId(String bojId) {
-        String message;
         if (Boolean.TRUE.equals(userRepository.existsByBojId(bojId))) {
             throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
         }
@@ -158,8 +156,6 @@ public class UserService {
     public TokenRes reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String username = jwtTokenUtil.getUsername(refreshToken);
-//        RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
-//                .orElseThrow(()->new IllegalArgumentException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
                 .orElseThrow(()->new IllegalArgumentException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         if (refreshToken.equals(redisRefreshToken.getToken())) {
