@@ -93,6 +93,19 @@ public class StudyService {
 
     }
 
+    public void createPin(String username, Long id) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND));
+        if (myStudy.getPinnedTime().getYear() == 0) {
+            myStudy.setPinnedTime(LocalDateTime.now());
+        } else {
+            myStudy.setPinnedTime(LocalDateTime.of(0, 1, 1, 6, 0));
+        }
+        myStudyRepository.save(myStudy);
+    }
+
     public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
         User user = checkUserByUsername(username);
         Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);

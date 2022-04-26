@@ -42,6 +42,17 @@ public class StudyController {
     }
 
     @ApiOperation(
+            value = "스터디 핀 고정",
+            notes = "요청에 따라 지정한 스터디를 가장 앞으로 옮긴다."
+    )
+    @PostMapping("/{id}")
+    public ResponseEntity<BaseResponseBody> createPin(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        studyService.createPin(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
+
+    @ApiOperation(
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
