@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.request.CodeCompileWithInputReq;
 import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
 import com.ssafy.alpaca.api.service.CodeService;
@@ -23,15 +24,26 @@ public class CodeController {
     private final CodeService codeService;
 
     @ApiOperation(
-            value = "코드 등록",
-            notes = "BOJ 예제 입력으로 코드를 컴파일한다."
+            value = "input에 의한 컴파일",
+            notes = "input에 따라 코드를 컴파일한다."
     )
-    @PostMapping()
-    public ResponseEntity<CodeSaveRes> compileCode(
-            @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException{
+    @PostMapping("/compile")
+    public ResponseEntity<BaseResponseBody> compileCode(
+            @RequestBody CodeCompileWithInputReq codeCompileWithInputReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.compileCode(username, codeCompileReq));
+        return ResponseEntity.ok(BaseResponseBody.of(200, codeService.compileCode(username, codeCompileWithInputReq)));
     }
+
+//    @ApiOperation(
+//            value = "예제코드 컴파일",
+//            notes = "BOJ 예제 입력으로 코드를 컴파일한다."
+//    )
+//    @PostMapping("/bojCompile")
+//    public ResponseEntity<CodeSaveRes> compileBojCode(
+//            @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
+//        String username = userService.getCurrentUsername();
+//        return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));
+//    }
 
     @ApiOperation(
             value = "코드 등록",

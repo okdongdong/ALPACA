@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.CodeCompileWithInputReq;
 import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
@@ -8,10 +9,7 @@ import com.ssafy.alpaca.api.response.CodeSaveRes;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.User;
-import com.ssafy.alpaca.db.repository.CodeRepository;
-import com.ssafy.alpaca.db.repository.ProblemRepository;
-import com.ssafy.alpaca.db.repository.ScheduleRepository;
-import com.ssafy.alpaca.db.repository.UserRepository;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,21 +45,34 @@ public class CodeService {
         }
     }
 
-    public CodeSaveRes compileCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
-        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
-
-        if (codeCompileReq.getCode().isEmpty()){
-            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+    public String compileCode(String username, CodeCompileWithInputReq codeCompileWithInputReq) {
+        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
+            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
 
-        return doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
-                compileVersion(codeCompileReq.getLanguage()), problem.getInputs(),problem.getOutputs());
+        if (Boolean.TRUE.equals(!problemRepository.existsById(codeCompileWithInputReq.getProblemId()))) {
+            throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
+        }
+
+        return doodleCompile(codeCompileWithInputReq.getCode(), codeCompileWithInputReq.getLanguage(),
+                compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
+
+//    public CodeSaveRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+//        User user = userRepository.findByUsername(username).orElseThrow(
+//                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+//        );
+//
+//        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
+//                () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
+//
+//        if (codeCompileReq.getCode().isEmpty()){
+//            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+//        }
+//
+//        return doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
+//                compileVersion(codeCompileReq.getLanguage()), problem.getInputs(),problem.getOutputs());
+//    }
 
     public void createCode(String username, CodeReq codeReq) {
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -89,57 +100,55 @@ public class CodeService {
         return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(id, problemId);
     }
 
-    public CodeSaveRes doodleCompile(String script, String language ,String versionIndex ,List<String> stdinList,List<String> answerList) {
+    public String doodleCompile(String script, String language ,String versionIndex, String stdin) {
         String clientId = "30bab460a38fc3db6e63aefa34335ae1"; //Replace with your client ID
         String clientSecret = "5390f6559f24a6e97eed02b2b69694e6272337c7c244ad636d9632ee9ca03d48"; //Replace with your client Secret
-        List<String> outputList = new ArrayList<>();
-        for (String stdin:stdinList){
-            stdin = stdin.substring(2,stdin.length()-2);
-            System.out.println(stdin);
-            try {
-                URL url = new URL("https://api.jdoodle.com/v1/execute");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
+        try {
+            URL url = new URL("https://api.jdoodle.com/v1/execute");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
 
-                String input = "{\"clientId\": \"" + clientId +
-                        "\",\"clientSecret\":\"" + clientSecret +
-                        "\",\"script\":\"" + script +
-                        "\",\"stdin\":\"" + stdin +
-                        "\",\"language\":\"" + language +
-                        "\",\"versionIndex\":\"" + versionIndex +
-                        "\"} ";
+            String input = "{\"clientId\": \"" + clientId +
+                    "\",\"clientSecret\":\"" + clientSecret +
+                    "\",\"script\":\"" + script +
+                    "\",\"stdin\":\"" + stdin +
+                    "\",\"language\":\"" + language +
+                    "\",\"versionIndex\":\"" + versionIndex +
+                    "\"} ";
 
-                OutputStream outputStream = connection.getOutputStream();
-                outputStream.write(input.getBytes());
-                outputStream.flush();
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(input.getBytes());
+            outputStream.flush();
 
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    throw new RuntimeException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
-                }
-
-                BufferedReader bufferedReader;
-                bufferedReader = new BufferedReader(new InputStreamReader(
-                        (connection.getInputStream())));
-
-                String output;
-                while ((output = bufferedReader.readLine()) != null) {
-                    System.out.println(output);
-                    outputList.add(output.substring(11,output.indexOf(",")+4));
-                }
-
-                connection.disconnect();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new RuntimeException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
             }
+
+            BufferedReader bufferedReader;
+            bufferedReader = new BufferedReader(new InputStreamReader(
+                    (connection.getInputStream())));
+
+            String output;
+            StringBuilder result = new StringBuilder();
+            while ((output = bufferedReader.readLine()) != null) {
+//                System.out.println(output);
+//                outputList.add(output.substring(11,output.indexOf(",")+4));
+                result.append(output);
+            }
+
+            connection.disconnect();
+            return result.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return CodeSaveRes.builder()
-                .outputList(outputList)
-                .answerList(answerList)
-                .build();
+//        for (String stdin:stdinList){
+//        }
+//        return CodeSaveRes.builder()
+//                .outputList(outputList)
+//                .answerList(answerList)
+//                .build();
     };
 
 }

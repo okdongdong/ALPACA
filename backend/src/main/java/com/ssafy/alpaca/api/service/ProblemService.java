@@ -52,13 +52,13 @@ public class ProblemService {
                 BufferedReader bufferedReader = new BufferedReader(
                         new InputStreamReader(httpURLConnection.getInputStream())
                 );
-                StringBuffer stringBuffer = new StringBuffer();
+                StringBuilder stringBuilder = new StringBuilder();
                 String inputLine;
                 while ((inputLine = bufferedReader.readLine()) != null) {
-                    stringBuffer.append(inputLine);
+                    stringBuilder.append(inputLine);
                 }
                 bufferedReader.close();
-                String response = stringBuffer.toString();
+                String response = stringBuilder.toString();
                 JSONParser jsonParser = new JSONParser();
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
                 long total_count = (long) jsonObject.get("count");
