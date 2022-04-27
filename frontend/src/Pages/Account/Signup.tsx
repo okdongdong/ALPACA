@@ -40,10 +40,16 @@ function Signup() {
 
   // 아이디 중복체크
   const usernameDuplicateCheck = async () => {
+    if (username === '') {
+      dispatch(setLoading(false));
+      return;
+    }
+
     dispatch(setLoading(true));
 
     if (isUsernameChecked) {
       setIsUsernameChecked(false);
+      dispatch(setLoading(false));
       return;
     }
 
@@ -53,12 +59,15 @@ function Signup() {
         url: `/auth/duplicated/username`,
         params: { username },
       });
-      console.log(res);
       setIsUsernameChecked(true);
     } catch (e) {
-      console.log(e);
       setIsUsernameChecked(false);
-      setUsernameMessage('아이디 중복검사에 실패했습니다.');
+      if (e.response.status === 409) {
+        setUsernameMessage(e.response.data.message);
+      } else {
+        setUsernameMessage('아이디 중복검사에 실패했습니다.');
+        console.log(e);
+      }
     }
 
     dispatch(setLoading(false));
@@ -66,10 +75,16 @@ function Signup() {
 
   // 닉네임 중복체크
   const nicknameDuplicateCheck = async () => {
+    if (nickname === '') {
+      dispatch(setLoading(false));
+      return;
+    }
+
     dispatch(setLoading(true));
 
     if (isNicknameChecked) {
       setIsUsernameChecked(false);
+      dispatch(setLoading(false));
       return;
     }
 
@@ -79,12 +94,15 @@ function Signup() {
         url: `/auth/duplicated/nickname`,
         params: { nickname },
       });
-      console.log(res);
       setIsNicknameChecked(true);
     } catch (e) {
-      console.log(e);
       setIsNicknameChecked(false);
-      setNicknameMessage('닉네임 중복검사에 실패했습니다.');
+      if (e.response.status === 409) {
+        setNicknameMessage(e.response.data.message);
+      } else {
+        setNicknameMessage('닉네임 중복검사에 실패했습니다.');
+        console.log(e);
+      }
     }
 
     dispatch(setLoading(false));
@@ -102,16 +120,15 @@ function Signup() {
       bojId,
     };
     try {
-      console.log(userInfo);
       const res = await customAxios({
         method: 'post',
         url: '/auth/signup',
         data: userInfo,
       });
-      console.log(res);
       navigate('/login');
     } catch (e) {
-      console.log(e);
+      console.log(e.message);
+      console.log(e.status);
     }
 
     dispatch(setLoading(false));
@@ -170,6 +187,7 @@ function Signup() {
         onButtonClick={usernameDuplicateCheck}
         readOnly={isUsernameChecked}
         helperText={usernameMessage}
+        buttonDisable={!!usernameMessage}
       />
       <CInput
         type="password"
@@ -190,11 +208,12 @@ function Signup() {
         onButtonClick={nicknameDuplicateCheck}
         readOnly={isNicknameChecked}
         helperText={nicknameMessage}
+        buttonDisable={!!nicknameMessage}
       />
       <CInputWithBtn
         onChange={setBojId}
         label="BOJ ID"
-        buttonContent="아이디 검색"
+        buttonContent="ID검색"
         onButtonClick={() => setOpen(true)}
         readOnly={true}
         value={bojId}

@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, Stack, styled } from '@mui/material';
+import { Dialog, Grid, Stack, styled } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
@@ -20,15 +20,37 @@ interface BojUserInfo {
   rank: number;
 }
 
-const CustomBox = styled('div')(({ theme }) => ({
+const CustomBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.bg,
   color: theme.palette.txt,
+  padding: theme.spacing(3),
 }));
 
 const CustomContent = styled('div')(({ theme }) => ({
-  minWidth: 600,
+  minWidth: 450,
   maxHeight: 600,
   overflowY: 'scroll',
+  /* 스크롤바 설정*/
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  /* 스크롤바 막대 설정*/
+  '&::-webkit-scrollbar-thumb': {
+    height: '100px',
+    backgroundColor: 'rgba(100,100,100,0.5)',
+    borderRadius: ' 10px',
+  },
+  /* 스크롤바 뒷 배경 설정*/
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'rgba(0,0,0,0)',
+  },
+}));
+
+const BojSearchResult = styled(Grid)(({ theme }) => ({
+  backgroundColor: theme.palette.bg,
+  color: theme.palette.txt,
+  justifyContent: 'center',
+  textAlign: 'center',
 }));
 
 function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
@@ -120,20 +142,28 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
           <div>{selectedId}를 연결하시겠습니까?</div>
         )}
       </ConfirmationWindow>
-      <CustomBox>
-        <DialogTitle>BOJ 아이디 검색</DialogTitle>
+      <CustomBox spacing={3}>
+        <h1>BOJ 아이디 검색</h1>
         <CSearchBar onSearch={getBojIdList} onChange={setSearchId} />
         <div>*아이디는 최대 100개까지만 검색됩니다.</div>
         <CustomContent>
           <Stack spacing={1}>
             {idList.map((item, idx) => (
-              <div key={idx}>
-                <span>bojId :{item.bojId}</span>
-                <span>tier :{item.tier}</span>
-                <span>solvedCount :{item.solvedCount}</span>
-                <span>rank :{item.rank}</span>
-                <CBtn content="선택" onClick={() => onClickHandler(item.bojId)} />
-              </div>
+              <BojSearchResult key={idx} container>
+                <Grid item xs={1}>
+                  {item.tier}
+                </Grid>
+                <Grid item xs={5}>
+                  {item.bojId}
+                </Grid>
+                <Grid item xs={3}>
+                  <div>{item.solvedCount} solved</div>
+                  <div> 🏅{item.rank}</div>
+                </Grid>
+                <Grid item xs={2} sx={{ height: '100%' }}>
+                  <CBtn content="선택" onClick={() => onClickHandler(item.bojId)} />
+                </Grid>
+              </BojSearchResult>
             ))}
           </Stack>
         </CustomContent>

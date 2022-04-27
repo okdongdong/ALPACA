@@ -9,7 +9,7 @@ import openviduReducer from './openviduReducer';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['account'],
+  whitelist: ['account', 'theme'],
 };
 
 const rootReducer = combineReducers({
