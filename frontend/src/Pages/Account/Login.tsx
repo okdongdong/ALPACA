@@ -5,9 +5,9 @@ import CBtn from '../../Components/Commons/CBtn';
 import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import CInput from '../../Components/Commons/CInput';
 import { customAxios } from '../../Lib/customAxios';
-import { setUserInfo } from '../../Redux/account/accountActions';
-import { setLoading } from '../../Redux/common/commonAction';
-import { setTheme } from '../../Redux/theme/themeActions';
+import { setUserInfo } from '../../Redux/accountReducer';
+import { setLoading } from '../../Redux/commonReducer';
+import { setTheme } from '../../Redux/themeReducer';
 
 function Login() {
   const navigate = useNavigate();

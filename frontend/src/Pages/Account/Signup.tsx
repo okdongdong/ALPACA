@@ -7,7 +7,7 @@ import CInput from '../../Components/Commons/CInput';
 import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
 import BojIdSearch from '../../Components/Dialogs/BojIdSearch';
 import { customAxios } from '../../Lib/customAxios';
-import { setLoading } from '../../Redux/common/commonAction';
+import { setLoading } from '../../Redux/commonReducer';
 
 function Signup() {
   // 사용할 hook 선언
