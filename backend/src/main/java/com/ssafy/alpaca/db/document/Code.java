@@ -22,7 +22,8 @@ public class Code {
     @Field(targetType = FieldType.INT64)
     private Long userId;
 
-    private String problemId;
+    @Field(targetType = FieldType.INT64)
+    private Long problemNumber;
 
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)

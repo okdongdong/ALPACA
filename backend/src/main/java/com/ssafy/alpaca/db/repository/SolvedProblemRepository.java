@@ -12,7 +12,7 @@ import java.util.List;
 public interface SolvedProblemRepository extends JpaRepository<SolvedProblem, Long> {
 
     @EntityGraph(attributePaths = "user")
-    List<SolvedProblem> findAllByProblemId(String problemId);
+    List<SolvedProblem> findAllByProblemNumber(Long problemNumber);
 
     List<SolvedProblem> findAllByUser(User user);
 }

@@ -64,13 +64,13 @@ public class CodeController {
     )
     @ApiImplicitParams({
         @ApiImplicitParam( name = "userId", value = "코드를 조회할 유저의 ID", dataTypeClass = Long.class ),
-        @ApiImplicitParam( name = "problemId", value = "코드를 조회할 문제의 ID", dataTypeClass = String.class )
+        @ApiImplicitParam( name = "problemNumber", value = "코드를 조회할 문제의 ID", dataTypeClass = String.class )
     })
     @GetMapping("/{userId}")
     public ResponseEntity<List<Code>> getCode(
-            @PathVariable Long userId, @RequestParam String problemId) {
+            @PathVariable Long userId, @RequestParam Long problemNumber) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.getCode(username, userId, problemId));
+        return ResponseEntity.ok(codeService.getCode(username, userId, problemNumber));
     }
 
 }

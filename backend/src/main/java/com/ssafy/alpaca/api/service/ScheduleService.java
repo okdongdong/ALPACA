@@ -61,11 +61,11 @@ public class ScheduleService {
                         .finishedAt(scheduleReq.getFinishedAt())
                         .build();
         List<ToSolveProblem> toSolveProblems = new ArrayList<>();
-        for (String id : scheduleReq.getToSolveProblems()) {
+        for (Long number : scheduleReq.getToSolveProblems()) {
             toSolveProblems.add(
                     ToSolveProblem.builder()
                             .schedule(schedule)
-                            .problemId(id)
+                            .problemNumber(number)
                             .build()
             );
         }
@@ -101,11 +101,11 @@ public class ScheduleService {
         schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
         schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         scheduleRepository.save(schedule);
-        for (String problemId : scheduleUpdateReq.getToSolveProblems()) {
+        for (Long number : scheduleUpdateReq.getToSolveProblems()) {
             toSolveProblemRepository.save(
                     ToSolveProblem.builder()
                             .schedule(schedule)
-                            .problemId(problemId)
+                            .problemNumber(number)
                             .build());
         }
     }
@@ -115,11 +115,10 @@ public class ScheduleService {
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(schedule);
         List<ProblemListRes> problemListRes = new ArrayList<>();
         for (ToSolveProblem solveProblem : toSolveProblem) {
-            Problem problem = problemRepository.findById(solveProblem.getProblemId()).orElseThrow(
+            Problem problem = problemRepository.findByProblemNumber(solveProblem.getProblemNumber()).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
             problemListRes.add(ProblemListRes.builder()
-                            .id(problem.getId())
-                            .number(problem.getNumber())
+                            .problemNumber(problem.getProblemNumber())
                             .title(problem.getTitle())
                             .level(problem.getLevel())
                             .build());
