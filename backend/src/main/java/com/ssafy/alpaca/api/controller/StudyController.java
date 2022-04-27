@@ -32,6 +32,27 @@ public class StudyController {
     private final StudyService studyService;
 
     @ApiOperation(
+            value = "스터디 개설",
+            notes = "입력 정보에 따라 새로운 스터디를 생성한다."
+    )
+    @PostMapping()
+    public ResponseEntity<BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.createStudy(username, studyReq)));
+    }
+
+    @ApiOperation(
+            value = "스터디 핀 고정",
+            notes = "요청에 따라 지정한 스터디를 가장 앞으로 옮긴다."
+    )
+    @PostMapping("/{id}")
+    public ResponseEntity<BaseResponseBody> createPin(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        studyService.createPin(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
+
+    @ApiOperation(
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
@@ -53,14 +74,38 @@ public class StudyController {
     }
 
     @ApiOperation(
-            value = "스터디 개설",
-            notes = "입력 정보에 따라 새로운 스터디를 생성한다."
+            value = "스터디 전체 문제 조회",
+            notes = "스터디 일정에 등록된 모든 문제를 조회한다."
     )
-    @PostMapping()
-    public ResponseEntity<BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.createStudy(username, studyReq)));
+    @GetMapping("/{id}/problems")
+    public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
+        return ResponseEntity.ok(studyService.getStudyProblem(id));
     }
+
+    @ApiOperation(
+            value = "스터디 수정",
+            notes = "스터디 제목과 정보를 수정한다."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
+        String username = userService.getCurrentUsername();
+        studyService.updateStudy(username, id, studyUpdateReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
+
+    @ApiOperation(
+            value = "스터디 삭제",
+            notes = "요청한 스터디 id에 따라 스터디를 삭제한다."
+    )
+    @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        studyService.deleteStudy(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
+
+    // 이하 스터디 멤버 관리 코드
 
     @ApiOperation(
             value = "스터디 방장 권한 위임",
@@ -98,37 +143,7 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
-    @ApiOperation(
-            value = "스터디 삭제",
-            notes = "요청한 스터디 id에 따라 스터디를 삭제한다."
-    )
-    @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) {
-        String username = userService.getCurrentUsername();
-        studyService.deleteStudy(username, id);
-        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
-    }
-
-    @ApiOperation(
-            value = "스터디 수정",
-            notes = "스터디 제목과 정보를 수정한다."
-    )
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
-        String username = userService.getCurrentUsername();
-        studyService.updateStudy(username, id, studyUpdateReq);
-        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
-    }
-
-    @ApiOperation(
-            value = "스터디 전체 문제 조회",
-            notes = "스터디 일정에 등록된 모든 문제를 조회한다."
-    )
-    @GetMapping("/{id}/problems")
-    public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
-        return ResponseEntity.ok(studyService.getStudyProblem(id));
-    }
+    // 이하 초대 관련 코드
 
     @ApiOperation(
             value = "스터디 초대 ",
