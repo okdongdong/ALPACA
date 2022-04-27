@@ -5,6 +5,7 @@ import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,7 @@ public class UserController {
             value = "닉네임으로 회원 검색",
             notes = "요청 키워드로 시작하는 닉네임의 회원들을 모두 보여준다."
     )
+    @ApiImplicitParam( name = "nickname", value = "검색할 닉네임" )
     @GetMapping("/search")
     public ResponseEntity<List<UserListRes>> getUserListByNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(userService.getByNickname(nickname));

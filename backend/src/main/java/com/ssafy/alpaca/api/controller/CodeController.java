@@ -8,6 +8,8 @@ import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeSaveRes;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +62,11 @@ public class CodeController {
             value = "코드 조회",
             notes = "유저가 푼 특정 문제의 모든 코드를 조회한다."
     )
-    @GetMapping("/{userId}/{studyId}")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "코드를 조회할 유저의 ID"),
+        @ApiImplicitParam(name = "problemId", value = "코드를 조회할 문제의 ID")
+    })
+    @GetMapping("/{userId}")
     public ResponseEntity<List<Code>> getCode(
             @PathVariable Long userId, @RequestParam String problemId) {
         String username = userService.getCurrentUsername();

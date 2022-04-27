@@ -34,18 +34,15 @@ public class ProblemService {
         return problemRepository.findTop10ByNumberStartingWithOrderByNumberAsc(searchWord);
     }
 
-    public void refreshSolvedProblem(String username, String bojId) {
+    public void refreshSolvedProblem(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
-        if (Boolean.TRUE.equals(!user.getBojId().equals(bojId))) {
-            throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
         int page = 1;
         HashSet<Long> solvedProblemList = new HashSet<>();
 
         try {
             while (true) {
-                URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + bojId + "&page=" + page);
+                URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + user.getBojId() + "&page=" + page);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setDoOutput(true);

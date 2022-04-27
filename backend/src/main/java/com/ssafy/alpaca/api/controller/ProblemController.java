@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Problem;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class ProblemController {
             value = "문제 검색",
             notes = "데이터베이스에 등록된 문제를 검색한다."
     )
+    @ApiImplicitParam( name = "searchWord", value = "검색할 문제 번호")
     @GetMapping()
     public ResponseEntity<List<Problem>> searchProblems(@RequestParam Long searchWord) {
         return ResponseEntity.ok(problemService.searchProblems(searchWord));
@@ -33,9 +35,9 @@ public class ProblemController {
             notes = "백준에서 푼 문제를 ALPACA DB에 연동한다."
     )
     @PostMapping()
-    public ResponseEntity<BaseResponseBody> refreshSolvedProblem(@RequestParam String bojId) {
+    public ResponseEntity<BaseResponseBody> refreshSolvedProblem() {
         String username = userService.getCurrentUsername();
-        problemService.refreshSolvedProblem(username, bojId);
+        problemService.refreshSolvedProblem(username);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 }

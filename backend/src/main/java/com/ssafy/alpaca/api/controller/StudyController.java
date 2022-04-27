@@ -56,6 +56,7 @@ public class StudyController {
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
+    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id")
     @GetMapping("/{id}")
     public ResponseEntity<StudyRes> getStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
@@ -77,6 +78,7 @@ public class StudyController {
             value = "스터디 전체 문제 조회",
             notes = "스터디 일정에 등록된 모든 문제를 조회한다."
     )
+    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id")
     @GetMapping("/{id}/problems")
     public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
         return ResponseEntity.ok(studyService.getStudyProblem(id));
@@ -86,6 +88,7 @@ public class StudyController {
             value = "스터디 수정",
             notes = "스터디 제목과 정보를 수정한다."
     )
+    @ApiImplicitParam( name = "id", value = "수정할 스터디의 id")
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
         String username = userService.getCurrentUsername();
