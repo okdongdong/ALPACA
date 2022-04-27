@@ -150,6 +150,29 @@ public class StudyController {
     // 이하 초대 관련 코드
 
     @ApiOperation(
+            value = "초대코드 조회",
+            notes = "현재 스터디의 초대코드를 조회하고 / 만료되었다면 생성하여 반환한다."
+    )
+    @ApiImplicitParam( name = "id", value = "초대코드를 조회할 스터디의 id", dataTypeClass = Long.class )
+    @GetMapping("/{id}/inviteCode")
+    public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id){
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
+    }
+
+    @ApiOperation(
+            value = "초대코드를 통해 스터디 가입",
+            notes = "스터디/초대코드 정보에 따라 스터디에 가입시킨다."
+    )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디의 id", dataTypeClass = Long.class )
+    @PostMapping("/{id}/inviteCode")
+    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq){
+        String username = userService.getCurrentUsername();
+        studyService.inviteUserCode(username, id, studyInviteReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
+
+    @ApiOperation(
             value = "스터디 초대 ",
             notes = "방장이 스터디에 사용자를 초대한다."
     )
@@ -160,30 +183,4 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
-    @ApiOperation(
-            value = "초대코드 생성 ",
-            notes = "초대코드를 생성한다."
-    )
-    @GetMapping("/{id}/inviteCode")
-    public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id){
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
-    }
-
-    @ApiOperation(
-            value = "초대코드로 스터디 등록 ",
-            notes = "초대코드로 스터디에 등록한다."
-    )
-    @PostMapping("/{id}/inviteCode")
-    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq){
-        String username = userService.getCurrentUsername();
-        studyService.inviteUserCode(username, id, studyInviteReq);
-        return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
-    }
-
-    @PostMapping("/test/{id}")
-    public ResponseEntity<BaseResponseBody> test(@PathVariable Long id) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.test(username, id)));
-    }
 }

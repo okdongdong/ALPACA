@@ -309,10 +309,12 @@ public class StudyService {
     public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-        if (study.getInviteCode().isEmpty()){
+        Optional<StudyCode> studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode());
+
+        if (studyCode.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
         }
-        if (!studyInviteReq.getInviteCode().equals(study.getInviteCode())){
+        if (Boolean.TRUE.equals(!study.getId().equals(studyCode.get().getStudyId()))){
             throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
         }
 
@@ -323,25 +325,6 @@ public class StudyService {
                         .study(study)
                         .build()
         );
-    }
-
-    public Long test(String username, Long id) {
-        InviteCode inviteCode = InviteCode.builder()
-                .studyId(id)
-                .code("1q2w3e4r")
-                .build();
-
-        StudyCode studyCode = StudyCode.builder()
-                .inviteCode("1q2w3e4r")
-                .studyId(id)
-                .build();
-
-        inviteCodeRedisRepository.save(inviteCode);
-        studyCodeRedisRepository.save(studyCode);
-
-        System.out.println(inviteCodeRedisRepository.findById(inviteCode.getStudyId()).get().getCode());
-        System.out.println(studyCodeRedisRepository.findById(studyCode.getInviteCode()).get().getStudyId());
-        return 1000L;
     }
 
 }

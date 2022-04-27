@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 
-@RedisHash(value = "InviteCode", timeToLive = 30)
+@RedisHash(value = "InviteCode", timeToLive = 600)
 @Getter
 @Setter
 @Builder
