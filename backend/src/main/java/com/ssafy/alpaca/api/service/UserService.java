@@ -54,33 +54,33 @@ public class UserService {
 
     public void checkUsername(String username) {
         if (Boolean.TRUE.equals(userRepository.existsByUsername(username))) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
         }
     }
 
     public void checkNickname(String nickname) {
         if (Boolean.TRUE.equals(userRepository.existsByNickname(nickname))) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
     }
 
     public void checkBojId(String bojId) {
         if (Boolean.TRUE.equals(userRepository.existsByBojId(bojId))) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
         }
     }
 
-    public void signup(SignupReq signupReq) {
+    public void signup(SignupReq signupReq) throws IllegalAccessException {
         if (!signupReq.getPassword().equals(signupReq.getPasswordCheck())) {
-            throw new IllegalArgumentException(ExceptionUtil.USER_PW_INVALID);
+            throw new IllegalAccessException(ExceptionUtil.USER_PW_INVALID);
         }
 
         if (Boolean.TRUE.equals(userRepository.existsByUsername(signupReq.getUsername()))) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_ID_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
         }
 
         if (Boolean.TRUE.equals(userRepository.existsByNickname(signupReq.getNickname()))) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.USER_NICKNAME_DUPLICATE);
         }
 
         userRepository.save(
@@ -93,7 +93,7 @@ public class UserService {
                         .build());
     }
 
-    public TokenRes login(LoginReq loginReq) {
+    public TokenRes login(LoginReq loginReq) throws IllegalAccessException {
         User user = userRepository.findByUsername(loginReq.getUsername())
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         checkPassword(loginReq.getPassword(), user.getPassword());
@@ -142,9 +142,9 @@ public class UserService {
         return token.substring(7);
     }
 
-    private void checkPassword(String rawPassword, String findMemberPassword) {
+    private void checkPassword(String rawPassword, String findMemberPassword) throws IllegalAccessException {
         if (!passwordEncoder.matches(rawPassword, findMemberPassword)) {
-            throw new IllegalArgumentException("ExceptionUtil.USER_PW_INVALID");
+            throw new IllegalAccessException(ExceptionUtil.USER_PW_INVALID);
         }
     }
 
@@ -153,15 +153,15 @@ public class UserService {
                 jwtTokenUtil.generateRefreshToken(username), REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    public TokenRes reissue(String refreshToken) {
+    public TokenRes reissue(String refreshToken) throws IllegalAccessException {
         refreshToken = resolveToken(refreshToken);
         String username = jwtTokenUtil.getUsername(refreshToken);
         RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
-                .orElseThrow(()->new IllegalArgumentException(ExceptionUtil.INVALID_REFRESH_TOKEN));
+                .orElseThrow(()->new IllegalAccessException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         if (refreshToken.equals(redisRefreshToken.getToken())) {
             return reissueRefreshToken(refreshToken, username);
         }
-        throw new IllegalArgumentException(ExceptionUtil.MISMATCH_REFRESH_TOKEN);
+        throw new IllegalAccessException(ExceptionUtil.MISMATCH_REFRESH_TOKEN);
     }
 
     private TokenRes reissueRefreshToken(String refreshToken, String username) {
@@ -222,7 +222,7 @@ public class UserService {
         }
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndIsRoomMaker(user, true))) {
-            throw new IllegalAccessException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
+            throw new IllegalArgumentException(ExceptionUtil.ROOMMAKER_CANNOT_RESIGN);
         }
 
         codeRepository.deleteAll(codeRepository.findAllByUserId(id));
@@ -256,10 +256,10 @@ public class UserService {
             throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
         }
         if (!passwordUpdateReq.getChangedPassword().equals(passwordUpdateReq.getChangedPasswordCheck())){
-            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+            throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_VALUE);
         }
         if (passwordUpdateReq.getChangedPassword().equals(passwordUpdateReq.getPassword())){
-            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+            throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_VALUE);
         }
         user.setPassword(passwordEncoder.encode(passwordUpdateReq.getChangedPassword()));
         userRepository.save(user);

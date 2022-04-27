@@ -42,7 +42,7 @@ public class CodeController {
     )
     @PostMapping("/bojCompile")
     public ResponseEntity<List<CodeCompileRes>> compileBojCode(
-            @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
+            @RequestBody CodeCompileReq codeCompileReq) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));
     }

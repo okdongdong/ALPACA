@@ -35,10 +35,10 @@ public class ScheduleService {
         );
     }
 
-    public Long createSchedule(ScheduleReq scheduleReq) throws IllegalAccessException {
+    public Long createSchedule(ScheduleReq scheduleReq) {
         if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
                 scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
-            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+            throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
         Study study = studyRepository.findById(scheduleReq.getStudyId()).orElseThrow(
@@ -52,7 +52,7 @@ public class ScheduleService {
         if (Boolean.TRUE.equals(scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, localDateTime, localDateTime.plusDays(1)))
         ) {
-            throw new DuplicateFormatFlagsException(ExceptionUtil.STUDY_DATE_DUPLICATE);
+            throw new NullPointerException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
 
         Schedule schedule = Schedule.builder()
@@ -75,10 +75,10 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) {
         if (scheduleUpdateReq.getFinishedAt().isBefore(scheduleUpdateReq.getStartedAt()) ||
                 scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
-            throw new IllegalAccessException(ExceptionUtil.INVALID_DATE_VALUE);
+            throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
         Schedule schedule = checkScheduleById(id);
@@ -130,7 +130,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) {
+    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) throws IllegalAccessException {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -138,7 +138,7 @@ public class ScheduleService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
-                () -> new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER));
+                () -> new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER));
 
         LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(

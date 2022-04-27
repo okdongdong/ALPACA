@@ -55,7 +55,7 @@ public class CodeService {
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-    public List<CodeCompileRes> compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+    public List<CodeCompileRes> compileBojCode(String username, CodeCompileReq codeCompileReq) {
         if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
@@ -64,7 +64,7 @@ public class CodeService {
                 () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
 
         if (codeCompileReq.getCode().isEmpty()){
-            throw new IllegalAccessException(ExceptionUtil.NOT_VALID_VALUE);
+            throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_VALUE);
         }
 
 
