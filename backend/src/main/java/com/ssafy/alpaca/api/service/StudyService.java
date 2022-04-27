@@ -287,9 +287,23 @@ public class StudyService {
         if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        String inviteCode = RandomCodeUtil.getRandomCode();
-        study.setInviteCode(inviteCode);
-        return inviteCode;
+
+        Optional<InviteCode> inviteCode = inviteCodeRedisRepository.findById(study.getId());
+        if (inviteCode.isPresent()) {
+            return inviteCode.get().getCode();
+        }
+
+        String newInviteCode = RandomCodeUtil.getRandomCode();
+        inviteCodeRedisRepository.save(InviteCode.builder()
+                                        .studyId(study.getId())
+                                        .code(newInviteCode)
+                                        .build());
+        studyCodeRedisRepository.save(StudyCode.builder()
+                                        .inviteCode(newInviteCode)
+                                        .studyId(study.getId())
+                                        .build());
+
+        return newInviteCode;
     }
 
     public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq){
