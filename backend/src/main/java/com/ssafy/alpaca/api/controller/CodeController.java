@@ -30,10 +30,10 @@ public class CodeController {
             notes = "input에 따라 코드를 컴파일한다."
     )
     @PostMapping("/compile")
-    public ResponseEntity<BaseResponseBody> compileCode(
+    public ResponseEntity<CodeCompileRes> compileCode(
             @RequestBody CodeCompileWithInputReq codeCompileWithInputReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, codeService.compileCode(username, codeCompileWithInputReq)));
+        return ResponseEntity.ok(codeService.compileCode(username, codeCompileWithInputReq));
     }
 
     @ApiOperation(
@@ -41,7 +41,7 @@ public class CodeController {
             notes = "BOJ 예제 입력으로 코드를 컴파일한다."
     )
     @PostMapping("/bojCompile")
-    public ResponseEntity<CodeCompileRes> compileBojCode(
+    public ResponseEntity<List<CodeCompileRes>> compileBojCode(
             @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));

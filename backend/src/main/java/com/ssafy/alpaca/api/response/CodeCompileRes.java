@@ -10,6 +10,15 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CodeCompileRes {
-    private List<String> outputList;
-    private List<String> answerList;
+
+    private Long result;
+
+    private String output;
+
+    private String memory;
+
+    private String runtime;
+
+    private String answer;
+
 }
