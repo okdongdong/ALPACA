@@ -12,6 +12,7 @@ interface CInputWithBtnProps {
   value?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  buttonDisable?: boolean;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   onButtonClick: () => void;
 }
@@ -34,6 +35,7 @@ function CInputWithBtn({
   value,
   readOnly = false,
   disabled = false,
+  buttonDisable = false,
   onChange,
   onButtonClick,
 }: CInputWithBtnProps) {
@@ -64,8 +66,10 @@ function CInputWithBtn({
             endAdornment={
               <InputAdornment position="end">
                 <CBtn
+                  disabled={buttonDisable}
                   content={buttonContent}
-                  height="25px"
+                  height="30px"
+                  width="80px"
                   backgroundColor={buttonBackgroundColor}
                   onClick={onButtonClickHandler}
                 />
