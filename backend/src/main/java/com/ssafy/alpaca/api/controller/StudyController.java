@@ -45,6 +45,7 @@ public class StudyController {
             value = "스터디 핀 고정",
             notes = "요청에 따라 지정한 스터디를 가장 앞으로 옮긴다."
     )
+    @ApiImplicitParam( name = "id", value = "고정할 스터디의 id", dataTypeClass = Long.class )
     @PostMapping("/{id}")
     public ResponseEntity<BaseResponseBody> createPin(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
@@ -56,7 +57,7 @@ public class StudyController {
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}")
     public ResponseEntity<StudyRes> getStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
@@ -78,7 +79,7 @@ public class StudyController {
             value = "스터디 전체 문제 조회",
             notes = "스터디 일정에 등록된 모든 문제를 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}/problems")
     public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
         return ResponseEntity.ok(studyService.getStudyProblem(id));
@@ -88,7 +89,7 @@ public class StudyController {
             value = "스터디 수정",
             notes = "스터디 제목과 정보를 수정한다."
     )
-    @ApiImplicitParam( name = "id", value = "수정할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "수정할 스터디의 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
         String username = userService.getCurrentUsername();
@@ -100,7 +101,7 @@ public class StudyController {
             value = "스터디 삭제",
             notes = "요청한 스터디 id에 따라 스터디를 삭제한다."
     )
-    @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
@@ -114,7 +115,7 @@ public class StudyController {
             value = "스터디 방장 권한 위임",
             notes = "요청 유저에게 방장 권한을 넘겨준다."
     )
-    @ApiImplicitParam( name = "id", value = "이임할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "이임할 스터디의 id", dataTypeClass = Long.class )
     @PutMapping("/member/{id}")
     public ResponseEntity<BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
@@ -126,7 +127,7 @@ public class StudyController {
             value = "스터디원 강퇴",
             notes = "방장의 요청에 의해, 소속된 스터디원을 강퇴한다."
     )
-    @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/member/{id}")
     public ResponseEntity<BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
@@ -138,7 +139,7 @@ public class StudyController {
             value = "스터디 탈퇴",
             notes = "요청한 스터디의 방장이 아닐 경우, 스터디에서 탈퇴한다."
     )
-    @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id")
+    @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/exit/{id}")
     public ResponseEntity<BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();

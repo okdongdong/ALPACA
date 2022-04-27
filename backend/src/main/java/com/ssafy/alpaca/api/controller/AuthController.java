@@ -26,7 +26,7 @@ public class AuthController {
             value = "ID 중복 검사",
             notes = "회원가입 단계에서, 중복된 ID가 있는지 확인한다."
     )
-    @ApiImplicitParam( name = "username", value = "가입 ID" )
+    @ApiImplicitParam( name = "username", value = "가입 ID", dataTypeClass = String.class )
     @GetMapping("/duplicated/username")
     public ResponseEntity<BaseResponseBody> checkUsername(@RequestParam String username) {
         userService.checkUsername(username);
@@ -37,7 +37,7 @@ public class AuthController {
             value = "닉네임 중복 검사",
             notes = "회원가입 단계에서, 중복된 닉네임이 있는지 확인한다."
     )
-    @ApiImplicitParam( name = "nickname", value = "가입 닉네임" )
+    @ApiImplicitParam( name = "nickname", value = "가입 닉네임", dataTypeClass = String.class)
     @GetMapping("/duplicated/nickname")
     public ResponseEntity<BaseResponseBody> checkNickname(@RequestParam String nickname) {
         userService.checkNickname(nickname);
@@ -48,7 +48,7 @@ public class AuthController {
             value = "백준 연동 중복 검사",
             notes = "백준 계정 연동시, 이미 등록된 계정인지 확인해준다."
     )
-    @ApiImplicitParam( name = "bojId", value = "연동 계정")
+    @ApiImplicitParam( name = "bojId", value = "연동 계정", dataTypeClass = String.class )
     @GetMapping("/duplicated/bojId")
     public ResponseEntity<BaseResponseBody> checkBojId(@RequestParam String bojId) {
         userService.checkBojId(bojId);
