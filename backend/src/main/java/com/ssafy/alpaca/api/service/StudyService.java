@@ -17,6 +17,8 @@ import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
 import com.ssafy.alpaca.db.entity.User;
+import com.ssafy.alpaca.db.redis.InviteCode;
+import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,8 @@ public class StudyService {
     private final MyStudyRepository myStudyRepository;
     private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final InviteCodeRedisRepository inviteCodeRedisRepository;
+    private final StudyCodeRedisRepository studyCodeRedisRepository;
 
     private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
@@ -282,18 +286,34 @@ public class StudyService {
         if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
             throw new IllegalArgumentException(ExceptionUtil.UNAUTHORIZED_USER);
         }
-        String inviteCode = RandomCodeUtil.getRandomCode();
-        study.setInviteCode(inviteCode);
-        return inviteCode;
+
+        Optional<InviteCode> inviteCode = inviteCodeRedisRepository.findById(study.getId());
+        if (inviteCode.isPresent()) {
+            return inviteCode.get().getCode();
+        }
+
+        String newInviteCode = RandomCodeUtil.getRandomCode();
+        inviteCodeRedisRepository.save(InviteCode.builder()
+                                        .studyId(study.getId())
+                                        .code(newInviteCode)
+                                        .build());
+        studyCodeRedisRepository.save(StudyCode.builder()
+                                        .inviteCode(newInviteCode)
+                                        .studyId(study.getId())
+                                        .build());
+
+        return newInviteCode;
     }
 
     public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-        if (study.getInviteCode().isEmpty()){
+        Optional<StudyCode> studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode());
+
+        if (studyCode.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
         }
-        if (!studyInviteReq.getInviteCode().equals(study.getInviteCode())){
+        if (Boolean.TRUE.equals(!study.getId().equals(studyCode.get().getStudyId()))){
             throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
         }
 
