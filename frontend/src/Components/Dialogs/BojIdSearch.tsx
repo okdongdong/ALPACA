@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/commonReducer';
+import CBadge from '../Commons/CBadge';
 import CBtn from '../Commons/CBtn';
 import CSearchBar from '../Commons/CSearchBar';
 import ConfirmationWindow from './ConfirmationWindow';
@@ -87,7 +88,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
         resInfoList.push(userInfo);
       });
 
-      setIdList((prev) => [...prev, ...resInfoList]);
+      setIdList(resInfoList);
     } catch (e) {
       console.log(e);
     }
@@ -151,7 +152,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
             {idList.map((item, idx) => (
               <BojSearchResult key={idx} container>
                 <Grid item xs={1}>
-                  {item.tier}
+                  <CBadge tier={item.tier} />
                 </Grid>
                 <Grid item xs={5}>
                   {item.bojId}
