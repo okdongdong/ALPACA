@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
+import RoomStudyLiveCodeEditer from '../../Components/Room/StudyLive/RoomStudyLiveCodeEditer';
 
 function StudyLive() {
   const dispatch = useDispatch();
@@ -272,10 +273,13 @@ function StudyLive() {
 
   return (
     <>
-      <div className="align_column_center">
-        {publisher !== undefined && publisher.getStreamManager() !== undefined && (
-          <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
-        )}
+      <div className="align_column_center" style={{ height: 'calc(100% - 10vh)' }}>
+        <div style={{ height: '100%' }}>
+          {publisher !== undefined && publisher.getStreamManager() !== undefined && (
+            <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
+          )}
+          <RoomStudyLiveCodeEditer />
+        </div>
         {publisher !== undefined && publisher.getStreamManager() !== undefined && (
           <RoomStudyLiveNavbar
             user={publisher}

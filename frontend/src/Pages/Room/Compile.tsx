@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import RoomCompileTitle from '../../Components/Room/Complie/RoomCompileTitle';
-import RoomComplileTest from '../../Components/Room/Complie/RoomComplileTest';
-import RoomCompileSelectLanguageBtn from '../../Components/Room/Complie/RoomCompileSelectLanguageBtn';
+import RoomCompileTitle from '../../Components/Room/Compile/RoomCompileTitle';
+import RoomComplileTest from '../../Components/Room/Compile/RoomComplileTest';
+import RoomCompileSelectLanguageBtn from '../../Components/Room/Compile/RoomCompileSelectLanguageBtn';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { useParams } from 'react-router-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -37,6 +37,7 @@ function Compile() {
 
   const handleChange = (value: any, event: any) => {
     setCode(value);
+    console.log(value.indexOf('\n'));
   };
 
   return (
