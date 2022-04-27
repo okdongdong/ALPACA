@@ -162,17 +162,16 @@ public class StudyService {
 
         List<ProblemListRes> problemListRes = new ArrayList<>();
         for (ToSolveProblem toSolveProblem : problemList) {
-            Optional<Problem> problem = problemRepository.findById(toSolveProblem.getProblemId());
+            Optional<Problem> problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber());
             if (problem.isEmpty()) {
                 continue;
             }
             problemListRes.add(ProblemListRes.builder()
-                    .id(toSolveProblem.getProblemId())
-                    .number(problem.get().getNumber())
+                    .problemNumber(problem.get().getProblemNumber())
                     .title(problem.get().getTitle())
                     .level(problem.get().getLevel())
                     .startedAt(toSolveProblem.getSchedule().getStartedAt())
-                    .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
+                    .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemNumber(toSolveProblem.getProblemNumber())))
                     .build());
         }
         return problemListRes;

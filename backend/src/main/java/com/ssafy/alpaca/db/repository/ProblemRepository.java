@@ -10,8 +10,10 @@ import java.util.Optional;
 @Repository
 public interface ProblemRepository extends MongoRepository<Problem,String> {
 
-    List<Problem> findTop10ByNumberStartingWithOrderByNumberAsc(Long searchWord);
+    List<Problem> findTop10ByProblemNumberStartingWithOrderByProblemNumberAsc(Long problemNumber);
 
-    Optional<Problem> findByNumber(Long number);
+    Optional<Problem> findByProblemNumber(Long problemNumber);
+
+    Boolean existsByProblemNumber(Long problemNumber);
 
 }

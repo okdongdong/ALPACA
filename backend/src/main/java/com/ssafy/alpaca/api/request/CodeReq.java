@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 public class CodeReq {
 
-    @ApiModelProperty( name = "problemId", example = "626782ed301b13bd5ee4e782" )
-    private String problemId;
+    @ApiModelProperty( name = "problemNumber", example = "1000" )
+    private Long problemNumber;
 
     @ApiModelProperty( name = "code", example = "print(\"Hello world\")" )
     private String code;

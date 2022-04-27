@@ -60,7 +60,7 @@ public class CodeService {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
 
-        Problem problem = problemRepository.findById(codeCompileReq.getProblemId()).orElseThrow(
+        Problem problem = problemRepository.findByProblemNumber(codeCompileReq.getProblemNumber()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
 
         if (codeCompileReq.getCode().isEmpty()){
@@ -85,25 +85,25 @@ public class CodeService {
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
 
-        if (Boolean.TRUE.equals(!problemRepository.existsById(codeReq.getProblemId()))) {
+        if (Boolean.TRUE.equals(!problemRepository.existsByProblemNumber(codeReq.getProblemNumber()))) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         }
 
-        List<Code> codes = codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(user.getId(), codeReq.getProblemId());
+        List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(user.getId(), codeReq.getProblemNumber());
         if (10 <= codes.size()) {
             codeRepository.delete(codes.get(codes.size()-1));
         }
 
         codeRepository.save(Code.builder()
                         .userId(user.getId())
-                        .problemId(codeReq.getProblemId())
+                        .problemNumber(codeReq.getProblemNumber())
                         .submittedCode(codeReq.getCode())
                         .build());
     }
 
-    public List<Code> getCode(String username, Long id, String problemId) {
+    public List<Code> getCode(String username, Long id, Long problemNumber) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(id, problemId);
+        return codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(id, problemNumber);
     }
 
     public CodeCompileRes doodleCompile(String script, String language ,String versionIndex, String stdin) {

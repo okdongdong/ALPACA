@@ -24,10 +24,10 @@ public class ProblemController {
             value = "문제 검색",
             notes = "데이터베이스에 등록된 문제를 검색한다."
     )
-    @ApiImplicitParam( name = "searchWord", value = "검색할 문제 번호", dataTypeClass = Long.class )
+    @ApiImplicitParam( name = "problemNumber", value = "검색할 문제 번호", dataTypeClass = Long.class )
     @GetMapping()
-    public ResponseEntity<List<Problem>> searchProblems(@RequestParam Long searchWord) {
-        return ResponseEntity.ok(problemService.searchProblems(searchWord));
+    public ResponseEntity<List<Problem>> searchProblems(@RequestParam Long problemNumber) {
+        return ResponseEntity.ok(problemService.searchProblems(problemNumber));
     }
 
     @ApiOperation(

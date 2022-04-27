@@ -30,8 +30,8 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
 
-    public List<Problem> searchProblems(Long searchWord){
-        return problemRepository.findTop10ByNumberStartingWithOrderByNumberAsc(searchWord);
+    public List<Problem> searchProblems(Long problemNumber){
+        return problemRepository.findTop10ByProblemNumberStartingWithOrderByProblemNumberAsc(problemNumber);
     }
 
     public void refreshSolvedProblem(String username) {
@@ -76,18 +76,17 @@ public class ProblemService {
 
         List<SolvedProblem> solvedProblems = solvedProblemRepository.findAllByUser(user);
         for (SolvedProblem solvedProblem : solvedProblems) {
-            solvedProblemList.remove(solvedProblem.getNumber());
+            solvedProblemList.remove(solvedProblem.getProblemNumber());
         }
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
-            Optional<Problem> problem = problemRepository.findByNumber(solvedProblem);
+            Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);
             if (problem.isEmpty()) {
                 continue;
             }
             newSolvedProblem.add(
                     SolvedProblem.builder()
-                            .problemId(problem.get().getId())
-                            .number(solvedProblem)
+                            .problemNumber(solvedProblem)
                             .user(user)
                             .build()
             );

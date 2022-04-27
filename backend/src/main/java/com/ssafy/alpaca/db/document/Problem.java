@@ -20,8 +20,9 @@ public class Problem {
     @Id
     private String id;
 
+    @Field(targetType = FieldType.INT64)
     @Indexed(unique = true)
-    private Long number;
+    private Long problemNumber;
 
     private String title;
 

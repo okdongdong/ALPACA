@@ -15,7 +15,9 @@ import lombok.experimental.SuperBuilder;
 public class TokenRes {
 
     private String grantType;
+
     private String accessToken;
+
     private String refreshToken;
 
     public static TokenRes of(String accessToken, String refreshToken) {
