@@ -214,6 +214,27 @@ public class StudyService {
         studyRepository.delete(study);
     }
 
+    public void checkMember(String username, Long userId, Long studyId) throws IllegalAccessException {
+        Study study = checkStudyById(studyId);
+        User user = checkUserByUsername(username);
+        User member = checkUserById(userId);
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+        boolean flagA = false, flagB = false;
+        for (MyStudy myStudy : myStudies) {
+            if (myStudy.getUser().getId().equals(userId)) {
+                flagA = true;
+            }
+            if (myStudy.getUser().getId().equals(user.getId())) {
+                flagB = true;
+            }
+        }
+
+        if (flagA && flagB) return;
+
+        throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+    }
+
     public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
