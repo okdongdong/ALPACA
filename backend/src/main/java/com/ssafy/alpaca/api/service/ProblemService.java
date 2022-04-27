@@ -65,6 +65,7 @@ public class ProblemService {
                 }
 
                 if (1 + total_count / 100 <= page) {
+                    httpURLConnection.disconnect();
                     break;
                 }
                 page ++;

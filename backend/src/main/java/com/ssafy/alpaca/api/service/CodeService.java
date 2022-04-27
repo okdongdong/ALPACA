@@ -5,11 +5,14 @@ import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
-import com.ssafy.alpaca.api.response.CodeSaveRes;
+import com.ssafy.alpaca.api.response.CodeCompileRes;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +46,7 @@ public class CodeService {
         }
     }
 
-    public String compileCode(String username, CodeCompileWithInputReq codeCompileWithInputReq) {
+    public CodeCompileRes compileCode(String username, CodeCompileWithInputReq codeCompileWithInputReq) {
         if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
@@ -52,7 +55,7 @@ public class CodeService {
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-    public CodeSaveRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+    public List<CodeCompileRes> compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
         if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
@@ -65,21 +68,16 @@ public class CodeService {
         }
 
 
-        List<String> resultList = new ArrayList<>();
-        List<String> outputList = new ArrayList<>();
-        String nowResult;
+        List<CodeCompileRes> codeCompileResList = new ArrayList<>();
+        CodeCompileRes codeCompileRes;
         for (int i=0; i<problem.getInputs().size(); i++) {
-            nowResult = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
+            codeCompileRes = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
                     compileVersion(codeCompileReq.getLanguage()), problem.getInputs().get(i));
             // 컴파일 실패할 경우 continue 해주는 조건문 필요
-            resultList.add(nowResult);
-            outputList.add(problem.getOutputs().get(i));
+            codeCompileRes.setAnswer(problem.getOutputs().get(i));
         }
 
-        return CodeSaveRes.builder()
-                .answerList(resultList)
-                .outputList(outputList)
-                .build();
+        return codeCompileResList;
     }
 
     public void createCode(String username, CodeReq codeReq) {
@@ -108,7 +106,7 @@ public class CodeService {
         return codeRepository.findAllByUserIdAndProblemIdOrderBySubmittedAtDesc(id, problemId);
     }
 
-    public String doodleCompile(String script, String language ,String versionIndex, String stdin) {
+    public CodeCompileRes doodleCompile(String script, String language ,String versionIndex, String stdin) {
         String clientId = "30bab460a38fc3db6e63aefa34335ae1"; //Replace with your client ID
         String clientSecret = "5390f6559f24a6e97eed02b2b69694e6272337c7c244ad636d9632ee9ca03d48"; //Replace with your client Secret
         try {
@@ -152,8 +150,19 @@ public class CodeService {
             }
 
             connection.disconnect();
-            return result.toString();
-        } catch (IOException e) {
+
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(result.toString());
+
+            System.out.println(result);
+
+            return CodeCompileRes.builder()
+                    .result((Long) jsonObject.get("statusCode"))
+                    .output(jsonObject.get("output").toString())
+                    .memory(jsonObject.get("memory").toString())
+                    .runtime(jsonObject.get("cpuTime").toString())
+                            .build();
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 //        for (String stdin:stdinList){
