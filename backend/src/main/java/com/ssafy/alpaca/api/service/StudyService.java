@@ -17,6 +17,8 @@ import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.ToSolveProblem;
 import com.ssafy.alpaca.db.entity.User;
+import com.ssafy.alpaca.db.redis.InviteCode;
+import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,8 @@ public class StudyService {
     private final MyStudyRepository myStudyRepository;
     private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final InviteCodeRedisRepository inviteCodeRedisRepository;
+    private final StudyCodeRedisRepository studyCodeRedisRepository;
 
     private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
@@ -305,6 +309,25 @@ public class StudyService {
                         .study(study)
                         .build()
         );
+    }
+
+    public Long test(String username, Long id) {
+        InviteCode inviteCode = InviteCode.builder()
+                .studyId(id)
+                .code("1q2w3e4r")
+                .build();
+
+        StudyCode studyCode = StudyCode.builder()
+                .inviteCode("1q2w3e4r")
+                .studyId(id)
+                .build();
+
+        inviteCodeRedisRepository.save(inviteCode);
+        studyCodeRedisRepository.save(studyCode);
+
+        System.out.println(inviteCodeRedisRepository.findById(inviteCode.getStudyId()).get().getCode());
+        System.out.println(studyCodeRedisRepository.findById(studyCode.getInviteCode()).get().getStudyId());
+        return 1000L;
     }
 
 }

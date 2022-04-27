@@ -180,4 +180,10 @@ public class StudyController {
         studyService.inviteUserCode(username, id, studyInviteReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
+
+    @PostMapping("/test/{id}")
+    public ResponseEntity<BaseResponseBody> test(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.test(username, id)));
+    }
 }
