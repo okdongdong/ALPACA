@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
 import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import CInput from '../../Components/Commons/CInput';
@@ -9,9 +9,10 @@ import { setUserInfo } from '../../Redux/accountReducer';
 import { setLoading } from '../../Redux/commonReducer';
 import { setTheme } from '../../Redux/themeReducer';
 
-function Login() {
+function Login(props: any) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -52,7 +53,13 @@ function Login() {
       dispatch(setTheme(res.data.theme));
 
       // 메인페이지로 이동
-      navigate('/');
+      console.log(location.state);
+
+      if (location.state !== '') {
+        navigate(location.state);
+      } else {
+        navigate('/');
+      }
     } catch (e) {
       console.log(e);
     }
