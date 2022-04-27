@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CodeSaveRes {
+public class CodeCompileRes {
     private List<String> outputList;
     private List<String> answerList;
 }

@@ -7,7 +7,7 @@ import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Code;
-import com.ssafy.alpaca.api.response.CodeSaveRes;
+import com.ssafy.alpaca.api.response.CodeCompileRes;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +41,7 @@ public class CodeController {
             notes = "BOJ 예제 입력으로 코드를 컴파일한다."
     )
     @PostMapping("/bojCompile")
-    public ResponseEntity<CodeSaveRes> compileBojCode(
+    public ResponseEntity<CodeCompileRes> compileBojCode(
             @RequestBody CodeCompileReq codeCompileReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));

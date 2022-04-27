@@ -5,11 +5,14 @@ import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
-import com.ssafy.alpaca.api.response.CodeSaveRes;
+import com.ssafy.alpaca.api.response.CodeCompileRes;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +55,7 @@ public class CodeService {
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-    public CodeSaveRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
+    public CodeCompileRes compileBojCode(String username, CodeCompileReq codeCompileReq) throws IllegalAccessException {
         if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
@@ -76,7 +79,7 @@ public class CodeService {
             outputList.add(problem.getOutputs().get(i));
         }
 
-        return CodeSaveRes.builder()
+        return CodeCompileRes.builder()
                 .answerList(resultList)
                 .outputList(outputList)
                 .build();
@@ -152,8 +155,12 @@ public class CodeService {
             }
 
             connection.disconnect();
-            return result.toString();
-        } catch (IOException e) {
+
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(result.toString());
+
+            return jsonObject.get("output").toString();
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 //        for (String stdin:stdinList){
