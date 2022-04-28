@@ -40,7 +40,7 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
     <>
       <div className="align_column_center">
         <video
-          style={{ borderRadius: '20px', width: '100%', height: '100%' }}
+          style={{ borderRadius: '20px', width: '100%', maxHeight: '80vh' }}
           autoPlay={true}
           id={'video-' + user.getStreamManager().stream.streamId}
           ref={videoRef}

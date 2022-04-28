@@ -37,9 +37,8 @@ function Router({ isLogin }: RouterProps) {
             },
           ],
         },
-
         {
-          path: 'codes/:codeId',
+          path: 'codes/:problemId/:userId',
           element: <Codes />,
         },
         {
@@ -62,7 +61,7 @@ function Router({ isLogin }: RouterProps) {
           element: <Signup />,
         },
         {
-          path: 'invite/:inviteId',
+          path: 'invite/:inviteCode',
           element: <Invite />,
         },
       ],

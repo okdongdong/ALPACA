@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { OpenVidu, Session } from 'openvidu-browser';
 import { useParams } from 'react-router-dom';
@@ -8,10 +9,15 @@ import { setSession, setOV } from '../../Redux/openvidu/openviduActions';
 import { useSelector } from 'react-redux';
 import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
+import RoomStudyLiveCamList from '../../Components/Room/StudyLive/RoomStudyLiveCamList';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
 import RoomStudyLiveCodeEditer from '../../Components/Room/StudyLive/RoomStudyLiveCodeEditer';
+import RoomStudyLiveCamListItem from '../../Components/Room/StudyLive/RoomStudyLiveCamListItem';
+import RoomStudyLiveMain from '../../Components/Room/StudyLive/RoomStudyLiveMain';
+import RoomStudyLiveChat from '../../Components/Room/StudyLive/RoomStudyLiveChat';
 
 function StudyLive() {
+  const theme = useTheme();
   const dispatch = useDispatch();
 
   // session 정보 (useState 이용시 rendering 문제로 값이 undefined로 읽히는 문제가 있어 변수로 선언.)
@@ -37,6 +43,9 @@ function StudyLive() {
   const [mainStreamManager, setMainStreamManager] = useState<any | undefined>(undefined);
   const [publisher, setPublisher] = useState<any | undefined>(undefined);
   const [subscribers, setSubscribers] = useState<any[]>([]);
+
+  const [openYjsDocs, setOpenYjsDocs] = useState<Boolean>(false);
+
   useEffect(() => {
     joinSession();
     return () => {
@@ -273,21 +282,65 @@ function StudyLive() {
 
   return (
     <>
-      <div className="align_column_center" style={{ height: 'calc(100% - 10vh)' }}>
-        <div style={{ height: '100%' }}>
-          {publisher !== undefined && publisher.getStreamManager() !== undefined && (
-            <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
-          )}
-          <RoomStudyLiveCodeEditer />
+      <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+        <div className="align_column_center" style={{ height: '100%', width: '100%' }}>
+          {publisher !== undefined &&
+            publisher.getStreamManager() !== undefined &&
+            (openYjsDocs || mainStreamManager ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '1vw',
+                  top: '50%',
+                  transform: 'translate(0, -50%)',
+                }}>
+                <RoomStudyLiveCamList users={[publisher, ...subscribers]} />
+              </div>
+            ) : (
+              <div style={{ height: '80vh', width: '80vw' }}>
+                <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
+              </div>
+            ))}
+          <div
+            style={{
+              height: 'calc(100% - 15vh)',
+              position: 'absolute',
+              right: '1vw',
+              width: '100%',
+              paddingLeft: '10vw',
+              paddingRight: '2vw',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <RoomStudyLiveMain
+              mainStreamManager={mainStreamManager}
+              openYjsDocs={openYjsDocs}
+              setOpenYjsDocs={setOpenYjsDocs}
+            />
+          </div>
         </div>
         {publisher !== undefined && publisher.getStreamManager() !== undefined && (
-          <RoomStudyLiveNavbar
-            user={publisher}
-            toggleCam={toggleCam}
-            toggleMic={toggleMic}
-            screenShare={screenShare}
-            stopScreenShare={stopScreenShare}
-          />
+          <>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '50%',
+                transform: 'translate(-50%)',
+              }}>
+              <RoomStudyLiveNavbar
+                user={publisher}
+                toggleCam={toggleCam}
+                toggleMic={toggleMic}
+                screenShare={screenShare}
+                stopScreenShare={stopScreenShare}
+              />
+            </div>
+            <div style={{ position: 'absolute', bottom: '0', right: '2vw' }}>
+              <RoomStudyLiveChat />
+            </div>
+          </>
         )}
       </div>
     </>
