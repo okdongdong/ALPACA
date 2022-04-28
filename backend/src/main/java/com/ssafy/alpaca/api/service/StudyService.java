@@ -1,9 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.StudyInviteReq;
-import com.ssafy.alpaca.api.request.StudyMemberReq;
-import com.ssafy.alpaca.api.request.StudyReq;
-import com.ssafy.alpaca.api.request.StudyUpdateReq;
+import com.ssafy.alpaca.api.request.*;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.ProblemListRes;
@@ -11,6 +8,7 @@ import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
+import com.ssafy.alpaca.db.document.Chat;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
@@ -44,6 +42,7 @@ public class StudyService {
     private final ProblemRepository problemRepository;
     private final InviteCodeRedisRepository inviteCodeRedisRepository;
     private final StudyCodeRedisRepository studyCodeRedisRepository;
+    private final ChatRepository chatRepository;
 
     private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
@@ -347,4 +346,14 @@ public class StudyService {
         );
     }
 
+    public void createChat(String username, Long id, ChatReq chatReq) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+
+        chatRepository.save(Chat.builder()
+                .userId(user.getId())
+                .studyId(study.getId())
+                .content(chatReq.getContent())
+                .build());
+    }
 }
