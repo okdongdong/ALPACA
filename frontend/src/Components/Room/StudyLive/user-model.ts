@@ -5,6 +5,7 @@ class UserModel {
   screenShareActive;
   nickname;
   streamManager: any;
+  screenStreamManager: any;
   type; // 'remote' | 'local'
 
   constructor() {
@@ -14,6 +15,7 @@ class UserModel {
     this.screenShareActive = false;
     this.nickname = '';
     this.streamManager = null;
+    this.screenStreamManager = null;
     this.type = 'local';
   }
 
@@ -41,6 +43,10 @@ class UserModel {
     return this.streamManager;
   }
 
+  getScreenStreamManger() {
+    return this.screenStreamManager;
+  }
+
   isLocal() {
     return this.type === 'local';
   }
@@ -59,7 +65,9 @@ class UserModel {
   setStreamManager(streamManager: any) {
     this.streamManager = streamManager;
   }
-
+  setScreenStreamManager(screenStreamManager: any) {
+    this.screenStreamManager = screenStreamManager;
+  }
   setConnectionId(conecctionId: string) {
     this.connectionId = conecctionId;
   }

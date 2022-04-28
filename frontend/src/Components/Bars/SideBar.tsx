@@ -26,12 +26,14 @@ const CustomDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
   ({ theme, open }) => ({
     width: 90,
     height: '100%',
-    background: theme.palette.bg,
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    '& .MuiDrawer-paper': {
+      background: theme.palette.bg,
+    },
   }),
 );
 

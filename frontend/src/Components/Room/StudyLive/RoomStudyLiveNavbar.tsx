@@ -23,8 +23,11 @@ type navPropsType = {
 const NavBtn = styled(Button)(({ theme }) => ({
   background: theme.palette.main,
   color: theme.palette.icon,
-  width: '2vw',
-  margin: '2vw',
+  width: '8vw',
+  margin: '1vh',
+  marginLeft: '4vh',
+  marginRight: '4vh',
+  borderRadius: '10px',
   '&:hover': {
     background: theme.palette.main + '90',
   },
