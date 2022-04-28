@@ -14,6 +14,7 @@ interface CBtnProps {
 }
 
 const CustomButton = styled(Button)(({ theme }) => ({
+  fontFamily: 'Pretendard-Regular',
   borderRadius: '10px',
   width: '100%',
   height: '100%',

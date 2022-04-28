@@ -27,8 +27,8 @@ function StudyLive() {
   let tmpSession: Session | undefined = undefined;
   let tmpOV: OpenVidu | undefined = undefined;
 
-  const reduxSession = useSelector((state: any) => state.openviduReducer.session);
-  const reduxOV = useSelector((state: any) => state.openviduReducer.OV);
+  const reduxSession = useSelector((state: any) => state.openvidu.session);
+  const reduxOV = useSelector((state: any) => state.openvidu.OV);
   useEffect(() => {
     OV = reduxOV || tmpOV || OV;
   });

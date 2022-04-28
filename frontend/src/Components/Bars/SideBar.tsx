@@ -2,16 +2,18 @@ import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { Drawer, List, ListItemButton, ListItemIcon } from '@mui/material';
 import Logo from '../../Assets/Img/Logo.png';
-import { useLocation } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { logout } from '../../Redux/accountReducer';
 import styles from './SideBar.module.css';
 import SideBarBtn from './SideBarBtn';
 
 import { Home, Logout, Assignment, Notifications } from '@mui/icons-material';
 
 type iconObjType = {
-  [index: string]: React.ReactNode;
+  [index: string]: { icon: React.ReactNode; onClick: Function };
 };
+
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -39,12 +41,26 @@ const CustomDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
 
 function SideBar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
+
+  const clickHome = () => {
+    navigate('/');
+  };
+  const clickProblem = () => {
+    navigate('problem-manage');
+  };
+  const clickLogout = () => {
+    dispatch(logout());
+  };
+  const clickNotification = () => {};
+
   const icon: iconObjType = {
-    Home: <Home />,
-    Problem: <Assignment />,
-    Logout: <Logout />,
-    Noti: <Notifications />,
+    Home: { icon: <Home />, onClick: clickHome },
+    Problem: { icon: <Assignment />, onClick: clickProblem },
+    Logout: { icon: <Logout />, onClick: clickLogout },
+    Noti: { icon: <Notifications />, onClick: clickNotification },
   };
 
   const iconList =
@@ -57,6 +73,9 @@ function SideBar() {
       <List>
         {iconList.map((text, index) => (
           <ListItemButton
+            onClick={() => {
+              icon[text].onClick();
+            }}
             key={text}
             sx={{
               minHeight: 48,
@@ -79,7 +98,7 @@ function SideBar() {
                 justifyContent: 'center',
                 color: theme.palette.icon,
               }}>
-              {icon[text]}
+              {icon[text].icon}
             </ListItemIcon>
           </ListItemButton>
         ))}
