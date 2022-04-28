@@ -2,6 +2,7 @@ import React from 'react';
 import MainIntroductionContent from './MainIntroductionContent';
 import MainIntroductionProfile from './MainIntroductionProfile';
 import { styled } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
 
 const MainIntroductionDiv = styled('div')({
   display: 'flex',
@@ -10,8 +11,9 @@ const MainIntroductionDiv = styled('div')({
 });
 
 function MainIntroduction() {
+  const userInfo = useSelector((state: any) => state.account);
   const [userData, setUserData] = React.useState<any[]>();
-  console.log(userData);
+  console.log(userInfo);
   return (
     <MainIntroductionDiv>
       <MainIntroductionProfile callback={setUserData} />

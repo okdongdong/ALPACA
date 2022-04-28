@@ -1,14 +1,19 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
 
-function MainIntroductionContent(props) {
+const Clabel = styled('label')(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+
+function MainIntroductionContent(props: any) {
   const [nickName, setNickName] = React.useState('ssafy');
   const [introduction, setIntroduction] = React.useState('hello');
 
   return (
     <div>
       <div>
-        <label htmlFor="">닉네임</label>
+        <Clabel htmlFor="">닉네임</Clabel>
       </div>
       <TextField
         id="filled-read-only-input"
@@ -21,7 +26,7 @@ function MainIntroductionContent(props) {
         }}
       />
       <div>
-        <label htmlFor="">자기소개</label>
+        <Clabel htmlFor="">자기소개</Clabel>
       </div>
       <TextField
         id="filled-read-only-input"

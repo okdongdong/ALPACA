@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, styled, Grid, Input, DialogTitle } from '@mui/material';
 import CBtn from '../Commons/CBtn';
 import Chip from '@mui/material/Chip';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import themeReducer from '../../Redux/themeReducer';
+import { useDispatch } from 'react-redux';
+import { customAxios } from '../../Lib/customAxios';
+import { useSelector } from 'react-redux';
+import { setUserInfo } from '../../Redux/accountReducer';
 
 export interface StudyCreateProps {
   open: boolean;
@@ -15,11 +20,29 @@ interface userData {
   userId: number;
   nickname: string;
 }
+const Clabel = styled('label')(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+const TInput = styled(Input)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+const CAutocomplete = styled(Autocomplete)(({ theme }) => ({
+  '& .MuiInput-root .MuiInput-input': {
+    color: theme.palette.txt,
+  },
+}));
+const CTextField = styled(TextField)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+
+const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
 
 // dialog 크기 조절
 const CustomContent = styled('div')(({ theme }) => ({
-  minWidth: 1200,
-  minHeight: 900,
+  minWidth: 960,
+  minHeight: 720,
   display: 'Grid',
   justifyContent: 'center',
   alignItems: 'center',
@@ -35,11 +58,31 @@ const MemberArray = styled('div')(({ theme }) => ({
   padding: 0.5,
   marginTop: 20,
 }));
+
 const ListItem = styled('li')(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
+const CChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.palette.main,
+  color: theme.palette.txt,
+}));
+
 function StudyCreate(props: StudyCreateProps) {
+  const dispatch = useDispatch();
+
+  // const userList = async () => {
+  //   try {
+  //     const res = await customAxios({
+  //       method: 'get',
+  //       url: `/user/search`,
+  //     });
+  //     console.log(res);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+
   const { onClose, open } = props;
   const cancleClose = () => {
     setStudyName('');
@@ -49,8 +92,26 @@ function StudyCreate(props: StudyCreateProps) {
     onClose();
   };
 
+  const createData = async () => {
+    const sendList = memberList.map((data) => data.userId);
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/user/study`,
+        data: {
+          info: studyintro,
+          title: studyname,
+          memberIdList: sendList,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleClose = () => {
     props.callback([studyname, studyintro, memberList]);
+    createData();
     setStudyName('');
     setStudyIntro('');
     setMemberList([]);
@@ -88,29 +149,29 @@ function StudyCreate(props: StudyCreateProps) {
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="lg">
       <CustomContent>
-        <DialogTitle sx={{ textAlign: 'center' }}>스터디 개설</DialogTitle>
+        <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
         <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
           <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <label>스터디 이름</label>
+            <Clabel>스터디 이름</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <Input multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeName}></Input>
+            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeName}></TInput>
           </Grid>
         </Grid>
         <Grid container>
           <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <label>스터디 소개</label>
+            <Clabel>스터디 소개</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <Input multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeIntro}></Input>
+            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeIntro}></TInput>
           </Grid>
         </Grid>
         <Grid container>
           <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <label>스터디원</label>
+            <Clabel>스터디원</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <Autocomplete
+            <CAutocomplete
               value={value}
               onChange={(event: any, newValue: userData) => {
                 setValue(newValue);
@@ -126,18 +187,18 @@ function StudyCreate(props: StudyCreateProps) {
                   return [...memberList];
                 });
               }}
-              isOptionEqualToValue={(option, value) => option.nickname === value.nickname}
+              isOptionEqualToValue={(option: any, value: any) => option.userId === value.userId}
               id="controllable-states-demo"
               options={userData}
               getOptionLabel={(option: userData) => option.nickname}
-              renderInput={(params) => <TextField {...params} variant="standard" />}
+              renderInput={(params) => <CTextField {...params} variant="standard" />}
             />
             <MemberArray>
               {memberList.map((data) => {
                 let icon;
                 return (
                   <ListItem key={data.userId}>
-                    <Chip icon={icon} label={data.nickname} onDelete={handleDelete(data)} />
+                    <CChip icon={icon} label={data.nickname} onDelete={handleDelete(data)} />
                   </ListItem>
                 );
               })}

@@ -18,8 +18,7 @@ function MainRoomsCreate() {
           '&:hover': {
             background: '#97B2E1' + '90',
           },
-        }}
-        onClick={onAddDetailDiv}>
+        }}>
         <AddIcon
           sx={{
             minWidth: 0,
