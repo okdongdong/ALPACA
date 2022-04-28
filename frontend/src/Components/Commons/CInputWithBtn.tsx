@@ -23,6 +23,7 @@ const CustomGridContainer = styled(Grid)(({ theme }) => ({
 }));
 
 const CustomInput = styled(Input)(({ theme }) => ({
+  fontFamily: 'Pretendard-Regular',
   color: theme.palette.txt,
 }));
 

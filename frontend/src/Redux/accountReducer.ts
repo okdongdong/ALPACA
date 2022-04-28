@@ -31,7 +31,7 @@ const accountSlice = createSlice({
     setUserInfo: (state, action) => ({
       ...action.payload,
     }),
-    logout: (state, action) => {
+    logout: (state) => {
       localStorage.clear();
       return {
         ...initialState,
