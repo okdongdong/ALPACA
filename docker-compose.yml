@@ -10,7 +10,7 @@ services:
       - "80:80" 
       - "443:443"
     volumes:
-      - /home/ubuntu/certbot:/var/www/html
+      - /home/ubuntu/docker-volume/ssl:/var/www/html
     container_name: "frontend"
   
   backend:
@@ -21,7 +21,7 @@ services:
     ports:
       - "8443:8443"
     volumes:
-      - /home/ubuntu/certbot:/root
+      - /home/ubuntu/docker-volume/ssl:/root
     container_name: "backend"
 
 
