@@ -214,7 +214,7 @@ public class StudyService {
         studyRepository.delete(study);
     }
 
-    public void checkMember(String username, Long userId, Long studyId) throws IllegalAccessException {
+    public void checkMember(String username, Long userId, Long studyId) {
         Study study = checkStudyById(studyId);
         User user = checkUserByUsername(username);
         User member = checkUserById(userId);
@@ -232,7 +232,7 @@ public class StudyService {
 
         if (flagA && flagB) return;
 
-        throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+        throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
 
     public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
@@ -326,16 +326,21 @@ public class StudyService {
         return newInviteCode;
     }
 
-    public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq) throws IllegalAccessException {
+    public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
+
+        if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
+            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        }
+
         Optional<StudyCode> studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode());
 
         if (studyCode.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
         }
         if (Boolean.TRUE.equals(!study.getId().equals(studyCode.get().getStudyId()))){
-            throw new IllegalAccessException(ExceptionUtil.INVITE_CODE_INVALID);
+            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
         }
 
         myStudyRepository.save(

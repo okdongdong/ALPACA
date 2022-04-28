@@ -145,8 +145,19 @@ public class ScheduleService {
                 study, localDateTime.minusWeeks(1), localDateTime.plusMonths(1).plusWeeks(2)));
     }
 
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(String username, Long id) throws IllegalAccessException {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
         Schedule schedule = checkScheduleById(id);
+        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, schedule.getStudy()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        if (Boolean.TRUE.equals(!myStudy.getIsRoomMaker())) {
+            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+
         scheduleRepository.delete(schedule);
     }
 }

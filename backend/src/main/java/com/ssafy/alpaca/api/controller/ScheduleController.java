@@ -72,8 +72,9 @@ public class ScheduleController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 일정의 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id) {
-        scheduleService.deleteSchedule(id);
+    public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        scheduleService.deleteSchedule(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 

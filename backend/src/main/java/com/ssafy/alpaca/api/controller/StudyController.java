@@ -121,7 +121,7 @@ public class StudyController {
         @ApiImplicitParam( name = "userId", value = "확인할 유저 id", dataTypeClass = Long.class )
     })
     @GetMapping("/checkMember/{studyId}/{userId}")
-    public ResponseEntity<BaseResponseBody> checkMember(@PathVariable Long studyId, @PathVariable Long userId) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> checkMember(@PathVariable Long studyId, @PathVariable Long userId) {
         String username = userService.getCurrentUsername();
         studyService.checkMember(username, userId, studyId);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -182,7 +182,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "가입할 스터디의 id", dataTypeClass = Long.class )
     @PostMapping("/{id}/inviteCode")
-    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq) {
         String username = userService.getCurrentUsername();
         studyService.inviteUserCode(username, id, studyInviteReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
