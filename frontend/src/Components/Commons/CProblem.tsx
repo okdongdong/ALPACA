@@ -1,10 +1,12 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { Button, styled } from '@mui/material';
+import CBadge from './CBadge';
 
 interface CProblemProps {
   number: number;
   level: number;
   title: string;
+  backgroundColor?: string;
   button?: ReactJSXElement;
 }
 
@@ -23,15 +25,18 @@ const ProblemBox = styled(Button)(({ theme }) => ({
   width: '100%',
 }));
 
-function CProblem({ number, level, title, button }: CProblemProps) {
+function CProblem({ number, level, title, button, backgroundColor }: CProblemProps) {
   // 새 창에서 문제페이지 띄워줌
   const onClickHandler = () => {
     window.open(`https://www.acmicpc.net/problem/${number}`, '_blank');
   };
   return (
-    <ProblemContainer>
+    <ProblemContainer style={{ backgroundColor: backgroundColor }}>
       <ProblemBox onClick={onClickHandler}>
-        <div>{level}</div>
+        <div>
+          <CBadge tier={level} type="problem" />
+          <div>{number}</div>
+        </div>
         <div>{title}</div>
       </ProblemBox>
       {button}

@@ -60,7 +60,7 @@ function Signup() {
         params: { username },
       });
       setIsUsernameChecked(true);
-    } catch (e) {
+    } catch (e: any) {
       setIsUsernameChecked(false);
       if (e.response.status === 409) {
         setUsernameMessage(e.response.data.message);
@@ -95,7 +95,7 @@ function Signup() {
         params: { nickname },
       });
       setIsNicknameChecked(true);
-    } catch (e) {
+    } catch (e: any) {
       setIsNicknameChecked(false);
       if (e.response.status === 409) {
         setNicknameMessage(e.response.data.message);
@@ -126,7 +126,7 @@ function Signup() {
         data: userInfo,
       });
       navigate('/login');
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.message);
       console.log(e.status);
     }

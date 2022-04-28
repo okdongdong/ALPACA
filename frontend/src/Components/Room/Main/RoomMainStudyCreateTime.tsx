@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { TextField } from '@mui/material';
+import { styled, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { dateToStringDate } from '../../../Lib/dateToString';
 
@@ -12,6 +12,15 @@ interface RoomMainStudyCreateTimeProps {
   setStartedAt: React.Dispatch<React.SetStateAction<Date | null>>;
   setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
 }
+
+const TimeContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  width: '100%',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+}));
+const DateBox = styled('div')(({ theme }) => ({ width: '50%' }));
+const TimeBox = styled('div')(({ theme }) => ({ display: 'flex' }));
 
 function RoomMainStudyCreateTime({
   selectedDay,
@@ -36,23 +45,27 @@ function RoomMainStudyCreateTime({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div>일시: {dateToStringDate(selectedDay)}</div>
-      <div>
-        시작시간:
-        <TimePicker
-          value={startedAt}
-          onChange={setStartedAt}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </div>
-      <div>
-        종료시간:
-        <TimePicker
-          value={finishedAt}
-          onChange={setFinishedAt}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </div>
+      <TimeContainer>
+        <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
+        <div>
+          <TimeBox>
+            <div>시작시간:</div>
+            <TimePicker
+              value={startedAt}
+              onChange={setStartedAt}
+              renderInput={(params) => <TextField {...params} size="small" sx={{ width: '50%' }} />}
+            />
+          </TimeBox>
+          <TimeBox>
+            <div>종료시간:</div>
+            <TimePicker
+              value={finishedAt}
+              onChange={setFinishedAt}
+              renderInput={(params) => <TextField {...params} size="small" sx={{ width: '50%' }} />}
+            />
+          </TimeBox>
+        </div>
+      </TimeContainer>
     </LocalizationProvider>
   );
 }

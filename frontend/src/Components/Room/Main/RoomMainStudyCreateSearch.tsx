@@ -62,12 +62,17 @@ function RoomMainStudyCreateSearch({
 
   return (
     <div>
-      <CSearchBar onChange={setQuery} onSearch={searchProblem} />
+      <CSearchBar
+        onChange={setQuery}
+        onSearch={searchProblem}
+        placeholder="문제를 검색해서 추가할 수 있습니다."
+      />
       <div>
         {problemList.map((problem, idx) => (
           <CProblem
             key={idx}
             number={problem.number}
+            backgroundColor={idx % 2 ? 'black' : ''}
             title={problem.title}
             level={problem.level}
             button={
