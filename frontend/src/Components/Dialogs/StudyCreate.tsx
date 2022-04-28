@@ -88,7 +88,7 @@ function StudyCreate(props: StudyCreateProps) {
     setStudyName('');
     setStudyIntro('');
     setMemberList([]);
-    setValue(null);
+    setValue({ userId: 0, nickname: '' });
     onClose();
   };
 
@@ -115,7 +115,7 @@ function StudyCreate(props: StudyCreateProps) {
     setStudyName('');
     setStudyIntro('');
     setMemberList([]);
-    setValue(null);
+    setValue({ userId: 0, nickname: '' });
     onClose();
   };
 
@@ -133,7 +133,7 @@ function StudyCreate(props: StudyCreateProps) {
     { userId: 45, nickname: '박조영' },
   ];
   const [memberList, setMemberList] = React.useState<any[]>([]);
-  const [value, setValue] = React.useState<userData | null>(null);
+  const [value, setValue] = React.useState<userData>({ userId: 0, nickname: '' });
   const handleDelete = (chipToDelete: userData) => () => {
     setMemberList((chips) => chips.filter((chip) => chip.userId !== chipToDelete.userId));
   };
@@ -171,7 +171,7 @@ function StudyCreate(props: StudyCreateProps) {
             <Clabel>스터디원</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <CAutocomplete
+            {/* <CAutocomplete
               value={value}
               onChange={(event: any, newValue: userData) => {
                 setValue(newValue);
@@ -192,7 +192,7 @@ function StudyCreate(props: StudyCreateProps) {
               options={userData}
               getOptionLabel={(option: userData) => option.nickname}
               renderInput={(params) => <CTextField {...params} variant="standard" />}
-            />
+            /> */}
             <MemberArray>
               {memberList.map((data) => {
                 let icon;

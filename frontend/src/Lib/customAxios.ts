@@ -2,12 +2,12 @@ import axios, { AxiosInstance } from 'axios';
 
 export const customAxios: AxiosInstance = axios.create({
   // baseURL이 작성되어있으므로 뒷부분만 작성해서 사용하면 됨
-  baseURL: `${import.meta.env.VITE_BASE_URL}/api/v1`,
+  baseURL: `${process.env.REACT_APP_BASE_URL}/api/v1`,
 });
 
 export const solvedAcAxios: AxiosInstance = axios.create({
   // baseURL이 작성되어있으므로 뒷부분만 작성해서 사용하면 됨
-  baseURL: `${import.meta.env.VITE_SOLVED_AC_BASE_URL}/api/v3`,
+  baseURL: `${process.env.REACT_APP_SOLVED_AC_BASE_URL}/api/v3`,
 });
 
 // 요청 보내기 전 실행할 함수

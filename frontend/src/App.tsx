@@ -3,7 +3,6 @@ import Router from './router';
 import './App.css';
 import { useSelector } from 'react-redux';
 import { Theme, ThemeProvider } from '@mui/material';
-import Testbtn from './Testbtn';
 import NowLoading from './Components/Commons/NowLoading';
 import { basic, dark, olivegreen, peachpink } from './Theme/theme';
 import { useEffect, useState } from 'react';
@@ -41,7 +40,6 @@ function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
-        {/* <Testbtn></Testbtn> */}
         <NowLoading />
         <GlobalStyles />
         <Router isLogin={isLogin} />

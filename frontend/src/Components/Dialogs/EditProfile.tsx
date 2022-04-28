@@ -177,6 +177,7 @@ function EditProfile(props: EditProfileProps) {
   };
   const editProfileImg = async (profileData: string) => {
     console.log(profileData);
+    console.log(frm.get('file'));
     try {
       await customAxios({
         method: 'post',
