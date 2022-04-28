@@ -79,6 +79,8 @@ public class CodeService {
                     compileVersion(codeCompileReq.getLanguage()), problem.getInputs().get(i));
             // 컴파일 실패할 경우 continue 해주는 조건문 필요
             codeCompileRes.setAnswer(problem.getOutputs().get(i));
+            codeCompileRes.setIsCorrect(Boolean.TRUE.equals(problem.getOutputs().get(i).equals(codeCompileRes.getOutput())));
+            codeCompileResList.add(codeCompileRes);
         }
 
         return codeCompileResList;

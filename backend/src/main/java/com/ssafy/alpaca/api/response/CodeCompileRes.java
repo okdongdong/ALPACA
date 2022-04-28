@@ -21,4 +21,6 @@ public class CodeCompileRes {
 
     private String answer;
 
+    private Boolean isCorrect;
+
 }
