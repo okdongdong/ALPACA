@@ -7,6 +7,8 @@ import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeCompileRes;
 import com.ssafy.alpaca.db.document.Problem;
+import com.ssafy.alpaca.db.entity.MyStudy;
+import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ import java.util.NoSuchElementException;
 public class CodeService {
 
     private final UserRepository userRepository;
+    private final MyStudyRepository myStudyRepository;
+    private final StudyRepository studyRepository;
     private final CodeRepository codeRepository;
     private final ProblemRepository problemRepository;
 
@@ -101,9 +105,32 @@ public class CodeService {
                         .build());
     }
 
-    public List<Code> getCode(String username, Long id, Long problemNumber) {
+    public List<Code> getCode(String username, Long studyId, Long userId, Long problemNumber) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        return codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(id, problemNumber);
+        Study study = studyRepository.findById(studyId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+        User member = userRepository.findById(userId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+        boolean flagA = false, flagB = false;
+        for (MyStudy myStudy : myStudies) {
+            if (myStudy.getUser().getId().equals(userId)) {
+                flagA = true;
+            }
+            if (myStudy.getUser().getId().equals(user.getId())) {
+                flagB = true;
+            }
+        }
+
+        if (flagA && flagB) return codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
+
+        throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
 
     public CodeCompileRes doodleCompile(String script, String language ,String versionIndex, String stdin) {

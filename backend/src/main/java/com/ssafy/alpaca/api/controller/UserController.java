@@ -50,7 +50,7 @@ public class UserController {
             notes = "요청한 회원의 프로필 이미지를 변경한다."
     )
     @ApiImplicitParam( name = "id", value = "변경할 사용자 id", dataTypeClass = Long.class )
-    @PostMapping("/profile/{id}")
+    @PostMapping("/{id}/profile")
     public ResponseEntity<BaseResponseBody> updateProfileImg(
             @PathVariable Long id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));

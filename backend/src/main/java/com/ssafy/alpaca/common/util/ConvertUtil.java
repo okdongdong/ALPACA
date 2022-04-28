@@ -1,5 +1,7 @@
 package com.ssafy.alpaca.common.util;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +15,6 @@ public class ConvertUtil {
         for (Byte b: bytes) {
             primitiveBytes[j++] = b;
         }
-        return new String(primitiveBytes);
+        return "data:image/png;base64," + StringUtils.newStringUtf8(Base64.encodeBase64(primitiveBytes, false));
     }
 }
