@@ -47,7 +47,7 @@ function Invite() {
     dispatch(setLoading(true));
 
     try {
-      const res = customAxios({ method: 'post', url: '', data: { studyId } });
+      const res = customAxios({ method: 'post', url: '', data: { studyId: inviteInfo.studyId } });
 
       console.log(res);
     } catch (e) {

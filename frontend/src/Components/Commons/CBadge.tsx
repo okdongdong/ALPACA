@@ -11,16 +11,22 @@ const TIER_COLOR = [
 
 interface CBadgeProps {
   tier: number;
-  width: number;
-  height: number;
+  type?: 'user' | 'problem';
+  width?: number;
+  height?: number;
 }
 
-function CBadge({ tier, width = 20, height = 25 }: CBadgeProps) {
+function CBadge({ tier, type = 'user', width = 20, height = 25 }: CBadgeProps) {
   const [tierText, setTierText] = useState<string | number>(0);
   const [tierColor, setTierColor] = useState<string>('#cdcdcd');
 
   const calTierInfo = () => {
     if (tier === 0) {
+      if (type === 'problem') {
+        setTierColor('#000');
+        setTierText('?');
+      }
+
       return;
     } else if (tier < 31) {
       const colorIdx = Math.floor((tier - 1) / 5);
@@ -28,7 +34,11 @@ function CBadge({ tier, width = 20, height = 25 }: CBadgeProps) {
       setTierText(5 - ((tier - 1) % 5));
     } else {
       setTierColor('#000');
-      setTierText('M');
+      if (type === 'user') {
+        setTierText('M');
+      } else {
+        setTierText('?');
+      }
     }
   };
 
