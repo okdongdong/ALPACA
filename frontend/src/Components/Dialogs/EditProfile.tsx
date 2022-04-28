@@ -1,6 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { Dialog, Button, styled, Grid, MenuItem, FormControl, Box, Input } from '@mui/material';
-import CBtn from '../Commons/CBtn';
+import React, { useState } from 'react';
+import {
+  Dialog,
+  Button,
+  styled,
+  Grid,
+  MenuItem,
+  FormControl,
+  Box,
+  Input,
+  useTheme,
+} from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
 import CInput from '../Commons/CInput';
 import ProfileImg from '../../Assets/Img/Img.png';
 import styles from '../Main/MainIntroductionProfile.module.css';
@@ -8,63 +20,40 @@ import Basic from '../../Assets/Img/Basic.png';
 import Dark from '../../Assets/Img/Dark.png';
 import Olivegreen from '../../Assets/Img/Olivegreen.png';
 import Peachpink from '../../Assets/Img/Peachpink.png';
-import ClearIcon from '@mui/icons-material/Clear';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-
+import { useDispatch } from 'react-redux';
+import { setTheme } from '../../Redux/themeReducer';
+import { customAxios } from '../../Lib/customAxios';
+import { useSelector } from 'react-redux';
+import { setUserInfo } from '../../Redux/accountReducer';
+import { useNavigate } from 'react-router-dom';
 //탈퇴 버튼
-interface WarnBtnProps {
-  content: string;
-  backgroundColor?: string;
-  color?: string;
-  disabled?: boolean;
-  width?: string | number;
-  height?: string | number;
-  onClick: () => void;
-}
 
-const CustomButton = styled(Button)(({ theme }) => ({
+const WButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
-  width: '100%',
-  height: '100%',
   backgroundColor: theme.palette.warn,
   color: theme.palette.txt,
 }));
-
-function WarnBtn({
-  content,
-  backgroundColor = '',
-  color = '',
-  disabled = false,
-  width = '',
-  height = '',
-  onClick,
-}: WarnBtnProps) {
-  return (
-    <CustomButton
-      sx={{
-        backgroundColor: backgroundColor,
-        color: color,
-        width: width,
-        height: height,
-      }}
-      disabled={disabled}
-      onClick={onClick}>
-      {content}
-    </CustomButton>
-  );
-}
 
 //프로필 사진 선택
 const ProfileSearch = styled('input')({
   display: 'none',
 });
 
+const Clabel = styled('label')(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+const TInput = styled(Input)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+const CSelect = styled(Select)(({ theme }) => ({
+  color: theme.palette.txt,
+}));
+
 // dialog 크기 조절
 const CustomContent = styled('div')(({ theme }) => ({
-  minWidth: 1200,
-  minHeight: 900,
+  minWidth: 960,
+  minHeight: 720,
   display: 'Grid',
   justifyContent: 'center',
   alignItems: 'center',
@@ -72,14 +61,22 @@ const CustomContent = styled('div')(({ theme }) => ({
 }));
 
 //테마 클릭 버튼
-const ThemeButton = styled('button')({
+const ThemeButton = styled('button')(({ theme }) => ({
   background: 'none',
   border: 0,
   padding: 10,
   '&:hover': {
-    background: '#97B2E1' + '90',
+    background: theme.palette.main + '90',
   },
-});
+}));
+const CButton = styled(Button)(({ theme }) => ({
+  borderRadius: '10px',
+  backgroundColor: theme.palette.main,
+  color: theme.palette.txt,
+  '&:hover': {
+    background: theme.palette.main + '90',
+  },
+}));
 
 //
 export interface EditProfileProps {
@@ -89,58 +86,134 @@ export interface EditProfileProps {
 }
 
 function EditProfile(props: EditProfileProps) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const userInfo = useSelector((state: any) => state.account);
+  const [stacks, setStacks] = React.useState('');
+  const [nickname, setNickname] = useState<string>('');
+  const [introduction, setIntroduction] = useState<string>('');
+  const [imgData, setImgData] = useState<any>();
+  const [themeSelect, setThemeSelect] = useState('');
   const { onClose, open } = props;
 
   const cancleClose = () => {
     onClose();
   };
-  const handleClose = () => {
-    props.callback([nickname, introduction, stacks, imgData, themeSelect]);
+
+  const editProfileImg = async () => {
+    console.log(frm.values);
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/user/profile/${userInfo.userId}`,
+        data: { file: frm },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const editUserData = async () => {
+    try {
+      await customAxios({
+        method: 'put',
+        url: `/user/${userInfo.userId}`,
+        data: {
+          info: introduction,
+          nickname: nickname,
+          preferredLanguage: stacks,
+          theme: themeSelect,
+        },
+      });
+      const resUserInfo = { ...userInfo };
+      (resUserInfo.nickname = nickname),
+        (resUserInfo.info = introduction),
+        (resUserInfo.preferredLanguage = stacks),
+        dispatch(setTheme(themeSelect));
+      dispatch(setUserInfo(resUserInfo));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteUserData = async () => {
+    try {
+      await customAxios({
+        method: 'delete',
+        url: `/user/${userInfo.userId}`,
+      });
+
+      // 메인페이지로 이동
+      navigate('/login');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const editPasswordData = async () => {
+    try {
+      await customAxios({
+        method: 'put',
+        url: `/user/changePassword/${userInfo.userId}`,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteClose = () => {
+    deleteUserData();
     onClose();
   };
 
-  // 선호 스택
-  const [stacks, setStacks] = React.useState('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setStacks(event.target.value as string);
+  const editPasswordClose = () => {
+    // editPasswordData();
+    onClose();
   };
 
+  const editDataClose = () => {
+    props.callback([nickname, introduction, stacks, imgData, themeSelect]);
+    editUserData();
+    editProfileImg();
+    onClose();
+  };
+  // 선호 스택
+
+  const handleChange = (event: SelectChangeEvent<unknown>) => {
+    if (typeof event.target.value === 'string') {
+      setStacks(event.target.value);
+    }
+  };
   // 닉네임/ 자기소개
-  const [nickname, setNickname] = useState<string>('');
-  const [introduction, setIntroduction] = useState<string>('');
+
   const inputIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIntroduction(event.target.value);
   };
 
-  const [imgData, setImgData] = useState(null);
-  const imgRef = useRef();
-
+  const frm = new FormData();
   const imageChange = (event: any) => {
-    const reader = new FileReader();
-    const file = imgRef.current.files[0];
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setImgData(reader.result);
-    };
-    console.log(event.target.files[0]);
+    const file = event.target.files[0];
+    console.log(event.target.files);
+    frm.append('file', event.target.files[0]);
   };
 
-  const [themeSelect, setThemeSelect] = useState('basic');
-
   return (
-    <Dialog onClose={handleClose} open={open} maxWidth="lg">
+    <Dialog onClose={editDataClose} open={open} maxWidth="lg">
       <CustomContent>
         <Grid
-          sx={{ minWidth: 900, display: 'flex', justifyContent: 'center', position: 'relative' }}>
+          sx={{ minWidth: 720, display: 'flex', justifyContent: 'center', position: 'relative' }}>
           <img src={imgData ? imgData : ProfileImg} className={styles.profileimg} alt="" />
-          <Box sx={{ position: 'absolute', bottom: 0, right: 350 }}>
+          <Box sx={{ position: 'absolute', bottom: 0, right: 250 }}>
             <label htmlFor="icon-button-file">
               <ProfileSearch
                 accept="image/*"
                 id="icon-button-file"
                 type="file"
                 onChange={imageChange}
-                ref={imgRef}
               />
               <IconButton
                 aria-label="upload picture"
@@ -149,15 +222,12 @@ function EditProfile(props: EditProfileProps) {
                   minHeight: 48,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  mx: 'auto',
-                  my: '10px',
-                  px: 2.5,
-                  borderRadius: '100px',
-                  background: '#97B2E1',
+                  borderRadius: '50%',
+                  background: theme.palette.main,
                   height: '50px',
                   width: '50px',
                   '&:hover': {
-                    background: '#97B2E1' + '90',
+                    background: theme.palette.main + '90',
                   },
                 }}>
                 <EditIcon
@@ -178,11 +248,11 @@ function EditProfile(props: EditProfileProps) {
           <Grid item xs={6}>
             <Grid container>
               <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-                <label>선호언어</label>
+                <Clabel>선호언어</Clabel>
               </Grid>
               <Grid item xs={8}>
                 <FormControl variant="standard" sx={{ minWidth: '100%' }}>
-                  <Select
+                  <CSelect
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={stacks}
@@ -191,7 +261,7 @@ function EditProfile(props: EditProfileProps) {
                     <MenuItem value="Java">Java</MenuItem>
                     <MenuItem value="C">C</MenuItem>
                     <MenuItem value="C++">C++</MenuItem>
-                  </Select>
+                  </CSelect>
                 </FormControl>
               </Grid>
             </Grid>
@@ -199,15 +269,17 @@ function EditProfile(props: EditProfileProps) {
         </Grid>
         <Grid container>
           <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <label>자기소개</label>
+            <Clabel>자기소개</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <Input multiline={true} sx={{ minWidth: '100%' }} onChange={inputIntro}></Input>
+            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={inputIntro}></TInput>
           </Grid>
         </Grid>
 
         <div>
-          <label htmlFor="">테마</label>
+          <Clabel htmlFor="" sx={{ marginLeft: 4 }}>
+            테마
+          </Clabel>
           <Grid
             sx={{
               paddingTop: 1,
@@ -237,29 +309,42 @@ function EditProfile(props: EditProfileProps) {
             </ThemeButton>
           </Grid>
         </div>
-        <Grid
-          sx={{
-            paddingTop: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItem: 'center',
-          }}>
-          <WarnBtn content="탈퇴" onClick={handleClose}></WarnBtn>
-          <CBtn content="비밀번호 변경" onClick={handleClose}></CBtn>
-          <CBtn content="수정" onClick={handleClose}></CBtn>
-          <IconButton
-            component="span"
-            sx={{ position: 'absolute', top: 40, right: 40 }}
-            onClick={cancleClose}>
-            <ClearIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: 'center',
-                color: '#000000',
-              }}
-            />
-          </IconButton>
+        <Grid container>
+          <Grid item xs={8}>
+            <WButton onClick={deleteClose} sx={{ height: 35, width: 50 }}>
+              탈퇴
+            </WButton>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sx={{
+              paddingTop: 1,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItem: 'center',
+            }}>
+            <CButton onClick={editPasswordClose} sx={{ height: 35, width: 110 }}>
+              비밀번호 변경
+            </CButton>
+            <CButton onClick={editDataClose} sx={{ height: 35, width: 50 }}>
+              수정
+            </CButton>
+          </Grid>
         </Grid>
+
+        <IconButton
+          component="span"
+          sx={{ position: 'absolute', top: 40, right: 40 }}
+          onClick={cancleClose}>
+          <ClearIcon
+            sx={{
+              minWidth: 0,
+              justifyContent: 'center',
+              color: '#000000',
+            }}
+          />
+        </IconButton>
       </CustomContent>
     </Dialog>
   );
