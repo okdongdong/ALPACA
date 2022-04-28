@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Dialog,
   Button,
@@ -14,7 +14,6 @@ import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import CInput from '../Commons/CInput';
-import ProfileImg from '../../Assets/Img/Img.png';
 import styles from '../Main/MainIntroductionProfile.module.css';
 import Basic from '../../Assets/Img/Basic.png';
 import Dark from '../../Assets/Img/Dark.png';
@@ -101,22 +100,6 @@ function EditProfile(props: EditProfileProps) {
     onClose();
   };
 
-  const editProfileImg = async () => {
-    console.log(frm.values);
-    try {
-      await customAxios({
-        method: 'post',
-        url: `/user/profile/${userInfo.userId}`,
-        data: { file: frm },
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const editUserData = async () => {
     try {
       await customAxios({
@@ -130,10 +113,10 @@ function EditProfile(props: EditProfileProps) {
         },
       });
       const resUserInfo = { ...userInfo };
-      (resUserInfo.nickname = nickname),
-        (resUserInfo.info = introduction),
-        (resUserInfo.preferredLanguage = stacks),
-        dispatch(setTheme(themeSelect));
+      resUserInfo.nickname = nickname;
+      resUserInfo.info = introduction;
+      resUserInfo.preferredLanguage = stacks;
+      dispatch(setTheme(themeSelect));
       dispatch(setUserInfo(resUserInfo));
     } catch (e) {
       console.log(e);
@@ -178,7 +161,6 @@ function EditProfile(props: EditProfileProps) {
   const editDataClose = () => {
     props.callback([nickname, introduction, stacks, imgData, themeSelect]);
     editUserData();
-    editProfileImg();
     onClose();
   };
   // 선호 스택
@@ -193,12 +175,37 @@ function EditProfile(props: EditProfileProps) {
   const inputIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIntroduction(event.target.value);
   };
-
+  const editProfileImg = async (profileData: string) => {
+    console.log(profileData);
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/user/${userInfo.userId}/profile`,
+        data: frm,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const resUserInfo = { ...userInfo };
+      resUserInfo.profileImg = profileData;
+      dispatch(setUserInfo(resUserInfo));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const imgRef = useRef<HTMLInputElement>(null);
   const frm = new FormData();
+  const reader = new FileReader();
   const imageChange = (event: any) => {
-    const file = event.target.files[0];
-    console.log(event.target.files);
+    const files = event.target.files[0];
     frm.append('file', event.target.files[0]);
+    reader.readAsDataURL(files);
+    reader.onloadend = () => {
+      setImgData(reader.result);
+      if (typeof reader.result === 'string') {
+        editProfileImg(reader.result);
+      }
+    };
   };
 
   return (
@@ -206,7 +213,7 @@ function EditProfile(props: EditProfileProps) {
       <CustomContent>
         <Grid
           sx={{ minWidth: 720, display: 'flex', justifyContent: 'center', position: 'relative' }}>
-          <img src={imgData ? imgData : ProfileImg} className={styles.profileimg} alt="" />
+          <img src={imgData ? imgData : userInfo.profileImg} className={styles.profileimg} alt="" />
           <Box sx={{ position: 'absolute', bottom: 0, right: 250 }}>
             <label htmlFor="icon-button-file">
               <ProfileSearch
@@ -214,6 +221,7 @@ function EditProfile(props: EditProfileProps) {
                 id="icon-button-file"
                 type="file"
                 onChange={imageChange}
+                ref={imgRef}
               />
               <IconButton
                 aria-label="upload picture"

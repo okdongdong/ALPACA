@@ -8,6 +8,7 @@ import { customAxios } from '../../Lib/customAxios';
 import { setUserInfo } from '../../Redux/accountReducer';
 import { setLoading } from '../../Redux/commonReducer';
 import { setTheme } from '../../Redux/themeReducer';
+import alpaca from '../../Assets/Img/alpaca.png';
 
 function Login(props: any) {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ function Login(props: any) {
         username: res.data.username,
         nickname: res.data.nickname,
         info: res.data.info,
-        profileImg: res.data.profileImg,
+        profileImg: !!res.data.profileImg ? res.data.profileImg : alpaca,
         bojId: res.data.bojId,
         preferredLanguage: res.data.preferredLanguage,
         studies: res.data.studies,
