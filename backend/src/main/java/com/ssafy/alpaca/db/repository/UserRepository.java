@@ -2,6 +2,8 @@ package com.ssafy.alpaca.db.repository;
 
 import com.ssafy.alpaca.db.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,5 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByBojId(String bojId);
 
-    List<User> findAllByNicknameStartingWithAndIdNotOrderByNicknameAsc(String nickname, Long userId);
+    @Query(value = "select * from alpaca.user where " +
+            "user.id != :userId and " +
+            "user.nickname like concat(:nickname, '%') " +
+            "order by user.username desc " +
+            "limit 10", nativeQuery = true)
+    List<User> findTop10ByNicknameStartingWithAndIdNotOrderByNicknameDesc(
+            @Param("nickname")String nickname, @Param("userId")Long userId);
+
 }

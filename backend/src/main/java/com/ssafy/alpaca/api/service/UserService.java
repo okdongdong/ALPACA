@@ -236,7 +236,7 @@ public class UserService {
         if (nickname.isBlank()) {
             throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
         }
-        List<User> userList = userRepository.findAllByNicknameStartingWithAndIdNotOrderByNicknameAsc(nickname, me.getId());
+        List<User> userList = userRepository.findTop10ByNicknameStartingWithAndIdNotOrderByNicknameDesc(nickname, me.getId());
 
         return userList.stream().map(user -> UserListRes.builder()
                 .id(user.getId())
