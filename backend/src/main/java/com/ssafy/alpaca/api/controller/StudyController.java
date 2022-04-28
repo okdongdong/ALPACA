@@ -12,6 +12,7 @@ import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -110,6 +111,21 @@ public class StudyController {
     }
 
     // 이하 스터디 멤버 관리 코드
+
+    @ApiOperation(
+            value = "같은 스터디원인지 확인",
+            notes = "특정 회원과 로그인된 유저가 같은 스터디에 가입되어있는지 확인한다."
+    )
+    @ApiImplicitParams({
+        @ApiImplicitParam( name = "studyId", value = "스터디 id", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "userId", value = "확인할 유저 id", dataTypeClass = Long.class )
+    })
+    @GetMapping("/checkMember/{studyId}/{userId}")
+    public ResponseEntity<BaseResponseBody> checkMember(@PathVariable Long studyId, @PathVariable Long userId) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        studyService.checkMember(username, userId, studyId);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
 
     @ApiOperation(
             value = "스터디 방장 권한 위임",
