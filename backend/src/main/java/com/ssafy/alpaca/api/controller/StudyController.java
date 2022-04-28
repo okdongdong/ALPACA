@@ -1,10 +1,7 @@
 package com.ssafy.alpaca.api.controller;
 
 
-import com.ssafy.alpaca.api.request.StudyInviteReq;
-import com.ssafy.alpaca.api.request.StudyMemberReq;
-import com.ssafy.alpaca.api.request.StudyReq;
-import com.ssafy.alpaca.api.request.StudyUpdateReq;
+import com.ssafy.alpaca.api.request.*;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
@@ -197,6 +194,19 @@ public class StudyController {
         String username = userService.getCurrentUsername();
         studyService.inviteStudy(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
+    }
+
+    // 이하 채팅
+
+    @ApiOperation(
+            value = "채팅기록 저장",
+            notes = "채팅 기록을 저장한다."
+    )
+    @PostMapping("/{id}/chat")
+    public ResponseEntity<BaseResponseBody> createChat(@PathVariable Long id, @RequestBody ChatReq chatReq) {
+        String username = userService.getCurrentUsername();
+        studyService.createChat(username, id, chatReq);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
 }

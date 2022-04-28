@@ -77,4 +77,5 @@ public class UserController {
         userService.updatePassword(id, passwordUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
+
 }
