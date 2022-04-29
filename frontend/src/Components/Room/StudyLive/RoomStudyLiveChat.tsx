@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Menu, Popover, Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { Chat } from '@mui/icons-material';
+import React, { useEffect, useRef, useState } from 'react';
+import { Avatar, Fab, Paper, Popover, Button, styled, useTheme } from '@mui/material';
+import { Chat, ArrowDownward } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import RoomStudyLiveChatInput from './RoomStudyLiveChatInput';
+import RoomStudyLiveChatReception from './RoomStudyLiveChatReception';
+import RoomStudyLiveChatSend from './RoomStudyLiveChatSend';
 
 const NavBtn = styled(Button)(({ theme }) => ({
   background: theme.palette.main,
@@ -16,6 +17,41 @@ const NavBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
+const ChatPaper = styled(Paper)(({ theme }) => ({
+  background: theme.palette.main,
+  position: 'relative',
+  paddingTop: '1vh',
+  width: '20vw',
+  height: '50vh',
+}));
+
+const ChatContentPaper = styled('div')(({ theme }) => ({
+  background: theme.palette.main,
+  padding: '2rem',
+  width: '20vw',
+  height: '44vh',
+  overflow: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '0.5vw',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    borderRadius: '100px',
+    backgroundColor: theme.palette.component,
+    boxShadow: 'inset 2px 2px 5px 0 rgba(#fff, 0.5)',
+  },
+}));
+
+const ChatNotiDiv = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  background: theme.palette.component,
+  borderRadius: '3px',
+  width: '15vw',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+}));
+
 type ChatType = {
   nickname: string;
   profileImg: string;
@@ -23,10 +59,17 @@ type ChatType = {
 };
 
 function RoomStudyLiveChat() {
+  const theme = useTheme();
+
   const [anchorEl, setAnchorEl] = useState<undefined | HTMLElement>();
   const [chatList, setChatList] = useState<ChatType[]>([]);
-  const session = useSelector((state: any) => state.openviduReducer.session);
+  const [isBottom, setIsBottom] = useState<Boolean>(true);
+  const [isNewMessage, setIsNewMessage] = useState<Boolean>(false);
+
+  const chatDivRef = useRef<HTMLDivElement>(null);
+  const session = useSelector((state: any) => state.openvidu.session);
   const openChat = Boolean(anchorEl);
+  const { nickname } = useSelector((state: any) => state.account);
 
   useEffect(() => {
     session.on('signal:chat', (event: any) => {
@@ -45,9 +88,36 @@ function RoomStudyLiveChat() {
     });
   }, []);
 
+  useEffect(() => {
+    console.log(isBottom);
+    if (isBottom) {
+      setIsNewMessage(false);
+      goToBottom();
+    } else {
+      setIsNewMessage(true);
+    }
+  }, [chatList]);
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
+    console.log('scrollHeight', scrollHeight);
+    console.log('scrollTop', scrollTop);
+    console.log('clientHeight', clientHeight);
+    if (scrollHeight - (scrollTop + clientHeight) < 10) {
+      setIsNewMessage(false);
+      setIsBottom(true);
+    } else {
+      setIsBottom(false);
+    }
+  };
+
+  const goToBottom = () => {
+    if (!chatDivRef.current) return;
+    chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
+  };
+
   const toggleChat = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (openChat) {
-      console.log(event);
       setAnchorEl(undefined);
     } else {
       setAnchorEl(event.currentTarget);
@@ -71,10 +141,64 @@ function RoomStudyLiveChat() {
           vertical: 'bottom',
           horizontal: 'right',
         }}>
-        {chatList.map((chat) => {
-          return chat.message;
-        })}
-        <RoomStudyLiveChatInput />
+        <ChatPaper>
+          <ChatContentPaper onScroll={handleScroll} ref={chatDivRef}>
+            {chatList.map((chat, index) => {
+              return chat.nickname === nickname ? (
+                <RoomStudyLiveChatSend key={`${chat.nickname}-${index}`} chat={chat} />
+              ) : (
+                <RoomStudyLiveChatReception key={`${chat.nickname}-${index}`} chat={chat} />
+              );
+            })}
+          </ChatContentPaper>
+          <Fab
+            onClick={goToBottom}
+            size="small"
+            sx={{
+              display: isBottom || isNewMessage ? 'none' : undefined,
+              position: 'absolute',
+              bottom: '6vh',
+              right: '1rem',
+              background: theme.palette.icon,
+              color: theme.palette.main,
+              '&:hover': {
+                background: theme.palette.icon + '90',
+              },
+            }}>
+            <ArrowDownward />
+          </Fab>
+          {chatList.length > 0 && (
+            <Button
+              onClick={goToBottom}
+              sx={{
+                position: 'absolute',
+                display: !isNewMessage ? 'none' : undefined,
+                left: '50%',
+                bottom: '6vh',
+                transform: 'translate(-50%)',
+                color: theme.palette.txt,
+                background: theme.palette.component,
+                '&:hover': {
+                  background: theme.palette.component,
+                },
+              }}>
+              <ChatNotiDiv>
+                <Avatar
+                  sx={{ bgcolor: theme.palette.component, width: 30, height: 30 }}
+                  alt={chatList[chatList.length - 1].nickname}
+                  src={chatList[chatList.length - 1].profileImg}
+                />
+                <span style={{ marginLeft: '6px', marginRight: '5px' }}>
+                  {chatList[chatList.length - 1].nickname}
+                </span>
+                <span>{chatList[chatList.length - 1].message}</span>
+              </ChatNotiDiv>
+              <ArrowDownward />
+            </Button>
+          )}
+
+          <RoomStudyLiveChatInput />
+        </ChatPaper>
       </Popover>
     </>
   );

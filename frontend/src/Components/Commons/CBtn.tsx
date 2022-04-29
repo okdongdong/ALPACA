@@ -39,6 +39,9 @@ function CBtn({
         color: color,
         width: width,
         height: height,
+        '&:hover': {
+          backgroundColor: backgroundColor + '90',
+        },
       }}
       disabled={disabled}
       onClick={onClick}>
