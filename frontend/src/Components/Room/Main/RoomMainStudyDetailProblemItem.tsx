@@ -1,19 +1,18 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Collapse, IconButton } from '@mui/material';
+import { alpha, Collapse, IconButton, Stack, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CBtn from '../../Commons/CBtn';
 import CProblem from '../../Commons/CProblem';
-import RoomMainStudyDetailUserItem, {
-  RoomMainStudyDetailUserItemProps,
-} from './RoomMainStudyDetailUserItem';
+import { SolvedMemeberList } from './RoomMainStudyDetail';
+import RoomMainStudyDetailUserItem from './RoomMainStudyDetailUserItem';
 
 export interface RoomMainStudyDetailProblemItemProps {
-  problemId: string;
+  problemId: number;
   number: number;
   level: number;
   title: string;
-  members?: RoomMainStudyDetailUserItemProps[];
+  members?: SolvedMemeberList[];
 }
 
 function RoomMainStudyDetailProblemItem({
@@ -24,19 +23,20 @@ function RoomMainStudyDetailProblemItem({
   members,
 }: RoomMainStudyDetailProblemItemProps) {
   const navigate = useNavigate();
-
+  const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <>
+    <div style={{ marginTop: '8px' }}>
       <CProblem
+        borderRadius="10px"
         number={number}
         level={level}
         title={title}
         button={
           <>
             <CBtn onClick={() => navigate(`/compile/${problemId}`)}>문제풀기</CBtn>
-            <IconButton onClick={() => setOpen((prev) => !prev)}>
+            <IconButton onClick={() => setOpen((prev) => !prev)} sx={{ width: 'fit-content' }}>
               {open ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </>
@@ -44,18 +44,23 @@ function RoomMainStudyDetailProblemItem({
       />
 
       <Collapse in={open}>
-        {!!members &&
-          members.map((member, idx) => (
-            <RoomMainStudyDetailUserItem
-              key={idx}
-              problemId={member.problemId}
-              userId={member.userId}
-              nickname={member.nickname}
-              profileImg={member.profileImg}
-            />
-          ))}
+        <Stack
+          className="scroll-box"
+          sx={{ marginTop: 1, borderRadius: '10px', backgroundColor: theme.palette.bg }}>
+          {!!members &&
+            members.map((member, idx) => (
+              <RoomMainStudyDetailUserItem
+                key={idx}
+                backgroundColor={idx % 2 ? theme.palette.bg : alpha(theme.palette.main, 0.3)}
+                problemId={number}
+                userId={member.id}
+                nickname={member.nickname}
+                profileImg={member.profileImg}
+              />
+            ))}
+        </Stack>
       </Collapse>
-    </>
+    </div>
   );
 }
 

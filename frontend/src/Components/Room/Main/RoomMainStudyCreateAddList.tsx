@@ -1,19 +1,28 @@
 import { Remove } from '@mui/icons-material';
-import { Icon, IconButton, styled } from '@mui/material';
+import { alpha, Divider, IconButton, styled, useTheme } from '@mui/material';
 import React from 'react';
 import CProblem from '../../Commons/CProblem';
-import { ToSolveProblem } from './RoomMainStudyDetail';
+import { ProblemRes } from './RoomMainStudyDetail';
 
 interface RoomMainStudyCreateAddListProps {
-  problemList: ToSolveProblem[];
-  addedProblemList: ToSolveProblem[];
-  setProblemList: React.Dispatch<React.SetStateAction<ToSolveProblem[]>>;
-  setAddedProblemList: React.Dispatch<React.SetStateAction<ToSolveProblem[]>>;
+  problemList: ProblemRes[];
+  addedProblemList: ProblemRes[];
+  setProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
+  setAddedProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
 }
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.warn,
   color: theme.palette.icon,
+  width: 30,
+  height: 30,
+  marginRight: theme.spacing(2),
+}));
+
+const ProblemBox = styled('div')(({ theme }) => ({
+  height: '20vh',
+  borderRadius: 10,
+  backgroundColor: theme.palette.bg,
 }));
 
 function RoomMainStudyCreateAddList({
@@ -22,6 +31,7 @@ function RoomMainStudyCreateAddList({
   setProblemList,
   setAddedProblemList,
 }: RoomMainStudyCreateAddListProps) {
+  const theme = useTheme();
   const deleteProblem = (idx: number) => {
     const tempAddedProblem = [...addedProblemList];
     const deletedProblem = tempAddedProblem.splice(idx, 1);
@@ -31,13 +41,15 @@ function RoomMainStudyCreateAddList({
     setAddedProblemList(tempAddedProblem);
   };
   return (
-    <div>
+    <div style={{ height: '50%' }}>
       <h3>추가된 문제</h3>
-      <div>
+      <Divider variant="middle" sx={{ margin: 0 }} />
+      <ProblemBox className="scroll-box">
         {addedProblemList.map((problem, idx) => (
           <CProblem
             key={idx}
-            number={problem.number}
+            backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
+            number={problem.problemNumber}
             title={problem.title}
             level={problem.level}
             button={
@@ -47,7 +59,7 @@ function RoomMainStudyCreateAddList({
             }
           />
         ))}
-      </div>
+      </ProblemBox>
     </div>
   );
 }

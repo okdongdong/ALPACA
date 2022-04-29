@@ -38,6 +38,7 @@ function CBtn({
         backgroundColor: backgroundColor,
         color: color,
         width: width,
+        minWidth: 'fit-content',
         height: height,
       }}
       disabled={disabled}
