@@ -31,6 +31,16 @@ public class ProblemController {
     }
 
     @ApiOperation(
+            value = "문제 조회",
+            notes = "문제 번호를 통해 문제 정보를 조회한다."
+    )
+    @ApiImplicitParam( name = "problemNumber", value = "조회할 문제 번호", dataTypeClass = Long.class)
+    @GetMapping("/{problemNumber}")
+    public ResponseEntity<Problem> getProblem(@PathVariable Long problemNumber) {
+        return ResponseEntity.ok(problemService.getProblem(problemNumber));
+    }
+
+    @ApiOperation(
             value = "백준에서 푼 문제 갱신",
             notes = "백준에서 푼 문제를 ALPACA DB에 연동한다."
     )

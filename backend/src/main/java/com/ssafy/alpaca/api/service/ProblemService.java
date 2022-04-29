@@ -30,8 +30,14 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
 
-    public List<Problem> searchProblems(Long problemNumber){
+    public List<Problem> searchProblems(Long problemNumber) {
         return problemRepository.findTop10ByProblemNumberStartingWithOrderByProblemNumberAsc(problemNumber);
+    }
+
+    public Problem getProblem(Long problemNumber) {
+        return problemRepository.findByProblemNumber(problemNumber).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
+        );
     }
 
     public void refreshSolvedProblem(String username) {
