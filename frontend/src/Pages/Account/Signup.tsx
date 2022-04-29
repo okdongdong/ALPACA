@@ -36,7 +36,7 @@ function Signup() {
 
   // 유저정보 입력 및 유효성 검사 정보
   const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,30}$/;
-  const usernameRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,20}$/;
+  const usernameRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]?).{6,20}$/;
 
   // 아이디 중복체크
   const usernameDuplicateCheck = async () => {
@@ -164,16 +164,16 @@ function Signup() {
     if (!username || usernameRegex.test(username)) {
       setUsernameMessage('');
     } else {
-      setUsernameMessage('영문자+숫자 조합으로 6자리이상 입력하세요.');
+      setUsernameMessage('영문자+숫자 조합으로 6자리 이상 20자리 이하로 입력해주세요.');
     }
   }, [username]);
 
   // // 닉네임 유효성검사
   useEffect(() => {
-    if (!nickname || (nickname.length > 1 && nickname.length < 9)) {
+    if (!nickname || (nickname.length > 1 && nickname.length < 21)) {
       setNicknameMessage('');
     } else {
-      setNicknameMessage('닉네임은 2글자 이상 8글자 이하로 입력해 주세요');
+      setNicknameMessage('닉네임은 2글자 이상 20글자 이하로 입력해주세요.');
     }
   }, [nickname]);
 

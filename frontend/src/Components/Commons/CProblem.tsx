@@ -8,6 +8,7 @@ interface CProblemProps {
   title: string;
   backgroundColor?: string;
   button?: ReactJSXElement;
+  borderRadius?: number | string;
 }
 
 const ProblemContainer = styled('div')(({ theme }) => ({
@@ -15,6 +16,7 @@ const ProblemContainer = styled('div')(({ theme }) => ({
   color: theme.palette.txt,
   display: 'flex',
   justifyContent: 'space-around',
+  alignItems: 'center',
 }));
 
 const ProblemBox = styled(Button)(({ theme }) => ({
@@ -25,17 +27,23 @@ const ProblemBox = styled(Button)(({ theme }) => ({
   width: '100%',
 }));
 
-function CProblem({ number, level, title, button, backgroundColor }: CProblemProps) {
+function CProblem({ number, level, title, button, backgroundColor, borderRadius }: CProblemProps) {
   // 새 창에서 문제페이지 띄워줌
   const onClickHandler = () => {
     window.open(`https://www.acmicpc.net/problem/${number}`, '_blank');
   };
   return (
-    <ProblemContainer style={{ backgroundColor: backgroundColor }}>
-      <ProblemBox onClick={onClickHandler}>
-        <div>
+    <ProblemContainer
+      sx={{
+        backgroundColor: backgroundColor,
+        borderRadius: borderRadius,
+        paddingTop: '4px',
+        paddingBottom: '4px',
+      }}>
+      <ProblemBox onClick={onClickHandler} sx={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <CBadge tier={level} type="problem" />
-          <div>{number}</div>
+          <div style={{ paddingLeft: 16 }}>{number}</div>
         </div>
         <div>{title}</div>
       </ProblemBox>
