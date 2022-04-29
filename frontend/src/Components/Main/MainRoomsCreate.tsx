@@ -2,6 +2,7 @@ import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
+// 지금 사용안함
 function MainRoomsCreate() {
   return (
     <div>
@@ -17,8 +18,7 @@ function MainRoomsCreate() {
           '&:hover': {
             background: '#97B2E1' + '90',
           },
-        }}
-        onClick={onAddDetailDiv}>
+        }}>
         <AddIcon
           sx={{
             minWidth: 0,

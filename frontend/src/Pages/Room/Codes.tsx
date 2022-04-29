@@ -4,7 +4,7 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 import { useTheme } from '@mui/material/styles';
 import { Divider, Grid } from '@mui/material';
 import RoomCodeRecordTime from '../../Components/Room/Codes/RoomCodeRecordTime';
-import RoomCompileTitle from '../../Components/Room/Complie/RoomCompileTitle';
+import RoomCompileTitle from '../../Components/Room/Compile/RoomCompileTitle';
 import CProfile from '../../Components/Commons/CProfile';
 
 const times = [
@@ -23,7 +23,7 @@ function Codes() {
     inherit: true,
     rules: [{ token: '', background: theme.palette.component }],
     colors: {
-      'editor.foreground': theme.palette.bg,
+      'editor.foreground': theme.palette.txt,
       'editor.background': theme.palette.component,
       'editorCursor.foreground': theme.palette.txt + '99',
       'editor.lineHighlightBackground': theme.palette.bg + '99',

@@ -14,6 +14,7 @@ interface CBtnProps {
 }
 
 const CustomButton = styled(Button)(({ theme }) => ({
+  fontFamily: 'Pretendard-Regular',
   borderRadius: '10px',
   width: '100%',
   height: '100%',
@@ -38,6 +39,9 @@ function CBtn({
         color: color,
         width: width,
         height: height,
+        '&:hover': {
+          backgroundColor: backgroundColor + '90',
+        },
       }}
       disabled={disabled}
       onClick={onClick}>

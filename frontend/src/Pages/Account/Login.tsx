@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
 import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import CInput from '../../Components/Commons/CInput';
 import { customAxios } from '../../Lib/customAxios';
-import { setUserInfo } from '../../Redux/account/accountActions';
-import { setLoading } from '../../Redux/common/commonAction';
-import { setTheme } from '../../Redux/theme/themeActions';
+import { setUserInfo } from '../../Redux/accountReducer';
+import { setLoading } from '../../Redux/commonReducer';
+import { setTheme } from '../../Redux/themeReducer';
+import alpaca from '../../Assets/Img/alpaca.png';
 
-function Login() {
+function Login(props: any) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -38,10 +40,11 @@ function Login() {
         username: res.data.username,
         nickname: res.data.nickname,
         info: res.data.info,
-        profileImg: res.data.profileImg,
+        profileImg: !!res.data.profileImg ? res.data.profileImg : alpaca,
         bojId: res.data.bojId,
         preferredLanguage: res.data.preferredLanguage,
         studies: res.data.studies,
+        isLogin: true,
       };
 
       console.log(resUserInfo);
@@ -51,8 +54,14 @@ function Login() {
       dispatch(setTheme(res.data.theme));
 
       // 메인페이지로 이동
-      navigate('/');
-    } catch (e) {
+      console.log(location.state);
+
+      if (!!location.state && typeof location.state === 'string') {
+        navigate(location.state);
+      } else {
+        navigate('/');
+      }
+    } catch (e: any) {
       console.log(e);
     }
 

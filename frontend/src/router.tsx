@@ -10,12 +10,17 @@ import Compile from './Pages/Room/Compile';
 import Invite from './Pages/Room/Invite';
 import ProblemManage from './Pages/Room/ProblemManage';
 import RoomMain from './Pages/Room/RoomMain';
+import StudyLive from './Pages/Room/StudyLive';
 
-function Router() {
+interface RouterProps {
+  isLogin: boolean;
+}
+
+function Router({ isLogin }: RouterProps) {
   return useRoutes([
     {
       path: '',
-      element: <MainLayout />,
+      element: isLogin ? <MainLayout /> : <Navigate to="login" />,
       children: [
         { path: '', element: <Main /> },
         {
@@ -26,11 +31,14 @@ function Router() {
               path: 'problem-manage',
               element: <ProblemManage />,
             },
+            {
+              path: 'live',
+              element: <StudyLive />,
+            },
           ],
         },
-
         {
-          path: 'codes/:codeId',
+          path: 'codes/:problemId/:userId',
           element: <Codes />,
         },
         {
@@ -42,7 +50,7 @@ function Router() {
     },
     {
       path: '',
-      element: <AccountLayout />,
+      element: !isLogin ? <AccountLayout /> : <Navigate to="/" />,
       children: [
         {
           path: 'login',
@@ -53,7 +61,7 @@ function Router() {
           element: <Signup />,
         },
         {
-          path: 'invite/:inviteId',
+          path: 'invite/:inviteCode',
           element: <Invite />,
         },
       ],

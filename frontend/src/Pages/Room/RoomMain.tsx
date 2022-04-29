@@ -1,7 +1,8 @@
-import { Grid, styled } from '@mui/material';
+import { Grid, Stack, styled } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DUMMY_STUDY_DATA } from '../../Assets/dummyData/dummyData';
+import CBtn from '../../Components/Commons/CBtn';
 import RoomMainCalendar, { DailySchedule } from '../../Components/Room/Main/RoomMainCalendar';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
 import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
@@ -107,16 +108,32 @@ function RoomMain() {
             setDateRange={setDateRange}
           />
         </Grid>
-        <Grid item xs={4}>
-          {isStudyExist ? (
-            <RoomMainStudyDetail
-              selectedDay={selectedDay}
-              selectedDayIdx={selectedDayIdx}
-              dateRange={dateRange}
-            />
-          ) : (
-            <RoomMainStudyCreate selectedDay={selectedDay} />
-          )}
+        <Grid item xs={3.5}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}>
+            {isStudyExist ? (
+              <RoomMainStudyDetail
+                selectedDay={selectedDay}
+                selectedDayIdx={selectedDayIdx}
+                dateRange={dateRange}
+              />
+            ) : (
+              <RoomMainStudyCreate selectedDay={selectedDay} />
+            )}
+            <Stack direction="row" spacing={5}>
+              <CBtn width="100%" height="100%" onClick={() => {}}>
+                초대
+              </CBtn>
+              <CBtn width="100%" height="100%" onClick={() => {}}>
+                스터디 라이브 입장
+              </CBtn>
+            </Stack>
+          </div>
         </Grid>
       </Grid>
     </div>

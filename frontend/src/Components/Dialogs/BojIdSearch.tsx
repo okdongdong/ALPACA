@@ -1,11 +1,12 @@
-import { Dialog, DialogTitle, Stack, styled } from '@mui/material';
-import { useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { solvedAcAxios } from '../../Lib/customAxios';
-import { setLoading } from '../../Redux/common/commonAction';
+import { Dialog, Grid, Stack, styled } from '@mui/material';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
+import { setLoading } from '../../Redux/commonReducer';
+import CBadge from '../Commons/CBadge';
 import CBtn from '../Commons/CBtn';
-import CInputWithBtn from '../Commons/CInputWithBtn';
 import CSearchBar from '../Commons/CSearchBar';
+import ConfirmationWindow from './ConfirmationWindow';
 
 interface BojIdSearchProps {
   open: boolean;
@@ -20,34 +21,47 @@ interface BojUserInfo {
   rank: number;
 }
 
-const CustomBox = styled('div')(({ theme }) => ({
+const CustomBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.bg,
   color: theme.palette.txt,
+  padding: theme.spacing(3),
 }));
 
 const CustomContent = styled('div')(({ theme }) => ({
-  minWidth: 600,
+  minWidth: 450,
   maxHeight: 600,
   overflowY: 'scroll',
+  /* 스크롤바 설정*/
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  /* 스크롤바 막대 설정*/
+  '&::-webkit-scrollbar-thumb': {
+    height: '100px',
+    backgroundColor: 'rgba(100,100,100,0.5)',
+    borderRadius: ' 10px',
+  },
+  /* 스크롤바 뒷 배경 설정*/
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'rgba(0,0,0,0)',
+  },
+}));
+
+const BojSearchResult = styled(Grid)(({ theme }) => ({
+  backgroundColor: theme.palette.bg,
+  color: theme.palette.txt,
+  justifyContent: 'center',
+  textAlign: 'center',
 }));
 
 function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
   const dispatch = useDispatch();
 
-  // 인피니티 스크롤 확인용
-  const interSectRef = useRef<HTMLDivElement>(null);
-  const nowLoading = useSelector((state: any) => state.commonReducer.nowLoading);
-
-  const [page, setPage] = useState<number>(1);
-  const [isFinished, setIsFinished] = useState<boolean>(true);
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState<boolean>(false);
   const [idList, setIdList] = useState<BojUserInfo[]>([]);
   const [searchId, setSearchId] = useState<string>('');
-
-  const onChangeHandler = () => {};
-
-  const infiniteHandler = () => {
-    getBojIdList();
-  };
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 
   const getBojIdList = async () => {
     dispatch(setLoading(true));
@@ -58,7 +72,6 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
         url: '/search/user',
         params: {
           query: searchId,
-          page: page,
         },
       });
       const resInfoList: BojUserInfo[] = [];
@@ -75,7 +88,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
         resInfoList.push(userInfo);
       });
 
-      setIdList((prev) => [...prev, ...resInfoList]);
+      setIdList(resInfoList);
     } catch (e) {
       console.log(e);
     }
@@ -83,28 +96,75 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
     dispatch(setLoading(false));
   };
 
+  const onClickHandler = (bojId: string) => {
+    setSelectedId(bojId);
+    bojDuplicateCheck();
+  };
+
+  // 백준연결
+  const bojDuplicateCheck = async () => {
+    dispatch(setLoading(true));
+
+    // 중복 x
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: '/auth/duplicated/bojId',
+        params: { bojId: selectedId },
+      });
+      console.log(res);
+      setBojId(selectedId);
+      setIsDuplicate(false);
+
+      // 중복 o
+    } catch (e) {
+      console.log(e);
+      setIsDuplicate(true);
+    }
+    setDuplicateDialogOpen(true);
+    dispatch(setLoading(false));
+  };
+
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      <CustomBox>
-        <DialogTitle>BOJ 아이디 검색</DialogTitle>
+      <ConfirmationWindow
+        open={duplicateDialogOpen}
+        setOpen={setDuplicateDialogOpen}
+        confirm={() => {
+          setBojId(selectedId);
+          setOpen(false);
+        }}>
+        {isDuplicate ? (
+          <>
+            <div>{selectedId}의 연결기록이 이미 존재합니다.</div>
+            <div>연결하시겠습니까?</div>
+          </>
+        ) : (
+          <div>{selectedId}를 연결하시겠습니까?</div>
+        )}
+      </ConfirmationWindow>
+      <CustomBox spacing={3}>
+        <h1>BOJ 아이디 검색</h1>
         <CSearchBar onSearch={getBojIdList} onChange={setSearchId} />
         <div>*아이디는 최대 100개까지만 검색됩니다.</div>
         <CustomContent>
           <Stack spacing={1}>
             {idList.map((item, idx) => (
-              <div key={idx}>
-                <span>bojId :{item.bojId}</span>
-                <span>tier :{item.tier}</span>
-                <span>solvedCount :{item.solvedCount}</span>
-                <span>rank :{item.rank}</span>
-                <CBtn
-                  content="선택"
-                  onClick={() => {
-                    setBojId(item.bojId);
-                    setOpen(false);
-                  }}
-                />
-              </div>
+              <BojSearchResult key={idx} container>
+                <Grid item xs={1}>
+                  <CBadge tier={item.tier} />
+                </Grid>
+                <Grid item xs={5}>
+                  {item.bojId}
+                </Grid>
+                <Grid item xs={3}>
+                  <div>{item.solvedCount} solved</div>
+                  <div> 🏅{item.rank}</div>
+                </Grid>
+                <Grid item xs={2} sx={{ height: '100%' }}>
+                  <CBtn content="선택" onClick={() => onClickHandler(item.bojId)} />
+                </Grid>
+              </BojSearchResult>
             ))}
           </Stack>
         </CustomContent>

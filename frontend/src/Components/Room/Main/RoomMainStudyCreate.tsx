@@ -61,7 +61,7 @@ function RoomMainStudyCreate({ selectedDay }: RoomMainStudyCreateProps) {
 
   return (
     <RoomMainComponentContainer>
-      <Stack>
+      <Stack sx={{ paddingLeft: 2, paddingRight: 2 }}>
         <h1 style={{ textAlign: 'center' }}>스터디 일정추가</h1>
         <RoomMainStudyCreateTime
           selectedDay={selectedDay}
@@ -70,6 +70,7 @@ function RoomMainStudyCreate({ selectedDay }: RoomMainStudyCreateProps) {
           finishedAt={finishedAt}
           setFinishedAt={setFinishedAt}
         />
+
         <RoomMainStudyCreateSearch
           problemList={problemList}
           setProblemList={setProblemList}
@@ -83,7 +84,9 @@ function RoomMainStudyCreate({ selectedDay }: RoomMainStudyCreateProps) {
           addedProblemList={addedProblemList}
           setAddedProblemList={setAddedProblemList}
         />
-        <CBtn onClick={onClickHandler}>스터디등록</CBtn>
+        <CBtn width="30%" onClick={onClickHandler}>
+          스터디등록
+        </CBtn>
       </Stack>
     </RoomMainComponentContainer>
   );

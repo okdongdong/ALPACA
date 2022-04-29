@@ -1,60 +1,58 @@
 import React, { useState } from 'react';
-import { Box, Grid, Pagination, Stack } from '@mui/material';
+import { Box, Grid, Pagination, Stack, IconButton } from '@mui/material';
 import usePagination from './MainRoomsPagenation';
 import PaginationItem from '@mui/material/PaginationItem';
-
-//create
-import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
+import StudyCreate from '../Dialogs/StudyCreate';
+import { styled } from '@mui/material/styles';
+
+const CIconButton = styled(IconButton)(({ theme }) => ({
+  margin: '10px',
+  padding: 2.5,
+  borderRadius: '10px',
+  background: theme.palette.main,
+  height: '200px',
+  width: '200px',
+  '&:hover': {
+    background: theme.palette.main + '90',
+  },
+}));
 
 function MainRooms() {
   let [page, setPage] = useState(1);
   const PER_PAGE = 3;
-  const [data, setData] = useState([1, 2, 3, 4, 5, 6, 7]);
+  const [data, setData] = useState<any[]>([]);
   const count = Math.ceil(data.length / PER_PAGE);
   const _DATA = usePagination(data, PER_PAGE);
-  const handleChange = (e, p) => {
+  const handleChange = (e: any, p: any) => {
     setPage(p);
     _DATA.jump(p);
   };
 
-  //create
-  const onAddDetailDiv = () => {
-    let datalist = [...data];
-    let counter = datalist.slice(-1)[0];
+  const addStudyData = (studyData: any) => {
+    setData((data) => {
+      return [...data, studyData];
+    });
+  };
 
-    // 나중에 여기를 스터디이름으로 변경
-    counter += 1;
-    datalist.push(counter);
-    setData(datalist);
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
   return (
     <Box p="5">
       <Grid container spacing={2} direction="row">
-        {_DATA.currentData().map((item, i) => {
+        {_DATA.currentData().map((study: any, i: number) => {
+          console.log(study);
           return (
             <Stack key={i}>
-              <MainRoomsDetail detail={item} />
+              <MainRoomsDetail detail={study} />
             </Stack>
           );
         })}
-        <IconButton
-          aria-label="EditIcon"
-          sx={{
-            mx: '10px',
-            my: '10px',
-            px: 2.5,
-            borderRadius: '10px',
-            background: '#97B2E1',
-            height: '200px',
-            width: '200px',
-            '&:hover': {
-              background: '#97B2E1' + '90',
-            },
-          }}
-          onClick={onAddDetailDiv}>
+        <CIconButton onClick={handleClickOpen}>
           <AddIcon
             sx={{
               minWidth: 0,
@@ -64,7 +62,14 @@ function MainRooms() {
               width: '100px',
             }}
           />
-        </IconButton>
+        </CIconButton>
+        <StudyCreate
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+          callback={addStudyData}
+        />
       </Grid>
       <Pagination
         count={count}
