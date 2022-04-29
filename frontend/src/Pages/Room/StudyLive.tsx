@@ -9,7 +9,13 @@ import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
 import RoomStudyLiveCamList from '../../Components/Room/StudyLive/RoomStudyLiveCamList';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
-import { setOV, setSession } from '../../Redux/openviduReducer';
+import {
+  setOVForCamera,
+  setOVForScreen,
+  setSessionForCamera,
+  setSessionForScreen,
+  setMainUser,
+} from '../../Redux/openviduReducer';
 import RoomStudyLiveMain from '../../Components/Room/StudyLive/RoomStudyLiveMain';
 import RoomStudyLiveChat from '../../Components/Room/StudyLive/RoomStudyLiveChat';
 
@@ -18,28 +24,34 @@ function StudyLive() {
   const dispatch = useDispatch();
 
   // session 정보 (useState 이용시 rendering 문제로 값이 undefined로 읽히는 문제가 있어 변수로 선언.)
-  let session: Session | undefined = undefined;
-  let OV: OpenVidu | undefined = undefined;
+  let sessionForCamera: Session | undefined = undefined;
+  let OVForCamera: OpenVidu | undefined = undefined;
+  let sessionForScreen: Session | undefined = undefined;
+  let OVForScreen: OpenVidu | undefined = undefined;
   // 지운부분
-  let tmpSession: Session | undefined = undefined;
-  let tmpOV: OpenVidu | undefined = undefined;
+  let tmpSessionForCamera: Session | undefined = undefined;
+  let tmpOVForCamera: OpenVidu | undefined = undefined;
+  let tmpSessionForScreen: Session | undefined = undefined;
+  let tmpOVForScreen: OpenVidu | undefined = undefined;
 
-  const reduxSession = useSelector((state: any) => state.openvidu.session);
-  const reduxOV = useSelector((state: any) => state.openvidu.OV);
-  const { nickname } = useSelector((state: any) => state.account);
-  console.log();
+  const ReduxSessionForCamera = useSelector((state: any) => state.openvidu.sessionForCamera);
+  const ReduxOVForCamera = useSelector((state: any) => state.openvidu.OVForCamera);
+  const ReduxSessionForScreen = useSelector((state: any) => state.openvidu.sessionForScreen);
+  const ReduxOVForScreen = useSelector((state: any) => state.openvidu.OVForScreen);
+  const nickname = useSelector((state: any) => state.account.nickname);
+  const mainUser = useSelector((state: any) => state.openvidu.mainUser);
+
   useEffect(() => {
-    OV = reduxOV || tmpOV || OV;
-  });
-  useEffect(() => {
-    session = reduxSession || tmpSession || session;
+    OVForCamera = ReduxOVForCamera || tmpOVForCamera;
+    sessionForCamera = ReduxSessionForCamera || tmpSessionForCamera;
+    OVForScreen = ReduxOVForScreen || tmpOVForScreen;
+    sessionForScreen = ReduxSessionForScreen || tmpSessionForScreen;
   });
 
   // let OV: OpenVidu | undefined = undefined;
   const { roomId } = useParams();
-  const [mainStreamManager, setMainStreamManager] = useState<any | undefined>(undefined);
-  const [publisher, setPublisher] = useState<any | undefined>(undefined);
-  const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [publisher, setPublisher] = useState<UserModel | undefined>(undefined);
+  const [subscribers, setSubscribers] = useState<UserModel[]>([]);
 
   const [openYjsDocs, setOpenYjsDocs] = useState<Boolean>(false);
 
@@ -51,15 +63,26 @@ function StudyLive() {
   }, []);
 
   const joinSession = () => {
-    OV = new OpenVidu();
-    dispatch(setOV(OV));
-    tmpOV = OV;
-    if (!OV) return;
-    session = OV.initSession();
-    dispatch(setSession(session));
-    tmpSession = session;
+    OVForCamera = new OpenVidu();
+    OVForScreen = new OpenVidu();
 
-    setMainStreamManager(undefined);
+    dispatch(setOVForCamera(OVForCamera));
+    dispatch(setOVForScreen(OVForScreen));
+
+    tmpOVForCamera = OVForCamera;
+    tmpOVForScreen = OVForScreen;
+
+    if (!OVForCamera || !OVForScreen) return;
+
+    sessionForCamera = OVForCamera.initSession();
+    sessionForScreen = OVForScreen.initSession();
+    dispatch(setSessionForCamera(sessionForCamera));
+    dispatch(setSessionForScreen(sessionForScreen));
+
+    tmpSessionForCamera = sessionForCamera;
+    tmpSessionForScreen = sessionForScreen;
+
+    dispatch(setMainUser(undefined));
     setPublisher(undefined);
     setSubscribers([]);
     subscribeToStreamCreated();
@@ -68,45 +91,64 @@ function StudyLive() {
   };
 
   const leaveSession = () => {
-    const mySession = session;
-    if (mySession) {
-      mySession.disconnect();
+    if (sessionForCamera) {
+      sessionForCamera.disconnect();
+    }
+    if (sessionForScreen) {
+      sessionForScreen.disconnect();
     }
 
     // Empty all properties...
-    dispatch(setOV(undefined));
-    dispatch(setSession(undefined));
-    setMainStreamManager(undefined);
+    dispatch(setSessionForCamera(undefined));
+    dispatch(setSessionForScreen(undefined));
+
+    dispatch(setMainUser(undefined));
     setPublisher(undefined);
     setSubscribers([]);
   };
 
   const subscribeToStreamCreated = () => {
-    if (!session) return;
-    session.on('streamCreated', (event: any) => {
-      const subscriber = session?.subscribe(event.stream, '');
-      // var subscribers = this.state.subscribers;
-      subscriber?.on('streamPlaying', (e: any) => {
-        checkSomeoneShareScreen();
-      });
-      const newUser = new UserModel();
-      newUser.setStreamManager(subscriber);
-      newUser.setConnectionId(event.stream.connection.connectionId);
-      newUser.setType('remote');
-      const nickname = event.stream.connection.data.split('%')[0];
-      newUser.setNickname(JSON.parse(nickname).clientData);
-      setSubscribers((prev) => {
-        return [...prev, newUser];
-      });
+    if (!sessionForCamera || !sessionForScreen) return;
+    sessionForCamera.on('streamCreated', (event: any) => {
+      const newUser = checkSubscribers(event.stream.connection.connectionId) || new UserModel();
+      if (event.stream.typeOfVideo === 'SCREEN') {
+        const subscriber = sessionForScreen?.subscribe(event.stream, '');
+        newUser.setScreenStreamManager(subscriber);
+      } else {
+        const subscriber = sessionForCamera?.subscribe(event.stream, '');
+        // var subscribers = this.state.subscribers;
+        subscriber?.on('streamPlaying', (e: any) => {
+          checkSomeoneShareScreen();
+        });
+        newUser.setStreamManager(subscriber);
+        newUser.setConnectionId(event.stream.connection.connectionId);
+        newUser.setType('remote');
+        const nickname = event.stream.connection.data.split('%')[0];
+        newUser.setNickname(JSON.parse(nickname).clientData);
+        setSubscribers((prev) => {
+          return [...prev, newUser];
+        });
+      }
     });
   };
+
+  const checkSubscribers = (connectionId: string) => {
+    const checkedSubscriber = subscribers.filter((user: UserModel) => {
+      return user.getConnectionId() === connectionId;
+    });
+    if (checkedSubscriber) {
+      return checkedSubscriber[0];
+    }
+    return undefined;
+  };
+
   const connectWebCam = async () => {
-    if (!OV) return;
-    if (!session) return;
-    var devices = await OV.getDevices();
+    if (!OVForCamera) return;
+    if (!sessionForCamera) return;
+    var devices = await OVForCamera.getDevices();
     var videoDevices = devices.filter((device: any) => device.kind === 'videoinput');
 
-    let tmpPublisher = OV.initPublisher('', {
+    let cameraPublisher = OVForCamera.initPublisher('', {
       audioSource: undefined,
       videoSource: videoDevices[0].deviceId,
       publishAudio: false,
@@ -115,21 +157,20 @@ function StudyLive() {
       frameRate: 30,
       insertMode: 'APPEND',
     });
-    if (session && session?.capabilities.publish) {
-      tmpPublisher.on('accessAllowed', () => {
-        if (!session) return;
-        session.publish(tmpPublisher);
+    if (sessionForCamera && sessionForCamera?.capabilities.publish) {
+      cameraPublisher.on('accessAllowed', () => {
+        if (!sessionForCamera) return;
+        sessionForCamera.publish(cameraPublisher);
       });
     }
     let localUser = new UserModel();
     localUser.setNickname(nickname);
-    localUser.setAudioActive(tmpPublisher.stream.audioActive);
-    localUser.setVideoActive(tmpPublisher.stream.videoActive);
+    localUser.setAudioActive(cameraPublisher.stream.audioActive);
+    localUser.setVideoActive(cameraPublisher.stream.videoActive);
     localUser.setScreenShareActive(false);
-    localUser.setConnectionId(session.connection.connectionId);
-    localUser.setStreamManager(tmpPublisher);
-    console.log(tmpPublisher);
-    console.log(localUser);
+    localUser.setConnectionId(sessionForCamera.connection.connectionId);
+    localUser.setStreamManager(cameraPublisher);
+
     subscribeToUserChanged();
     subscribeToStreamDestroyed();
     setPublisher(localUser);
@@ -137,6 +178,7 @@ function StudyLive() {
   };
 
   const toggleCam = () => {
+    if (!publisher) return;
     publisher.setVideoActive(!publisher.isVideoActive());
     publisher.getStreamManager().publishVideo(publisher.isVideoActive());
     sendSignalUserChanged({ isVideoActive: publisher.isVideoActive() });
@@ -144,47 +186,56 @@ function StudyLive() {
   };
 
   const toggleMic = () => {
+    if (!publisher) return;
     publisher.setAudioActive(!publisher.isAudioActive());
     publisher.getStreamManager().publishAudio(publisher.isAudioActive());
     sendSignalUserChanged({ isAudioActive: publisher.isAudioActive() });
   };
 
   const sendSignalUserChanged = (data: any) => {
-    if (!session) return;
+    if (!sessionForCamera) return;
     const signalOptions = {
       data: JSON.stringify(data),
       type: 'userChanged',
     };
-    session.signal(signalOptions);
+    sessionForCamera.signal(signalOptions);
   };
 
   const checkSomeoneShareScreen = () => {
-    let isScreenShared;
-    // return true if at least one passes the test
-    isScreenShared =
+    return (
       subscribers.some((user) => user.isScreenShareActive()) ||
-      (publisher && publisher.isScreenShareActive());
-
-    // 여기서 레이아웃 설정
+      (publisher && publisher.isScreenShareActive())
+    );
   };
 
   const connectToSession = () => {
     getToken(roomId || '0').then((token) => {
-      connect(String(token));
+      console.log(token);
+      connectSessionToCamera(String(token));
+    });
+    getToken(roomId || '0').then((token) => {
+      console.log(token);
+      connectSessionToScreen(String(token));
     });
   };
 
-  const connect = (token: string) => {
-    if (!session) return;
-    session.connect(token, { clientData: nickname }).then(() => {
+  const connectSessionToCamera = (token: string) => {
+    if (!sessionForCamera) return;
+    sessionForCamera.connect(token, { clientData: nickname }).then(() => {
       connectWebCam();
     });
   };
 
+  const connectSessionToScreen = (token: string) => {
+    if (!sessionForScreen) return;
+    sessionForScreen.connect(token, { clientData: nickname });
+  };
+
   const screenShare = () => {
     const videoSource = navigator.userAgent.indexOf('Firefox') !== -1 ? 'window' : 'screen';
-    if (!reduxOV) return;
-    const tmpPublisher = reduxOV.initPublisher(
+    if (!OVForScreen) return;
+    if (!publisher) return;
+    const screenPublisher = OVForScreen.initPublisher(
       '',
       {
         videoSource: videoSource,
@@ -205,12 +256,12 @@ function StudyLive() {
         }
       },
     );
-    tmpPublisher.once('accessAllowed', () => {
-      if (!session) return;
-      session.unpublish(publisher.getStreamManager());
-      session.publish(tmpPublisher).then(() => {
-        setPublisher((localPublisher: UserModel) => {
-          localPublisher.setStreamManager(tmpPublisher);
+    screenPublisher.once('accessAllowed', () => {
+      if (!sessionForScreen) return;
+      sessionForScreen.publish(screenPublisher).then(() => {
+        setPublisher((localPublisher: UserModel | undefined) => {
+          if (!localPublisher) return;
+          localPublisher.setScreenStreamManager(screenPublisher);
           localPublisher.setScreenShareActive(true);
           return localPublisher;
         });
@@ -220,21 +271,32 @@ function StudyLive() {
       });
     });
 
-    tmpPublisher.on('streamPlaying', () => {
-      tmpPublisher.videos[0].video.parentElement.classList.remove('custom-class');
-    });
+    // screenPublisher.on('streamPlaying', () => {
+    //   screenPublisher.videos[0].video.parentElement.classList.remove('custom-class');
+    // });
   };
 
   const stopScreenShare = () => {
-    if (!session) return;
-    session.unpublish(publisher.getStreamManager());
-    connectWebCam();
+    if (!sessionForScreen) return;
+    if (!publisher) return;
+    console.log(publisher);
+    sessionForScreen.unpublish(publisher.getScreenStreamManager());
+
+    setPublisher((localPublisher: UserModel | undefined) => {
+      if (!localPublisher) return;
+      localPublisher.setScreenStreamManager(undefined);
+      localPublisher.setScreenShareActive(false);
+      return localPublisher;
+    });
+    sendSignalUserChanged({
+      isScreenShareActive: publisher.isScreenShareActive(),
+    });
   };
 
   const subscribeToStreamDestroyed = () => {
-    if (!session) return;
+    if (!sessionForCamera) return;
     // On every Stream destroyed...
-    session.on('streamDestroyed', (event: any) => {
+    sessionForCamera.on('streamDestroyed', (event: any) => {
       // Remove the stream from 'subscribers' array
       deleteSubscriber(event.stream);
       setTimeout(() => {
@@ -249,9 +311,33 @@ function StudyLive() {
       return remoteUsers.filter((user) => user.getStreamManager().stream !== stream);
     });
   };
+
   const subscribeToUserChanged = () => {
-    if (!session) return;
-    session.on('signal:userChanged', (event: any) => {
+    if (!sessionForCamera || !sessionForScreen) return;
+    sessionForCamera.on('signal:userChanged', (event: any) => {
+      setSubscribers((remoteUsers: UserModel[]) => {
+        return remoteUsers.map((user: UserModel) => {
+          if (user.getConnectionId() === event.from.connectionId) {
+            const data = JSON.parse(event.data);
+            console.log('EVENTO REMOTE: ', event.data);
+            if (data.isAudioActive !== undefined) {
+              user.setAudioActive(data.isAudioActive);
+            }
+            if (data.isVideoActive !== undefined) {
+              user.setVideoActive(data.isVideoActive);
+            }
+            if (data.nickname !== undefined) {
+              user.setNickname(data.nickname);
+            }
+            if (data.isScreenShareActive !== undefined) {
+              user.setScreenShareActive(data.isScreenShareActive);
+            }
+          }
+          return user;
+        });
+      });
+    });
+    sessionForScreen.on('signal:userChanged', (event: any) => {
       setSubscribers((remoteUsers: UserModel[]) => {
         return remoteUsers.map((user: UserModel) => {
           if (user.getConnectionId() === event.from.connectionId) {
@@ -293,14 +379,14 @@ function StudyLive() {
               alignItems: 'center',
             }}>
             <RoomStudyLiveMain
-              mainStreamManager={mainStreamManager}
+              mainStreamManager={mainUser}
               openYjsDocs={openYjsDocs}
               setOpenYjsDocs={setOpenYjsDocs}
             />
           </div>
           {publisher !== undefined &&
             publisher.getStreamManager() !== undefined &&
-            (openYjsDocs || mainStreamManager ? (
+            (openYjsDocs || mainUser ? (
               <div
                 style={{
                   position: 'absolute',

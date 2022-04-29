@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const getToken = (mySessionId: string) => {
+const getToken = async (mySessionId: string) => {
   return createSession(mySessionId).then((sessionId) => createToken(String(sessionId)));
 };
 
@@ -58,7 +58,6 @@ const createToken = (sessionId: string) => {
         },
       )
       .then((response) => {
-        console.log('TOKEN', response);
         resolve(response.data.token);
       })
       .catch((error) => reject(error));
