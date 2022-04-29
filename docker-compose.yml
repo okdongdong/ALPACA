@@ -19,7 +19,7 @@ services:
       context: backend/
       dockerfile: Dockerfile
     ports:
-      - "8442:8442"
+      - "8081:8081"
     volumes:
       - /home/ubuntu/docker-volume/ssl:/root
     container_name: "backend"
