@@ -68,7 +68,7 @@ public class StudyService {
         );
     }
 
-    public Long createStudy(String username, StudyReq studyReq) {
+    public StudyListRes createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
         if (12 < studyReq.getMemberIdList().size()) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_MEMBERS);
@@ -77,10 +77,13 @@ public class StudyService {
 
         HashSet<Long> hashSet = new HashSet<>();
         List<MyStudy> myStudyList = new ArrayList<>();
+        List<String> profileImgList = new ArrayList<>();
         for (Long userId : studyReq.getMemberIdList()) {
             if (hashSet.contains(userId)) {
                 continue;
             }
+            User addUser = checkUserById(userId);
+
             hashSet.add(userId);
 
             myStudyList.add(MyStudy.builder()
@@ -88,11 +91,18 @@ public class StudyService {
                     .user(checkUserById(userId))
                     .study(study)
                     .build());
+
+            profileImgList.add(convertUtil.convertByteArrayToString(addUser.getProfileImg()));
         }
 
         studyRepository.save(study);
         myStudyRepository.saveAll(myStudyList);
-        return study.getId();
+        return StudyListRes.builder()
+                .id(study.getId())
+                .title(study.getTitle())
+                .pinnedTime(myStudyList.get(0).getPinnedTime())
+                .profileImgList(profileImgList)
+                .build();
     }
 
     public void createPin(String username, Long id) {

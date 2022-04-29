@@ -126,6 +126,7 @@ public class UserService {
                 .bojId(user.getBojId())
                 .theme(user.getTheme())
                 .preferredLanguage(user.getPreferredLanguage())
+                .studyCount(myStudyRepository.countAllByUser(user))
                 .studies(studyListRes)
                 .build();
     }

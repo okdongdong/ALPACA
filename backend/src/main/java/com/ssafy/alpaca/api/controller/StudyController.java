@@ -34,9 +34,9 @@ public class StudyController {
             notes = "입력 정보에 따라 새로운 스터디를 생성한다."
     )
     @PostMapping()
-    public ResponseEntity<BaseResponseBody> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
+    public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, studyService.createStudy(username, studyReq)));
+        return ResponseEntity.ok(studyService.createStudy(username, studyReq));
     }
 
     @ApiOperation(
