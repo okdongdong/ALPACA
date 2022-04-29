@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Document(collection = "chat")
@@ -29,6 +30,7 @@ public class Chat {
     @Field(targetType = FieldType.DATE_TIME)
     private LocalDateTime timeStamp = LocalDateTime.now();
 
+    @NotBlank
     private String content;
 
 }
