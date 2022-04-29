@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
-import axios from 'axios';
 import { OpenVidu, Session } from 'openvidu-browser';
 import { useParams } from 'react-router-dom';
 import { getToken } from '../../Lib/openvidu';
@@ -11,8 +10,6 @@ import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiv
 import RoomStudyLiveCamList from '../../Components/Room/StudyLive/RoomStudyLiveCamList';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
 import { setOV, setSession } from '../../Redux/openviduReducer';
-import RoomStudyLiveCodeEditer from '../../Components/Room/StudyLive/RoomStudyLiveCodeEditer';
-import RoomStudyLiveCamListItem from '../../Components/Room/StudyLive/RoomStudyLiveCamListItem';
 import RoomStudyLiveMain from '../../Components/Room/StudyLive/RoomStudyLiveMain';
 import RoomStudyLiveChat from '../../Components/Room/StudyLive/RoomStudyLiveChat';
 
@@ -29,6 +26,8 @@ function StudyLive() {
 
   const reduxSession = useSelector((state: any) => state.openvidu.session);
   const reduxOV = useSelector((state: any) => state.openvidu.OV);
+  const { nickname } = useSelector((state: any) => state.account);
+  console.log();
   useEffect(() => {
     OV = reduxOV || tmpOV || OV;
   });
@@ -38,8 +37,6 @@ function StudyLive() {
 
   // let OV: OpenVidu | undefined = undefined;
   const { roomId } = useParams();
-  const [localUser, setLocalUser] = useState<UserModel>(new UserModel());
-  const [nickname, setNickname] = useState<string>('성아영');
   const [mainStreamManager, setMainStreamManager] = useState<any | undefined>(undefined);
   const [publisher, setPublisher] = useState<any | undefined>(undefined);
   const [subscribers, setSubscribers] = useState<any[]>([]);
@@ -62,7 +59,6 @@ function StudyLive() {
     dispatch(setSession(session));
     tmpSession = session;
 
-    setNickname('성아영');
     setMainStreamManager(undefined);
     setPublisher(undefined);
     setSubscribers([]);
@@ -192,8 +188,8 @@ function StudyLive() {
       '',
       {
         videoSource: videoSource,
-        publishAudio: localUser.isAudioActive(),
-        publishVideo: localUser.isVideoActive(),
+        publishAudio: publisher.isAudioActive(),
+        publishVideo: publisher.isVideoActive(),
         mirror: false,
       },
       (error: any) => {
@@ -284,23 +280,6 @@ function StudyLive() {
     <>
       <div style={{ height: '100%', width: '100%', position: 'relative' }}>
         <div className="align_column_center" style={{ height: '100%', width: '100%' }}>
-          {publisher !== undefined &&
-            publisher.getStreamManager() !== undefined &&
-            (openYjsDocs || mainStreamManager ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '1vw',
-                  top: '50%',
-                  transform: 'translate(0, -50%)',
-                }}>
-                <RoomStudyLiveCamList users={[publisher, ...subscribers]} />
-              </div>
-            ) : (
-              <div style={{ height: '80vh', width: '80vw' }}>
-                <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
-              </div>
-            ))}
           <div
             style={{
               height: 'calc(100% - 15vh)',
@@ -319,6 +298,23 @@ function StudyLive() {
               setOpenYjsDocs={setOpenYjsDocs}
             />
           </div>
+          {publisher !== undefined &&
+            publisher.getStreamManager() !== undefined &&
+            (openYjsDocs || mainStreamManager ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '1vw',
+                  top: '50%',
+                  transform: 'translate(0, -50%)',
+                }}>
+                <RoomStudyLiveCamList users={[publisher, ...subscribers]} />
+              </div>
+            ) : (
+              <div style={{ height: '80vh', width: '80vw' }}>
+                <RoomStudyLiveCamMatrix users={[publisher, ...subscribers]} />
+              </div>
+            ))}
         </div>
         {publisher !== undefined && publisher.getStreamManager() !== undefined && (
           <>

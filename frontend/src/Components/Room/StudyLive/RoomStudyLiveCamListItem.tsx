@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { Button } from '@mui/material';
 import UserModel from './user-model';
 import { useSelector } from 'react-redux';
 
@@ -12,7 +13,7 @@ type PropsType = React.VideoHTMLAttributes<HTMLVideoElement> & {
 
 function RoomStudyLiveCamListItem({ user }: userPropsType) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const session = useSelector((state: any) => state.openviduReducer.session);
+  const session = useSelector((state: any) => state.openvidu.session);
 
   useEffect(() => {
     if (!user) return;
@@ -39,13 +40,18 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
   return (
     <>
       <div className="align_column_center">
-        <video
-          style={{ borderRadius: '20px', width: '100%', maxHeight: '80vh' }}
-          autoPlay={true}
-          id={'video-' + user.getStreamManager().stream.streamId}
-          ref={videoRef}
-          // muted={this.props.mutedSound}
-        />
+        <Button
+          onClick={() => {
+            console.log(user.getStreamManager().streamId);
+          }}>
+          <video
+            style={{ borderRadius: '20px', width: '100%', maxHeight: '80vh' }}
+            autoPlay={true}
+            id={'video-' + user.getStreamManager().stream.streamId}
+            ref={videoRef}
+            // muted={this.props.mutedSound}
+          />
+        </Button>
 
         {user.getNickname()}
       </div>
