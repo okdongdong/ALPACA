@@ -15,6 +15,8 @@ import java.util.Optional;
 @Repository
 public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
 
+    Long countAllByUser(User user);
+
     List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
 
     Boolean existsByUserAndIsRoomMaker(User user, Boolean isRoomMaker);
