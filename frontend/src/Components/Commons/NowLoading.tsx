@@ -2,7 +2,7 @@ import { Backdrop, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 function NowLoading() {
-  const nowLoading = useSelector((state: any) => state.commonReducer.nowLoading);
+  const nowLoading = useSelector((state: any) => state.common.nowLoading);
 
   return (
     <Backdrop sx={{ color: '#fff', zIndex: 12000 }} open={nowLoading}>

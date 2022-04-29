@@ -1,17 +1,19 @@
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Drawer, List, ListItemButton, ListItemIcon } from '@mui/material';
+import { Drawer, List, ListItemButton, ListItemIcon, Button } from '@mui/material';
 import Logo from '../../Assets/Img/Logo.png';
-import { useLocation } from 'react-router-dom';
-
+import Logo_White from '../../Assets/Img/Logo_White.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { logout } from '../../Redux/accountReducer';
 import styles from './SideBar.module.css';
-import SideBarBtn from './SideBarBtn';
 
 import { Home, Logout, Assignment, Notifications } from '@mui/icons-material';
 
 type iconObjType = {
-  [index: string]: React.ReactNode;
+  [index: string]: { icon: React.ReactNode; onClick: Function };
 };
+
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -26,37 +28,70 @@ const CustomDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
   ({ theme, open }) => ({
     width: 90,
     height: '100%',
-    background: theme.palette.bg,
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    '& .MuiDrawer-paper': {
+      background: theme.palette.bg,
+    },
   }),
 );
 
 function SideBar() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
+
+  const userTheme = useSelector((state: any) => state.theme);
+
+  const clickHome = () => {
+    if (params.roomId !== undefined) {
+      navigate(`room/${params.roomId}`);
+    }
+  };
+  const clickProblem = () => {
+    if (params.roomId !== undefined) {
+      navigate(`room/${params.roomId}/problem-manage`);
+    }
+  };
+  const clickLogout = () => {
+    dispatch(logout());
+  };
+  const clickNotification = () => {};
+
   const icon: iconObjType = {
-    Home: <Home />,
-    Problem: <Assignment />,
-    Logout: <Logout />,
-    Noti: <Notifications />,
+    Home: { icon: <Home />, onClick: clickHome },
+    Problem: { icon: <Assignment />, onClick: clickProblem },
+    Logout: { icon: <Logout />, onClick: clickLogout },
+    Noti: { icon: <Notifications />, onClick: clickNotification },
   };
 
   const iconList =
-    location.pathname.indexOf('room') === -1
-      ? ['Home', 'Problem', 'Logout', 'Noti']
-      : ['Logout', 'Noti'];
+    pathname.indexOf('room') === -1 ? ['Logout', 'Noti'] : ['Home', 'Problem', 'Logout', 'Noti'];
   return (
     <CustomDrawer variant="permanent">
       <DrawerHeader>
-        <img src={Logo} className={styles.logo} alt="" />
+        <Button>
+          <img
+            src={userTheme === 'dark' ? Logo_White : Logo}
+            className={styles.logo}
+            alt=""
+            onClick={() => {
+              navigate('/');
+            }}
+          />
+        </Button>
       </DrawerHeader>
       <List>
         {iconList.map((text, index) => (
           <ListItemButton
+            onClick={() => {
+              icon[text].onClick();
+            }}
             key={text}
             sx={{
               minHeight: 48,
@@ -79,7 +114,7 @@ function SideBar() {
                 justifyContent: 'center',
                 color: theme.palette.icon,
               }}>
-              {icon[text]}
+              {icon[text].icon}
             </ListItemIcon>
           </ListItemButton>
         ))}

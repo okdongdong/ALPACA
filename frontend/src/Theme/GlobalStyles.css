@@ -18,3 +18,7 @@
 .h_100 {
   height: 100%;
 }
+
+.radius_10 {
+  border-radius: 10px;
+}
