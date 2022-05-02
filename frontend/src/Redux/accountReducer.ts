@@ -10,6 +10,7 @@ interface UserInfo {
   preferredLanguage: string;
   studies: string[];
   isLogin: boolean;
+  studyCount: number;
 }
 
 const initialState: UserInfo = {
@@ -22,6 +23,7 @@ const initialState: UserInfo = {
   preferredLanguage: '',
   studies: [],
   isLogin: false,
+  studyCount: 0,
 };
 
 const accountSlice = createSlice({

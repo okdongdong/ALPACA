@@ -45,6 +45,7 @@ function Login(props: any) {
         preferredLanguage: res.data.preferredLanguage,
         studies: res.data.studies,
         isLogin: true,
+        studyCount: res.data.studyCount,
       };
 
       console.log(resUserInfo);
