@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Grid, Pagination, Stack, IconButton } from '@mui/material';
-import usePagination from './MainRoomsPagenation';
-import PaginationItem from '@mui/material/PaginationItem';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
 import StudyCreate from '../Dialogs/StudyCreate';
 import { styled } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
+import { customAxios } from '../../Lib/customAxios';
 
 const CIconButton = styled(IconButton)(({ theme }) => ({
   margin: '10px',
@@ -20,35 +20,52 @@ const CIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 function MainRooms() {
-  let [page, setPage] = useState(1);
+  const userInfo = useSelector((state: any) => state.account);
+  const [page, setPage] = useState(1);
   const PER_PAGE = 3;
-  const [data, setData] = useState<any[]>([]);
-  const count = Math.ceil(data.length / PER_PAGE);
-  const _DATA = usePagination(data, PER_PAGE);
-  const handleChange = (e: any, p: any) => {
+  const count = Math.ceil(userInfo.studyCount / PER_PAGE);
+  const [studyList, setStudyList] = useState<any>(userInfo.studies);
+  const [open, setOpen] = useState(false);
+  const handleChange = (e: any, p: number) => {
     setPage(p);
-    _DATA.jump(p);
+    searchData(p);
   };
 
-  const addStudyData = (studyData: any) => {
-    setData((data) => {
-      return [...data, studyData];
-    });
-  };
-
-  const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
+  };
+
+  const newData = (newPage: number, newStudyData: any) => {
+    setPage(newPage);
+    setStudyList(newStudyData);
+  };
+
+  const pinData = (newPage: number, newStudyData: any) => {
+    setPage(newPage);
+    setStudyList(newStudyData);
+  };
+
+  const searchData = async (now: number) => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/study`,
+        params: { page: now - 1 },
+      });
+      console.log(res);
+      setStudyList(res.data.content);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
     <Box p="5">
       <Grid container spacing={2} direction="row">
-        {_DATA.currentData().map((study: any, i: number) => {
-          console.log(study);
+        {studyList.slice(0, 3).map((study: any, i: number) => {
           return (
             <Stack key={i}>
-              <MainRoomsDetail detail={study} />
+              <MainRoomsDetail detail={study} page={page} callback={pinData} />
             </Stack>
           );
         })}
@@ -65,10 +82,12 @@ function MainRooms() {
         </CIconButton>
         <StudyCreate
           open={open}
+          page={page}
+          studyList={studyList}
+          callback={newData}
           onClose={() => {
             setOpen(false);
           }}
-          callback={addStudyData}
         />
       </Grid>
       <Pagination
