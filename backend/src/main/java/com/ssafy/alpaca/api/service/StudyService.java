@@ -109,10 +109,10 @@ public class StudyService {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
-        if (myStudy.getPinnedTime().getYear() == 0) {
+        if (myStudy.getPinnedTime().getYear() == 1) {
             myStudy.setPinnedTime(LocalDateTime.now());
         } else {
-            myStudy.setPinnedTime(LocalDateTime.of(0, 1, 1, 6, 0));
+            myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
         }
         myStudyRepository.save(myStudy);
     }
