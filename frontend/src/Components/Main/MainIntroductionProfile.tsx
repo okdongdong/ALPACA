@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import styles from './MainIntroductionProfile.module.css';
 import EditProfile from '../Dialogs/EditProfile';
-import { useDispatch } from 'react-redux';
-import { setTheme } from '../../Redux/themeReducer';
-import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
-import { setUserInfo } from '../../Redux/accountReducer';
-import { useNavigate } from 'react-router-dom';
-
-export interface ProfileProps {
-  callback: Function;
-}
 
 const ProfileDiv = styled('div')({
   position: 'relative',
@@ -39,16 +30,9 @@ const CIconButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-function MainIntroductionProfile(props: ProfileProps) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+function MainIntroductionProfile() {
   const userInfo = useSelector((state: any) => state.account);
-  const [open, setOpen] = React.useState(false);
-  const [userData, setUserData] = useState<any[] | null>();
-  const EditUserData = (sendData: any) => {
-    setUserData(sendData);
-    props.callback(userData);
-  };
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -69,8 +53,7 @@ function MainIntroductionProfile(props: ProfileProps) {
           }}
         />
       </CIconButton>
-      <EditProfile open={open} onClose={handleClose} callback={EditUserData} />
-      {/* <img src={userData[3]} alt="" /> */}
+      <EditProfile open={open} onClose={handleClose} />
     </ProfileDiv>
   );
 }
