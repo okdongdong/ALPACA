@@ -25,6 +25,8 @@ public class Code {
     @Field(targetType = FieldType.INT64)
     private Long problemNumber;
 
+    private String language;
+
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)
     private LocalDateTime submittedAt = LocalDateTime.now();
