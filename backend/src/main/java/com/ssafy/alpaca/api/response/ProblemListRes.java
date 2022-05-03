@@ -19,7 +19,7 @@ public class ProblemListRes {
 
     private String title;
 
-    private Integer level;
+    private Long level;
 
     private LocalDateTime startedAt;
 

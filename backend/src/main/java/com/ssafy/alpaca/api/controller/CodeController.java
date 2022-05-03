@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.CodeCompileWithInputReq;
 import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
+import com.ssafy.alpaca.api.response.CodeRes;
 import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -68,7 +69,7 @@ public class CodeController {
         @ApiImplicitParam( name = "problemNumber", value = "코드를 조회할 문제의 ID", dataTypeClass = String.class )
     })
     @GetMapping("/{studyId}/{userId}")
-    public ResponseEntity<List<Code>> getCode(
+    public ResponseEntity<CodeRes> getCode(
             @PathVariable Long studyId, @PathVariable Long userId, @RequestParam Long problemNumber) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(codeService.getCode(username, studyId, userId, problemNumber));
