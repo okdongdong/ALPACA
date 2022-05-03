@@ -34,6 +34,16 @@ public class ScheduleController {
     }
 
     @ApiOperation(
+            value = "오늘의 스터디 일정 조회",
+            notes = "오늘 예정된 스터디의 문제들을 조회한다."
+    )
+    @GetMapping("/{id}/today")
+    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(scheduleService.getTodaySchedule(username, id));
+    }
+
+    @ApiOperation(
             value = "스터디 일정 추가 수정",
             notes = "스터디 일정을 수정한다."
     )
