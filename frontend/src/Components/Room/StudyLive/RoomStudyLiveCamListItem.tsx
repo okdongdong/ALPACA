@@ -16,28 +16,15 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const session = useSelector((state: any) => state.openvidu.sessionForCamera);
 
+  // useEffect(() => {
+  //   if (!user) return;
+  //   user.getStreamManager().addVideoElement(videoRef.current);
+  // }, []);
   useEffect(() => {
     if (!user) return;
+    console.log(user);
     user.getStreamManager().addVideoElement(videoRef.current);
-    subscribeToUserChanged();
-  }, []);
-  useEffect(() => {
-    if (!user) return;
-    console.log('changed', user);
-    // if (!user.isScreenShareActive()) {
-    user.getStreamManager().addVideoElement(videoRef.current);
-    // }
   }, [user]);
-  const subscribeToUserChanged = () => {
-    session.on('signal:userChanged', (event: any) => {
-      console.log(event);
-      const data = JSON.parse(event.data);
-      if (user.getConnectionId() === event.from.connectionId && data.isScreenShareActive === true) {
-        console.log('socket changed', user);
-        user.getStreamManager().addVideoElement(videoRef.current);
-      }
-    });
-  };
   return (
     <>
       <div className="align_column_center">
