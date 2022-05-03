@@ -9,6 +9,7 @@ import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
 import RoomStudyLiveCamList from '../../Components/Room/StudyLive/RoomStudyLiveCamList';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
+import RoomStudyLiveAppbar from '../../Components/Room/StudyLive/RoomStudyLiveAppbar';
 import {
   setOVForCamera,
   setOVForScreen,
@@ -235,7 +236,7 @@ function StudyLive() {
     const videoSource = navigator.userAgent.indexOf('Firefox') !== -1 ? 'window' : 'screen';
     if (!OVForScreen) return;
     if (!publisher) return;
-    const screenPublisher = OVForScreen.initPublisher(
+    const screenPublisher = OVForScreen.initPublisherAsync(
       '',
       {
         videoSource: videoSource,
@@ -243,7 +244,43 @@ function StudyLive() {
         publishVideo: publisher.isVideoActive(),
         mirror: false,
       },
-      (error: any) => {
+      // (error: any) => {
+      //   if (error && error.name === 'SCREEN_EXTENSION_NOT_INSTALLED') {
+      //     alert('show extension Dialog');
+      //     // this.setState({ showExtensionDialog: true });
+      //   } else if (error && error.name === 'SCREEN_SHARING_NOT_SUPPORTED') {
+      //     alert('Your browser does not support screen sharing');
+      //   } else if (error && error.name === 'SCREEN_EXTENSION_DISABLED') {
+      //     alert('You need to enable screen sharing extension');
+      //   } else if (error && error.name === 'SCREEN_CAPTURE_DENIED') {
+      //     alert('You need to choose a window or application to share');
+      //   }
+      // },
+    )
+      .then((screenPublisher) => {
+        screenPublisher.once('accessAllowed', () => {
+          if (!sessionForScreen) return;
+          sessionForScreen.publish(screenPublisher).then(() => {
+            setPublisher((localPublisher: UserModel | undefined) => {
+              if (!localPublisher) return;
+              localPublisher.setScreenStreamManager(screenPublisher);
+              localPublisher.setScreenShareActive(true);
+              return localPublisher;
+            });
+            sendSignalUserChanged({
+              isScreenShareActive: publisher.isScreenShareActive(),
+            });
+          });
+        });
+
+        screenPublisher.stream
+          .getMediaStream()
+          .getVideoTracks()[0]
+          .addEventListener('ended', () => {
+            stopScreenShare();
+          });
+      })
+      .catch((error: any) => {
         if (error && error.name === 'SCREEN_EXTENSION_NOT_INSTALLED') {
           alert('show extension Dialog');
           // this.setState({ showExtensionDialog: true });
@@ -254,23 +291,7 @@ function StudyLive() {
         } else if (error && error.name === 'SCREEN_CAPTURE_DENIED') {
           alert('You need to choose a window or application to share');
         }
-      },
-    );
-    screenPublisher.once('accessAllowed', () => {
-      if (!sessionForScreen) return;
-      sessionForScreen.publish(screenPublisher).then(() => {
-        setPublisher((localPublisher: UserModel | undefined) => {
-          if (!localPublisher) return;
-          localPublisher.setScreenStreamManager(screenPublisher);
-          localPublisher.setScreenShareActive(true);
-          return localPublisher;
-        });
-        sendSignalUserChanged({
-          isScreenShareActive: publisher.isScreenShareActive(),
-        });
       });
-    });
-
     // screenPublisher.on('streamPlaying', () => {
     //   screenPublisher.videos[0].video.parentElement.classList.remove('custom-class');
     // });
@@ -421,6 +442,9 @@ function StudyLive() {
             </div>
             <div style={{ position: 'absolute', bottom: '0', right: '2vw' }}>
               <RoomStudyLiveChat />
+            </div>
+            <div style={{ position: 'absolute', top: '1vh', right: '2vw' }}>
+              <RoomStudyLiveAppbar />
             </div>
           </>
         )}

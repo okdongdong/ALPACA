@@ -42,7 +42,7 @@ function RoomStudyLiveChatReception({ chat }: ChatPropsType) {
           marginLeft: '36px',
           padding: '3px',
           borderRadius: '2px',
-          background: theme.palette.icon,
+          background: theme.palette.component,
           maxWidth: '10vw',
           wordBreak: 'break-all',
         }}>

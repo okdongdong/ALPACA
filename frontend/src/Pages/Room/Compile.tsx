@@ -10,11 +10,18 @@ import { Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 type Monaco = typeof monaco;
-
+type problemInfoType = {
+  level: number;
+  title: string;
+  problemNumber: number;
+  inputs: string[];
+  outputs: string[];
+};
 function Compile() {
   const theme = useTheme();
   const preferredLanguage = useSelector((state: any) => state.account.preferredLanguage);
   const { problemId } = useParams();
+  const [problemInfo, setProblemInfo] = useState<problemInfoType>();
   const [language, setLanguage] = useState<string>(
     preferredLanguage === 'python3' ? 'python' : preferredLanguage,
   );
@@ -37,7 +44,20 @@ function Compile() {
   });
   useEffect(() => {
     // 문제관련 정보 가져오기
+    getProblemInfo();
   }, []);
+
+  const getProblemInfo = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/problem/${problemId}`,
+      });
+      setProblemInfo(res.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const handleChange = (value: any, event: any) => {
     setCode(value);

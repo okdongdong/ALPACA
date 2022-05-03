@@ -46,7 +46,7 @@ function SideBar() {
   const dispatch = useDispatch();
   const theme = useTheme();
 
-  const userTheme = useSelector((state: any) => state.theme);
+  const userTheme = useSelector((state: any) => state.theme.themeType);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {

@@ -22,6 +22,7 @@ function RoomStudyLiveChatInput({ goToBottom }: sendProps) {
   const [message, setMessage] = useState<string>('');
 
   const sendChat = () => {
+    if (message === '') return;
     session.signal({
       data: JSON.stringify({ message: message, profileImg: profileImg }),
       to: [],
