@@ -27,7 +27,7 @@ public class Problem {
     private String title;
 
     @Field(targetType = FieldType.INT32)
-    private Integer level;
+    private Long level;
 
     @Field(targetType = FieldType.ARRAY)
     private List<String> inputs;

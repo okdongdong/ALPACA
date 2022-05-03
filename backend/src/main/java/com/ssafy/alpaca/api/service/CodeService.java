@@ -3,6 +3,8 @@ package com.ssafy.alpaca.api.service;
 import com.ssafy.alpaca.api.request.CodeCompileWithInputReq;
 import com.ssafy.alpaca.api.request.CodeReq;
 import com.ssafy.alpaca.api.request.CodeCompileReq;
+import com.ssafy.alpaca.api.response.CodeRes;
+import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeCompileRes;
@@ -38,6 +40,7 @@ public class CodeService {
     private final StudyRepository studyRepository;
     private final CodeRepository codeRepository;
     private final ProblemRepository problemRepository;
+    private final ConvertUtil convertUtil;
 
     private String compileVersion(String language) {
         switch (language) {
@@ -108,7 +111,7 @@ public class CodeService {
                         .build());
     }
 
-    public List<Code> getCode(String username, Long studyId, Long userId, Long problemNumber) {
+    public CodeRes getCode(String username, Long studyId, Long userId, Long problemNumber) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
         Study study = studyRepository.findById(studyId).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
@@ -131,7 +134,20 @@ public class CodeService {
             }
         }
 
-        if (flagA && flagB) return codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
+        if (flagA && flagB) {
+            List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
+            Problem problem = problemRepository.findByProblemNumber(problemNumber).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
+            );
+            return CodeRes.builder()
+                    .nickname(member.getNickname())
+                    .profileImg(convertUtil.convertByteArrayToString(member.getProfileImg()))
+                    .problemNumber(problemNumber)
+                    .level(problem.getLevel())
+                    .codeSet(CodeRes.CodeList.of(codes))
+                    .build();
+        }
+
 
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
