@@ -16,4 +16,7 @@ public class CodeReq {
     @ApiModelProperty( name = "code", example = "print(\"Hello world\")" )
     private String code;
 
+    @ApiModelProperty( name = "language", example = "python3" )
+    private String language;
+
 }

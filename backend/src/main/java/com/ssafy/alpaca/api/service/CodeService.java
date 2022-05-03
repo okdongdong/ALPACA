@@ -104,6 +104,7 @@ public class CodeService {
                         .userId(user.getId())
                         .problemNumber(codeReq.getProblemNumber())
                         .submittedCode(codeReq.getCode())
+                        .language(codeReq.getLanguage())
                         .build());
     }
 
