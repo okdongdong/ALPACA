@@ -30,7 +30,7 @@ function RoomStudyLiveChatSend({ chat }: ChatPropsType) {
             paddingLeft: '6px',
             paddingRight: '6px',
             borderRadius: '2px',
-            background: theme.palette.icon,
+            background: theme.palette.component,
             maxWidth: '10vw',
             wordBreak: 'break-all',
           }}>
