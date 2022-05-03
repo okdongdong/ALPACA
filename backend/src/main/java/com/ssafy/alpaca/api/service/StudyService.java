@@ -1,10 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.*;
-import com.ssafy.alpaca.api.response.ScheduleListRes;
-import com.ssafy.alpaca.api.response.StudyListRes;
-import com.ssafy.alpaca.api.response.ProblemListRes;
-import com.ssafy.alpaca.api.response.StudyRes;
+import com.ssafy.alpaca.api.response.*;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
@@ -361,14 +358,20 @@ public class StudyService {
         );
     }
 
-    public void createChat(String username, Long id, ChatReq chatReq) {
+    public ChatRes saveChat(String username, ChatReq chatReq) {
         User user = checkUserByUsername(username);
-        Study study = checkStudyById(id);
+        Study study = checkStudyById(chatReq.getStudyId());
 
-        chatRepository.save(Chat.builder()
+        Chat chat = chatRepository.save(Chat.builder()
                 .userId(user.getId())
                 .studyId(study.getId())
                 .content(chatReq.getContent())
                 .build());
+
+        return ChatRes.builder()
+                .nickname(user.getNickname())
+                .content(chat.getContent())
+                .timeStamp(chat.getTimeStamp())
+                .build();
     }
 }
