@@ -43,7 +43,7 @@ class UserModel {
     return this.streamManager;
   }
 
-  getScreenStreamManger() {
+  getScreenStreamManager() {
     return this.screenStreamManager;
   }
 

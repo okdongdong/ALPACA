@@ -67,7 +67,7 @@ function RoomStudyLiveChat() {
   const [isNewMessage, setIsNewMessage] = useState<Boolean>(false);
 
   const chatDivRef = useRef<HTMLDivElement>(null);
-  const session = useSelector((state: any) => state.openvidu.session);
+  const session = useSelector((state: any) => state.openvidu.sessionForCamera);
   const openChat = Boolean(anchorEl);
   const { nickname } = useSelector((state: any) => state.account);
 
@@ -197,7 +197,7 @@ function RoomStudyLiveChat() {
             </Button>
           )}
 
-          <RoomStudyLiveChatInput />
+          <RoomStudyLiveChatInput goToBottom={goToBottom} />
         </ChatPaper>
       </Popover>
     </>
