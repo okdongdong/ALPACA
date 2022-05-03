@@ -75,6 +75,41 @@ public class ScheduleService {
         return schedule.getId();
     }
 
+    public ScheduleRes getTodaySchedule(String username, Long studyId) {
+        Study study = studyRepository.findById(studyId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(
+                localDateTime.getYear(),
+                localDateTime.getMonth(),
+                localDateTime.getDayOfMonth(), 0, 0);
+        Optional<Schedule> todaySchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                study, today, today.plusDays(1));
+
+        if (todaySchedule.isEmpty()) {
+            throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
+        }
+
+        List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(todaySchedule.get());
+        List<ProblemListRes> problemListRes = new ArrayList<>();
+        for (ToSolveProblem solveProblem : toSolveProblem) {
+            Problem problem = problemRepository.findByProblemNumber(solveProblem.getProblemNumber()).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
+            problemListRes.add(ProblemListRes.builder()
+                    .problemNumber(problem.getProblemNumber())
+                    .title(problem.getTitle())
+                    .level(problem.getLevel())
+                    .build());
+        }
+        return ScheduleRes.builder()
+                .startedAt(todaySchedule.get().getStartedAt())
+                .finishedAt(todaySchedule.get().getFinishedAt())
+                .problemListRes(problemListRes)
+                .build();
+    }
+
     public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) {
         if (scheduleUpdateReq.getFinishedAt().isBefore(scheduleUpdateReq.getStartedAt()) ||
                 scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
