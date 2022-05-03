@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { InputBase, FormControl, InputLabel } from '@mui/material';
 const CustomInput = styled(InputBase)(({ theme }) => ({
@@ -20,14 +20,23 @@ const CustomLabel = styled(InputLabel)({
     color: '#3C5FAE',
   },
 });
-function RoomCompileTestByUser() {
+
+type CompileTestByUserType = {
+  setUserInput: Function;
+};
+function RoomCompileTestByUser({ setUserInput }: CompileTestByUserType) {
+  const [input, setInput] = useState<string>('');
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(event.target.value);
+    setUserInput(event.target.value);
+  };
   return (
     <div style={{ padding: '15px', width: '100%' }}>
       <FormControl variant="standard" sx={{ margin: '15px', width: 'calc(100% - 30px)' }}>
         <CustomLabel shrink htmlFor="compile-input">
           Input
         </CustomLabel>
-        <CustomInput rows={7} multiline id="compile-input" />
+        <CustomInput rows={7} multiline id="compile-input" value={input} onChange={handleChange} />
       </FormControl>
       <FormControl variant="standard" sx={{ margin: '15px', width: 'calc(100% - 30px)' }}>
         <CustomLabel shrink htmlFor="compile-output">

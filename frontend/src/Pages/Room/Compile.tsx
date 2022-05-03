@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { customAxios } from '../../Lib/customAxios';
 import RoomCompileTitle from '../../Components/Room/Compile/RoomCompileTitle';
 import RoomComplileTest from '../../Components/Room/Compile/RoomComplileTest';
 import RoomCompileSelectLanguageBtn from '../../Components/Room/Compile/RoomCompileSelectLanguageBtn';
@@ -7,13 +8,16 @@ import { useParams } from 'react-router-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
+import { useSelector } from 'react-redux';
 type Monaco = typeof monaco;
 
 function Compile() {
   const theme = useTheme();
+  const preferredLanguage = useSelector((state: any) => state.account.preferredLanguage);
   const { problemId } = useParams();
-  const [language, setLanguage] = useState<string>('python');
+  const [language, setLanguage] = useState<string>(
+    preferredLanguage === 'python3' ? 'python' : preferredLanguage,
+  );
   const [code, setCode] = useState<string>('');
   const editorRef = useRef(null);
   const monaco = useMonaco();
@@ -37,7 +41,29 @@ function Compile() {
 
   const handleChange = (value: any, event: any) => {
     setCode(value);
-    console.log(value.indexOf('\n'));
+  };
+
+  const submitCode = async (tab: number, input?: string) => {
+    const returnCode = code.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+    const url = tab === 0 ? '/code/bojCompile' : '/code/compile';
+    const data =
+      tab === 0
+        ? {
+            code: returnCode,
+            language: language === 'python' ? 'python3' : language,
+            problemNumber: parseInt(problemId || '1000'),
+          }
+        : {
+            code: returnCode,
+            language: language === 'python' ? 'python3' : language,
+            input,
+          };
+    const res = await customAxios({
+      method: 'post',
+      url,
+      data,
+    });
+    console.log(res);
   };
 
   return (
@@ -80,7 +106,7 @@ function Compile() {
             />
           </Grid>
           <Grid item xs={20} md={4}>
-            <RoomComplileTest />
+            <RoomComplileTest submitCode={submitCode} />
           </Grid>
         </Grid>
       </Grid>

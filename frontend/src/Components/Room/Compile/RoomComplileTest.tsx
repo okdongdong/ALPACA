@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+
 import { styled } from '@mui/material/styles';
 import { Tabs, Tab, Button } from '@mui/material';
+
 import RoomCompileTestByValue from './RoomCompileTestByValue';
 import RoomCompileTestByUser from './RoomCompileTestByUser';
+
 const samples = [
   { inputValue: '[1, 2, 3, 10]', outputValue: '6', result: '통과하였습니다' },
   { inputValue: '[1, 2, 3, 10]', outputValue: '6', result: '통과하였습니다' },
@@ -53,11 +56,17 @@ const CustomButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function RoomComplileTest() {
+type CompileTestType = {
+  submitCode: Function;
+};
+
+function RoomComplileTest({ submitCode }: CompileTestType) {
   const [tab, setTab] = useState<number>(0);
+  const [userInput, setUserInput] = useState<string>('');
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
+
   return (
     <>
       <div style={{ width: '100%', height: '100%' }}>
@@ -78,11 +87,17 @@ function RoomComplileTest() {
             justifyContent: 'space-between',
           }}>
           <div style={{ width: '100%' }}>
-            {tab == 0 ? <RoomCompileTestByValue samples={samples} /> : <RoomCompileTestByUser />}
+            {tab === 0 ? (
+              <RoomCompileTestByValue samples={samples} />
+            ) : (
+              <RoomCompileTestByUser setUserInput={setUserInput} />
+            )}
           </div>
           <div style={{ marginLeft: 'auto' }}>
             <CustomButton>코드저장</CustomButton>
-            <CustomButton>코드실행</CustomButton>
+            <CustomButton onClick={() => submitCode(tab, tab === 1 && userInput)}>
+              코드실행
+            </CustomButton>
           </div>
         </div>
       </div>
