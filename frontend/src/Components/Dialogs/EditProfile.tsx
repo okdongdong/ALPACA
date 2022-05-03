@@ -33,9 +33,18 @@ const Clabel = styled('label')(({ theme }) => ({
 }));
 const TInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
 }));
+
 const CSelect = styled(Select)(({ theme }) => ({
   color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
 }));
 
 const CustomContent = styled('div')(({ theme }) => ({
@@ -70,20 +79,21 @@ export interface EditProfileProps {
   onClose: () => void;
 }
 
-function EditProfile(props: EditProfileProps) {
+function EditProfile({ onClose, open }: EditProfileProps) {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const userTheme = useSelector((state: any) => state.theme.themeType);
   const userInfo = useSelector((state: any) => state.account);
   const [stacks, setStacks] = React.useState(userInfo.preferredLanguage);
   const [nickname, setNickname] = useState<string>(userInfo.nickname);
   const [introduction, setIntroduction] = useState<string>(userInfo.info);
   const [imgData, setImgData] = useState<any>();
-  const [themeSelect, setThemeSelect] = useState('');
-  const { onClose, open } = props;
+  const [themeSelect, setThemeSelect] = useState(userTheme);
   const [openEditPassword, setOpenEditPassword] = useState(false);
 
   const cancleClose = () => {
     onClose();
+    setThemeSelect(userTheme);
   };
 
   const editDataClose = () => {
@@ -162,6 +172,7 @@ function EditProfile(props: EditProfileProps) {
       resUserInfo.nickname = nickname;
       resUserInfo.info = introduction;
       resUserInfo.preferredLanguage = stacks;
+      console.log('수정 테마', themeSelect);
       dispatch(setTheme(themeSelect));
       dispatch(setUserInfo(resUserInfo));
     } catch (e) {
@@ -182,7 +193,7 @@ function EditProfile(props: EditProfileProps) {
   };
 
   return (
-    <Dialog onClose={editDataClose} open={open} maxWidth="lg">
+    <Dialog onClose={cancleClose} open={open} maxWidth="lg">
       <CustomContent>
         <Grid
           sx={{ minWidth: 720, display: 'flex', justifyContent: 'center', position: 'relative' }}>
@@ -260,6 +271,7 @@ function EditProfile(props: EditProfileProps) {
           <Grid item xs={10}>
             <TInput
               multiline={true}
+              maxRows={4}
               sx={{ minWidth: '100%' }}
               onChange={inputIntro}
               value={introduction}></TInput>
@@ -332,7 +344,7 @@ function EditProfile(props: EditProfileProps) {
             sx={{
               minWidth: 0,
               justifyContent: 'center',
-              color: '#000000',
+              color: theme.palette.txt,
             }}
           />
         </IconButton>

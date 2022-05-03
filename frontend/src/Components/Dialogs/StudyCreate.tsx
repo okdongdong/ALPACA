@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, styled, Input, DialogTitle, FormHelperText, FormControl } from '@mui/material';
+import { Dialog, Input, DialogTitle, FormHelperText, FormControl } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Grid from '@mui/material/Grid';
@@ -33,6 +34,10 @@ const Clabel = styled('label')(({ theme }) => ({
 }));
 const TInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
 }));
 
 const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
@@ -72,6 +77,7 @@ const Demo = styled('div')(({ theme }) => ({
 
 function StudyCreate(props: StudyCreateProps) {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
   const myData = [
     { id: userInfo.userId, nickname: userInfo.nickname, profileImg: userInfo.profileImg },
@@ -180,7 +186,7 @@ function StudyCreate(props: StudyCreateProps) {
   };
 
   return (
-    <Dialog onClose={handleClose} open={open} maxWidth="lg">
+    <Dialog onClose={cancleClose} open={open} maxWidth="lg">
       <CustomContent>
         <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
         <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
@@ -236,7 +242,7 @@ function StudyCreate(props: StudyCreateProps) {
                         <ListItemAvatar>
                           <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
                         </ListItemAvatar>
-                        <ListItemText primary={item.nickname} />
+                        <ListItemText primary={item.nickname} sx={{ color: theme.palette.txt }} />
                       </ListItemButton>
                     </ListItem>
                   );

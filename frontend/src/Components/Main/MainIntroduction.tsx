@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 const MainIntroductionDiv = styled('div')({
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: 'flex-end',
 });
 
 function MainIntroduction() {
