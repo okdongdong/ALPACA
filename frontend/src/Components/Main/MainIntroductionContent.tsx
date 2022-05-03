@@ -1,15 +1,13 @@
-import React from 'react';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
 
 const Clabel = styled('label')(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-function MainIntroductionContent(props: any) {
-  const [nickName, setNickName] = React.useState('ssafy');
-  const [introduction, setIntroduction] = React.useState('hello');
-
+function MainIntroductionContent() {
+  const userInfo = useSelector((state: any) => state.account);
   return (
     <div>
       <div>
@@ -19,7 +17,7 @@ function MainIntroductionContent(props: any) {
         id="filled-read-only-input"
         multiline
         maxRows={4}
-        value={nickName}
+        value={userInfo.nickname}
         sx={{
           width: 500,
           background: '#F2F2F2',
@@ -32,7 +30,7 @@ function MainIntroductionContent(props: any) {
         id="filled-read-only-input"
         multiline
         maxRows={4}
-        value={introduction}
+        value={userInfo.info}
         sx={{
           width: 500,
           background: '#F2F2F2',

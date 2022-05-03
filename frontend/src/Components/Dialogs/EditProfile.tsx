@@ -1,32 +1,22 @@
 import React, { useRef, useState } from 'react';
-import {
-  Dialog,
-  Button,
-  styled,
-  Grid,
-  MenuItem,
-  FormControl,
-  Box,
-  Input,
-  useTheme,
-} from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
-import EditIcon from '@mui/icons-material/Edit';
-import CInput from '../Commons/CInput';
-import styles from '../Main/MainIntroductionProfile.module.css';
-import Basic from '../../Assets/Img/Basic.png';
-import Dark from '../../Assets/Img/Dark.png';
-import Olivegreen from '../../Assets/Img/Olivegreen.png';
-import Peachpink from '../../Assets/Img/Peachpink.png';
+import { Dialog, Button, Grid, MenuItem, FormControl, Box, Input } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
 import { setTheme } from '../../Redux/themeReducer';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
-import { useNavigate } from 'react-router-dom';
-//탈퇴 버튼
+import { logout } from '../../Redux/accountReducer';
+import EditPassword from './EditPassword';
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import styles from '../Main/MainIntroductionProfile.module.css';
+import Basic from '../../Assets/Img/Basic.png';
+import Dark from '../../Assets/Img/Dark.png';
+import Olivegreen from '../../Assets/Img/Olivegreen.png';
+import Peachpink from '../../Assets/Img/Peachpink.png';
 
 const WButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
@@ -34,7 +24,6 @@ const WButton = styled(Button)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-//프로필 사진 선택
 const ProfileSearch = styled('input')({
   display: 'none',
 });
@@ -49,7 +38,6 @@ const CSelect = styled(Select)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-// dialog 크기 조절
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 960,
   minHeight: 720,
@@ -59,7 +47,6 @@ const CustomContent = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.bg,
 }));
 
-//테마 클릭 버튼
 const ThemeButton = styled('button')(({ theme }) => ({
   background: 'none',
   border: 0,
@@ -68,6 +55,7 @@ const ThemeButton = styled('button')(({ theme }) => ({
     background: theme.palette.main + '90',
   },
 }));
+
 const CButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
   backgroundColor: theme.palette.main,
@@ -77,27 +65,85 @@ const CButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-//
 export interface EditProfileProps {
   open: boolean;
   onClose: () => void;
-  callback: Function;
 }
 
 function EditProfile(props: EditProfileProps) {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
-  const [stacks, setStacks] = React.useState('');
-  const [nickname, setNickname] = useState<string>('');
-  const [introduction, setIntroduction] = useState<string>('');
+  const [stacks, setStacks] = React.useState(userInfo.preferredLanguage);
+  const [nickname, setNickname] = useState<string>(userInfo.nickname);
+  const [introduction, setIntroduction] = useState<string>(userInfo.info);
   const [imgData, setImgData] = useState<any>();
   const [themeSelect, setThemeSelect] = useState('');
   const { onClose, open } = props;
+  const [openEditPassword, setOpenEditPassword] = useState(false);
 
   const cancleClose = () => {
     onClose();
+  };
+
+  const editDataClose = () => {
+    editUserData();
+    onClose();
+  };
+
+  const dialogOpen = () => {
+    setOpenEditPassword(true);
+  };
+  const dialogClose = () => {
+    setOpenEditPassword(false);
+  };
+
+  const handleChange = (event: SelectChangeEvent<unknown>) => {
+    if (typeof event.target.value === 'string') {
+      setStacks(event.target.value);
+    }
+  };
+
+  const inputNickname = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(event.target.value);
+  };
+  const inputIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIntroduction(event.target.value);
+  };
+
+  const editProfileImg = async (profileData: string) => {
+    console.log(profileData);
+    console.log(frm.get('file'));
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/user/${userInfo.userId}/profile`,
+        data: frm,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const resUserInfo = { ...userInfo };
+      resUserInfo.profileImg = profileData;
+      dispatch(setUserInfo(resUserInfo));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const imgRef = useRef<HTMLInputElement>(null);
+  const frm = new FormData();
+  const reader = new FileReader();
+  const imageChange = (event: any) => {
+    const files = event.target.files[0];
+    frm.append('file', event.target.files[0]);
+    reader.readAsDataURL(files);
+    reader.onloadend = () => {
+      setImgData(reader.result);
+      if (typeof reader.result === 'string') {
+        editProfileImg(reader.result);
+      }
+    };
   };
 
   const editUserData = async () => {
@@ -129,84 +175,10 @@ function EditProfile(props: EditProfileProps) {
         method: 'delete',
         url: `/user/${userInfo.userId}`,
       });
-
-      // 메인페이지로 이동
-      navigate('/login');
+      dispatch(logout());
     } catch (e) {
       console.log(e);
     }
-  };
-
-  const editPasswordData = async () => {
-    try {
-      await customAxios({
-        method: 'put',
-        url: `/user/changePassword/${userInfo.userId}`,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const deleteClose = () => {
-    deleteUserData();
-    onClose();
-  };
-
-  const editPasswordClose = () => {
-    // editPasswordData();
-    onClose();
-  };
-
-  const editDataClose = () => {
-    props.callback([nickname, introduction, stacks, imgData, themeSelect]);
-    editUserData();
-    onClose();
-  };
-  // 선호 스택
-
-  const handleChange = (event: SelectChangeEvent<unknown>) => {
-    if (typeof event.target.value === 'string') {
-      setStacks(event.target.value);
-    }
-  };
-  // 닉네임/ 자기소개
-
-  const inputIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIntroduction(event.target.value);
-  };
-  const editProfileImg = async (profileData: string) => {
-    console.log(profileData);
-    console.log(frm.get('file'));
-    try {
-      await customAxios({
-        method: 'post',
-        url: `/user/${userInfo.userId}/profile`,
-        data: frm,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      const resUserInfo = { ...userInfo };
-      resUserInfo.profileImg = profileData;
-      dispatch(setUserInfo(resUserInfo));
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const imgRef = useRef<HTMLInputElement>(null);
-  const frm = new FormData();
-  const reader = new FileReader();
-  const imageChange = (event: any) => {
-    const files = event.target.files[0];
-    frm.append('file', event.target.files[0]);
-    reader.readAsDataURL(files);
-    reader.onloadend = () => {
-      setImgData(reader.result);
-      if (typeof reader.result === 'string') {
-        editProfileImg(reader.result);
-      }
-    };
   };
 
   return (
@@ -251,8 +223,13 @@ function EditProfile(props: EditProfileProps) {
           </Box>
         </Grid>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <CInput label="닉네임" onChange={setNickname}></CInput>
+          <Grid item xs={6} container>
+            <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+              <Clabel>닉네임</Clabel>
+            </Grid>
+            <Grid item xs={8}>
+              <TInput onChange={inputNickname} sx={{ minWidth: '100%' }} value={nickname}></TInput>
+            </Grid>
           </Grid>
           <Grid item xs={6}>
             <Grid container>
@@ -281,7 +258,11 @@ function EditProfile(props: EditProfileProps) {
             <Clabel>자기소개</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={inputIntro}></TInput>
+            <TInput
+              multiline={true}
+              sx={{ minWidth: '100%' }}
+              onChange={inputIntro}
+              value={introduction}></TInput>
           </Grid>
         </Grid>
 
@@ -320,7 +301,7 @@ function EditProfile(props: EditProfileProps) {
         </div>
         <Grid container>
           <Grid item xs={8}>
-            <WButton onClick={deleteClose} sx={{ height: 35, width: 50 }}>
+            <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
               탈퇴
             </WButton>
           </Grid>
@@ -333,9 +314,10 @@ function EditProfile(props: EditProfileProps) {
               justifyContent: 'space-between',
               alignItem: 'center',
             }}>
-            <CButton onClick={editPasswordClose} sx={{ height: 35, width: 110 }}>
+            <CButton onClick={dialogOpen} sx={{ height: 35, width: 110 }}>
               비밀번호 변경
             </CButton>
+            <EditPassword open={openEditPassword} onClose={dialogClose}></EditPassword>
             <CButton onClick={editDataClose} sx={{ height: 35, width: 50 }}>
               수정
             </CButton>
