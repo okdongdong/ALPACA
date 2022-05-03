@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.controller;
 
 
 import com.ssafy.alpaca.api.request.*;
+import com.ssafy.alpaca.api.response.ChatRes;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +31,7 @@ public class StudyController {
 
     private final UserService userService;
     private final StudyService studyService;
+    private final SimpMessagingTemplate template;
 
     @ApiOperation(
             value = "스터디 개설",
@@ -196,17 +200,20 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
-    // 이하 채팅
+    // swagger api 안될 수도 있음
 
     @ApiOperation(
-            value = "채팅기록 저장",
-            notes = "채팅 기록을 저장한다."
+            value = "채팅기록 전송 및 저장",
+            notes = "채팅 기록을 전송하고 저장한다."
     )
-    @PostMapping("/{id}/chat")
-    public ResponseEntity<BaseResponseBody> createChat(@PathVariable Long id, @RequestBody ChatReq chatReq) {
+    // message를 받을 endpoint
+    // "/pub/study/chat"로 받는다. Pathvariable이 되는지는 아직 모름
+    @MessageMapping("/study/chat")
+    // 처리를 마친 반환 값(message)를 반환할 곳
+    public void createChat(ChatReq chatReq) {
         String username = userService.getCurrentUsername();
-        studyService.createChat(username, id, chatReq);
-        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+        ChatRes chatRes = studyService.saveChat(username, chatReq);
+        template.convertAndSend("/sub/study/chat"+chatReq.getStudyId(),chatRes);
     }
 
 }
