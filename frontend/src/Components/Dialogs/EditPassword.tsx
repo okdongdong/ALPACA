@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Dialog, styled, Grid, IconButton, DialogTitle } from '@mui/material';
+import { Dialog, Grid, IconButton, DialogTitle } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import CInput from '../Commons/CInput';
@@ -25,6 +26,7 @@ export interface EditPasswordProps {
 }
 
 function EditPassword(props: EditPasswordProps) {
+  const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
   const [presentPassword, setPresentPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
@@ -127,7 +129,7 @@ function EditPassword(props: EditPasswordProps) {
             sx={{
               minWidth: 0,
               justifyContent: 'center',
-              color: '#000000',
+              color: theme.palette.txt,
             }}
           />
         </IconButton>

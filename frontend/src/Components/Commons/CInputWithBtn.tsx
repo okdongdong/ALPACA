@@ -25,6 +25,13 @@ const CustomGridContainer = styled(Grid)(({ theme }) => ({
 const CustomInput = styled(Input)(({ theme }) => ({
   fontFamily: 'Pretendard-Regular',
   color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:hover': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
 }));
 
 function CInputWithBtn({

@@ -7,6 +7,7 @@ import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
+import { useNavigate } from 'react-router-dom';
 
 export interface StudyCreateProps {
   detail: any;
@@ -45,16 +46,16 @@ const CButton = styled(Button)(({ theme }) => ({
 function MainRoomsDetail(props: StudyCreateProps) {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userInfo = useSelector((state: any) => state.account);
   const temp = props.detail.profileImgList.slice(0, 4);
 
   const pinStudy = async () => {
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'post',
         url: `/study/${props.detail.id}`,
       });
-      console.log(res);
       pinCheckOn();
     } catch (e) {
       console.log(e);
@@ -68,10 +69,8 @@ function MainRoomsDetail(props: StudyCreateProps) {
         url: `/study`,
         params: { page: 0 },
       });
-      console.log('0페이지 리스트 ', res.data.content);
       const resUserInfo = { ...userInfo };
       resUserInfo.studies = res.data.content;
-      console.log(resUserInfo);
       dispatch(setUserInfo(resUserInfo));
       props.callback(1, res.data.content);
     } catch (e) {
@@ -79,24 +78,29 @@ function MainRoomsDetail(props: StudyCreateProps) {
     }
   };
 
+  const goStudy = () => {
+    navigate(`/room/${props.detail.id}`);
+  };
+
   return (
-    <div>
-      <CButton>
-        <PushPinIcon
-          sx={{
-            position: 'absolute',
-            top: 5,
-            left: 5,
-            color:
-              props.detail.pinnedTime === '0001-01-01T06:00:00' || props.detail.pinnedTime === null
-                ? theme.palette.bg
-                : theme.palette.component_accent,
-            margin: 0,
-            padding: 0,
-            height: '35px',
-            width: '35px',
-          }}
-          onClick={pinStudy}></PushPinIcon>
+    <div style={{ position: 'relative' }}>
+      <PushPinIcon
+        sx={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          color:
+            props.detail.pinnedTime === '0001-01-01T06:00:00' || props.detail.pinnedTime === null
+              ? theme.palette.bg
+              : theme.palette.component_accent,
+          margin: 0,
+          padding: 0,
+          height: '35px',
+          width: '35px',
+          zIndex: 1,
+        }}
+        onClick={pinStudy}></PushPinIcon>
+      <CButton onClick={goStudy}>
         <Grid container sx={{ padding: 2 }}>
           {temp.map((item: string, i: number) => {
             return (

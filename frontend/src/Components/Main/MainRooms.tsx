@@ -3,7 +3,7 @@ import { Box, Grid, Pagination, Stack, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
 import StudyCreate from '../Dialogs/StudyCreate';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
 
@@ -20,6 +20,7 @@ const CIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 function MainRooms() {
+  const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
   const [page, setPage] = useState(1);
   const PER_PAGE = 3;
@@ -95,7 +96,20 @@ function MainRooms() {
         size="large"
         page={page}
         onChange={handleChange}
-        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          '& .MuiPagination-ul': {
+            '& .MuiPaginationItem-root': {
+              color: theme.palette.txt,
+              '&.Mui-selected': {
+                background: theme.palette.main,
+                color: theme.palette.txt,
+              },
+            },
+          },
+        }}
       />
     </Box>
   );
