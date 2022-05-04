@@ -16,7 +16,7 @@ const DayBox = styled(Button)(({ theme }) => ({
   width: '100%',
   borderRadius: '10px',
   textAlign: 'center',
-  height: theme.spacing(10),
+  height: theme.spacing(8),
   '&:hover': {
     backgroundColor: theme.palette.accent,
     color: theme.palette.icon,

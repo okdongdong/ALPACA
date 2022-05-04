@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { DUMMY_STUDY_DATA } from '../../Assets/dummyData/dummyData';
 import CBtn from '../../Components/Commons/CBtn';
 import RoomMainCalendar, { DailySchedule } from '../../Components/Room/Main/RoomMainCalendar';
+import RoomMainChat from '../../Components/Room/Main/RoomMainChat';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
 import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
 import RoomMainStudyDetail, { ProblemRes } from '../../Components/Room/Main/RoomMainStudyDetail';
@@ -66,7 +67,7 @@ function RoomMain() {
     } catch (e) {}
   };
 
-  const seyScheduleHandler = () => {
+  const setScheduleHandler = () => {
     const tempSchedules: Schedule[] = [];
 
     DUMMY_STUDY_DATA.scheduleListRes.map((scheduleRes) => {
@@ -84,11 +85,10 @@ function RoomMain() {
   // 페이지 랜더링시 스터디 기본정보를 가져옴
   useEffect(() => {
     getRoomInfo();
+    setScheduleHandler();
     setTitle(DUMMY_STUDY_DATA.title);
     setInfo(DUMMY_STUDY_DATA.info);
     setMembers(DUMMY_STUDY_DATA.members);
-    seyScheduleHandler();
-    console.log(schedules);
   }, []);
 
   // 현재 선택한 날짜에 스터디가 존재하는지 확인
@@ -114,13 +114,16 @@ function RoomMain() {
           <RoomMainIntroduction info={info} members={members} />
         </Grid>
         <Grid item xs={6}>
-          <RoomMainCalendar
-            schedules={schedules}
-            selectedDay={selectedDay}
-            dateRange={dateRange}
-            setSelectedDay={setSelectedDay}
-            setDateRange={setDateRange}
-          />
+          <Stack spacing={3}>
+            <RoomMainCalendar
+              schedules={schedules}
+              selectedDay={selectedDay}
+              dateRange={dateRange}
+              setSelectedDay={setSelectedDay}
+              setDateRange={setDateRange}
+            />
+            <RoomMainChat roomId={roomId} />
+          </Stack>
         </Grid>
         <Grid item xs={4} sx={{ paddingRight: 4 }}>
           <div
@@ -145,7 +148,8 @@ function RoomMain() {
               />
             ) : (
               <RoomMainStudyCreate
-                scheduleId={dateRange[selectedDayIdx].schedule?.id}
+                scheduleId={dateRange[selectedDayIdx]?.schedule?.id}
+                // scheduleId={dateRange[selectedDayIdx].schedule.id}
                 startedAt={startedAt}
                 finishedAt={finishedAt}
                 problemListRes={problemListRes}
