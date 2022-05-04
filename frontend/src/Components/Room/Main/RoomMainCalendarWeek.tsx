@@ -6,7 +6,8 @@ const WeekContainer = styled(Grid)(({ theme }) => ({
   borderRadius: '10px 10px 0 0',
   backgroundColor: theme.palette.accent,
   paddingRight: theme.spacing(1),
-
+  width: '100%',
+  marginLeft: 0,
   color: theme.palette.icon,
 }));
 

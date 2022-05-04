@@ -32,7 +32,7 @@ interface AddStudyData {
 function RoomMainStudyCreate({
   selectedDay,
   isEdit,
-  scheduleId,
+  scheduleId = 0,
   startedAt,
   finishedAt,
   problemListRes,

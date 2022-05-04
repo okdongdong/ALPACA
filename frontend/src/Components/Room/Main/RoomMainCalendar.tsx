@@ -27,13 +27,16 @@ const CalendarTitle = styled('div')(({ theme }) => ({
 
 const CalendarBox = styled(Grid)(({ theme }) => ({
   background: theme.palette.component,
+  marginLeft: 0,
+  marginTop: 0,
+  width:'100%',
   paddingRight: theme.spacing(1),
   paddingBottom: theme.spacing(1),
   borderRadius: '0 0 10px 10px',
 }));
 
 function RoomMainCalendar({
-  schedules,
+  schedules = [],
   selectedDay,
   dateRange,
   setSelectedDay,
