@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰이 가지고 있는 정보에 기록된 사용자가 인증받은 사용자인지 확인
                 equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
                 // 유효한 토큰인지 확인
-                validateAccessToken(accessToken, userDetails);
+                validateAccessToken(accessToken);
                 // SecurityContext에 Authentication 객체를 저장
                 processSecurity(request, userDetails);
             }
@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰이 가지고 있는 정보에 기록된 사용자가 인증받은 사용자인지 확인
                 equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
                 // 유효한 토큰인지 확인
-                validateAccessToken(refreshToken, userDetails);
+                validateAccessToken(refreshToken);
                 // SecurityContext에 Authentication 객체를 저장
                 processSecurity(request, userDetails);
             }
@@ -86,8 +86,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void validateAccessToken(String accessToken, UserDetails userDetails) {
-        if (Boolean.FALSE.equals(jwtTokenUtil.validateToken(accessToken, userDetails))) {
+    private void validateAccessToken(String accessToken) {
+        if (Boolean.FALSE.equals(jwtTokenUtil.validateToken(accessToken))) {
             throw new IllegalArgumentException("ExceptionUtil.INVALID_AUTH_TOKEN");
         }
     }
