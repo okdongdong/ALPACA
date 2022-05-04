@@ -3,7 +3,6 @@ package com.ssafy.alpaca.api.controller;
 import com.ssafy.alpaca.api.request.ChatReq;
 import com.ssafy.alpaca.api.response.ChatRes;
 import com.ssafy.alpaca.api.service.StudyService;
-import com.ssafy.alpaca.api.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
-    private final UserService userService;
+
     private final StudyService studyService;
     private final SimpMessagingTemplate template;
 
@@ -26,8 +25,8 @@ public class ChatController {
     @MessageMapping("/chat/study")
     // 처리를 마친 반환 값(message)를 반환할 곳
     public void createChat(ChatReq chatReq) {
-        String username = userService.getCurrentUsername();
-        ChatRes chatRes = studyService.saveChat(username, chatReq);
+
+        ChatRes chatRes = studyService.saveChat(chatReq);
         template.convertAndSend("/sub/chat/study/"+chatReq.getStudyId(),chatRes);
     }
 }

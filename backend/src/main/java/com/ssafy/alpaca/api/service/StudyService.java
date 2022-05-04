@@ -358,8 +358,8 @@ public class StudyService {
         );
     }
 
-    public ChatRes saveChat(String username, ChatReq chatReq) {
-        User user = checkUserByUsername(username);
+    public ChatRes saveChat(ChatReq chatReq) {
+        User user = checkUserById(chatReq.getUserId());
         Study study = checkStudyById(chatReq.getStudyId());
 
         Chat chat = chatRepository.save(Chat.builder()
