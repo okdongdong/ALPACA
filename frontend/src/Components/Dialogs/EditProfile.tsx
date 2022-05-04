@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Dialog, Button, Grid, MenuItem, FormControl, Box, Input } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -17,6 +17,9 @@ import Basic from '../../Assets/Img/Basic.png';
 import Dark from '../../Assets/Img/Dark.png';
 import Olivegreen from '../../Assets/Img/Olivegreen.png';
 import Peachpink from '../../Assets/Img/Peachpink.png';
+import { setLoading } from '../../Redux/commonReducer';
+import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
+import FormHelperText from '@mui/material/FormHelperText';
 
 const WButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
@@ -57,7 +60,8 @@ const CustomContent = styled('div')(({ theme }) => ({
 }));
 
 const ThemeButton = styled('button')(({ theme }) => ({
-  background: 'none',
+  background: theme.palette.bg,
+  borderRadius: '10px',
   border: 0,
   padding: 10,
   '&:hover': {
@@ -85,20 +89,26 @@ function EditProfile({ onClose, open }: EditProfileProps) {
   const userTheme = useSelector((state: any) => state.theme.themeType);
   const userInfo = useSelector((state: any) => state.account);
   const [stacks, setStacks] = React.useState(userInfo.preferredLanguage);
-  const [nickname, setNickname] = useState<string>(userInfo.nickname);
+  const [newNickname, setNewNickname] = useState<string>(userInfo.nickname);
   const [introduction, setIntroduction] = useState<string>(userInfo.info);
   const [imgData, setImgData] = useState<any>();
   const [themeSelect, setThemeSelect] = useState(userTheme);
   const [openEditPassword, setOpenEditPassword] = useState(false);
+  const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(true);
+  const [nicknameMessage, setNicknameMessage] = useState<string>('');
+  const [nicknameOkMessage, setNicknameOkMessage] = useState<string>('');
 
   const cancleClose = () => {
     onClose();
     setThemeSelect(userTheme);
+    setNewNickname(userInfo.nickname);
+    setNicknameOkMessage('');
   };
 
   const editDataClose = () => {
     editUserData();
     onClose();
+    setNicknameOkMessage('');
   };
 
   const dialogOpen = () => {
@@ -114,15 +124,11 @@ function EditProfile({ onClose, open }: EditProfileProps) {
     }
   };
 
-  const inputNickname = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
-  };
   const inputIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIntroduction(event.target.value);
   };
 
   const editProfileImg = async (profileData: string) => {
-    console.log(profileData);
     console.log(frm.get('file'));
     try {
       await customAxios({
@@ -138,6 +144,8 @@ function EditProfile({ onClose, open }: EditProfileProps) {
       dispatch(setUserInfo(resUserInfo));
     } catch (e) {
       console.log(e);
+      setImgData(userInfo.profileImg);
+      alert('프로필 이미지는 10MB를 초과할 수 없습니다.');
     }
   };
 
@@ -163,13 +171,13 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         url: `/user/${userInfo.userId}`,
         data: {
           info: introduction,
-          nickname: nickname,
+          nickname: newNickname,
           preferredLanguage: stacks,
           theme: themeSelect,
         },
       });
       const resUserInfo = { ...userInfo };
-      resUserInfo.nickname = nickname;
+      resUserInfo.nickname = newNickname;
       resUserInfo.info = introduction;
       resUserInfo.preferredLanguage = stacks;
       console.log('수정 테마', themeSelect);
@@ -191,6 +199,51 @@ function EditProfile({ onClose, open }: EditProfileProps) {
       console.log(e);
     }
   };
+
+  const nicknameDuplicateCheck = async () => {
+    if (newNickname === '') {
+      dispatch(setLoading(false));
+      return;
+    }
+    if (newNickname === userInfo.nickname) {
+      return;
+    }
+    dispatch(setLoading(true));
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/auth/duplicated/nickname`,
+        params: { nickname: newNickname },
+      });
+
+      setIsNicknameChecked(true);
+      setNicknameOkMessage('사용 가능한 닉네임 입니다.');
+    } catch (e: any) {
+      setIsNicknameChecked(false);
+      if (e.response.status === 409) {
+        setNicknameMessage(e.response.data.message);
+      } else {
+        setNicknameMessage('이미 존재하는 닉네임 입니다.');
+        console.log(e);
+      }
+    }
+
+    dispatch(setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!newNickname || (newNickname.length > 1 && newNickname.length < 21)) {
+      setNicknameMessage('');
+      setNicknameOkMessage('');
+    } else {
+      setNicknameMessage('닉네임은 2글자 이상 20글자 이하로 입력해주세요.');
+    }
+    if (newNickname === userInfo.nickname) {
+      setIsNicknameChecked(true);
+    } else {
+      setIsNicknameChecked(false);
+    }
+  }, [newNickname]);
 
   return (
     <Dialog onClose={cancleClose} open={open} maxWidth="lg">
@@ -234,13 +287,32 @@ function EditProfile({ onClose, open }: EditProfileProps) {
           </Box>
         </Grid>
         <Grid container spacing={2}>
-          <Grid item xs={6} container>
-            <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+          <Grid item xs={6} container sx={{ position: 'relative' }}>
+            <CInputWithBtn
+              onChange={setNewNickname}
+              label="닉네임"
+              buttonContent={'중복확인'}
+              onButtonClick={nicknameDuplicateCheck}
+              helperText={nicknameMessage}
+              value={newNickname}
+              buttonDisable={!!nicknameMessage}
+            />
+            <FormHelperText
+              sx={{
+                color: theme.palette.main,
+                fontWeight: '400',
+                position: 'absolute',
+                top: '50%',
+                right: '22%',
+              }}>
+              {nicknameOkMessage}
+            </FormHelperText>
+            {/* <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
               <Clabel>닉네임</Clabel>
             </Grid>
             <Grid item xs={8}>
               <TInput onChange={inputNickname} sx={{ minWidth: '100%' }} value={nickname}></TInput>
-            </Grid>
+            </Grid> */}
           </Grid>
           <Grid item xs={6}>
             <Grid container>
@@ -289,22 +361,38 @@ function EditProfile({ onClose, open }: EditProfileProps) {
               justifyContent: 'space-around',
               alignItem: 'center',
             }}>
-            <ThemeButton onClick={() => setThemeSelect('basic')}>
+            <ThemeButton
+              onClick={() => setThemeSelect('basic')}
+              sx={{
+                background: themeSelect === 'basic' ? theme.palette.main : theme.palette.bg,
+              }}>
               <img src={Basic} alt="" />
               <br />
               <label htmlFor="">기본</label>
             </ThemeButton>
-            <ThemeButton onClick={() => setThemeSelect('dark')}>
+            <ThemeButton
+              onClick={() => setThemeSelect('dark')}
+              sx={{
+                background: themeSelect === 'dark' ? theme.palette.main : theme.palette.bg,
+              }}>
               <img src={Dark} alt="" />
               <br />
               <label htmlFor="">다크</label>
             </ThemeButton>
-            <ThemeButton onClick={() => setThemeSelect('olivegreen')}>
+            <ThemeButton
+              onClick={() => setThemeSelect('olivegreen')}
+              sx={{
+                background: themeSelect === 'olivegreen' ? theme.palette.main : theme.palette.bg,
+              }}>
               <img src={Olivegreen} alt="" />
               <br />
               <label htmlFor="">올리브그린</label>
             </ThemeButton>
-            <ThemeButton onClick={() => setThemeSelect('peachpink')}>
+            <ThemeButton
+              onClick={() => setThemeSelect('peachpink')}
+              sx={{
+                background: themeSelect === 'peachpink' ? theme.palette.main : theme.palette.bg,
+              }}>
               <img src={Peachpink} alt="" />
               <br />
               <label htmlFor="">피치핑크</label>
@@ -330,7 +418,10 @@ function EditProfile({ onClose, open }: EditProfileProps) {
               비밀번호 변경
             </CButton>
             <EditPassword open={openEditPassword} onClose={dialogClose}></EditPassword>
-            <CButton onClick={editDataClose} sx={{ height: 35, width: 50 }}>
+            <CButton
+              onClick={editDataClose}
+              sx={{ height: 35, width: 50 }}
+              disabled={!isNicknameChecked}>
               수정
             </CButton>
           </Grid>
