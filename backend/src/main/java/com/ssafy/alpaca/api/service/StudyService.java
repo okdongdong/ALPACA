@@ -369,7 +369,7 @@ public class StudyService {
                 .build());
 
         return ChatRes.builder()
-                .nickname(user.getNickname())
+                .userId(user.getId())
                 .content(chat.getContent())
                 .timeStamp(chat.getTimeStamp())
                 .build();
