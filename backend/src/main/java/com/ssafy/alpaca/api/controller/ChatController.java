@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,8 +44,8 @@ public class ChatController {
             notes = "pageable에 해당하는 채팅을 20개단위로 조회한다."
     )
     @GetMapping("/chat/study/{id}")
-    public ResponseEntity<Slice<ChatListRes>> getChatListByStudy(@PathVariable Long id, @PageableDefault(size = 20, sort = "timeStamp", direction = Sort.Direction.DESC) Pageable pageable){
-        return ResponseEntity.ok(studyService.getChatListByStudy(id, pageable));
+    public ResponseEntity<Slice<ChatListRes>> getChatListByStudy(@PathVariable Long id, @RequestParam String offsetId, @PageableDefault(size = 20, sort = "timeStamp", direction = Sort.Direction.DESC) Pageable pageable){
+        return ResponseEntity.ok(studyService.getChatListByStudy(id,offsetId, pageable));
     }
 
 }

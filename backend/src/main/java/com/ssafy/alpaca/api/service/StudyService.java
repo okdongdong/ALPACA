@@ -376,9 +376,9 @@ public class StudyService {
                 .build();
     }
 
-    public Slice<ChatListRes> getChatListByStudy(Long studyId, Pageable pageable) {
+    public Slice<ChatListRes> getChatListByStudy(Long studyId, String offsetId, Pageable pageable) {
 
-        Slice<Chat> chats = chatRepository.findAllByStudyId(studyId, pageable);
+        Slice<Chat> chats = chatRepository.findAllByStudyId(offsetId, studyId, pageable);
 
         return chats.map(chat -> ChatListRes.builder()
                 .userId(chat.getUserId())
