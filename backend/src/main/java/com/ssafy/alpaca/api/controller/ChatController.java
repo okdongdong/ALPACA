@@ -1,12 +1,20 @@
 package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.ChatReq;
+import com.ssafy.alpaca.api.response.ChatListRes;
 import com.ssafy.alpaca.api.response.ChatRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,4 +37,14 @@ public class ChatController {
         ChatRes chatRes = studyService.saveChat(chatReq);
         template.convertAndSend("/sub/chat/study/"+chatReq.getStudyId(),chatRes);
     }
+
+    @ApiOperation(
+            value = "채팅 내용 조회",
+            notes = "pageable에 해당하는 채팅을 20개단위로 조회한다."
+    )
+    @GetMapping("/chat/study/{id}")
+    public ResponseEntity<Slice<ChatListRes>> getChatListByStudy(@PathVariable Long id, @PageableDefault(size = 20, sort = "timeStamp", direction = Sort.Direction.DESC) Pageable pageable){
+        return ResponseEntity.ok(studyService.getChatListByStudy(id, pageable));
+    }
+
 }

@@ -18,6 +18,7 @@ import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -374,4 +375,16 @@ public class StudyService {
                 .timeStamp(chat.getTimeStamp())
                 .build();
     }
+
+    public Slice<ChatListRes> getChatListByStudy(Long studyId, Pageable pageable) {
+
+        Slice<Chat> chats = chatRepository.findAllByStudyId(studyId, pageable);
+
+        return chats.map(chat -> ChatListRes.builder()
+                .userId(chat.getUserId())
+                .content(chat.getContent())
+                .timeStamp(chat.getTimeStamp())
+                .build());
+    }
+
 }
