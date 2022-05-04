@@ -111,28 +111,40 @@ public class CodeService {
 
     public CodeRes getCode(String username, Long studyId, Long userId, Long problemNumber) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        Study study = studyRepository.findById(studyId).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
         User member = userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
-        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+        boolean returnFlag = false;
 
-        boolean flagA = false, flagB = false;
-        for (MyStudy myStudy : myStudies) {
-            if (myStudy.getUser().getId().equals(userId)) {
-                flagA = true;
+        if (studyId == null) {
+            if (Boolean.TRUE.equals(user.getId().equals(member.getId()))) {
+                returnFlag =  true;
             }
-            if (myStudy.getUser().getId().equals(user.getId())) {
-                flagB = true;
+        } else {
+            Study study = studyRepository.findById(studyId).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+            );
+            List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+            boolean flagA = false, flagB = false;
+            for (MyStudy myStudy : myStudies) {
+                if (myStudy.getUser().getId().equals(userId)) {
+                    flagA = true;
+                }
+                if (myStudy.getUser().getId().equals(user.getId())) {
+                    flagB = true;
+                }
+            }
+
+            if (flagA && flagB) {
+                returnFlag = true;
             }
         }
 
-        if (flagA && flagB) {
+        if (returnFlag) {
             List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
             Problem problem = problemRepository.findByProblemNumber(problemNumber).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
@@ -145,7 +157,6 @@ public class CodeService {
                     .codeSet(CodeRes.CodeList.of(codes))
                     .build();
         }
-
 
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }

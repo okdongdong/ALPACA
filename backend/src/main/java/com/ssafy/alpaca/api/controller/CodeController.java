@@ -68,11 +68,11 @@ public class CodeController {
         @ApiImplicitParam( name = "studyId", value = "코드를 조회하고있는 스터디의 ID", dataTypeClass = Long.class ),
         @ApiImplicitParam( name = "problemNumber", value = "코드를 조회할 문제의 ID", dataTypeClass = String.class )
     })
-    @GetMapping("/{studyId}/{userId}")
+    @GetMapping("/{id}")
     public ResponseEntity<CodeRes> getCode(
-            @PathVariable Long studyId, @PathVariable Long userId, @RequestParam Long problemNumber) {
+            @PathVariable Long id, @RequestParam Long problemNumber, @RequestParam(required = false) Long studyId) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.getCode(username, studyId, userId, problemNumber));
+        return ResponseEntity.ok(codeService.getCode(username, studyId, id, problemNumber));
     }
 
 }
