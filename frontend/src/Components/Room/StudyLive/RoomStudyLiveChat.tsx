@@ -144,7 +144,7 @@ function RoomStudyLiveChat() {
         <ChatPaper>
           <ChatContentPaper onScroll={handleScroll} ref={chatDivRef}>
             {chatList.map((chat, index) => {
-              return chat.nickname === nickname ? (
+              return chat.nickname !== nickname ? (
                 <RoomStudyLiveChatSend key={`${chat.nickname}-${index}`} chat={chat} />
               ) : (
                 <RoomStudyLiveChatReception key={`${chat.nickname}-${index}`} chat={chat} />

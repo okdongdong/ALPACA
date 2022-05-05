@@ -56,7 +56,6 @@ function Login(props: any) {
 
       // 메인페이지로 이동
       console.log(location.state);
-
       if (!!location.state && typeof location.state === 'string') {
         navigate(location.state);
       } else {

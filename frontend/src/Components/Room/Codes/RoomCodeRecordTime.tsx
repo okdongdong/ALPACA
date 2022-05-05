@@ -1,29 +1,38 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Button } from '@mui/material';
+type codeInfoType = {
+  id: string;
+  language: string;
+  problemNumber: number;
+  submittedAt: string;
+  submittedCode: string;
+  userId: number;
+};
+
 type timesProps = {
-  times: { time: string; id: number }[];
+  codeList: codeInfoType[];
   setCode: Function;
 };
 
-function RoomCodeRecordTime({ times, setCode }: timesProps) {
+function RoomCodeRecordTime({ codeList, setCode }: timesProps) {
   const theme = useTheme();
 
-  const handleClick = (id: number) => {
-    console.log(id);
-  };
+  // const handleClick = (id: string) => {
+  //   setCode()
+  // };
   return (
     <div style={{ width: '100%', height: 'calc(100% - 3vh)', background: theme.palette.component }}>
       <span>제출시간</span>
       <div>
-        {times.map((time, index) => {
+        {codeList.map((code, index) => {
           return (
             <Button
-              key={index}
+              key={`user-code-${index}`}
               onClick={() => {
-                handleClick(time.id);
+                setCode(code.submittedCode);
               }}>
-              {time.time}
+              {code.submittedAt}
             </Button>
           );
         })}

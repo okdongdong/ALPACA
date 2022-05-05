@@ -8,7 +8,9 @@ import { useParams } from 'react-router-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setLoading, setLoadingMessage } from '../../Redux/commonReducer';
+
 type Monaco = typeof monaco;
 type problemInfoType = {
   level: number;
@@ -17,8 +19,10 @@ type problemInfoType = {
   inputs: string[];
   outputs: string[];
 };
+
 function Compile() {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const preferredLanguage = useSelector((state: any) => state.account.preferredLanguage);
   const { problemId } = useParams();
   const [problemInfo, setProblemInfo] = useState<problemInfoType>();
@@ -26,7 +30,6 @@ function Compile() {
     preferredLanguage === 'python3' ? 'python' : preferredLanguage,
   );
   const [code, setCode] = useState<string>('');
-  const editorRef = useRef(null);
   const monaco = useMonaco();
   monaco?.editor.defineTheme('myTheme', {
     base: 'vs',
@@ -78,58 +81,96 @@ function Compile() {
             language: language === 'python' ? 'python3' : language,
             input,
           };
-    const res = await customAxios({
-      method: 'post',
-      url,
-      data,
-    });
-    console.log(res);
+    dispatch(setLoading(true));
+    dispatch(setLoadingMessage('채점중입니다'));
+    try {
+      const res = await customAxios({
+        method: 'post',
+        url,
+        data,
+      });
+      dispatch(setLoading(false));
+      return res.data;
+    } catch (e) {
+      console.log(e);
+    }
+    dispatch(setLoading(false));
+  };
+
+  const saveCode = async () => {
+    dispatch(setLoading(true));
+    try {
+      const data = {
+        code: code,
+        language: language === 'python' ? 'python3' : language,
+        problemNumber: parseInt(problemId || '1000'),
+      };
+      await customAxios({
+        method: 'post',
+        url: '/code',
+        data,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    dispatch(setLoading(false));
   };
 
   return (
     <>
-      <Grid
-        sx={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <RoomCompileTitle problemTitle="A+B" problemId={1000} />
+      {problemInfo && (
         <Grid
-          container
           sx={{
             height: '100%',
             width: '100%',
             display: 'flex',
-            justifyContent: 'space-around',
-          }}
-          columns={20}
-          spacing={6}>
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <RoomCompileTitle
+            tier={problemInfo.level}
+            problemTitle={problemInfo.title}
+            problemId={problemInfo.problemNumber}
+          />
           <Grid
-            item
-            xs={20}
-            md={16}
+            container
             sx={{
-              height: 'calc(100% - 80px)',
-              // width: '80%',
-            }}>
-            <RoomCompileSelectLanguageBtn selectLanguage={setLanguage} />
-            <Editor
-              height="100%" // By default, it fully fits with its parent
-              theme="myTheme"
-              onChange={handleChange}
-              value={code}
-              language={language}
-            />
-          </Grid>
-          <Grid item xs={20} md={4}>
-            <RoomComplileTest submitCode={submitCode} />
+              height: '100%',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-around',
+            }}
+            columns={20}
+            spacing={6}>
+            <Grid
+              item
+              xs={20}
+              md={16}
+              sx={{
+                height: 'calc(100% - 80px)',
+                // width: '80%',
+              }}>
+              <RoomCompileSelectLanguageBtn selectLanguage={setLanguage} />
+              <Editor
+                height="100%" // By default, it fully fits with its parent
+                theme="myTheme"
+                onChange={handleChange}
+                value={code}
+                language={language}
+              />
+            </Grid>
+            <Grid item xs={20} md={4}>
+              <RoomComplileTest
+                inputs={problemInfo.inputs}
+                outputs={problemInfo.outputs}
+                submitCode={submitCode}
+                saveCode={saveCode}
+              />
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      )}
     </>
   );
   // <div>Compile : {problemId}</div>;

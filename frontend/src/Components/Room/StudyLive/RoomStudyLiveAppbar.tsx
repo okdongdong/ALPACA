@@ -1,7 +1,12 @@
 import React from 'react';
 import CBtn from '../../Commons/CBtn';
 import { useTheme } from '@mui/material';
-function RoomStudyLiveAppbar() {
+
+type LiveAppbarType = {
+  exitStudyLive: Function;
+};
+
+function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
   const theme = useTheme();
   return (
     <div>
@@ -9,7 +14,7 @@ function RoomStudyLiveAppbar() {
         <CBtn onClick={() => console.log('스터디')}>오늘의 스터디 문제</CBtn>
       </span>
       <span>
-        <CBtn onClick={() => console.log('퇴장')} backgroundColor={theme.palette.warn}>
+        <CBtn onClick={() => exitStudyLive()} backgroundColor={theme.palette.warn}>
           퇴장
         </CBtn>
       </span>

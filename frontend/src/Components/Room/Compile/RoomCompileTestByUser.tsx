@@ -23,8 +23,9 @@ const CustomLabel = styled(InputLabel)({
 
 type CompileTestByUserType = {
   setUserInput: Function;
+  output: string;
 };
-function RoomCompileTestByUser({ setUserInput }: CompileTestByUserType) {
+function RoomCompileTestByUser({ setUserInput, output }: CompileTestByUserType) {
   const [input, setInput] = useState<string>('');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
@@ -46,6 +47,7 @@ function RoomCompileTestByUser({ setUserInput }: CompileTestByUserType) {
           inputProps={{
             readOnly: true,
           }}
+          value={output}
           rows={7}
           multiline
           id="compile-output"
