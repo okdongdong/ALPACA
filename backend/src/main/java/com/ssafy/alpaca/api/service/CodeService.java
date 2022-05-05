@@ -76,13 +76,11 @@ public class CodeService {
 
 
         List<CodeCompileRes> codeCompileResList = new ArrayList<>();
-        CodeCompileRes codeCompileRes;
         for (int i=0; i<problem.getInputs().size(); i++) {
-            codeCompileRes = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
+            CodeCompileRes codeCompileRes = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
                     compileVersion(codeCompileReq.getLanguage()), problem.getInputs().get(i));
-            // 컴파일 실패할 경우 continue 해주는 조건문 필요
-            codeCompileRes.setAnswer(problem.getOutputs().get(i));
-            codeCompileRes.setIsCorrect(Boolean.TRUE.equals(problem.getOutputs().get(i).equals(codeCompileRes.getOutput())));
+            codeCompileRes.setAnswer(problem.getOutputs().get(i).stripTrailing());
+            codeCompileRes.setIsCorrect(Boolean.TRUE.equals(codeCompileRes.getAnswer().equals(codeCompileRes.getOutput())));
             codeCompileResList.add(codeCompileRes);
         }
 
@@ -113,28 +111,40 @@ public class CodeService {
 
     public CodeRes getCode(String username, Long studyId, Long userId, Long problemNumber) {
         // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        Study study = studyRepository.findById(studyId).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
         User member = userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
-        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+        boolean returnFlag = false;
 
-        boolean flagA = false, flagB = false;
-        for (MyStudy myStudy : myStudies) {
-            if (myStudy.getUser().getId().equals(userId)) {
-                flagA = true;
+        if (studyId == null) {
+            if (Boolean.TRUE.equals(user.getId().equals(member.getId()))) {
+                returnFlag =  true;
             }
-            if (myStudy.getUser().getId().equals(user.getId())) {
-                flagB = true;
+        } else {
+            Study study = studyRepository.findById(studyId).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+            );
+            List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+            boolean flagA = false, flagB = false;
+            for (MyStudy myStudy : myStudies) {
+                if (myStudy.getUser().getId().equals(userId)) {
+                    flagA = true;
+                }
+                if (myStudy.getUser().getId().equals(user.getId())) {
+                    flagB = true;
+                }
+            }
+
+            if (flagA && flagB) {
+                returnFlag = true;
             }
         }
 
-        if (flagA && flagB) {
+        if (returnFlag) {
             List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
             Problem problem = problemRepository.findByProblemNumber(problemNumber).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
@@ -147,7 +157,6 @@ public class CodeService {
                     .codeSet(CodeRes.CodeList.of(codes))
                     .build();
         }
-
 
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
@@ -170,11 +179,6 @@ public class CodeService {
                     "\",\"versionIndex\":\"" + versionIndex +
                     "\"} ";
 
-            System.out.println(script);
-            System.out.println(stdin);
-            System.out.println(language);
-            System.out.println(versionIndex);
-
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(input.getBytes());
             outputStream.flush();
@@ -190,8 +194,6 @@ public class CodeService {
             String output;
             StringBuilder result = new StringBuilder();
             while ((output = bufferedReader.readLine()) != null) {
-//                System.out.println(output);
-//                outputList.add(output.substring(11,output.indexOf(",")+4));
                 result.append(output);
             }
 
@@ -200,23 +202,15 @@ public class CodeService {
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(result.toString());
 
-            System.out.println(result);
-
             return CodeCompileRes.builder()
                     .result((Long) jsonObject.get("statusCode"))
-                    .output(jsonObject.get("output").toString())
+                    .output(jsonObject.get("output").toString().stripTrailing())
                     .memory(jsonObject.get("memory").toString())
                     .runtime(jsonObject.get("cpuTime").toString())
                             .build();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-//        for (String stdin:stdinList){
-//        }
-//        return CodeSaveRes.builder()
-//                .outputList(outputList)
-//                .answerList(answerList)
-//                .build();
         return null;
     }
 
