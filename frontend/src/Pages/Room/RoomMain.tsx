@@ -17,6 +17,10 @@ interface Member {
   profileImg: string;
 }
 
+export interface MemberDict {
+  [key: number]: { nickname: string; profileImg: string };
+}
+
 export interface Schedule {
   id: number;
   finishedAt: Date;
@@ -36,6 +40,7 @@ function RoomMain() {
   const [title, setTitle] = useState<string>('');
   const [info, setInfo] = useState<string>('');
   const [members, setMembers] = useState<Member[]>([]);
+  const [memberDict, setMemberDict] = useState<MemberDict>({});
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedDayIdx, setSelectedDayIdx] = useState<number>(0);
@@ -64,13 +69,19 @@ function RoomMain() {
       setInfo(res.data.info);
       setMembers(res.data.members);
       setSchedules(res.data.schedules);
+
+      const tempDict: MemberDict = {};
+      res.data.members.forEach((member: Member) => {
+        tempDict[member.userId] = { nickname: member.nickname, profileImg: member.profileImg };
+      });
+      setMemberDict(tempDict);
     } catch (e) {}
   };
 
   const setScheduleHandler = () => {
     const tempSchedules: Schedule[] = [];
 
-    DUMMY_STUDY_DATA.scheduleListRes.map((scheduleRes) => {
+    DUMMY_STUDY_DATA.scheduleListRes.forEach((scheduleRes) => {
       const temp = {
         id: scheduleRes.id,
         finishedAt: new Date(scheduleRes.finishedAt),
@@ -82,13 +93,27 @@ function RoomMain() {
     setSchedules(tempSchedules);
   };
 
-  // 페이지 랜더링시 스터디 기본정보를 가져옴
-  useEffect(() => {
-    getRoomInfo();
+  // 연결한 뒤 삭제할 것
+  const tempGetInfo = () => {
     setScheduleHandler();
     setTitle(DUMMY_STUDY_DATA.title);
     setInfo(DUMMY_STUDY_DATA.info);
     setMembers(DUMMY_STUDY_DATA.members);
+    const tempDict: MemberDict = {};
+    DUMMY_STUDY_DATA.members.forEach((member: Member, key) => {
+      tempDict[member.userId] = {
+        nickname: member.nickname,
+        profileImg: member.profileImg,
+      };
+    });
+    setMemberDict(tempDict);
+    console.log('memberDict', tempDict);
+  };
+
+  // 페이지 랜더링시 스터디 기본정보를 가져옴
+  useEffect(() => {
+    getRoomInfo();
+    tempGetInfo();
   }, []);
 
   // 현재 선택한 날짜에 스터디가 존재하는지 확인
@@ -122,7 +147,7 @@ function RoomMain() {
               setSelectedDay={setSelectedDay}
               setDateRange={setDateRange}
             />
-            <RoomMainChat roomId={roomId} />
+            <RoomMainChat roomId={roomId} memberDict={memberDict} />
           </Stack>
         </Grid>
         <Grid item xs={4} sx={{ paddingRight: 4 }}>
