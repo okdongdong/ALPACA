@@ -1,57 +1,69 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Button } from '@mui/material';
+import { Button, useTheme, styled } from '@mui/material';
+import { Mic, MicOff, Videocam, VideocamOff, ScreenShare } from '@mui/icons-material';
 import UserModel from './user-model';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setMainUser } from '../../../Redux/openviduReducer';
 
 type userPropsType = {
   user: UserModel;
 };
 
-type PropsType = React.VideoHTMLAttributes<HTMLVideoElement> & {
-  srcObject: MediaStream;
-};
+const VideoButton = styled(Button)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: theme.palette.main + '30',
+    boxShadow: 'none',
+  },
+  '&& .MuiTouchRipple-child': {
+    backgroundColor: theme.palette.main + '70',
+  },
+}));
 
 function RoomStudyLiveCamListItem({ user }: userPropsType) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const session = useSelector((state: any) => state.openvidu.session);
+  const theme = useTheme();
+  const dispatch = useDispatch();
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const session = useSelector((state: any) => state.openvidu.sessionForCamera);
+  const mainUser = useSelector((state: any) => state.openvidu.mainUser);
+
+  // useEffect(() => {
+  //   if (!user) return;
+  //   user.getStreamManager().addVideoElement(videoRef.current);
+  // }, []);
   useEffect(() => {
     if (!user) return;
     user.getStreamManager().addVideoElement(videoRef.current);
-    subscribeToUserChanged();
-  }, []);
-  useEffect(() => {
-    if (!user) return;
-    console.log('changed', user);
-    // if (!user.isScreenShareActive()) {
-    user.getStreamManager().addVideoElement(videoRef.current);
-    // }
   }, [user]);
-  const subscribeToUserChanged = () => {
-    session.on('signal:userChanged', (event: any) => {
-      console.log(event);
-      const data = JSON.parse(event.data);
-      if (user.getConnectionId() === event.from.connectionId && data.isScreenShareActive === true) {
-        console.log('socket changed', user);
-        user.getStreamManager().addVideoElement(videoRef.current);
-      }
-    });
-  };
   return (
     <>
       <div className="align_column_center">
-        <Button
+        <VideoButton
+          sx={{ position: 'relative', width: '100%', height: '95%', gridAutoFlow: 'dense' }}
           onClick={() => {
-            console.log(user.getStreamManager().streamId);
+            dispatch(setMainUser(user));
           }}>
           <video
-            style={{ borderRadius: '20px', width: '100%', maxHeight: '80vh' }}
+            style={{
+              borderRadius: '20px',
+              width: '100%',
+              height: '100%',
+              maxHeight: '80vh',
+              border: mainUser === user ? `3px solid ${theme.palette.component_accent}` : '',
+            }}
             autoPlay={true}
             id={'video-' + user.getStreamManager().stream.streamId}
             ref={videoRef}
             // muted={this.props.mutedSound}
           />
-        </Button>
+          <div style={{ position: 'absolute', bottom: 0, color: theme.palette.icon }}>
+            <span>
+              {user !== undefined && user.screenShareActive ? <ScreenShare /> : undefined}
+            </span>
+            <span>{user !== undefined && user.audioActive ? <Mic /> : <MicOff />}</span>
+            <span>{user !== undefined && user.videoActive ? <Videocam /> : <VideocamOff />}</span>
+          </div>
+        </VideoButton>
 
         {user.getNickname()}
       </div>

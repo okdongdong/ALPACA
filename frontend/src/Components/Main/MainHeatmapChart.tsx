@@ -1,7 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import { styled } from '@mui/material/styles';
-import MainHeatmapChartDetail from './MainHeatmapChartDetail';
 import { CalendarHeatmap } from 'reaviz';
 
 const data = [
@@ -28,8 +25,6 @@ const data = [
 ];
 
 function MainHeatmapChart() {
-  const [selected, setSelected] = React.useState('');
-
   const MainGridDiv = styled('div')({
     display: 'grid',
     justifyContent: 'center',

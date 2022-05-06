@@ -14,14 +14,14 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalAccessException.class)
-    public ErrorResult illegalAccessExHandler(IllegalAccessException e) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalArgExHandler(IllegalArgumentException e) {
         return new ErrorResult(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResult illegalArgExHandler(IllegalArgumentException e) {
+    @ExceptionHandler(IllegalAccessException.class)
+    public ErrorResult illegalAccessExHandler(IllegalAccessException e) {
         return new ErrorResult(e.getMessage());
     }
 
@@ -32,8 +32,8 @@ public class GlobalExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DuplicateFormatFlagsException.class)
-    public ErrorResult duplicateFormatFlagsException(DuplicateFormatFlagsException e) {
+    @ExceptionHandler(NullPointerException.class)
+    public ErrorResult NullPointerExHandler(NullPointerException e) {
         return new ErrorResult(e.getMessage());
     }
 

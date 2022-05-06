@@ -15,13 +15,11 @@ import java.util.stream.Collectors;
 @Builder
 public class ProblemListRes {
 
-    private String id;
-
-    private String number;
+    private Long problemNumber;
 
     private String title;
 
-    private Integer level;
+    private Long level;
 
     private LocalDateTime startedAt;
 

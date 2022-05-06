@@ -21,7 +21,7 @@ public class ToSolveProblem {
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
 
-    @Column(name = "problem_id")
-    private String problemId;
+    @Column(name = "problem_number")
+    private Long problemNumber;
 
 }

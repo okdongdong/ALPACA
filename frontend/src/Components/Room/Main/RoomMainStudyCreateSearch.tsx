@@ -1,21 +1,30 @@
 import { Add } from '@mui/icons-material';
-import { IconButton, styled } from '@mui/material';
+import { alpha, IconButton, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { solvedAcAxios } from '../../../Lib/customAxios';
+import { customAxios, solvedAcAxios } from '../../../Lib/customAxios';
 import CProblem from '../../Commons/CProblem';
 import CSearchBar from '../../Commons/CSearchBar';
-import { ToSolveProblem } from './RoomMainStudyDetail';
+import { ProblemRes } from './RoomMainStudyDetail';
 
 interface RoomMainStudyCreateSearchProps {
-  problemList: ToSolveProblem[];
-  addedProblemList: ToSolveProblem[];
-  setProblemList: React.Dispatch<React.SetStateAction<ToSolveProblem[]>>;
-  setAddedProblemList: React.Dispatch<React.SetStateAction<ToSolveProblem[]>>;
+  problemList: ProblemRes[];
+  addedProblemList: ProblemRes[];
+  setProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
+  setAddedProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
 }
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.accent,
   color: theme.palette.icon,
+  width: 30,
+  height: 30,
+  marginRight: theme.spacing(2),
+}));
+
+const ProblemBox = styled('div')(({ theme }) => ({
+  height: '20vh',
+  borderRadius: 10,
+  backgroundColor: theme.palette.bg,
 }));
 
 function RoomMainStudyCreateSearch({
@@ -24,6 +33,7 @@ function RoomMainStudyCreateSearch({
   setProblemList,
   setAddedProblemList,
 }: RoomMainStudyCreateSearchProps) {
+  const theme = useTheme();
   const [query, setQuery] = useState<string>('');
 
   const addProblem = (idx: number) => {
@@ -36,6 +46,12 @@ function RoomMainStudyCreateSearch({
   };
 
   const searchProblem = async () => {
+    // const res = await customAxios({
+    //   method: 'get',
+    //   url: '/problem',
+    //   params: { problemNumber: query },
+    // });
+
     const res = await solvedAcAxios({
       method: 'get',
       url: '/search/problem',
@@ -43,14 +59,13 @@ function RoomMainStudyCreateSearch({
     });
     console.log(res);
 
-    const resProblems: ToSolveProblem[] = [];
+    const resProblems: ProblemRes[] = [];
 
     res.data.items.map((item: any) => {
       // 이미 추가되지 않은 문제만 출력해줌
-      if (!addedProblemList.some((problem) => problem.id === item.id)) {
+      if (!addedProblemList.some((problem) => problem.problemNumber === item.problemNumber)) {
         resProblems.push({
-          id: item.id,
-          number: item.number,
+          problemNumber: item.problemNumber,
           title: item.titleKo,
           level: item.level,
         });
@@ -61,18 +76,18 @@ function RoomMainStudyCreateSearch({
   };
 
   return (
-    <div>
+    <div style={{ height: '50%' }}>
       <CSearchBar
         onChange={setQuery}
         onSearch={searchProblem}
         placeholder="문제를 검색해서 추가할 수 있습니다."
       />
-      <div>
+      <ProblemBox className="scroll-box">
         {problemList.map((problem, idx) => (
           <CProblem
             key={idx}
-            number={problem.number}
-            backgroundColor={idx % 2 ? 'black' : ''}
+            number={problem.problemNumber}
+            backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
             title={problem.title}
             level={problem.level}
             button={
@@ -82,7 +97,7 @@ function RoomMainStudyCreateSearch({
             }
           />
         ))}
-      </div>
+      </ProblemBox>
     </div>
   );
 }

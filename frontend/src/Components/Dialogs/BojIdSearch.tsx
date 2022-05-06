@@ -30,21 +30,6 @@ const CustomBox = styled(Stack)(({ theme }) => ({
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 450,
   maxHeight: 600,
-  overflowY: 'scroll',
-  /* 스크롤바 설정*/
-  '&::-webkit-scrollbar': {
-    width: '8px',
-  },
-  /* 스크롤바 막대 설정*/
-  '&::-webkit-scrollbar-thumb': {
-    height: '100px',
-    backgroundColor: 'rgba(100,100,100,0.5)',
-    borderRadius: ' 10px',
-  },
-  /* 스크롤바 뒷 배경 설정*/
-  '&::-webkit-scrollbar-track': {
-    backgroundColor: 'rgba(0,0,0,0)',
-  },
 }));
 
 const BojSearchResult = styled(Grid)(({ theme }) => ({
@@ -147,7 +132,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
         <h1>BOJ 아이디 검색</h1>
         <CSearchBar onSearch={getBojIdList} onChange={setSearchId} />
         <div>*아이디는 최대 100개까지만 검색됩니다.</div>
-        <CustomContent>
+        <CustomContent className="scroll-box">
           <Stack spacing={1}>
             {idList.map((item, idx) => (
               <BojSearchResult key={idx} container>

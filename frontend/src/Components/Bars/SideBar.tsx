@@ -8,7 +8,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { logout } from '../../Redux/accountReducer';
 import styles from './SideBar.module.css';
 
-import { Home, Logout, Assignment, Notifications } from '@mui/icons-material';
+import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function };
@@ -46,7 +46,7 @@ function SideBar() {
   const dispatch = useDispatch();
   const theme = useTheme();
 
-  const userTheme = useSelector((state: any) => state.theme);
+  const userTheme = useSelector((state: any) => state.theme.themeType);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {
@@ -86,19 +86,56 @@ function SideBar() {
           />
         </Button>
       </DrawerHeader>
-      <List>
-        {iconList.map((text, index) => (
+      <List
+        sx={{
+          height: '100%',
+        }}>
+        <span>
+          {iconList.map((text, index) => (
+            <ListItemButton
+              onClick={() => {
+                icon[text].onClick();
+              }}
+              key={text}
+              sx={{
+                minHeight: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                mx: 'auto',
+                my: '10px',
+                px: 2.5,
+                borderRadius: '100px',
+                background: theme.palette.main,
+                height: '50px',
+                width: '50px',
+                '&:hover': {
+                  background: theme.palette.main + '90',
+                },
+              }}>
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.icon,
+                }}>
+                {icon[text].icon}
+              </ListItemIcon>
+            </ListItemButton>
+          ))}
+        </span>
+      </List>
+      <span>
+        {pathname.indexOf('room') !== -1 && (
           <ListItemButton
-            onClick={() => {
-              icon[text].onClick();
-            }}
-            key={text}
+            onClick={() => {}}
+            key="settings"
             sx={{
               minHeight: 48,
               justifyContent: 'center',
               alignItems: 'center',
               mx: 'auto',
-              my: '10px',
+              mt: 'auto',
+              mb: '30px',
               px: 2.5,
               borderRadius: '100px',
               background: theme.palette.main,
@@ -114,11 +151,11 @@ function SideBar() {
                 justifyContent: 'center',
                 color: theme.palette.icon,
               }}>
-              {icon[text].icon}
+              <Settings />
             </ListItemIcon>
           </ListItemButton>
-        ))}
-      </List>
+        )}
+      </span>
     </CustomDrawer>
   );
 }

@@ -69,10 +69,8 @@ public class JwtTokenUtil {
     }
 
     // 토큰의 유효성 + 만료일자 확인
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        String username = getUsername(token);
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+    public Boolean validateToken(String token) {
+        return !isTokenExpired(token);
     }
 
     // JWT 토큰에서 인증 정보 조회
