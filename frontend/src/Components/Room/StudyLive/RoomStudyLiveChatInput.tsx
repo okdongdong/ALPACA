@@ -11,19 +11,25 @@ const SendBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
-function RoomStudyLiveChatInput() {
+type sendProps = {
+  goToBottom: Function;
+};
+
+function RoomStudyLiveChatInput({ goToBottom }: sendProps) {
   const theme = useTheme();
-  const session = useSelector((state: any) => state.openvidu.session);
+  const session = useSelector((state: any) => state.openvidu.sessionForCamera);
   const { profileImg } = useSelector((state: any) => state.account);
   const [message, setMessage] = useState<string>('');
 
   const sendChat = () => {
+    if (message === '') return;
     session.signal({
       data: JSON.stringify({ message: message, profileImg: profileImg }),
       to: [],
       type: 'chat',
     });
     setMessage('');
+    goToBottom();
   };
 
   const sendChatByKeyboard = (e: React.KeyboardEvent<HTMLInputElement>) => {

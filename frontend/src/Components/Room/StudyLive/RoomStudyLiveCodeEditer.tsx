@@ -105,7 +105,7 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
           transition: 'all .2s',
           overflow: 'hidden',
         }}>
-        <div style={{ padding: '10px' }}>
+        <div style={{ padding: '10px', color: theme.palette.txt }}>
           코드편집
           <CustonIconBtn
             size="small"

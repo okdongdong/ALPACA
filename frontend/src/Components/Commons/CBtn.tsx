@@ -20,6 +20,9 @@ const CustomButton = styled(Button)(({ theme }) => ({
   height: '100%',
   backgroundColor: theme.palette.main,
   color: theme.palette.txt,
+  '&:hover': {
+    backgroundColor: theme.palette.main + '90',
+  },
 }));
 
 function CBtn({
@@ -38,6 +41,7 @@ function CBtn({
         backgroundColor: backgroundColor,
         color: color,
         width: width,
+        minWidth: 'fit-content',
         height: height,
         '&:hover': {
           backgroundColor: backgroundColor + '90',

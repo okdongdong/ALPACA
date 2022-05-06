@@ -14,6 +14,7 @@ export default function GlobalStyles() {
           width: '100%',
           height: '100%',
           background: theme.palette.main,
+          color: theme.palette.txt,
           // WebkitOverflowScrolling: 'touch',
           // "&::-webkit-scrollbar": {
           //   width: "0.5vw"

@@ -7,28 +7,27 @@ import {
   useTheme,
 } from '@mui/material';
 import React, { KeyboardEvent } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
-
-import CBtn from './CBtn';
+import CBtn from '../../Commons/CBtn';
+import { Send } from '@mui/icons-material';
 
 interface CSearchBarProps {
   placeholder?: string;
   helperText?: string;
   backgroundColor?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
-  onSearch: () => void;
+  onSendMessage: () => void;
 }
 
 const CustomInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-function CSearchBar({
+function RoomMainChatBar({
   placeholder = '',
   helperText = '',
   backgroundColor,
   onChange,
-  onSearch,
+  onSendMessage,
 }: CSearchBarProps) {
   const theme = useTheme();
 
@@ -37,13 +36,13 @@ function CSearchBar({
   };
 
   const onButtonClickHandler = () => {
-    onSearch();
+    onSendMessage();
   };
 
   const onKeyUpHandler = (event: KeyboardEvent<HTMLFormElement>) => {
     if (event.key === 'Enter') {
       // 엔터키 눌렀을 때 검색실행
-      onSearch();
+      onSendMessage();
     }
   };
 
@@ -71,7 +70,7 @@ function CSearchBar({
           endAdornment={
             <InputAdornment position="end">
               <CBtn
-                content={<SearchIcon />}
+                content={<Send />}
                 height="25px"
                 backgroundColor="rgba(0,0,0,0)"
                 onClick={onButtonClickHandler}
@@ -85,4 +84,4 @@ function CSearchBar({
   );
 }
 
-export default CSearchBar;
+export default RoomMainChatBar;

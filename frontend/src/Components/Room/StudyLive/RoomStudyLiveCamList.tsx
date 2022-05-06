@@ -12,7 +12,6 @@ function RoomStudyLiveCamList({ users }: usersPropsType) {
   const [page, setPage] = useState<number>(0);
   const minPage = 0;
   const maxPage = parseInt(`${(users.length - 1) / 6}`);
-  console.log(minPage, maxPage);
   const pageDown = () => {
     if (page > minPage) setPage((prev) => prev - 1);
   };

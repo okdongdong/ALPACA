@@ -9,27 +9,35 @@ type ChatType = {
 
 type ChatPropsType = {
   chat: ChatType;
+  avatar: Boolean;
 };
 
-function RoomStudyLiveChatReception({ chat }: ChatPropsType) {
+function RoomStudyLiveChatReception({ chat, avatar }: ChatPropsType) {
   const theme = useTheme();
   const { nickname, profileImg, message } = chat;
   return (
     <div style={{ marginBottom: '8px' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'start',
-          alignItems: 'center',
-          marginBottom: '8px',
-        }}>
-        <Avatar
-          sx={{ bgcolor: theme.palette.component, width: 30, height: 30 }}
-          alt={nickname}
-          src={profileImg}
-        />
-        <span style={{ color: theme.palette.txt, marginLeft: '6px' }}>{nickname}</span>
-      </div>
+      {avatar && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'start',
+            alignItems: 'center',
+            marginBottom: '8px',
+          }}>
+          <Avatar
+            sx={{
+              bgcolor: theme.palette.component,
+              width: 30,
+              height: 30,
+              boxShadow: `0px 3px 5px -1px rgb(0 0 0 / 20%), 0px 6px 10px 0px rgb(0 0 0 / 14%), 0px 1px 18px 0px rgb(0 0 0 / 12%)`,
+            }}
+            alt={nickname}
+            src={profileImg}
+          />
+          <span style={{ color: theme.palette.txt, marginLeft: '6px' }}>{nickname}</span>
+        </div>
+      )}
       <div
         style={{
           color: theme.palette.txt,
@@ -37,7 +45,7 @@ function RoomStudyLiveChatReception({ chat }: ChatPropsType) {
           marginLeft: '36px',
           padding: '3px',
           borderRadius: '2px',
-          background: theme.palette.icon,
+          background: theme.palette.component,
           maxWidth: '10vw',
           wordBreak: 'break-all',
         }}>
