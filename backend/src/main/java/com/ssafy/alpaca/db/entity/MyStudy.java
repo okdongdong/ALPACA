@@ -23,7 +23,7 @@ public class MyStudy {
 
     @Builder.Default
     @Column(name = "pinned_time")
-    private LocalDateTime pinnedTime = LocalDateTime.of(0, 1, 1, 6, 0);
+    private LocalDateTime pinnedTime = LocalDateTime.of(1, 1, 1, 6, 0);
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", nullable = false)

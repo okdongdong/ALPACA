@@ -22,7 +22,7 @@ public class ScheduleReq {
     @ApiModelProperty( name = "finishedAt", example = "2022-04-15T11:32:44")
     private LocalDateTime finishedAt;
 
-    @ApiModelProperty( name = "toSolveProblems", example = "['625f62ad9319670330d4993e']")
-    private List<String> toSolveProblems;
+    @ApiModelProperty( name = "toSolveProblems", example = "[1000, 1001]")
+    private List<Long> toSolveProblems;
 
 }

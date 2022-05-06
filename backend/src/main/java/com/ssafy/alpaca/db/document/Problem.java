@@ -20,13 +20,14 @@ public class Problem {
     @Id
     private String id;
 
+    @Field(targetType = FieldType.INT64)
     @Indexed(unique = true)
-    private String number;
+    private Long problemNumber;
 
     private String title;
 
     @Field(targetType = FieldType.INT32)
-    private Integer level;
+    private Long level;
 
     @Field(targetType = FieldType.ARRAY)
     private List<String> inputs;

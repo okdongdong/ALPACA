@@ -6,15 +6,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-@Document(collection = "code")
+@Document(collection = "chat")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Code {
+public class Chat {
 
     @Id
     private String id;
@@ -23,14 +24,13 @@ public class Code {
     private Long userId;
 
     @Field(targetType = FieldType.INT64)
-    private Long problemNumber;
-
-    private String language;
+    private Long studyId;
 
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime timeStamp = LocalDateTime.now();
 
-    private String submittedCode;
+    @NotBlank
+    private String content;
 
 }
