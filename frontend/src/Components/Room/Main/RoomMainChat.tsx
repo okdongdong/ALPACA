@@ -12,6 +12,7 @@ import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
 interface RoomMainChattingProps {
   roomId: string | undefined;
   memberDict: MemberDict;
+  offsetId: string;
 }
 
 interface ReceiveMessage {
@@ -30,7 +31,7 @@ const header = {
   Authorization: token,
 };
 
-function RoomMainChat({ roomId, memberDict }: RoomMainChattingProps) {
+function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   const dispatch = useDispatch();
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -42,7 +43,6 @@ function RoomMainChat({ roomId, memberDict }: RoomMainChattingProps) {
   const [chatList, setChatList] = useState<ReceiveMessage[]>([]);
 
   const [page, setPage] = useState<number>(0);
-  const [offsetId, setOffsetId] = useState<string>('');
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -104,7 +104,7 @@ function RoomMainChat({ roomId, memberDict }: RoomMainChattingProps) {
       const res = await customAxios({
         method: 'get',
         url: `/chat/study/${roomId}`,
-        params: { offsetId, page },
+        params: { offsetId, page, size: 5 },
       });
       setChatList((prev) => [...res.data.content.reverse(), ...prev]);
       setPage((prev) => prev + 1);

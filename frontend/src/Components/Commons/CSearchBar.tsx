@@ -16,7 +16,7 @@ interface CSearchBarProps {
   helperText?: string;
   backgroundColor?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
-  onSearch: () => void;
+  onSearch?: () => void;
 }
 
 const CustomInput = styled(Input)(({ theme }) => ({
@@ -28,7 +28,7 @@ function CSearchBar({
   helperText = '',
   backgroundColor,
   onChange,
-  onSearch,
+  onSearch = () => {},
 }: CSearchBarProps) {
   const theme = useTheme();
 

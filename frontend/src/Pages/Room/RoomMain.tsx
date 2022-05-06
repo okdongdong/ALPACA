@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DUMMY_STUDY_DATA } from '../../Assets/dummyData/dummyData';
 import CBtn from '../../Components/Commons/CBtn';
+import MemberInvite from '../../Components/Dialogs/MemberInvite';
 import RoomMainCalendar, { DailySchedule } from '../../Components/Room/Main/RoomMainCalendar';
 import RoomMainChat from '../../Components/Room/Main/RoomMainChat';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
@@ -57,6 +58,12 @@ function RoomMain() {
   const [finishedAt, setFinishedAt] = useState<Date | null>(selectedDay);
   const [problemListRes, setProblemListRes] = useState<ProblemRes[]>([]);
 
+  // 채팅 이전기록 조회
+  const [offsetId, setOffsetId] = useState<string>('');
+
+  // 초대 dialog open
+  const [open, setOpen] = useState<boolean>(false);
+
   // 스터디룸 정보조회
   const getRoomInfo = async () => {
     try {
@@ -69,6 +76,7 @@ function RoomMain() {
       setInfo(res.data.info);
       setMembers(res.data.members);
       setSchedules(res.data.schedules);
+      setOffsetId(res.data.offsetId);
 
       const tempDict: MemberDict = {};
       res.data.members.forEach((member: Member) => {
@@ -133,6 +141,7 @@ function RoomMain() {
 
   return (
     <Box sx={{ height: '100%', width: '100%' }}>
+      <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
       <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
         <Grid item xs={2}>
           <RoomTitle>{title}</RoomTitle>
@@ -147,7 +156,7 @@ function RoomMain() {
               setSelectedDay={setSelectedDay}
               setDateRange={setDateRange}
             />
-            <RoomMainChat roomId={roomId} memberDict={memberDict} />
+            <RoomMainChat roomId={roomId} memberDict={memberDict} offsetId={offsetId} />
           </Stack>
         </Grid>
         <Grid item xs={4} sx={{ paddingRight: 4 }}>
@@ -186,7 +195,12 @@ function RoomMain() {
               />
             )}
             <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
-              <CBtn width="100%" height="100%" onClick={() => {}}>
+              <CBtn
+                width="100%"
+                height="100%"
+                onClick={() => {
+                  setOpen(true);
+                }}>
                 초대
               </CBtn>
               <CBtn
