@@ -2,10 +2,7 @@ package com.ssafy.alpaca.api.response;
 
 import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class CodeRes {
 
@@ -29,14 +27,15 @@ public class CodeRes {
 
     private List<CodeList> codeSet;
 
+    @Getter
     @Builder
     public static class CodeList {
 
-        public String language;
+        private String language;
 
-        public LocalDateTime submittedAt;
+        private LocalDateTime submittedAt;
 
-        public String submittedCode;
+        private String submittedCode;
 
         public static List<CodeList> of (List<Code> list) {
             return list.stream().map(

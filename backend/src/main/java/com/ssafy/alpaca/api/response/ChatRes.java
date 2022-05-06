@@ -1,16 +1,14 @@
 package com.ssafy.alpaca.api.response;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ChatRes {
     @ApiModelProperty( name = "userId", example = "1" )
