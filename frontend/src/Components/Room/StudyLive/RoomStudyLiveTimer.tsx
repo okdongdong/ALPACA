@@ -25,10 +25,9 @@ const Timer = styled('div')(({ theme }) => ({
 
 const TimeSpan = styled(InputBase)(({ theme }) => ({
   background: theme.palette.bg,
-  // height: '2vh',
+  color: theme.palette.txt,
   width: '3vw',
   textAlign: 'center',
-  // padding: '8px 13px 8px 13px',
   borderRadius: '5px',
   '.MuiInputBase-input': {
     textAlign: 'center',
@@ -37,13 +36,19 @@ const TimeSpan = styled(InputBase)(({ theme }) => ({
 
 const TimerPaper = styled('div')(({ theme }) => ({
   background: theme.palette.component,
+  color: theme.palette.txt,
   width: '13vw',
   height: '24vh',
   padding: '10px',
 }));
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.main,
+  color:
+    theme.palette.main === '#2D2D2D'
+      ? '#FFFFFF'
+      : theme.palette.main === '#FFC2C0'
+      ? theme.palette.component_accent
+      : theme.palette.main,
 }));
 
 function RoomStudyLiveTimer() {

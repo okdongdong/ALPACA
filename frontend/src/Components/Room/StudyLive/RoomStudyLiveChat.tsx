@@ -143,7 +143,15 @@ function RoomStudyLiveChat() {
               return chat.nickname !== nickname ? (
                 <RoomStudyLiveChatSend key={`${chat.nickname}-${index}`} chat={chat} />
               ) : (
-                <RoomStudyLiveChatReception key={`${chat.nickname}-${index}`} chat={chat} />
+                <RoomStudyLiveChatReception
+                  key={`${chat.nickname}-${index}`}
+                  chat={chat}
+                  avatar={
+                    chatList.length > 1 && chatList[index - 1]?.nickname === chat.nickname
+                      ? false
+                      : true
+                  }
+                />
               );
             })}
           </ChatContentPaper>
