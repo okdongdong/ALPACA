@@ -18,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.*;
 
@@ -30,6 +32,23 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
 
+    private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException{
+        httpURLConnection.setRequestMethod("GET");
+        httpURLConnection.setDoOutput(true);
+        BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(httpURLConnection.getInputStream())
+        );
+        StringBuilder stringBuilder = new StringBuilder();
+        String inputLine;
+        while ((inputLine = bufferedReader.readLine()) != null) {
+            stringBuilder.append(inputLine);
+        }
+        bufferedReader.close();
+        String response = stringBuilder.toString();
+        JSONParser jsonParser = new JSONParser();
+        return (JSONObject) jsonParser.parse(response);
+    }
+
     public List<Problem> searchProblems(Long problemNumber) {
         return problemRepository.findTop10ByProblemNumberStartingWithOrderByProblemNumberAsc(problemNumber);
     }
@@ -40,9 +59,33 @@ public class ProblemService {
         );
     }
 
-    public void refreshSolvedProblem(String username) {
+    public void refreshSolvedAc(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        refreshClassLevel(user);
+        refreshSolvedProblem(user);
+    }
+
+    private void refreshClassLevel(User user) {
+        try {
+            URL url = new URL("https://solved.ac/api/v3/search/user?query=" + user.getBojId());
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            JSONObject jsonObject = getJsonDataFromURL(httpURLConnection);
+            List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
+            JSONObject userData = jsonObjects.get(0);
+            if (Boolean.TRUE.equals(!userData.get("handle").toString().equals(user.getBojId()))) {
+                throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
+            }
+
+            user.setClassLevel((Long) userData.get("class"));
+            user.setClassDecoration(userData.get("classDecoration").toString());
+            userRepository.save(user);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshSolvedProblem(User user) {
         int page = 1;
         HashSet<Long> solvedProblemList = new HashSet<>();
 
@@ -50,20 +93,7 @@ public class ProblemService {
             while (true) {
                 URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + user.getBojId() + "&page=" + page);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setDoOutput(true);
-                BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(httpURLConnection.getInputStream())
-                );
-                StringBuilder stringBuilder = new StringBuilder();
-                String inputLine;
-                while ((inputLine = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(inputLine);
-                }
-                bufferedReader.close();
-                String response = stringBuilder.toString();
-                JSONParser jsonParser = new JSONParser();
-                JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
+                JSONObject jsonObject = getJsonDataFromURL(httpURLConnection);
                 long total_count = (long) jsonObject.get("count");
                 List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
                 for (JSONObject j : jsonObjects) {
@@ -84,6 +114,7 @@ public class ProblemService {
         for (SolvedProblem solvedProblem : solvedProblems) {
             solvedProblemList.remove(solvedProblem.getProblemNumber());
         }
+
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
             Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);

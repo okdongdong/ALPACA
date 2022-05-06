@@ -41,13 +41,13 @@ public class ProblemController {
     }
 
     @ApiOperation(
-            value = "백준에서 푼 문제 갱신",
-            notes = "백준에서 푼 문제를 ALPACA DB에 연동한다."
+            value = "solved.ac 정보 갱신",
+            notes = "class정보와 백준에서 푼 문제를 ALPACA DB에 연동한다."
     )
     @PostMapping()
     public ResponseEntity<BaseResponseBody> refreshSolvedProblem() {
         String username = userService.getCurrentUsername();
-        problemService.refreshSolvedProblem(username);
+        problemService.refreshSolvedAc(username);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 }

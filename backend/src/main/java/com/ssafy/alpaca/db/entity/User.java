@@ -22,7 +22,7 @@ public class User {
     private Long id;
 
     @NotBlank
-    @Pattern(regexp = "")
+//    @Pattern(regexp = "")
     @Size(min = 6, max = 20)
     @Column(unique = true)
     private String username;
@@ -41,6 +41,13 @@ public class User {
     @NotBlank
     @Column(name = "boj_id", unique = true)
     private String bojId;
+
+    @Column(name = "class_level")
+    private Long classLevel;
+
+    @NotBlank
+    @Column(name = "class_decoration")
+    private String classDecoration;
 
     @Builder.Default
     private String theme = "basic";
