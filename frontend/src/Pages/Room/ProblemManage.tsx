@@ -12,7 +12,6 @@ import CBtn from '../../Components/Commons/CBtn';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { customAxios } from '../../Lib/customAxios';
-import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function escapeRegExp(value: string): string {
@@ -47,7 +46,7 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
               title="Clear"
               aria-label="Clear"
               size="small"
-              style={{ visibility: props.value ? 'visible' : 'hidden' }}
+              style={{ visibility: props.value ? 'visible' : 'hidden', color: theme.palette.txt }}
               onClick={props.clearSearch}>
               <ClearIcon fontSize="small" />
             </IconButton>
@@ -59,6 +58,7 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
             sm: 400,
           },
           m: (theme) => theme.spacing(1, 0.5, 1.5),
+          '& .MuiInputBase-root': { color: theme.palette.txt },
           '& .MuiSvgIcon-root': {
             mr: 0.5,
           },
@@ -77,22 +77,30 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
 }
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  '& 	.MuiDataGrid-columnHeader': {
+    color: theme.palette.txt,
+  },
+  '& .MuiDataGrid-sortIcon': {
+    color: theme.palette.txt,
+  },
   [`& .${gridClasses.row}.odd`]: {
-    backgroundColor: theme.palette.grey[200],
+    color: theme.palette.txt,
+    backgroundColor: theme.palette.main + '90',
     '&:hover, &.Mui-hovered': {
-      backgroundColor: theme.palette.component,
+      backgroundColor: theme.palette.main + 'C0',
     },
     '&.Mui-selected': {
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.main,
     },
   },
   [`& .${gridClasses.row}.even`]: {
-    backgroundColor: theme.palette.main,
+    color: theme.palette.txt,
+    backgroundColor: theme.palette.bg,
     '&:hover, &.Mui-hovered': {
-      backgroundColor: theme.palette.component,
+      backgroundColor: theme.palette.main + 'C0',
     },
     '&.Mui-selected': {
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.main,
     },
   },
 }));
@@ -100,7 +108,6 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 function BasicMenu(props: any) {
   const navigate = useNavigate();
   const theme = useTheme();
-  const userInfo = useSelector((state: any) => state.account);
   const { roomId } = useParams();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -111,10 +118,9 @@ function BasicMenu(props: any) {
     setAnchorEl(null);
   };
 
-  const goCode = () => {
+  const goCode = (userId: number) => {
     setAnchorEl(null);
-    console.log(`/codes/${props.data.problemNumber}/${userInfo.userId}`);
-    navigate(`/codes/${props.data.problemNumber}/${userInfo.userId}`, { state: roomId });
+    navigate(`/codes/${props.data.problemNumber}/${userId}`, { state: roomId });
   };
   return (
     <div>
@@ -132,6 +138,9 @@ function BasicMenu(props: any) {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        sx={{
+          '& .MuiMenu-paper': { background: theme.palette.component, color: theme.palette.txt },
+        }}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}>
@@ -146,7 +155,11 @@ function BasicMenu(props: any) {
               }}
               key={i}>
               <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
-              <CBtn content="코드" onClick={goCode}></CBtn>
+              <CBtn
+                content="코드"
+                onClick={() => {
+                  goCode(member.id);
+                }}></CBtn>
             </MenuItem>
           );
         })}
@@ -223,18 +236,22 @@ const testdata = [
     problemNumber: 1000,
     solvedMemberList: [
       {
+        id: 1,
+        nickname: 'test111',
+        profileImg: '',
+      },
+      {
+        id: 32,
         nickname: 'test11',
         profileImg: '',
       },
       {
+        id: 33,
         nickname: 'test11',
         profileImg: '',
       },
       {
-        nickname: 'test11',
-        profileImg: '',
-      },
-      {
+        id: 22,
         nickname: 'test11',
         profileImg: '',
       },
