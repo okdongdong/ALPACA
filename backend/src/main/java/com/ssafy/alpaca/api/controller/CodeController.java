@@ -64,7 +64,7 @@ public class CodeController {
             notes = "유저가 푼 특정 문제의 모든 코드를 조회한다."
     )
     @ApiImplicitParams({
-        @ApiImplicitParam( name = "userId", value = "코드를 작성한 유저의 ID", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "id", value = "코드를 작성한 유저의 ID", dataTypeClass = Long.class ),
         @ApiImplicitParam( name = "studyId", value = "코드를 조회하고있는 스터디의 ID", dataTypeClass = Long.class ),
         @ApiImplicitParam( name = "problemNumber", value = "코드를 조회할 문제의 ID", dataTypeClass = String.class )
     })
