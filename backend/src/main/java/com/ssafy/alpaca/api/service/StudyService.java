@@ -67,6 +67,13 @@ public class StudyService {
         );
     }
 
+    private void checkRoomMaker(User user, Study study) throws IllegalAccessException {
+        if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
+            return;
+        }
+        throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+    }
+
     public StudyListRes createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
         if (12 < studyReq.getMemberIdList().size()) {
@@ -126,14 +133,12 @@ public class StudyService {
 
         LocalDateTime localDateTime = LocalDateTime.now();
         LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
-        LocalDateTime tomorrow = today.plusDays(1);
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, today, tomorrow);
+                study, today, today.plusDays(1));
 
-        LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).minusWeeks(1);
-        LocalDateTime nextMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0).plusMonths(1).plusWeeks(2);
+        LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
         List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, thisMonth, nextMonth);
+                study, thisMonth.minusWeeks(1), thisMonth.plusMonths(1).plusWeeks(2));
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
@@ -203,11 +208,7 @@ public class StudyService {
     public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-
-        MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
-        if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
+        checkRoomMaker(user, study);
 
         study.setTitle(studyUpdateReq.getTitle());
         study.setInfo(studyUpdateReq.getInfo());
@@ -217,11 +218,7 @@ public class StudyService {
     public void deleteStudy(String username, Long id) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-
-        MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
-        if (Boolean.TRUE.equals(!myStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
+        checkRoomMaker(user, study);
         studyRepository.delete(study);
     }
 
@@ -270,11 +267,8 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
+        checkRoomMaker(user, study);
 
-        MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
-        if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
         if (user.getId().equals(member.getId())) {
             throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
         }
@@ -298,10 +292,7 @@ public class StudyService {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
-        MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
-        if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
+        checkRoomMaker(user, study);
         myStudyRepository.save(
                 MyStudy.builder()
                         .isRoomMaker(false)
@@ -314,10 +305,7 @@ public class StudyService {
     public String createInviteCode(String username, Long id) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
-        MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
-        if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
-        }
+        checkRoomMaker(user, study);
 
         Optional<InviteCode> inviteCode = inviteCodeRedisRepository.findById(study.getId());
         if (inviteCode.isPresent()) {

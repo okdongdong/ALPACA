@@ -25,6 +25,8 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
 
     Optional<MyStudy> findByUserAndStudy(User user, Study study);
 
+    Boolean existsByUserAndStudyAndIsRoomMaker(User user, Study study, Boolean check);
+
     @EntityGraph(attributePaths = {"user"})
     List<MyStudy> findAllByStudy(Study study);
 
