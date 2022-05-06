@@ -92,7 +92,11 @@ function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTest
           problemNumber: problemId,
         },
       });
-      setIsMyCode(true);
+      if (res.data.codeSet.length > 0) {
+        setIsMyCode(true);
+      } else {
+        setIsMyCode(false);
+      }
     } catch (e) {
       setIsMyCode(false);
     }

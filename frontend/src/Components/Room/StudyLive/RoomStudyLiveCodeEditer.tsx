@@ -8,6 +8,7 @@ import { useTheme, styled } from '@mui/material/styles';
 import { ArrowRight, ArrowLeft, DragHandle } from '@mui/icons-material';
 import { Icon, IconButton } from '@mui/material';
 
+import { useParams } from 'react-router-dom';
 import RoomCompileSelectLanguageBtn from '../Compile/RoomCompileSelectLanguageBtn';
 
 import './RoomStudyLiveCodeEditor.css';
@@ -56,8 +57,9 @@ type codeEditorProps = {
 };
 
 function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEditorProps) {
+  const { roomId } = useParams();
   const ydoc = new Y.Doc();
-  const provider = new WebsocketProvider('ws://192.168.219.106:1234', '1', ydoc);
+  const provider = new WebsocketProvider(process.env.REACT_APP_YJS_DOCS || '', roomId || '1', ydoc);
   const ytext = ydoc.getText('monaco');
   const theme = useTheme();
   const editorRef = useRef(null);
