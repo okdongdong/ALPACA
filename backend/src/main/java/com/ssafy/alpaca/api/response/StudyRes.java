@@ -26,6 +26,8 @@ public class StudyRes {
 
     private List<ScheduleListRes> scheduleListRes;
 
+    private String offsetId;
+
     @Builder
     public static class Member {
         public Long userId;

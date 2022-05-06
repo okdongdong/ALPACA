@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class ChatRes {
-    @ApiModelProperty( name = "nickname", example = "곤듀" )
-    private String nickname;
+    @ApiModelProperty( name = "userId", example = "1" )
+    private Long userId;
 
     @ApiModelProperty( name = "content", example = "내일까지 실버 374문제 풀어오세요!" )
     private String content;

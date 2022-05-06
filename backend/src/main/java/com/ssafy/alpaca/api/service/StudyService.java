@@ -16,8 +16,10 @@ import com.ssafy.alpaca.db.redis.InviteCode;
 import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,6 +136,8 @@ public class StudyService {
                 study, thisMonth, nextMonth);
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+        Chat chat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
         return StudyRes.builder()
                 .title(study.getTitle())
                 .info(study.getTitle())
@@ -145,6 +149,7 @@ public class StudyService {
                                 .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
                                 .build()).collect(Collectors.toList()))
                 .scheduleListRes(ScheduleListRes.of(schedules))
+                .offsetId(chat.getId())
                 .build();
     }
 
@@ -358,8 +363,8 @@ public class StudyService {
         );
     }
 
-    public ChatRes saveChat(String username, ChatReq chatReq) {
-        User user = checkUserByUsername(username);
+    public ChatRes saveChat(ChatReq chatReq) {
+        User user = checkUserById(chatReq.getUserId());
         Study study = checkStudyById(chatReq.getStudyId());
 
         Chat chat = chatRepository.save(Chat.builder()
@@ -369,9 +374,21 @@ public class StudyService {
                 .build());
 
         return ChatRes.builder()
-                .nickname(user.getNickname())
+                .userId(user.getId())
                 .content(chat.getContent())
                 .timeStamp(chat.getTimeStamp())
                 .build();
     }
+
+    public Slice<ChatListRes> getChatListByStudy(Long studyId, String offsetId, Pageable pageable) {
+        ObjectId objectId = new ObjectId(offsetId);
+        Slice<Chat> chats = chatRepository.findPartByStudyId(objectId, studyId, pageable);
+
+        return chats.map(chat -> ChatListRes.builder()
+                .userId(chat.getUserId())
+                .content(chat.getContent())
+                .timeStamp(chat.getTimeStamp())
+                .build());
+    }
+
 }
