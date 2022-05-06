@@ -24,6 +24,7 @@ function Compile() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const preferredLanguage = useSelector((state: any) => state.account.preferredLanguage);
+  const themeType = useSelector((state: any) => state.theme.themeType);
   const { problemId } = useParams();
   const [problemInfo, setProblemInfo] = useState<problemInfoType>();
   const [language, setLanguage] = useState<string>(
@@ -32,7 +33,7 @@ function Compile() {
   const [code, setCode] = useState<string>('');
   const monaco = useMonaco();
   monaco?.editor.defineTheme('myTheme', {
-    base: 'vs',
+    base: themeType === 'dark' ? 'vs-dark' : 'vs',
     inherit: true,
     rules: [{ token: '', background: theme.palette.component }],
     colors: {
@@ -40,7 +41,8 @@ function Compile() {
       'editor.background': theme.palette.component,
       'editorCursor.foreground': theme.palette.txt + '99',
       'editor.lineHighlightBackground': theme.palette.bg + '99',
-      'editorLineNumber.foreground': theme.palette.accent,
+      'editorLineNumber.foreground': theme.palette.txt,
+      'editorLineNumber.activeForeground': theme.palette.txt + '90',
       'editor.selectionBackground': theme.palette.main + '30',
       'editor.inactiveSelectionBackground': theme.palette.main + '15',
     },

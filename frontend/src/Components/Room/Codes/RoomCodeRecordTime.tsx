@@ -16,9 +16,6 @@ type timesProps = {
 function RoomCodeRecordTime({ codeList, setCode, setLanguage }: timesProps) {
   const theme = useTheme();
 
-  // const handleClick = (id: string) => {
-  //   setCode()
-  // };
   return (
     <div
       style={{

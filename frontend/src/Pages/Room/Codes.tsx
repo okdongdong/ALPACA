@@ -65,7 +65,6 @@ function Codes() {
       setCodeList(res.data.codeSet);
     } catch (e: any) {
       setErrorMessage(e.response.data.message);
-      console.log(e.response);
     }
   };
 

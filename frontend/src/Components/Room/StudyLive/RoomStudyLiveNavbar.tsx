@@ -40,10 +40,6 @@ function RoomStudyLiveNavbar({
   screenShare,
   stopScreenShare,
 }: navPropsType) {
-  useEffect(() => {
-    console.log(user);
-  }, [user.audioActive]);
-
   return (
     <div className="align_center">
       <NavBtn

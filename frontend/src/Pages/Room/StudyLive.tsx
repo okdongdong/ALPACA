@@ -141,7 +141,6 @@ function StudyLive() {
       if (res.isConfirmed) {
         leaveSession();
         navigate(`/room/${roomId}`);
-        console.log(res);
       }
     });
   };
@@ -248,11 +247,9 @@ function StudyLive() {
 
   const connectToSession = () => {
     getToken(roomId || '0').then((token) => {
-      console.log(token);
       connectSessionToCamera(String(token));
     });
     getToken(roomId || '0').then((token) => {
-      console.log(token);
       connectSessionToScreen(String(token));
     });
   };
@@ -337,7 +334,6 @@ function StudyLive() {
   const stopScreenShare = () => {
     if (!sessionForScreen) return;
     if (!publisher) return;
-    console.log(publisher);
     sessionForScreen.unpublish(publisher.getScreenStreamManager());
 
     setPublisher((localPublisher: UserModel | undefined) => {
@@ -377,7 +373,6 @@ function StudyLive() {
         return remoteUsers.map((user: UserModel) => {
           if (user.getConnectionId() === event.from.connectionId) {
             const data = JSON.parse(event.data);
-            console.log('EVENTO REMOTE: ', event.data);
             if (data.isAudioActive !== undefined) {
               user.setAudioActive(data.isAudioActive);
             }
@@ -400,7 +395,6 @@ function StudyLive() {
         return remoteUsers.map((user: UserModel) => {
           if (user.getConnectionId() === event.from.connectionId) {
             const data = JSON.parse(event.data);
-            console.log('EVENTO REMOTE: ', event.data);
             if (data.isAudioActive !== undefined) {
               user.setAudioActive(data.isAudioActive);
             }

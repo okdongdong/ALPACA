@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
 import { styled } from '@mui/material/styles';
-import { Tabs, Tab, Button, useTheme } from '@mui/material';
+import { Tabs, Tab, Button, useTheme, Tooltip } from '@mui/material';
 
 import RoomCompileTestByValue from './RoomCompileTestByValue';
 import RoomCompileTestByUser from './RoomCompileTestByUser';
+import { customAxios } from '../../../Lib/customAxios';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type CustomTabsProps = {
   children?: React.ReactNode;
@@ -65,14 +68,35 @@ type ResultType = {
 
 function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTestType) {
   const theme = useTheme();
+  const userId = useSelector((state: any) => state.account.userId);
+  const navigate = useNavigate();
+  const { problemId } = useParams();
   const [tab, setTab] = useState<number>(0);
   const [userInput, setUserInput] = useState<string>('');
   const [userOutput, setUserOutput] = useState<string>('');
   const [userResult, setUserResult] = useState<ResultType[]>();
+  const [isMyCode, setIsMyCode] = useState<Boolean>(false);
+
+  useEffect(() => {}, []);
   useEffect(() => {
+    getCodeInfo();
     setUserOutput('');
   }, [tab]);
 
+  const getCodeInfo = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/code/${userId}`,
+        params: {
+          problemNumber: problemId,
+        },
+      });
+      setIsMyCode(true);
+    } catch (e) {
+      setIsMyCode(false);
+    }
+  };
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
@@ -133,7 +157,17 @@ function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTest
             )}
           </div>
           <div style={{ marginLeft: 'auto' }}>
-            <CustomButton onClick={handleSaveCode}>코드저장</CustomButton>
+            {isMyCode && (
+              <CustomButton
+                onClick={() => {
+                  navigate(`/codes/${problemId}/${userId}`);
+                }}>
+                코드보기
+              </CustomButton>
+            )}
+            <Tooltip title="제출 최신순 10개까지 저장할 수 있습니다.">
+              <CustomButton onClick={handleSaveCode}>코드저장</CustomButton>
+            </Tooltip>
             <CustomButton onClick={handleSubmitCode}>코드실행</CustomButton>
           </div>
         </div>

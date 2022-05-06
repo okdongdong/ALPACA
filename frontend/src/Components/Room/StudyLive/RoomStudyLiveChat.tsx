@@ -89,7 +89,6 @@ function RoomStudyLiveChat() {
   }, []);
 
   useEffect(() => {
-    console.log(isBottom);
     if (isBottom) {
       setIsNewMessage(false);
       goToBottom();
@@ -100,9 +99,6 @@ function RoomStudyLiveChat() {
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
-    console.log('scrollHeight', scrollHeight);
-    console.log('scrollTop', scrollTop);
-    console.log('clientHeight', clientHeight);
     if (scrollHeight - (scrollTop + clientHeight) < 10) {
       setIsNewMessage(false);
       setIsBottom(true);
