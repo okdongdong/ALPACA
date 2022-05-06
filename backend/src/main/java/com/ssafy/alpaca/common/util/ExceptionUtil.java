@@ -10,6 +10,7 @@ public class ExceptionUtil {
     public static final String INVALID_DATE_VALUE = "종료시간이 더 빠를 수 없습니다.";
     public static final String TOO_MANY_MEMBERS = "스터디 멤버는 12명을 초과할 수 없습니다.";
     public static final String INVITE_CODE_NOT_EXISTS = "초대코드가 존재하지 않습니다.";
+    public static final String INVALID_AUTH_TOKEN = "토큰값이 유효하지 않습니다.";
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     public static final String NOT_MYSELF = "본인이 아닙니다.";
