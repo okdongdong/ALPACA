@@ -16,6 +16,7 @@ import com.ssafy.alpaca.db.redis.InviteCode;
 import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -135,6 +136,8 @@ public class StudyService {
                 study, thisMonth, nextMonth);
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+        Chat chat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
         return StudyRes.builder()
                 .title(study.getTitle())
                 .info(study.getTitle())
@@ -146,6 +149,7 @@ public class StudyService {
                                 .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
                                 .build()).collect(Collectors.toList()))
                 .scheduleListRes(ScheduleListRes.of(schedules))
+                .offsetId(chat.getId())
                 .build();
     }
 
@@ -377,8 +381,8 @@ public class StudyService {
     }
 
     public Slice<ChatListRes> getChatListByStudy(Long studyId, String offsetId, Pageable pageable) {
-
-        Slice<Chat> chats = chatRepository.findAllByStudyId(offsetId, studyId, pageable);
+        ObjectId objectId = new ObjectId(offsetId);
+        Slice<Chat> chats = chatRepository.findPartByStudyId(objectId, studyId, pageable);
 
         return chats.map(chat -> ChatListRes.builder()
                 .userId(chat.getUserId())
