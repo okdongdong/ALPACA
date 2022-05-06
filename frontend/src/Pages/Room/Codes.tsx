@@ -7,22 +7,17 @@ import { Divider, Grid } from '@mui/material';
 import RoomCodeRecordTime from '../../Components/Room/Codes/RoomCodeRecordTime';
 import RoomCompileTitle from '../../Components/Room/Compile/RoomCompileTitle';
 import CProfile from '../../Components/Commons/CProfile';
-
-type problemInfoType = {
-  level: number;
-  title: string;
-  problemNumber: number;
-  inputs: string[];
-  outputs: string[];
-};
-
+import ALPACA from '../../Assets/Img/alpaca.png';
 type codeInfoType = {
-  id: string;
   language: string;
-  problemNumber: number;
   submittedAt: string;
   submittedCode: string;
-  userId: number;
+};
+
+type problemInfoType = {
+  problemNumber: number;
+  level: number;
+  title: string;
 };
 
 function Codes() {
@@ -37,6 +32,8 @@ function Codes() {
   const [codeList, setCodeList] = useState<codeInfoType[]>();
   const [nickname, setNickname] = useState<string>('성아영');
   const [profileImg, setProfileImg] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>();
+
   useEffect(() => {
     getCodeInfo();
   }, []);
@@ -58,23 +55,20 @@ function Codes() {
         url: `/code/${userId}`,
         params,
       });
-      console.log(res);
-      setCodeList(res.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const getUserInfo = async () => {
-    try {
-      const res = await customAxios({
-        method: 'get',
-        url: `/problem/${problemId}`,
+      setNickname(res.data.nickname);
+      setProblemInfo({
+        level: res.data.level,
+        title: res.data.title,
+        problemNumber: res.data.problemNumber,
       });
-      setProblemInfo(res.data);
-    } catch (e) {
-      console.log(e);
+      setProfileImg(res.data.profileImg || ALPACA);
+      setCodeList(res.data.codeSet);
+    } catch (e: any) {
+      setErrorMessage(e.response.data.message);
+      console.log(e.response);
     }
   };
+
   monaco?.editor.defineTheme('myTheme', {
     base: 'vs',
     inherit: true,
@@ -91,7 +85,7 @@ function Codes() {
   });
   return (
     <>
-      {problemInfo && (
+      {problemInfo ? (
         <Grid
           style={{
             height: '100%',
@@ -108,10 +102,7 @@ function Codes() {
             problemId={problemInfo.problemNumber}
           />
           <div style={{ position: 'absolute', top: '1vh', right: '2vw' }}>
-            <CProfile
-              nickname="성아영"
-              profileImg="https://avatars.githubusercontent.com/u/55776650?v=4"
-            />
+            <CProfile nickname={nickname} profileImg={profileImg} />
           </div>
           <Grid
             container
@@ -124,7 +115,13 @@ function Codes() {
             columns={20}
             spacing={6}>
             <Grid item xs={20} md={3}>
-              {codeList && <RoomCodeRecordTime setCode={setCurCode} codeList={codeList} />}
+              {codeList && (
+                <RoomCodeRecordTime
+                  setCode={setCurCode}
+                  setLanguage={setLanguage}
+                  codeList={codeList}
+                />
+              )}
             </Grid>
             <Grid item xs={20} md={17}>
               <Editor
@@ -139,6 +136,8 @@ function Codes() {
             </Grid>
           </Grid>
         </Grid>
+      ) : (
+        <>{errorMessage ? errorMessage : ''}</>
       )}
     </>
   );
