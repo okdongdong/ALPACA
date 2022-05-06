@@ -123,7 +123,8 @@ function StudyCreate(props: StudyCreateProps) {
     onClose();
   };
   const handleDelete = (chipToDelete: userData) => () => {
-    setMemberList((chips) => chips.filter((chip) => chip.id !== chipToDelete.id));
+    if (userInfo.userId !== chipToDelete.id)
+      setMemberList((chips) => chips.filter((chip) => chip.id !== chipToDelete.id));
   };
 
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
