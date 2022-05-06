@@ -9,6 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class StudyInviteReq {
+
     @ApiModelProperty( name = "inviteCode", example = "VTU0FCGS6H" )
     private String inviteCode;
+
 }

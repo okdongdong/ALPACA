@@ -1,5 +1,11 @@
-import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import { FormControl, FormHelperText, Input, InputAdornment, styled } from '@mui/material';
+import {
+  FormControl,
+  FormHelperText,
+  Input,
+  InputAdornment,
+  styled,
+  useTheme,
+} from '@mui/material';
 import React, { KeyboardEvent } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -8,7 +14,7 @@ import CBtn from './CBtn';
 interface CSearchBarProps {
   placeholder?: string;
   helperText?: string;
-  buttonBackgroundColor?: string;
+  backgroundColor?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   onSearch: () => void;
 }
@@ -17,7 +23,15 @@ const CustomInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-function CSearchBar({ placeholder = '', helperText = '', onChange, onSearch }: CSearchBarProps) {
+function CSearchBar({
+  placeholder = '',
+  helperText = '',
+  backgroundColor,
+  onChange,
+  onSearch,
+}: CSearchBarProps) {
+  const theme = useTheme();
+
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
@@ -39,7 +53,15 @@ function CSearchBar({ placeholder = '', helperText = '', onChange, onSearch }: C
       onSubmit={(event) => {
         event.preventDefault();
       }}>
-      <FormControl variant="standard" error={!!helperText} fullWidth>
+      <FormControl
+        variant="filled"
+        error={!!helperText}
+        fullWidth
+        sx={{
+          backgroundColor: backgroundColor || theme.palette.bg,
+          borderRadius: '10px',
+          marginBottom: 1,
+        }}>
         <CustomInput
           id="search-bar"
           onChange={onChangeHandler}

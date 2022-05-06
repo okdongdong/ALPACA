@@ -1,26 +1,32 @@
 import { Grid, styled } from '@mui/material';
 
+const WEEK_DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const WeekContainer = styled(Grid)(({ theme }) => ({
+  borderRadius: '10px 10px 0 0',
+  backgroundColor: theme.palette.accent,
+  paddingRight: theme.spacing(1),
+  width: '100%',
+  marginLeft: 0,
+  color: theme.palette.icon,
+}));
+
 const WeekBox = styled(Grid)(({ theme }) => ({
+  height: theme.spacing(5),
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: theme.spacing(5),
-  backgroundColor: theme.palette.accent,
-  color: theme.palette.icon,
-  paddingRight: theme.spacing(1),
 }));
 
 function RoomMainCalendarWeek() {
-  const weekDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
   return (
-    <Grid container columns={7} columnSpacing={1}>
-      {weekDay.map((day, idx) => (
+    <WeekContainer container columns={7} columnSpacing={1}>
+      {WEEK_DAY.map((day, idx) => (
         <WeekBox item xs={1} key={idx}>
           {day}
         </WeekBox>
       ))}
-    </Grid>
+    </WeekContainer>
   );
 }
 

@@ -34,6 +34,8 @@ public class LoginRes extends TokenRes{
 
     private List<StudyListRes> studies;
 
+    private Long studyCount;
+
     public static LoginRes of(TokenRes tokenRes, LoginRes loginRes) {
         return LoginRes.builder()
                 .grantType(tokenRes.getGrantType())
@@ -47,6 +49,7 @@ public class LoginRes extends TokenRes{
                 .bojId(loginRes.getBojId())
                 .theme(loginRes.getTheme())
                 .preferredLanguage(loginRes.getPreferredLanguage())
+                .studyCount(loginRes.getStudyCount())
                 .studies(loginRes.getStudies())
                 .build();
     }

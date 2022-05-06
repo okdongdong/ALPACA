@@ -21,7 +21,7 @@ public class SolvedProblem {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "problem_id")
-    private String problemId;
+    @Column(name = "problem_number")
+    private Long problemNumber;
 
 }

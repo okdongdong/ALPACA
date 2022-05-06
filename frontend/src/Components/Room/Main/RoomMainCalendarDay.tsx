@@ -1,4 +1,5 @@
-import { Button, Grid, Stack, styled, useTheme } from '@mui/material';
+import { alpha, Button, Divider, Grid, Stack, styled, useTheme } from '@mui/material';
+import { dateToStringTimeSimple } from '../../../Lib/dateToString';
 import { DailySchedule } from './RoomMainCalendar';
 
 interface RoomMainCalendarDayProps {
@@ -15,7 +16,7 @@ const DayBox = styled(Button)(({ theme }) => ({
   width: '100%',
   borderRadius: '10px',
   textAlign: 'center',
-  height: theme.spacing(10),
+  height: theme.spacing(8),
   '&:hover': {
     backgroundColor: theme.palette.accent,
     color: theme.palette.icon,
@@ -45,13 +46,27 @@ function RoomMainCalendarDay({
               ? theme.palette.main
               : dailySchedule.day.getMonth() === nowDay.getMonth()
               ? ''
-              : '#aaaaaa',
+              : alpha(theme.palette.bg, 0.6),
         }}
         onClick={onClickHandler}>
-        <Stack>
+        <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
           <div>{dailySchedule.day.getDate()}</div>
-          <hr />
-          {!!dailySchedule.schedule && <span>{dailySchedule.schedule.startedAt.getTime()}</span>}
+          <Divider variant="middle" sx={{ margin: 0 }} />
+          <div
+            style={{
+              flexGrow: 1,
+              width: '100%',
+              minHeight: 1,
+              alignItems: 'center',
+              display: 'flex',
+            }}>
+            {!!dailySchedule.schedule && (
+              <div>
+                <span>{dateToStringTimeSimple(dailySchedule.schedule.startedAt)}</span>
+                <span>~ {dateToStringTimeSimple(dailySchedule.schedule.finishedAt)}</span>
+              </div>
+            )}
+          </div>
         </Stack>
       </DayBox>
     </Grid>

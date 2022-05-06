@@ -1,45 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, styled, Grid, Input, DialogTitle } from '@mui/material';
+import { Dialog, Input, DialogTitle, FormHelperText, FormControl } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Grid from '@mui/material/Grid';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
+import Avatar from '@mui/material/Avatar';
 import CBtn from '../Commons/CBtn';
 import Chip from '@mui/material/Chip';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import themeReducer from '../../Redux/themeReducer';
-import { useDispatch } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
+import alpaca from '../../Assets/Img/alpaca.png';
 
 export interface StudyCreateProps {
   open: boolean;
   onClose: () => void;
+  page: number;
+  studyList: any;
   callback: Function;
 }
 
 interface userData {
-  userId: number;
+  id: number;
   nickname: string;
+  profileImg: string;
 }
 const Clabel = styled('label')(({ theme }) => ({
   color: theme.palette.txt,
 }));
 const TInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
-}));
-const CAutocomplete = styled(Autocomplete)(({ theme }) => ({
-  '& .MuiInput-root .MuiInput-input': {
-    color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
   },
-}));
-const CTextField = styled(TextField)(({ theme }) => ({
-  color: theme.palette.txt,
 }));
 
 const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
-// dialog 크기 조절
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 960,
   minHeight: 720,
@@ -49,7 +53,6 @@ const CustomContent = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.bg,
 }));
 
-// 스터디원 선택
 const MemberArray = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'left',
@@ -59,7 +62,7 @@ const MemberArray = styled('div')(({ theme }) => ({
   marginTop: 20,
 }));
 
-const ListItem = styled('li')(({ theme }) => ({
+const ListChip = styled('li')(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
@@ -68,86 +71,123 @@ const CChip = styled(Chip)(({ theme }) => ({
   color: theme.palette.txt,
 }));
 
+const Demo = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.component,
+}));
+
 function StudyCreate(props: StudyCreateProps) {
   const dispatch = useDispatch();
-
-  // const userList = async () => {
-  //   try {
-  //     const res = await customAxios({
-  //       method: 'get',
-  //       url: `/user/search`,
-  //     });
-  //     console.log(res);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
-
+  const theme = useTheme();
+  const userInfo = useSelector((state: any) => state.account);
+  const myData = [
+    { id: userInfo.userId, nickname: userInfo.nickname, profileImg: userInfo.profileImg },
+  ];
+  const [studyname, setStudyName] = useState('');
+  const [studyintro, setStudyIntro] = useState('');
+  const [memberList, setMemberList] = useState<any[]>(myData);
   const { onClose, open } = props;
-  const cancleClose = () => {
-    setStudyName('');
-    setStudyIntro('');
-    setMemberList([]);
-    setValue({ userId: 0, nickname: '' });
-    onClose();
-  };
+  const [getUser, setgetUser] = useState<any>([]);
+  const [nameMessage, setNameMessage] = useState<string>('');
+  const [introMessage, setIntroMessage] = useState<string>('');
+  const nameRegex = /^.{1,50}$/;
+  const introRegex = /^.{1,500}$/;
 
-  const createData = async () => {
-    const sendList = memberList.map((data) => data.userId);
-    try {
-      await customAxios({
-        method: 'post',
-        url: `/user/study`,
-        data: {
-          info: studyintro,
-          title: studyname,
-          memberIdList: sendList,
-        },
-      });
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (nameRegex.test(studyname)) {
+      setNameMessage('');
+    } else {
+      setNameMessage('50자 이하로 입력하세요.');
     }
-  };
+  }, [studyname]);
+
+  useEffect(() => {
+    if (introRegex.test(studyintro)) {
+      setIntroMessage('');
+    } else {
+      setIntroMessage('500자 이하로 입력하세요.');
+    }
+  }, [studyintro]);
 
   const handleClose = () => {
-    props.callback([studyname, studyintro, memberList]);
     createData();
     setStudyName('');
     setStudyIntro('');
-    setMemberList([]);
-    setValue({ userId: 0, nickname: '' });
+    setMemberList(myData);
     onClose();
   };
 
-  const userData = [
-    { userId: 1, nickname: '강동옥' },
-    { userId: 2, nickname: '김동욱' },
-    { userId: 3, nickname: '김동옥' },
-    { userId: 4, nickname: '강동익' },
-    { userId: 5, nickname: '강동욱' },
-    { userId: 6, nickname: '강옥동' },
-    { userId: 7, nickname: '박준영' },
-    { userId: 8, nickname: '박준형' },
-    { userId: 11, nickname: '김정' },
-    { userId: 23, nickname: '이현욱' },
-    { userId: 45, nickname: '박조영' },
-  ];
-  const [memberList, setMemberList] = React.useState<any[]>([]);
-  const [value, setValue] = React.useState<userData>({ userId: 0, nickname: '' });
+  const cancleClose = () => {
+    setStudyName('');
+    setStudyIntro('');
+    setMemberList(myData);
+    onClose();
+  };
   const handleDelete = (chipToDelete: userData) => () => {
-    setMemberList((chips) => chips.filter((chip) => chip.userId !== chipToDelete.userId));
+    if (userInfo.userId !== chipToDelete.id)
+      setMemberList((chips) => chips.filter((chip) => chip.id !== chipToDelete.id));
   };
 
-  const [studyname, setStudyName] = useState('');
-  const [studyintro, setStudyIntro] = useState('');
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStudyName(event.target.value);
   };
   const onChangeIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStudyIntro(event.target.value);
   };
+
+  const userSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    userList(event.target.value);
+  };
+
+  const createData = async () => {
+    const sendList = memberList.map((data) => data.id);
+    try {
+      const res = await customAxios({
+        method: 'post',
+        url: `/study`,
+        data: {
+          info: studyintro,
+          memberIdList: sendList,
+          title: studyname,
+        },
+      });
+      const resUserInfo = { ...userInfo };
+      resUserInfo.studies = [...resUserInfo.studies, res.data];
+      resUserInfo.studyCount += 1;
+      dispatch(setUserInfo(resUserInfo));
+      const page = Math.ceil(resUserInfo.studyCount / 3);
+      searchData(page);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const searchData = async (now: number) => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/study`,
+        params: { page: now - 1 },
+      });
+      props.callback(now, res.data.content);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const userList = async (inputValue: string) => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/user/search`,
+        params: { nickname: inputValue },
+      });
+      setgetUser(res.data);
+    } catch (e: any) {
+      console.log(e.response);
+    }
+  };
+
   return (
-    <Dialog onClose={handleClose} open={open} maxWidth="lg">
+    <Dialog onClose={cancleClose} open={open} maxWidth="lg">
       <CustomContent>
         <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
         <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
@@ -155,7 +195,10 @@ function StudyCreate(props: StudyCreateProps) {
             <Clabel>스터디 이름</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeName}></TInput>
+            <FormControl variant="standard" error={!!nameMessage} fullWidth>
+              <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeName}></TInput>
+              <FormHelperText>{nameMessage}</FormHelperText>
+            </FormControl>
           </Grid>
         </Grid>
         <Grid container>
@@ -163,7 +206,10 @@ function StudyCreate(props: StudyCreateProps) {
             <Clabel>스터디 소개</Clabel>
           </Grid>
           <Grid item xs={10}>
-            <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeIntro}></TInput>
+            <FormControl variant="standard" error={!!introMessage} fullWidth>
+              <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeIntro}></TInput>
+              <FormHelperText>{introMessage}</FormHelperText>
+            </FormControl>
           </Grid>
         </Grid>
         <Grid container>
@@ -171,35 +217,49 @@ function StudyCreate(props: StudyCreateProps) {
             <Clabel>스터디원</Clabel>
           </Grid>
           <Grid item xs={10}>
-            {/* <CAutocomplete
-              value={value}
-              onChange={(event: any, newValue: userData) => {
-                setValue(newValue);
-                setMemberList((memberList) => {
-                  if (newValue != null) {
-                    if (
-                      !memberList.some((samedata) => {
-                        return samedata.userId === newValue.userId;
-                      })
-                    )
-                      return [...memberList, newValue];
-                  }
-                  return [...memberList];
-                });
-              }}
-              isOptionEqualToValue={(option: any, value: any) => option.userId === value.userId}
-              id="controllable-states-demo"
-              options={userData}
-              getOptionLabel={(option: userData) => option.nickname}
-              renderInput={(params) => <CTextField {...params} variant="standard" />}
-            /> */}
+            <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
+            <Demo>
+              <List
+                sx={{
+                  position: 'relative',
+                  overflow: 'auto',
+                  maxHeight: 200,
+                }}>
+                {getUser.map((item: any) => {
+                  return (
+                    <ListItem key={item.id}>
+                      <ListItemButton
+                        onClick={() => {
+                          setMemberList((memberList) => {
+                            if (
+                              !memberList.some((samedata) => {
+                                return samedata.id === item.id;
+                              })
+                            )
+                              return [...memberList, item];
+                            else return [...memberList];
+                          });
+                        }}>
+                        <ListItemAvatar>
+                          <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
+                        </ListItemAvatar>
+                        <ListItemText primary={item.nickname} sx={{ color: theme.palette.txt }} />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Demo>
             <MemberArray>
-              {memberList.map((data) => {
-                let icon;
+              {memberList.map((data: any) => {
                 return (
-                  <ListItem key={data.userId}>
-                    <CChip icon={icon} label={data.nickname} onDelete={handleDelete(data)} />
-                  </ListItem>
+                  <ListChip key={data.id}>
+                    <CChip
+                      avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
+                      label={data.nickname}
+                      onDelete={handleDelete(data)}
+                    />
+                  </ListChip>
                 );
               })}
             </MemberArray>
@@ -207,7 +267,10 @@ function StudyCreate(props: StudyCreateProps) {
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
           <CBtn content="닫기" onClick={cancleClose}></CBtn>
-          <CBtn content="확인" onClick={handleClose}></CBtn>
+          <CBtn
+            content="확인"
+            onClick={handleClose}
+            disabled={!!nameMessage || !!introMessage}></CBtn>
         </Grid>
       </CustomContent>
     </Dialog>

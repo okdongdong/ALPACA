@@ -15,7 +15,7 @@ public class RandomCodeUtil {
         SecureRandom sr = new SecureRandom();
         sr.setSeed(new Date().getTime());
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 24; i++) {
             sb.append(charSet[sr.nextInt(setLength)]);
         }
 
