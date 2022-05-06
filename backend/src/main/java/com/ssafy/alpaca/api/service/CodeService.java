@@ -153,6 +153,7 @@ public class CodeService {
                     .nickname(member.getNickname())
                     .profileImg(convertUtil.convertByteArrayToString(member.getProfileImg()))
                     .problemNumber(problemNumber)
+                    .title(problem.getTitle())
                     .level(problem.getLevel())
                     .codeSet(CodeRes.CodeList.of(codes))
                     .build();

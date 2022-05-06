@@ -23,6 +23,8 @@ public class CodeRes {
 
     private Long problemNumber;
 
+    private String title;
+
     private Long level;
 
     private List<CodeList> codeSet;
@@ -30,11 +32,11 @@ public class CodeRes {
     @Builder
     public static class CodeList {
 
-        private String language;
+        public String language;
 
-        private LocalDateTime submittedAt;
+        public LocalDateTime submittedAt;
 
-        private String submittedCode;
+        public String submittedCode;
 
         public static List<CodeList> of (List<Code> list) {
             return list.stream().map(
