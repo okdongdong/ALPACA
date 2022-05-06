@@ -23,7 +23,6 @@ function RoomStudyLiveMain({ mainStreamManager, openYjsDocs, setOpenYjsDocs }: m
   const [width, setWidth] = useState<string>('20vw');
   const handleDrag = (e: React.DragEvent) => {
     // 1920 기준 500
-    console.log(e.currentTarget?.parentElement?.getBoundingClientRect());
     const innerWidth = e.currentTarget.parentElement?.getBoundingClientRect().right;
     if (innerWidth && window.innerWidth * 0.95 > e.clientX && e.clientX > 500) {
       setWidth(`${innerWidth - e.clientX}px`);

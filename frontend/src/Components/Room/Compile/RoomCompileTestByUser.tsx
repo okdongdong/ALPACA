@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { InputBase, FormControl, InputLabel } from '@mui/material';
 const CustomInput = styled(InputBase)(({ theme }) => ({
+  color: theme.palette.txt,
   'label + &': {
     marginTop: theme.spacing(3),
   },
@@ -15,16 +16,18 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const CustomLabel = styled(InputLabel)({
+const CustomLabel = styled(InputLabel)(({ theme }) => ({
+  color: theme.palette.txt,
   '&.Mui-focused': {
-    color: '#3C5FAE',
+    color: theme.palette.component_accent,
   },
-});
+}));
 
 type CompileTestByUserType = {
   setUserInput: Function;
+  output: string;
 };
-function RoomCompileTestByUser({ setUserInput }: CompileTestByUserType) {
+function RoomCompileTestByUser({ setUserInput, output }: CompileTestByUserType) {
   const [input, setInput] = useState<string>('');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
@@ -46,6 +49,7 @@ function RoomCompileTestByUser({ setUserInput }: CompileTestByUserType) {
           inputProps={{
             readOnly: true,
           }}
+          value={output}
           rows={7}
           multiline
           id="compile-output"

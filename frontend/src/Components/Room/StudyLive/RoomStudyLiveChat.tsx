@@ -89,7 +89,6 @@ function RoomStudyLiveChat() {
   }, []);
 
   useEffect(() => {
-    console.log(isBottom);
     if (isBottom) {
       setIsNewMessage(false);
       goToBottom();
@@ -100,9 +99,6 @@ function RoomStudyLiveChat() {
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
-    console.log('scrollHeight', scrollHeight);
-    console.log('scrollTop', scrollTop);
-    console.log('clientHeight', clientHeight);
     if (scrollHeight - (scrollTop + clientHeight) < 10) {
       setIsNewMessage(false);
       setIsBottom(true);
@@ -144,10 +140,18 @@ function RoomStudyLiveChat() {
         <ChatPaper>
           <ChatContentPaper onScroll={handleScroll} ref={chatDivRef}>
             {chatList.map((chat, index) => {
-              return chat.nickname === nickname ? (
+              return chat.nickname !== nickname ? (
                 <RoomStudyLiveChatSend key={`${chat.nickname}-${index}`} chat={chat} />
               ) : (
-                <RoomStudyLiveChatReception key={`${chat.nickname}-${index}`} chat={chat} />
+                <RoomStudyLiveChatReception
+                  key={`${chat.nickname}-${index}`}
+                  chat={chat}
+                  avatar={
+                    chatList.length > 1 && chatList[index - 1]?.nickname === chat.nickname
+                      ? false
+                      : true
+                  }
+                />
               );
             })}
           </ChatContentPaper>

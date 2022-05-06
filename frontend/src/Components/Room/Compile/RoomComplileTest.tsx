@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { styled } from '@mui/material/styles';
-import { Tabs, Tab, Button } from '@mui/material';
+import { Tabs, Tab, Button, useTheme, Tooltip } from '@mui/material';
 
 import RoomCompileTestByValue from './RoomCompileTestByValue';
 import RoomCompileTestByUser from './RoomCompileTestByUser';
-
-const samples = [
-  { inputValue: '[1, 2, 3, 10]', outputValue: '6', result: '통과하였습니다' },
-  { inputValue: '[1, 2, 3, 10]', outputValue: '6', result: '통과하였습니다' },
-  { inputValue: '[1, 2, 3, 10]', outputValue: '6', result: '통과하였습니다' },
-];
+import { customAxios } from '../../../Lib/customAxios';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type CustomTabsProps = {
   children?: React.ReactNode;
@@ -58,15 +55,73 @@ const CustomButton = styled(Button)(({ theme }) => ({
 
 type CompileTestType = {
   submitCode: Function;
+  saveCode: Function;
+  inputs: string[];
+  outputs: string[];
 };
 
-function RoomComplileTest({ submitCode }: CompileTestType) {
+type ResultType = {
+  answer: string;
+  isCorrect: Boolean;
+  output: string;
+};
+
+function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTestType) {
+  const theme = useTheme();
+  const userId = useSelector((state: any) => state.account.userId);
+  const navigate = useNavigate();
+  const { problemId } = useParams();
   const [tab, setTab] = useState<number>(0);
   const [userInput, setUserInput] = useState<string>('');
+  const [userOutput, setUserOutput] = useState<string>('');
+  const [userResult, setUserResult] = useState<ResultType[]>();
+  const [isMyCode, setIsMyCode] = useState<Boolean>(false);
+
+  useEffect(() => {}, []);
+  useEffect(() => {
+    getCodeInfo();
+    setUserOutput('');
+  }, [tab]);
+
+  const getCodeInfo = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/code/${userId}`,
+        params: {
+          problemNumber: problemId,
+        },
+      });
+      setIsMyCode(true);
+    } catch (e) {
+      setIsMyCode(false);
+    }
+  };
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
 
+  const handleSubmitCode = async () => {
+    const res = await submitCode(tab, tab === 1 && userInput);
+    if (!res) return;
+    if (tab === 0) {
+      setUserResult(
+        res.map((result: any) => {
+          return {
+            answer: result.answer,
+            isCorrect: result.isCorrect,
+            output: result.output,
+          };
+        }),
+      );
+    } else {
+      setUserOutput(res.output);
+    }
+  };
+
+  const handleSaveCode = () => {
+    saveCode();
+  };
   return (
     <>
       <div style={{ width: '100%', height: '100%' }}>
@@ -81,23 +136,39 @@ function RoomComplileTest({ submitCode }: CompileTestType) {
         <div
           style={{
             height: 'calc(100% - 67px)',
-            background: '#F2F2F2',
+            background: theme.palette.component,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}>
-          <div style={{ width: '100%' }}>
+          <div style={{ width: '100%', maxHeight: '72vh', overflow: 'auto' }}>
             {tab === 0 ? (
-              <RoomCompileTestByValue samples={samples} />
+              <RoomCompileTestByValue
+                samples={inputs.map((input, idx) => {
+                  return {
+                    inputValue: input,
+                    outputValue: outputs[idx],
+                    result: userResult && userResult[idx],
+                  };
+                })}
+              />
             ) : (
-              <RoomCompileTestByUser setUserInput={setUserInput} />
+              <RoomCompileTestByUser setUserInput={setUserInput} output={userOutput} />
             )}
           </div>
           <div style={{ marginLeft: 'auto' }}>
-            <CustomButton>코드저장</CustomButton>
-            <CustomButton onClick={() => submitCode(tab, tab === 1 && userInput)}>
-              코드실행
-            </CustomButton>
+            {isMyCode && (
+              <CustomButton
+                onClick={() => {
+                  navigate(`/codes/${problemId}/${userId}`);
+                }}>
+                코드보기
+              </CustomButton>
+            )}
+            <Tooltip title="제출 최신순 10개까지 저장할 수 있습니다.">
+              <CustomButton onClick={handleSaveCode}>코드저장</CustomButton>
+            </Tooltip>
+            <CustomButton onClick={handleSubmitCode}>코드실행</CustomButton>
           </div>
         </div>
       </div>

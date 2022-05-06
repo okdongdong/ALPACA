@@ -39,7 +39,7 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
     <>
       <div className="align_column_center">
         <VideoButton
-          sx={{ position: 'relative' }}
+          sx={{ position: 'relative', width: '100%', height: '95%', gridAutoFlow: 'dense' }}
           onClick={() => {
             dispatch(setMainUser(user));
           }}>
@@ -47,6 +47,7 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
             style={{
               borderRadius: '20px',
               width: '100%',
+              height: '100%',
               maxHeight: '80vh',
               border: mainUser === user ? `3px solid ${theme.palette.component_accent}` : '',
             }}

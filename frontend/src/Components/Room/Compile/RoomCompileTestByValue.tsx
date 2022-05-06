@@ -6,8 +6,14 @@ type sampleType = {
   samples: {
     inputValue: string;
     outputValue: string;
-    result?: string;
+    result?: ResultType;
   }[];
+};
+
+type ResultType = {
+  answer: string;
+  isCorrect: Boolean;
+  output: string;
 };
 
 function RoomCompileTestByValue({ samples }: sampleType) {
@@ -20,7 +26,7 @@ function RoomCompileTestByValue({ samples }: sampleType) {
             idx={idx + 1}
             inputValue={sample.inputValue}
             outputValue={sample.outputValue}
-            result={sample.result || ''}
+            result={sample.result}
           />
         );
       })}

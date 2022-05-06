@@ -193,7 +193,7 @@ function RoomMain() {
                 width="100%"
                 height="100%"
                 onClick={() => {
-                  navigate(`/room/${roomId}/live`);
+                  navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
                 }}>
                 스터디 라이브 입장
               </CBtn>

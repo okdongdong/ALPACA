@@ -2,14 +2,18 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import { OpenVidu, Session } from 'openvidu-browser';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getToken } from '../../Lib/openvidu';
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 import UserModel from '../../Components/Room/StudyLive/user-model';
 import RoomStudyLiveCamMatrix from '../../Components/Room/StudyLive/RoomStudyLiveCamMatrix';
 import RoomStudyLiveCamList from '../../Components/Room/StudyLive/RoomStudyLiveCamList';
 import RoomStudyLiveNavbar from '../../Components/Room/StudyLive/RoomStudyLiveNavbar';
 import RoomStudyLiveAppbar from '../../Components/Room/StudyLive/RoomStudyLiveAppbar';
+import RoomStudyLiveMain from '../../Components/Room/StudyLive/RoomStudyLiveMain';
+import RoomStudyLiveChat from '../../Components/Room/StudyLive/RoomStudyLiveChat';
+import RoomStudyLiveTimer from '../../Components/Room/StudyLive/RoomStudyLiveTimer';
 import {
   setOVForCamera,
   setOVForScreen,
@@ -17,8 +21,6 @@ import {
   setSessionForScreen,
   setMainUser,
 } from '../../Redux/openviduReducer';
-import RoomStudyLiveMain from '../../Components/Room/StudyLive/RoomStudyLiveMain';
-import RoomStudyLiveChat from '../../Components/Room/StudyLive/RoomStudyLiveChat';
 
 function StudyLive() {
   const theme = useTheme();
@@ -51,12 +53,26 @@ function StudyLive() {
 
   // let OV: OpenVidu | undefined = undefined;
   const { roomId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [publisher, setPublisher] = useState<UserModel | undefined>(undefined);
   const [subscribers, setSubscribers] = useState<UserModel[]>([]);
 
   const [openYjsDocs, setOpenYjsDocs] = useState<Boolean>(false);
 
   useEffect(() => {
+    if (!location.state) {
+      Swal.fire({
+        title: '잘못된 접근입니다.',
+        icon: 'warning',
+        background: theme.palette.bg,
+        confirmButtonColor: theme.palette.main,
+        confirmButtonText: '확인',
+      }).then(() => {
+        navigate(-1);
+      });
+      return;
+    }
     joinSession();
     return () => {
       leaveSession();
@@ -107,7 +123,27 @@ function StudyLive() {
     setPublisher(undefined);
     setSubscribers([]);
   };
-
+  const exitStudyLive = () => {
+    Swal.fire({
+      title: '정말 나가시겠습니까?',
+      icon: 'warning',
+      color: theme.palette.txt,
+      background: theme.palette.bg,
+      showCancelButton: true,
+      cancelButtonColor: theme.palette.main,
+      cancelButtonText: '취소',
+      confirmButtonColor: theme.palette.warn,
+      confirmButtonText: '확인',
+      heightAuto: false,
+      backdrop: `
+        z-index: 2000`,
+    }).then((res) => {
+      if (res.isConfirmed) {
+        leaveSession();
+        navigate(`/room/${roomId}`);
+      }
+    });
+  };
   const subscribeToStreamCreated = () => {
     if (!sessionForCamera || !sessionForScreen) return;
     sessionForCamera.on('streamCreated', (event: any) => {
@@ -211,11 +247,9 @@ function StudyLive() {
 
   const connectToSession = () => {
     getToken(roomId || '0').then((token) => {
-      console.log(token);
       connectSessionToCamera(String(token));
     });
     getToken(roomId || '0').then((token) => {
-      console.log(token);
       connectSessionToScreen(String(token));
     });
   };
@@ -300,7 +334,6 @@ function StudyLive() {
   const stopScreenShare = () => {
     if (!sessionForScreen) return;
     if (!publisher) return;
-    console.log(publisher);
     sessionForScreen.unpublish(publisher.getScreenStreamManager());
 
     setPublisher((localPublisher: UserModel | undefined) => {
@@ -340,7 +373,6 @@ function StudyLive() {
         return remoteUsers.map((user: UserModel) => {
           if (user.getConnectionId() === event.from.connectionId) {
             const data = JSON.parse(event.data);
-            console.log('EVENTO REMOTE: ', event.data);
             if (data.isAudioActive !== undefined) {
               user.setAudioActive(data.isAudioActive);
             }
@@ -363,7 +395,6 @@ function StudyLive() {
         return remoteUsers.map((user: UserModel) => {
           if (user.getConnectionId() === event.from.connectionId) {
             const data = JSON.parse(event.data);
-            console.log('EVENTO REMOTE: ', event.data);
             if (data.isAudioActive !== undefined) {
               user.setAudioActive(data.isAudioActive);
             }
@@ -444,7 +475,10 @@ function StudyLive() {
               <RoomStudyLiveChat />
             </div>
             <div style={{ position: 'absolute', top: '1vh', right: '2vw' }}>
-              <RoomStudyLiveAppbar />
+              <RoomStudyLiveAppbar exitStudyLive={exitStudyLive} />
+            </div>
+            <div style={{ position: 'absolute', top: '1vh', left: '2vw' }}>
+              <RoomStudyLiveTimer />
             </div>
           </>
         )}
