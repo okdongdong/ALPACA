@@ -71,7 +71,7 @@ public class ScheduleController {
     @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}/monthly")
     public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(
-            @PathVariable Long id, @RequestParam Integer year, @RequestParam Month month) throws IllegalAccessException {
+            @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(scheduleService.getScheduleMonthList(username, id, year, month));
     }
