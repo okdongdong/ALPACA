@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.common.jwt;
 
 import com.ssafy.alpaca.api.service.CustomUserDetailService;
+import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void validateAccessToken(String accessToken) {
         if (Boolean.FALSE.equals(jwtTokenUtil.validateToken(accessToken))) {
-            throw new IllegalArgumentException("ExceptionUtil.INVALID_AUTH_TOKEN");
+            throw new IllegalArgumentException(ExceptionUtil.INVALID_AUTH_TOKEN);
         }
     }
 

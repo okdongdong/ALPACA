@@ -113,7 +113,7 @@ public class UserService {
                         .id(myStudy.getStudy().getId())
                         .title(myStudy.getStudy().getTitle())
                         .pinnedTime(myStudy.getPinnedTime())
-                        .profileImgList(myStudyRepository.findAllByStudy(myStudy.getStudy()).stream().map(
+                        .profileImgList(myStudyRepository.findTop4ByStudy(myStudy.getStudy()).stream().map(
                                 anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
                                 .collect(Collectors.toList()))
                         .build()).collect(Collectors.toList());
