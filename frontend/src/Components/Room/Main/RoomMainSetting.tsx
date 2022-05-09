@@ -1,6 +1,6 @@
-import { Stack, styled, Switch, useTheme } from '@mui/material';
+import { Collapse, Stack, styled, Switch, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { customAxios } from '../../../Lib/customAxios';
@@ -17,6 +17,7 @@ function RoomMainSetting() {
   const { roomId } = useParams();
   const theme = useTheme();
   const dispatch = useDispatch();
+  const isSetting = useSelector((state: any) => state.room.isSetting);
 
   const [alarmOn, setAlarmOn] = useState<boolean>(true);
 
@@ -97,33 +98,37 @@ function RoomMainSetting() {
   };
 
   return (
-    <RoomMainComponentContainer>
-      <CustomBox spacing={2}>
-        <div>
-          <CBtn
-            onClick={() => {
-              setAlarmOn((prev) => !prev);
-            }}>
-            알림설정
-          </CBtn>
-          <Switch checked={alarmOn} onChange={onAlarmClickHandler} />
-        </div>
-        <CBtn
-          backgroundColor={theme.palette.warn}
-          onClick={() => {
-            deleteHandler();
-          }}>
-          스터디 삭제
-        </CBtn>
-        <CBtn
-          backgroundColor={theme.palette.warn}
-          onClick={() => {
-            leaveHandler();
-          }}>
-          스터디 탈퇴
-        </CBtn>
-      </CustomBox>
-    </RoomMainComponentContainer>
+    <Collapse in={isSetting} sx={{ position: 'fixed', left: 150, bottom: 50 }}>
+      <div style={{ width: 200, height: 200 }}>
+        <RoomMainComponentContainer>
+          <CustomBox spacing={2} sx={{ padding: 1 }}>
+            <div>
+              <CBtn
+                onClick={() => {
+                  setAlarmOn((prev) => !prev);
+                }}>
+                알림설정
+              </CBtn>
+              <Switch checked={alarmOn} onChange={onAlarmClickHandler} />
+            </div>
+            <CBtn
+              backgroundColor={theme.palette.warn}
+              onClick={() => {
+                deleteHandler();
+              }}>
+              스터디 삭제
+            </CBtn>
+            <CBtn
+              backgroundColor={theme.palette.warn}
+              onClick={() => {
+                leaveHandler();
+              }}>
+              스터디 탈퇴
+            </CBtn>
+          </CustomBox>
+        </RoomMainComponentContainer>
+      </div>
+    </Collapse>
   );
 }
 

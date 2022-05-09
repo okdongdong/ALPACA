@@ -104,6 +104,7 @@ function RoomMainChat() {
   const getPrevChat = async () => {
     if (isFinished) return;
     if (isLoading) return;
+    if (!offsetId) return;
     setIsLoading(true);
     try {
       const prevScrollHeight = scrollRef.current?.scrollHeight;
@@ -145,7 +146,7 @@ function RoomMainChat() {
   };
 
   const infiniteHandler = async (entries: any) => {
-    if (isLoading || isFinished) return;
+    if (isLoading || isFinished || !offsetId) return;
     const target = entries[0];
     if (target.isIntersecting) {
       console.log('is InterSecting');
@@ -155,7 +156,7 @@ function RoomMainChat() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(infiniteHandler, options);
-    if (infiniteRef.current !== null) {
+    if (infiniteRef.current !== null && !offsetId) {
       observer.observe(infiniteRef.current);
     }
     return () => observer.disconnect();
@@ -174,7 +175,6 @@ function RoomMainChat() {
   }, []);
   return (
     <RoomMainComponentContainer>
-      <button onClick={() => getPrevChat()}>버튼</button>
       <Stack
         spacing={1}
         className="scroll-box"

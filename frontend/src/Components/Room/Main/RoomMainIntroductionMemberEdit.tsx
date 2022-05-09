@@ -96,8 +96,12 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
       if (res) {
         setIsEdit(false);
         Swal.fire('양도 성공!', '방장 권한을 양도했습니다.', 'success');
-      } else if (errorMessage) Swal.fire('양도 실패!', errorMessage, 'error');
-    } else Swal.fire('양도 실패!', '잠시 후 다시 시도해주세요.', 'error');
+      } else if (!!errorMessage)
+        Swal.fire('양도 실패!', errorMessage, 'error').then(() => {
+          setErrorMessage('');
+        });
+      else Swal.fire('양도 실패!', '잠시 후 다시 시도해주세요.', 'error');
+    }
   };
 
   const onDeleteHandler = async (memberId: number) => {
@@ -119,7 +123,10 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
     if (result.isConfirmed) {
       const res = await expulsionMember(memberId);
       if (res) Swal.fire('강퇴 성공!', '멤버를 강퇴했습니다.', 'success');
-      else if (errorMessage) Swal.fire('양도 실패!', errorMessage, 'error');
+      else if (!!errorMessage)
+        Swal.fire('양도 실패!', errorMessage, 'error').then(() => {
+          setErrorMessage('');
+        });
       else Swal.fire('강퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };

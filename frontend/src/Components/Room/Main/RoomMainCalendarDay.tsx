@@ -48,8 +48,9 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, setNowDay }: RoomMainCalen
         }}
         onClick={onClickHandler}>
         <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
-          <div>{dailySchedule.day.getDate()}</div>
-          <Divider variant="middle" sx={{ margin: 0 }} />
+          <div style={{ color: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+            {dailySchedule.day.getDate()}
+          </div>
           <div
             style={{
               flexGrow: 1,
@@ -60,8 +61,8 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, setNowDay }: RoomMainCalen
             }}>
             {!!dailySchedule.schedule && (
               <div>
-                <span>{dateToStringTimeSimple(dailySchedule.schedule.startedAt)}</span>
-                <span>~ {dateToStringTimeSimple(dailySchedule.schedule.finishedAt)}</span>
+                <span>{dateToStringTimeSimple(new Date(dailySchedule.schedule.startedAt))}</span>
+                <span>~ {dateToStringTimeSimple(new Date(dailySchedule.schedule.finishedAt))}</span>
               </div>
             )}
           </div>

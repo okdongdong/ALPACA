@@ -13,20 +13,17 @@ import RoomMainStudyDetail from '../../Components/Room/Main/RoomMainStudyDetail'
 import { customAxios } from '../../Lib/customAxios';
 import {
   setRoomInfo,
-  setMembers,
   setMemberDict,
   setSchedules,
-  setSelectedDay,
   setSelectedDayIdx,
   setIsStudyExist,
-  setDateRange,
   setIsEdit,
-  setStartedAt,
-  setFinishedAt,
   setProblemListRes,
   Schedule,
   Member,
   MemberDict,
+  resetRoomInfo,
+  setScheduleId,
 } from '../../Redux/roomReducer';
 
 const RoomTitle = styled('h1')(({ theme }) => ({
@@ -43,6 +40,7 @@ function RoomMain() {
   const title = useSelector((state: any) => state.room.title);
   const dateRange = useSelector((state: any) => state.room.dateRange);
   const selectedDay = useSelector((state: any) => state.room.selectedDay);
+  const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const isStudyExist = useSelector((state: any) => state.room.isStudyExist);
   const isEdit = useSelector((state: any) => state.room.isEdit);
 
@@ -67,14 +65,14 @@ function RoomMain() {
         const finishedAt = new Date(schedule.finishedAt);
         tempSchedules.push({ id: schedule.id, startedAt, finishedAt });
       });
-      setSchedules(tempSchedules);
+      dispatch(setSchedules(tempSchedules));
 
       // 유저정보 dict형태{id:info}로 저장
       const tempDict: MemberDict = {};
       res.data.members.forEach((member: Member) => {
         tempDict[member.userId] = { nickname: member.nickname, profileImg: member.profileImg };
       });
-      setMemberDict(tempDict);
+      dispatch(setMemberDict(tempDict));
       console.log('userDict:', tempDict);
     } catch (e) {}
   };
@@ -98,9 +96,12 @@ function RoomMain() {
     dispatch(setProblemListRes([]));
   }, [selectedDay]);
 
+  useEffect(() => {
+    dispatch(setScheduleId(dateRange[selectedDayIdx]?.schedule?.id));
+  }, [selectedDayIdx]);
+
   return (
     <Box sx={{ height: '100%', width: '100%' }}>
-      <RoomMainSetting />
       <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
       <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
         <Grid item xs={2}>
@@ -143,6 +144,7 @@ function RoomMain() {
           </div>
         </Grid>
       </Grid>
+      <RoomMainSetting />
     </Box>
   );
 }

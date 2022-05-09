@@ -18,14 +18,17 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 
 function RoomMainIntroductionMemberList({ setIsEdit }: RoomMainIntroductionMemberListProps) {
   const members = useSelector((state: any) => state.room.members);
+  const userId = useSelector((state: any) => state.account.userId);
 
   return (
     <RoomMainComponentContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h4>스터디원</h4>
-        <CustomIconButton size="small" onClick={() => setIsEdit(true)}>
-          <Settings />
-        </CustomIconButton>
+        {members.some((member: Member) => member.userId === userId && member.isRoomMaker) && (
+          <CustomIconButton size="small" onClick={() => setIsEdit(true)}>
+            <Settings />
+          </CustomIconButton>
+        )}
       </div>
       <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
       <Stack spacing={1}>

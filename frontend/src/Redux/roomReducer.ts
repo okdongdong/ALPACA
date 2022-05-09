@@ -5,6 +5,7 @@ export interface Member {
   isRoomMaker: boolean;
   nickname: string;
   profileImg: string;
+  isQuery?: boolean; // 문제검색시 사용
 }
 
 export interface MemberDict {
@@ -66,6 +67,9 @@ export interface RoomInfo {
 
   // 선택된 스케줄 아이디
   scheduleId: number;
+
+  // 세팅창 오픈
+  isSetting: boolean;
 }
 
 const initialState: RoomInfo = {
@@ -84,13 +88,19 @@ const initialState: RoomInfo = {
   problemListRes: [],
   offsetId: '',
   scheduleId: 0,
+  isSetting: false,
 };
 
 const roomSlice = createSlice({
   name: 'room',
   initialState,
   reducers: {
-    setRoomInfo: (state, action) => ({ ...state, ...action.payload }),
+    setRoomInfo: (state, action) => ({
+      ...state,
+      ...action.payload,
+      schedules: action.payload.scheduleListRes,
+    }),
+    resetRoomInfo: (state) => ({ ...initialState }),
     setTitle: (state, action) => {
       state.title = action.payload;
     },
@@ -136,11 +146,21 @@ const roomSlice = createSlice({
     setScheduleId: (state, action) => {
       state.scheduleId = action.payload;
     },
+    addSchedule: (state, action) => {
+      state.dateRange[action.payload.idx].schedule = action.payload.schedule;
+    },
+    settingOn: (state) => {
+      state.isSetting = !state.isSetting;
+    },
+    memberQueryCheck: (state, action) => {
+      state.members[action.payload.idx].isQuery = action.payload.isChecked;
+    },
   },
 });
 
 export const {
   setRoomInfo,
+  resetRoomInfo,
   setTitle,
   setInfo,
   setMembers,
@@ -156,6 +176,9 @@ export const {
   setProblemListRes,
   setOffsetId,
   setScheduleId,
+  addSchedule,
+  settingOn,
+  memberQueryCheck,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

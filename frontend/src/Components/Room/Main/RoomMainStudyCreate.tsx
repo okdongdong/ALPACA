@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
-import { setDateRange, setIsStudyExist } from '../../../Redux/roomReducer';
+import { addSchedule, setIsStudyExist } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
-import { DailySchedule } from './RoomMainCalendar';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyCreateAddList from './RoomMainStudyCreateAddList';
 import RoomMainStudyCreateSearch from './RoomMainStudyCreateSearch';
@@ -32,7 +31,6 @@ function RoomMainStudyCreate() {
   const finishedAt = useSelector((state: any) => state.room.finishedAt);
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
-  const dateRange = useSelector((state: any) => state.room.dateRange);
 
   const [searchProblemList, setSearchProblemList] = useState<ProblemRes[]>([]);
 
@@ -48,25 +46,30 @@ function RoomMainStudyCreate() {
         studyId: roomId || '',
         toSolveProblems: [],
       };
+      console.log(1111);
 
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
+      console.log(2222);
 
       const res = await customAxios({
         method: 'post',
         url: '/schedule',
         data: data,
       });
+      console.log(3333);
+      console.log('added:', res);
 
-      const tempDateRange = [...dateRange];
-      tempDateRange[selectedDayIdx].schedule = {
+      const idx = selectedDayIdx;
+      const schedule = {
         id: res.data.message,
         startedAt: data.startedAt,
         finishedAt: data.finishedAt,
       };
 
-      dispatch(setDateRange(tempDateRange));
+      console.log(44444);
+      dispatch(addSchedule({ idx, schedule }));
       dispatch(setIsStudyExist(true));
     } catch (e: any) {
       console.log(e.response);
@@ -81,7 +84,6 @@ function RoomMainStudyCreate() {
         studyId: roomId || '',
         toSolveProblems: [],
       };
-
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });

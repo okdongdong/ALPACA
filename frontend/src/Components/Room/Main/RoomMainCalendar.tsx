@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
+import { setLoading } from '../../../Redux/commonReducer';
 import { Schedule, setDateRange, setSchedules } from '../../../Redux/roomReducer';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
@@ -62,7 +63,7 @@ function RoomMainCalendar() {
       };
 
       if (scheduleIdx < schedules.length) {
-        let scheduleDay = schedules[scheduleIdx].startedAt;
+        let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
         if (
           temp.day.getFullYear() === scheduleDay.getFullYear() &&
           temp.day.getMonth() === scheduleDay.getMonth() &&
@@ -79,11 +80,13 @@ function RoomMainCalendar() {
 
   // 달이 변할때 스케줄을 가져오는 함수
   const getMonthlySchedule = async () => {
+    getStartDate();
+    dispatch(setLoading(true));
     try {
       const res = await customAxios({
         method: 'get',
         url: `/schedule/${roomId}/monthly`,
-        params: { month: 'APRIL', year: nowDay.getFullYear() },
+        params: { month: nowDay.getMonth() + 1, year: nowDay.getFullYear() },
       });
       console.log('change month: ', res);
       const tempSchedules: Schedule[] = [];
@@ -95,10 +98,10 @@ function RoomMainCalendar() {
       });
 
       dispatch(setSchedules([...tempSchedules]));
-      getStartDate();
     } catch (e: any) {
       console.log(e.response);
     }
+    dispatch(setLoading(false));
   };
 
   useEffect(() => {

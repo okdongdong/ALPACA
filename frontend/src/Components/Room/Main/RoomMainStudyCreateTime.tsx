@@ -50,7 +50,7 @@ function RoomMainStudyCreateTime() {
           <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
           <TimePicker
             value={startedAt}
-            onChange={setStartedAt}
+            onChange={(e) => dispatch(setStartedAt(e))}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -62,7 +62,7 @@ function RoomMainStudyCreateTime() {
           ~
           <TimePicker
             value={finishedAt}
-            onChange={setFinishedAt}
+            onChange={(e) => dispatch(setFinishedAt(e))}
             renderInput={(params) => (
               <TextField
                 {...params}

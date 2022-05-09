@@ -6,6 +6,7 @@ import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { logout } from '../../Redux/accountReducer';
+import { settingOn } from '../../Redux/roomReducer';
 import styles from './SideBar.module.css';
 
 import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
@@ -150,7 +151,8 @@ function SideBar() {
                 minWidth: 0,
                 justifyContent: 'center',
                 color: theme.palette.icon,
-              }}>
+              }}
+              onClick={() => dispatch(settingOn())}>
               <Settings />
             </ListItemIcon>
           </ListItemButton>
