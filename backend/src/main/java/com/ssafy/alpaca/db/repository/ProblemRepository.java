@@ -16,4 +16,6 @@ public interface ProblemRepository extends MongoRepository<Problem,String> {
 
     Boolean existsByProblemNumber(Long problemNumber);
 
+    List<Problem> findAllByClassLevel(Long classLevel);
+
 }

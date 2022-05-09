@@ -32,7 +32,7 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
 
-    private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException{
+    private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException {
         httpURLConnection.setRequestMethod("GET");
         httpURLConnection.setDoOutput(true);
         BufferedReader bufferedReader = new BufferedReader(
@@ -104,7 +104,7 @@ public class ProblemService {
                     httpURLConnection.disconnect();
                     break;
                 }
-                page ++;
+                page++;
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -131,4 +131,46 @@ public class ProblemService {
         solvedProblemRepository.saveAll(newSolvedProblem);
     }
 
+    public List<Problem> recommendProblem(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+        Long classLevel = user.getClassLevel();
+        List<Problem> recommendList = new ArrayList<>();
+        if (classLevel < 10) {
+            return comparedProblem(classLevel+1,user,recommendList);
+        } else {
+            return comparedProblem(classLevel,user,recommendList);
+        }
+    }
+
+    private List<Problem> comparedProblem(Long classLevel,User user,List<Problem> recommendList){
+        List<Long> solvedProblemNumberList = solvedProblemRepository.findProblemNumbersByUser(user.getId());
+        List<Problem> problemList = problemRepository.findAllByClassLevel(classLevel);
+        Collections.shuffle(problemList);
+        for (Problem problem : problemList) {
+            if (!solvedProblemNumberList.contains(problem.getProblemNumber())) {
+                recommendList.add(problem);
+                if (recommendList.size() == 3) {
+                    break;
+                }
+            }
+        }
+        if (recommendList.size() < 3) {
+            classLevel -=1;
+            if (classLevel==0){
+                List<Problem> unclassList =problemRepository.findAllByClassLevel(null);
+                Collections.shuffle(unclassList);
+                for (Problem problem : unclassList) {
+                    if (!solvedProblemNumberList.contains(problem.getProblemNumber())) {
+                        recommendList.add(problem);
+                        if (recommendList.size() == 3) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return comparedProblem(classLevel,user,recommendList);
+        }
+        return recommendList;
+    }
 }
