@@ -1,21 +1,19 @@
 import { Remove } from '@mui/icons-material';
-import { Divider, IconButton, Stack, styled, Theme, useTheme } from '@mui/material';
+import { Divider, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { customAxios } from '../../../Lib/customAxios';
-import { Member } from '../../../Pages/Room/RoomMain';
 import { setLoading } from '../../../Redux/commonReducer';
+import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 
 interface RoomMainIntroductionMemberEditProps {
-  members: Member[];
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  setMembers: React.Dispatch<React.SetStateAction<Member[]>>;
 }
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
@@ -25,16 +23,13 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
   height: 25,
 }));
 
-function RoomMainIntroductionMemberEdit({
-  members,
-  setIsEdit,
-  setMembers,
-}: RoomMainIntroductionMemberEditProps) {
+function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMemberEditProps) {
   const { roomId } = useParams();
   const theme = useTheme();
   const dispatch = useDispatch();
 
   const userId = useSelector((state: any) => state.account.userId);
+  const members = useSelector((state: any) => state.room.members);
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -139,7 +134,7 @@ function RoomMainIntroductionMemberEdit({
       </div>
       <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
       <Stack spacing={1}>
-        {members.map((member, idx) => (
+        {members.map((member: Member, idx: number) => (
           <div
             key={idx}
             style={{

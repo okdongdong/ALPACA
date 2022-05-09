@@ -1,7 +1,9 @@
 import { Divider, Stack } from '@mui/material';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
+import { setDateRange, setIsStudyExist } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import { DailySchedule } from './RoomMainCalendar';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
@@ -9,22 +11,6 @@ import RoomMainStudyCreateAddList from './RoomMainStudyCreateAddList';
 import RoomMainStudyCreateSearch from './RoomMainStudyCreateSearch';
 import RoomMainStudyCreateTime from './RoomMainStudyCreateTime';
 import { ProblemRes } from './RoomMainStudyDetail';
-
-interface RoomMainStudyCreateProps {
-  selectedDay: Date;
-  isEdit: boolean;
-  scheduleId?: number;
-  startedAt: Date | null;
-  finishedAt: Date | null;
-  problemListRes: ProblemRes[];
-  selectedDayIdx: number;
-  dateRange: DailySchedule[];
-  setStartedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-  setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-  setProblemListRes: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
-  setIsStudyExist: React.Dispatch<React.SetStateAction<boolean>>;
-  setDateRange: React.Dispatch<React.SetStateAction<DailySchedule[]>>;
-}
 
 interface AddStudyData {
   id?: number;
@@ -34,22 +20,19 @@ interface AddStudyData {
   toSolveProblems: number[];
 }
 
-function RoomMainStudyCreate({
-  selectedDay,
-  isEdit,
-  scheduleId = 0,
-  startedAt,
-  finishedAt,
-  problemListRes,
-  selectedDayIdx,
-  dateRange,
-  setStartedAt,
-  setFinishedAt,
-  setProblemListRes,
-  setIsStudyExist,
-  setDateRange,
-}: RoomMainStudyCreateProps) {
+function RoomMainStudyCreate() {
   const { roomId } = useParams();
+
+  const dispatch = useDispatch();
+
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
+  const isEdit = useSelector((state: any) => state.room.isEdit);
+  const scheduleId = useSelector((state: any) => state.room.scheduleId);
+  const startedAt = useSelector((state: any) => state.room.startedAt);
+  const finishedAt = useSelector((state: any) => state.room.finishedAt);
+  const problemListRes = useSelector((state: any) => state.room.problemListRes);
+  const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
+  const dateRange = useSelector((state: any) => state.room.dateRange);
 
   const [searchProblemList, setSearchProblemList] = useState<ProblemRes[]>([]);
 
@@ -66,7 +49,7 @@ function RoomMainStudyCreate({
         toSolveProblems: [],
       };
 
-      problemListRes.forEach((problem) => {
+      problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
 
@@ -83,8 +66,8 @@ function RoomMainStudyCreate({
         finishedAt: data.finishedAt,
       };
 
-      setDateRange(tempDateRange);
-      setIsStudyExist(true);
+      dispatch(setDateRange(tempDateRange));
+      dispatch(setIsStudyExist(true));
     } catch (e: any) {
       console.log(e.response);
     }
@@ -99,7 +82,7 @@ function RoomMainStudyCreate({
         toSolveProblems: [],
       };
 
-      problemListRes.forEach((problem) => {
+      problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
 
@@ -130,26 +113,16 @@ function RoomMainStudyCreate({
       <Stack justifyContent="space-between" sx={{ padding: 2, height: '100%' }} spacing={2}>
         <h2 style={{ textAlign: 'left' }}>{isEdit ? `스터디 일정변경` : `스터디 일정추가`}</h2>
         <Divider variant="middle" />
-        <RoomMainStudyCreateTime
-          selectedDay={selectedDay}
-          startedAt={startedAt}
-          setStartedAt={setStartedAt}
-          finishedAt={finishedAt}
-          setFinishedAt={setFinishedAt}
-        />
+        <RoomMainStudyCreateTime />
         <Divider variant="middle" />
         <RoomMainStudyCreateSearch
           problemList={searchProblemList}
           setProblemList={setSearchProblemList}
-          addedProblemList={problemListRes}
-          setAddedProblemList={setProblemListRes}
         />
         <Divider variant="middle" />
         <RoomMainStudyCreateAddList
           problemList={searchProblemList}
           setProblemList={setSearchProblemList}
-          addedProblemList={problemListRes}
-          setAddedProblemList={setProblemListRes}
         />
         <div style={{ width: '100%', justifyContent: 'end', display: 'flex' }}>
           <CBtn width={130} height="100%" onClick={onClickHandler}>

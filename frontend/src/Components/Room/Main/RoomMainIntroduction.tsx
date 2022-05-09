@@ -1,22 +1,17 @@
-import { Settings } from '@mui/icons-material';
 import { Divider, Stack, styled } from '@mui/material';
 import { useState } from 'react';
-import { Member } from '../../../Pages/Room/RoomMain';
+import { useSelector } from 'react-redux';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainIntroductionMemberEdit from './RoomMainIntroductionMemberEdit';
 import RoomMainIntroductionMemberList from './RoomMainIntroductionMemberList';
-
-interface RoomMainIntroductionProps {
-  info: string;
-  members: Member[];
-  setMembers: React.Dispatch<React.SetStateAction<Member[]>>;
-}
 
 const IntroductionContainer = styled(Stack)(({ theme }) => ({
   width: '100%',
 }));
 
-function RoomMainIntroduction({ info, members, setMembers }: RoomMainIntroductionProps) {
+function RoomMainIntroduction() {
+  const info = useSelector((state: any) => state.room.info);
+
   // 스터디원 관리
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
@@ -29,13 +24,9 @@ function RoomMainIntroduction({ info, members, setMembers }: RoomMainIntroductio
       </RoomMainComponentContainer>
 
       {isEdit ? (
-        <RoomMainIntroductionMemberEdit
-          members={members}
-          setIsEdit={setIsEdit}
-          setMembers={setMembers}
-        />
+        <RoomMainIntroductionMemberEdit setIsEdit={setIsEdit} />
       ) : (
-        <RoomMainIntroductionMemberList members={members} setIsEdit={setIsEdit} />
+        <RoomMainIntroductionMemberList setIsEdit={setIsEdit} />
       )}
     </IntroductionContainer>
   );

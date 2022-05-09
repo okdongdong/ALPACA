@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Member } from '../../../Pages/Room/RoomMain';
+import { Member } from '../../../Redux/roomReducer';
 import CBadge from '../../Commons/CBadge';
 import CProfile from '../../Commons/CProfile';
 

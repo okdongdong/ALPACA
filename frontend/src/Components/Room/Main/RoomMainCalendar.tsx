@@ -2,20 +2,12 @@ import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import { Grid, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
-import { Schedule } from '../../../Pages/Room/RoomMain';
+import { Schedule, setDateRange, setSchedules } from '../../../Redux/roomReducer';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
-
-interface RoomMainCalendarProps {
-  roomId: string | undefined;
-  schedules: Schedule[];
-  selectedDay: Date;
-  dateRange: DailySchedule[];
-  setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
-  setSelectedDay: React.Dispatch<React.SetStateAction<Date>>;
-  setDateRange: React.Dispatch<React.SetStateAction<DailySchedule[]>>;
-}
 
 export interface DailySchedule {
   day: Date;
@@ -38,17 +30,15 @@ const CalendarBox = styled(Grid)(({ theme }) => ({
   borderRadius: '0 0 10px 10px',
 }));
 
-function RoomMainCalendar({
-  roomId,
-  schedules = [],
-  selectedDay,
-  dateRange,
-  setSchedules,
-  setSelectedDay,
-  setDateRange,
-}: RoomMainCalendarProps) {
-  // 현재 보고 있는 달력의 달을 확인하기 위한 변수
+function RoomMainCalendar() {
+  const { roomId } = useParams();
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const dateRange = useSelector((state: any) => state.room.dateRange);
+  const schedules = useSelector((state: any) => state.room.schedules);
+
+  // 현재 보고 있는 달력의 달을 확인하기 위한 변수
   const [nowDay, setNowDay] = useState<Date>(new Date());
 
   // request최적화를 위해 설정
@@ -84,7 +74,7 @@ function RoomMainCalendar({
       tempDateRange.push(temp);
       startDate.setDate(startDate.getDate() + 1);
     }
-    setDateRange(tempDateRange);
+    dispatch(setDateRange(tempDateRange));
   };
 
   // 달이 변할때 스케줄을 가져오는 함수
@@ -104,7 +94,7 @@ function RoomMainCalendar({
         tempSchedules.push({ id: schedule.id, startedAt, finishedAt });
       });
 
-      setSchedules([...tempSchedules]);
+      dispatch(setSchedules([...tempSchedules]));
       getStartDate();
     } catch (e: any) {
       console.log(e.response);
@@ -150,14 +140,12 @@ function RoomMainCalendar({
         columns={7}
         spacing={1}
         sx={{ paddingLeft: 0, paddingTop: theme.spacing(1) }}>
-        {dateRange.map((dailySchedule, idx) => (
+        {dateRange.map((dailySchedule: DailySchedule, idx: number) => (
           <RoomMainCalendarDay
             dailySchedule={dailySchedule}
             key={idx}
             nowDay={nowDay}
             setNowDay={setNowDay}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
           />
         ))}
       </CalendarBox>

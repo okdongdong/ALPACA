@@ -1,7 +1,9 @@
-import { Add, ArrowDropDown } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import { alpha, Collapse, IconButton, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { customAxios, solvedAcAxios } from '../../../Lib/customAxios';
+import { useDispatch, useSelector } from 'react-redux';
+import { solvedAcAxios } from '../../../Lib/customAxios';
+import { setProblemListRes } from '../../../Redux/roomReducer';
 import CProblem from '../../Commons/CProblem';
 import CSearchBar from '../../Commons/CSearchBar';
 import RoomMainStudyCreateSearchFilter from './RoomMainStudyCreateSearchFilter';
@@ -9,9 +11,7 @@ import { ProblemRes } from './RoomMainStudyDetail';
 
 interface RoomMainStudyCreateSearchProps {
   problemList: ProblemRes[];
-  addedProblemList: ProblemRes[];
   setProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
-  setAddedProblemList: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
 }
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
@@ -37,21 +37,22 @@ const ProblemBox = styled('div')(({ theme }) => ({
 
 function RoomMainStudyCreateSearch({
   problemList,
-  addedProblemList,
   setProblemList,
-  setAddedProblemList,
 }: RoomMainStudyCreateSearchProps) {
   const theme = useTheme();
+
+  const dispatch = useDispatch();
+  const problemListRes = useSelector((state: any) => state.room.problemListRes);
   const [query, setQuery] = useState<string>('');
   const [isFilter, setIsFilter] = useState<boolean>(false);
 
   const addProblem = (idx: number) => {
     const tempProblemList = [...problemList];
     const addedProblem = tempProblemList.splice(idx, 1);
-    const newAddedProblemList = [...addedProblemList, ...addedProblem];
+    const newAddedProblemList = [...problemListRes, ...addedProblem];
 
     setProblemList(tempProblemList);
-    setAddedProblemList(newAddedProblemList);
+    dispatch(setProblemListRes(newAddedProblemList));
   };
 
   // solvedAC api를 사용해 문제 검색
@@ -67,7 +68,9 @@ function RoomMainStudyCreateSearch({
 
     res.data.items.forEach((item: any) => {
       // 이미 추가되지 않은 문제만 출력해줌
-      if (!addedProblemList.some((problem) => problem.problemNumber === item.problemNumber)) {
+      if (
+        !problemListRes.some((problem: ProblemRes) => problem.problemNumber === item.problemNumber)
+      ) {
         resProblems.push({
           problemNumber: item.problemId,
           title: item.titleKo,
@@ -98,7 +101,7 @@ function RoomMainStudyCreateSearch({
       </FilterBox>
 
       <ProblemBox className="scroll-box">
-        {problemList.map((problem, idx) => (
+        {problemList.map((problem: ProblemRes, idx: number) => (
           <CProblem
             key={idx}
             number={problem.problemNumber}
