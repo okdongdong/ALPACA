@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,7 @@ public class ProblemService {
 
             user.setClassLevel((Long) userData.get("class"));
             user.setClassDecoration(userData.get("classDecoration").toString());
+            user.setLevel((Long) userData.get("tier"));
             userRepository.save(user);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -115,10 +117,10 @@ public class ProblemService {
 
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
-            Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);
-            if (problem.isEmpty()) {
-                continue;
-            }
+//            Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);
+//            if (problem.isEmpty()) {
+//                continue;
+//            }
             newSolvedProblem.add(
                     SolvedProblem.builder()
                             .problemNumber(solvedProblem)
