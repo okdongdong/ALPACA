@@ -18,10 +18,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
 
-    private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException{
+    private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException {
         httpURLConnection.setRequestMethod("GET");
         httpURLConnection.setDoOutput(true);
         BufferedReader bufferedReader = new BufferedReader(
@@ -79,6 +78,7 @@ public class ProblemService {
 
             user.setClassLevel((Long) userData.get("class"));
             user.setClassDecoration(userData.get("classDecoration").toString());
+            user.setLevel((Long) userData.get("tier"));
             userRepository.save(user);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -104,7 +104,7 @@ public class ProblemService {
                     httpURLConnection.disconnect();
                     break;
                 }
-                page ++;
+                page++;
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -117,10 +117,10 @@ public class ProblemService {
 
         List<SolvedProblem> newSolvedProblem = new ArrayList<>();
         for (Long solvedProblem : solvedProblemList) {
-            Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);
-            if (problem.isEmpty()) {
-                continue;
-            }
+//            Optional<Problem> problem = problemRepository.findByProblemNumber(solvedProblem);
+//            if (problem.isEmpty()) {
+//                continue;
+//            }
             newSolvedProblem.add(
                     SolvedProblem.builder()
                             .problemNumber(solvedProblem)
@@ -131,4 +131,54 @@ public class ProblemService {
         solvedProblemRepository.saveAll(newSolvedProblem);
     }
 
+    public List<Problem> recommendProblem(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
+
+        if (user.getClassDecoration().equals("gold")) {
+            if (user.getClassLevel() < 10) {
+                return getClassProblem(user.getClassLevel()+1, user);
+            } else {
+                return getRandomProblem(user);
+            }
+        } else {
+            return getClassProblem(user.getClassLevel(), user);
+        }
+    }
+
+    private List<Problem> get3FromCandidate(List<Problem> candidateProblems, Long userId) {
+        List<Problem> selectProblems = new ArrayList<>();
+        HashSet<Integer> selectIndex = new HashSet<>();
+        HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(userId);
+        Random random = new Random();
+
+        while (selectProblems.size() < 3) {
+            Integer newCandidate = random.nextInt(candidateProblems.size());
+            if (selectIndex.contains(newCandidate)) {
+                continue;
+            }
+            selectIndex.add(newCandidate);
+            if (solvedProblems.contains((long) newCandidate)) {
+                continue;
+            }
+            selectProblems.add(candidateProblems.get(newCandidate));
+        }
+        return selectProblems;
+    }
+
+    private List<Problem> getClassProblem(Long classLevel, User user) {
+        List<Problem> candidateProblems = problemRepository.findAllByClassLevel(classLevel);
+        return get3FromCandidate(candidateProblems, user.getId());
+    }
+
+    private List<Problem> getRandomProblem(User user) {
+        List<Problem> candidateProblems = problemRepository.findAllByLevelGreaterThanEqual(user.getLevel());
+        if (candidateProblems.size() == 0) {
+            throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
+        } else if (candidateProblems.size() <= 3) {
+            return candidateProblems;
+        } else {
+            return get3FromCandidate(candidateProblems, user.getId());
+        }
+    }
 }

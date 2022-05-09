@@ -50,4 +50,14 @@ public class ProblemController {
         problemService.refreshSolvedAc(username);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
+
+    @ApiOperation(
+            value = "문제 추천",
+            notes = "자신의 class정보에 맞는 문제 3개를 추천받는다."
+    )
+    @GetMapping("/recommend")
+    public ResponseEntity<List<Problem>> recommendProblem(){
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(problemService.recommendProblem(username));
+    }
 }
