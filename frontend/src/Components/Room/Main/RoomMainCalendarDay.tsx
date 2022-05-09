@@ -1,13 +1,13 @@
 import { alpha, Button, Divider, Grid, Stack, styled, useTheme } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
 import { dateToStringTimeSimple } from '../../../Lib/dateToString';
+import { setSelectedDay } from '../../../Redux/roomReducer';
 import { DailySchedule } from './RoomMainCalendar';
 
 interface RoomMainCalendarDayProps {
   dailySchedule: DailySchedule;
   nowDay: Date;
-  selectedDay: Date;
   setNowDay: React.Dispatch<React.SetStateAction<Date>>;
-  setSelectedDay: React.Dispatch<React.SetStateAction<Date>>;
 }
 
 const DayBox = styled(Button)(({ theme }) => ({
@@ -23,18 +23,15 @@ const DayBox = styled(Button)(({ theme }) => ({
   },
 }));
 
-function RoomMainCalendarDay({
-  dailySchedule,
-  nowDay,
-  selectedDay,
-  setNowDay,
-  setSelectedDay,
-}: RoomMainCalendarDayProps) {
+function RoomMainCalendarDay({ dailySchedule, nowDay, setNowDay }: RoomMainCalendarDayProps) {
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
 
   const onClickHandler = () => {
     console.log('dailySchedule: ', dailySchedule.day);
-    setSelectedDay(new Date(dailySchedule.day));
+    dispatch(setSelectedDay(new Date(dailySchedule.day)));
     setNowDay(new Date(dailySchedule.day));
   };
 
@@ -51,8 +48,9 @@ function RoomMainCalendarDay({
         }}
         onClick={onClickHandler}>
         <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
-          <div>{dailySchedule.day.getDate()}</div>
-          <Divider variant="middle" sx={{ margin: 0 }} />
+          <div style={{ color: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+            {dailySchedule.day.getDate()}
+          </div>
           <div
             style={{
               flexGrow: 1,
@@ -63,8 +61,8 @@ function RoomMainCalendarDay({
             }}>
             {!!dailySchedule.schedule && (
               <div>
-                <span>{dateToStringTimeSimple(dailySchedule.schedule.startedAt)}</span>
-                <span>~ {dateToStringTimeSimple(dailySchedule.schedule.finishedAt)}</span>
+                <span>{dateToStringTimeSimple(new Date(dailySchedule.schedule.startedAt))}</span>
+                <span>~ {dateToStringTimeSimple(new Date(dailySchedule.schedule.finishedAt))}</span>
               </div>
             )}
           </div>

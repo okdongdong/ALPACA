@@ -1,20 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
 import { Divider, Stack, styled } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { MemberDict } from '../../../Pages/Room/RoomMain';
+import { useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
 import CProfile from '../../Commons/CProfile';
-
-interface RoomMainChattingProps {
-  roomId: string | undefined;
-  memberDict: MemberDict;
-  offsetId: string;
-}
+import { useParams } from 'react-router-dom';
 
 interface ReceiveMessage {
   userId: number;
@@ -44,12 +38,14 @@ const options = {
   threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
 };
 
-function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
-  const dispatch = useDispatch();
+function RoomMainChat() {
+  const { roomId } = useParams();
+
+  const memberDict = useSelector((state: any) => state.room.memberDict);
+  const offsetId = useSelector((state: any) => state.room.offsetId);
 
   // 채팅 인피니티 스크롤 관련
   const scrollRef = useRef<HTMLDivElement>(null);
-  const topCheckRef = useRef<HTMLDivElement>(null);
   const infiniteRef = useRef<HTMLDivElement>(null);
 
   const userId = useSelector((state: any) => state.account.userId);
@@ -108,6 +104,7 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   const getPrevChat = async () => {
     if (isFinished) return;
     if (isLoading) return;
+    if (!offsetId) return;
     setIsLoading(true);
     try {
       const prevScrollHeight = scrollRef.current?.scrollHeight;
@@ -149,7 +146,7 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   };
 
   const infiniteHandler = async (entries: any) => {
-    if (isLoading || isFinished) return;
+    if (isLoading || isFinished || !offsetId) return;
     const target = entries[0];
     if (target.isIntersecting) {
       console.log('is InterSecting');
@@ -159,7 +156,7 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
 
   useEffect(() => {
     const observer = new IntersectionObserver(infiniteHandler, options);
-    if (infiniteRef.current !== null) {
+    if (infiniteRef.current !== null && !offsetId) {
       observer.observe(infiniteRef.current);
     }
     return () => observer.disconnect();
@@ -178,7 +175,6 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   }, []);
   return (
     <RoomMainComponentContainer>
-      <button onClick={() => getPrevChat()}>버튼</button>
       <Stack
         spacing={1}
         className="scroll-box"
@@ -201,8 +197,8 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
           <MessageBox key={idx}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <CProfile
-                nickname={memberDict[chat.userId].nickname}
-                profileImg={memberDict[chat.userId].profileImg}
+                nickname={memberDict[chat.userId]?.nickname}
+                profileImg={memberDict[chat.userId]?.profileImg}
               />
               :{chat.content}
             </div>

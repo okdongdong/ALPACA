@@ -3,33 +3,36 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Grid,
   Radio,
   RadioGroup,
+  Stack,
   styled,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Member } from '../../../Pages/Room/RoomMain';
+import { useDispatch, useSelector } from 'react-redux';
+import { Member, memberQueryCheck } from '../../../Redux/roomReducer';
 import CBadge from '../../Commons/CBadge';
 import CProfile from '../../Commons/CProfile';
 
 interface RoomMainStudyCreateSearchFilterProps {
-  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  tierValue: number;
+  setTierValue: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const TierBox = styled('div')(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-around',
   width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
 }));
 
-function RoomMainStudyCreateSearchFilter({ setQuery }: RoomMainStudyCreateSearchFilterProps) {
-  const members = useSelector((state: any) => state.room.members);
+function RoomMainStudyCreateSearchFilter({
+  tierValue,
+  setTierValue,
+}: RoomMainStudyCreateSearchFilterProps) {
+  const dispatch = useDispatch();
 
-  const [tierValue, setTierValue] = useState<number>(1);
-  const [memberChecked, setMemberChecked] = useState<boolean[]>(
-    new Array(members.length).fill(false),
-  );
+  const members = useSelector((state: any) => state.room.members);
 
   const onTierChageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTierValue(parseInt(event.target.value));
@@ -39,48 +42,58 @@ function RoomMainStudyCreateSearchFilter({ setQuery }: RoomMainStudyCreateSearch
     event: React.ChangeEvent<HTMLInputElement>,
     idx: number,
   ) => {
-    const tempMemberChecked = [...memberChecked];
-
-    tempMemberChecked[idx] = event.target.checked;
-
-    setMemberChecked(tempMemberChecked);
+    dispatch(memberQueryCheck({ idx, isChecked: event.target.checked }));
   };
-
-  useEffect(() => {
-    setQuery('1');
-  }, [tierValue]);
 
   return (
     <>
-      <FormControl>
+      <FormControl sx={{ width: '100%' }}>
         <FormLabel id="problem-tier">문제 난이도</FormLabel>
-        <RadioGroup row aria-labelledby="problem-tier" onChange={onTierChageHandler}>
-          <TierBox>
-            <FormControlLabel value={1} control={<Radio />} label={<CBadge tier={1} labelOff />} />
-            <FormControlLabel value={6} control={<Radio />} label={<CBadge tier={6} labelOff />} />
-            <FormControlLabel
-              value={11}
-              control={<Radio />}
-              label={<CBadge tier={11} labelOff />}
-            />
-          </TierBox>
-          <TierBox>
-            <FormControlLabel
-              value={16}
-              control={<Radio />}
-              label={<CBadge tier={16} labelOff />}
-            />
-            <FormControlLabel
-              value={21}
-              control={<Radio />}
-              label={<CBadge tier={21} labelOff />}
-            />
-            <FormControlLabel
-              value={26}
-              control={<Radio />}
-              label={<CBadge tier={26} labelOff />}
-            />
-          </TierBox>
+        <RadioGroup
+          row
+          aria-labelledby="problem-tier"
+          onChange={onTierChageHandler}
+          value={tierValue}
+          sx={{ width: '100%' }}>
+          <Stack sx={{ width: '100%' }}>
+            <TierBox>
+              <FormControlLabel value={0} control={<Radio />} label="전체" />
+            </TierBox>
+            <TierBox>
+              <FormControlLabel
+                value={1}
+                control={<Radio />}
+                label={<CBadge tier={1} labelOff />}
+              />
+              <FormControlLabel
+                value={6}
+                control={<Radio />}
+                label={<CBadge tier={6} labelOff />}
+              />
+              <FormControlLabel
+                value={11}
+                control={<Radio />}
+                label={<CBadge tier={11} labelOff />}
+              />
+            </TierBox>
+            <TierBox>
+              <FormControlLabel
+                value={16}
+                control={<Radio />}
+                label={<CBadge tier={16} labelOff />}
+              />
+              <FormControlLabel
+                value={21}
+                control={<Radio />}
+                label={<CBadge tier={21} labelOff />}
+              />
+              <FormControlLabel
+                value={26}
+                control={<Radio />}
+                label={<CBadge tier={26} labelOff />}
+              />
+            </TierBox>
+          </Stack>
         </RadioGroup>
       </FormControl>
       <FormControl>
@@ -98,7 +111,7 @@ function RoomMainStudyCreateSearchFilter({ setQuery }: RoomMainStudyCreateSearch
                 value={1}
                 control={
                   <Checkbox
-                    checked={memberChecked[idx]}
+                    checked={member.isQuery}
                     onChange={(event) => onMemberCheckedChangeHandler(event, idx)}
                     name={member.nickname}
                   />

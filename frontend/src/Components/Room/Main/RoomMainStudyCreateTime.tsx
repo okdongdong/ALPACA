@@ -4,14 +4,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { styled, TextField, useTheme } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { dateToStringDate } from '../../../Lib/dateToString';
-
-interface RoomMainStudyCreateTimeProps {
-  selectedDay: Date;
-  startedAt: Date | null;
-  finishedAt: Date | null;
-  setStartedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-  setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { setFinishedAt, setStartedAt } from '../../../Redux/roomReducer';
 
 const TimeContainer = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -26,26 +20,26 @@ const TimeBox = styled('div')(({ theme }) => ({
   justifyContent: 'end',
 }));
 
-function RoomMainStudyCreateTime({
-  selectedDay,
-  startedAt,
-  finishedAt,
-  setStartedAt,
-  setFinishedAt,
-}: RoomMainStudyCreateTimeProps) {
+function RoomMainStudyCreateTime() {
   const theme = useTheme();
+
+  const dispatch = useDispatch();
+
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
+  const startedAt = useSelector((state: any) => state.room.startedAt);
+  const finishedAt = useSelector((state: any) => state.room.finishedAt);
 
   // 시작시간을 종료시간보다 더 늦게 설정했을 때
   useEffect(() => {
     if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
-      setFinishedAt(new Date(startedAt));
+      dispatch(setFinishedAt(new Date(startedAt)));
     }
   }, [startedAt]);
 
   // 종료시간을 시작시간보다 더 빠르게 설정했을 때
   useEffect(() => {
     if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
-      setStartedAt(new Date(finishedAt));
+      dispatch(setStartedAt(new Date(finishedAt)));
     }
   }, [finishedAt]);
 
@@ -56,7 +50,7 @@ function RoomMainStudyCreateTime({
           <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
           <TimePicker
             value={startedAt}
-            onChange={setStartedAt}
+            onChange={(e) => dispatch(setStartedAt(e))}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -68,7 +62,7 @@ function RoomMainStudyCreateTime({
           ~
           <TimePicker
             value={finishedAt}
-            onChange={setFinishedAt}
+            onChange={(e) => dispatch(setFinishedAt(e))}
             renderInput={(params) => (
               <TextField
                 {...params}
