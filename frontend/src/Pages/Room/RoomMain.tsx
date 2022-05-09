@@ -1,5 +1,6 @@
 import { Box, Grid, Stack, styled } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DUMMY_STUDY_DATA } from '../../Assets/dummyData/dummyData';
 import CBtn from '../../Components/Commons/CBtn';
@@ -7,11 +8,13 @@ import MemberInvite from '../../Components/Dialogs/MemberInvite';
 import RoomMainCalendar, { DailySchedule } from '../../Components/Room/Main/RoomMainCalendar';
 import RoomMainChat from '../../Components/Room/Main/RoomMainChat';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
+import RoomMainSetting from '../../Components/Room/Main/RoomMainSetting';
 import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
 import RoomMainStudyDetail, { ProblemRes } from '../../Components/Room/Main/RoomMainStudyDetail';
 import { customAxios } from '../../Lib/customAxios';
+import { setRoomInfo } from '../../Redux/roomReducer';
 
-interface Member {
+export interface Member {
   userId: number;
   isRoomMaker: boolean;
   nickname: string;
@@ -37,6 +40,7 @@ const RoomTitle = styled('h1')(({ theme }) => ({
 function RoomMain() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [title, setTitle] = useState<string>('');
   const [info, setInfo] = useState<string>('');
@@ -54,8 +58,8 @@ function RoomMain() {
   const [isEdit, setIsEdit] = useState(false);
 
   // 스터디 조회
-  const [startedAt, setStartedAt] = useState<Date | null>(selectedDay);
-  const [finishedAt, setFinishedAt] = useState<Date | null>(selectedDay);
+  const [startedAt, setStartedAt] = useState<Date | null>(new Date(selectedDay));
+  const [finishedAt, setFinishedAt] = useState<Date | null>(new Date(selectedDay));
   const [problemListRes, setProblemListRes] = useState<ProblemRes[]>([]);
 
   // 채팅 이전기록 조회
@@ -72,56 +76,35 @@ function RoomMain() {
         url: `/study/${roomId}`,
       });
 
+      console.log('roomInfo: ', res);
+
       setTitle(res.data.title);
       setInfo(res.data.info);
       setMembers(res.data.members);
-      setSchedules(res.data.schedules);
       setOffsetId(res.data.offsetId);
+      dispatch(setRoomInfo(res.data));
+      // 문자열로 받아진 스케줄 Date로 변환
+      const tempSchedules: Schedule[] = [];
+      res.data.scheduleListRes.forEach((schedule: Schedule) => {
+        const startedAt = new Date(schedule.startedAt);
+        const finishedAt = new Date(schedule.finishedAt);
+        tempSchedules.push({ id: schedule.id, startedAt, finishedAt });
+      });
+      setSchedules(tempSchedules);
 
+      // 유저정보 dict형태{id:info}로 저장
       const tempDict: MemberDict = {};
       res.data.members.forEach((member: Member) => {
         tempDict[member.userId] = { nickname: member.nickname, profileImg: member.profileImg };
       });
       setMemberDict(tempDict);
+      console.log('userDict:', tempDict);
     } catch (e) {}
-  };
-
-  const setScheduleHandler = () => {
-    const tempSchedules: Schedule[] = [];
-
-    DUMMY_STUDY_DATA.scheduleListRes.forEach((scheduleRes) => {
-      const temp = {
-        id: scheduleRes.id,
-        finishedAt: new Date(scheduleRes.finishedAt),
-        startedAt: new Date(scheduleRes.startedAt),
-      };
-      tempSchedules.push(temp);
-    });
-
-    setSchedules(tempSchedules);
-  };
-
-  // 연결한 뒤 삭제할 것
-  const tempGetInfo = () => {
-    setScheduleHandler();
-    setTitle(DUMMY_STUDY_DATA.title);
-    setInfo(DUMMY_STUDY_DATA.info);
-    setMembers(DUMMY_STUDY_DATA.members);
-    const tempDict: MemberDict = {};
-    DUMMY_STUDY_DATA.members.forEach((member: Member, key) => {
-      tempDict[member.userId] = {
-        nickname: member.nickname,
-        profileImg: member.profileImg,
-      };
-    });
-    setMemberDict(tempDict);
-    console.log('memberDict', tempDict);
   };
 
   // 페이지 랜더링시 스터디 기본정보를 가져옴
   useEffect(() => {
     getRoomInfo();
-    tempGetInfo();
   }, []);
 
   // 현재 선택한 날짜에 스터디가 존재하는지 확인
@@ -133,7 +116,6 @@ function RoomMain() {
       setSelectedDayIdx(dateDiff);
       setIsStudyExist(Boolean(dateRange[dateDiff].schedule));
     }
-
     // 날짜가 변경되면 수정모드 해제 및 추가된문제 초기화
     setIsEdit(false);
     setProblemListRes([]);
@@ -141,18 +123,21 @@ function RoomMain() {
 
   return (
     <Box sx={{ height: '100%', width: '100%' }}>
+      <RoomMainSetting />
       <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
       <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
         <Grid item xs={2}>
           <RoomTitle>{title}</RoomTitle>
-          <RoomMainIntroduction info={info} members={members} />
+          <RoomMainIntroduction info={info} members={members} setMembers={setMembers} />
         </Grid>
         <Grid item xs={6}>
           <Stack spacing={3}>
             <RoomMainCalendar
+              roomId={roomId}
               schedules={schedules}
               selectedDay={selectedDay}
               dateRange={dateRange}
+              setSchedules={setSchedules}
               setSelectedDay={setSelectedDay}
               setDateRange={setDateRange}
             />
@@ -179,19 +164,23 @@ function RoomMain() {
                 setFinishedAt={setFinishedAt}
                 setProblemListRes={setProblemListRes}
                 setIsEdit={setIsEdit}
+                setIsStudyExist={setIsStudyExist}
               />
             ) : (
               <RoomMainStudyCreate
                 scheduleId={dateRange[selectedDayIdx]?.schedule?.id}
-                // scheduleId={dateRange[selectedDayIdx].schedule.id}
                 startedAt={startedAt}
                 finishedAt={finishedAt}
                 problemListRes={problemListRes}
+                dateRange={dateRange}
+                selectedDayIdx={selectedDayIdx}
+                selectedDay={selectedDay}
+                isEdit={isEdit}
                 setStartedAt={setStartedAt}
                 setFinishedAt={setFinishedAt}
                 setProblemListRes={setProblemListRes}
-                selectedDay={selectedDay}
-                isEdit={isEdit}
+                setIsStudyExist={setIsStudyExist}
+                setDateRange={setDateRange}
               />
             )}
             <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>

@@ -5,6 +5,7 @@ import themeReducer from './themeReducer';
 import accountReducer from './accountReducer';
 import commonReducer from './commonReducer';
 import openviduReducer from './openviduReducer';
+import roomReducer from './roomReducer';
 
 const persistConfig = {
   key: 'root',
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   account: accountReducer,
   common: commonReducer,
   openvidu: openviduReducer,
+  room: roomReducer,
 });
 
 export default persistReducer(persistConfig, rootReducer);

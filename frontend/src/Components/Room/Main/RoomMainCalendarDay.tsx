@@ -33,8 +33,9 @@ function RoomMainCalendarDay({
   const theme = useTheme();
 
   const onClickHandler = () => {
-    setSelectedDay(dailySchedule.day);
-    setNowDay(dailySchedule.day);
+    console.log('dailySchedule: ', dailySchedule.day);
+    setSelectedDay(new Date(dailySchedule.day));
+    setNowDay(new Date(dailySchedule.day));
   };
 
   return (

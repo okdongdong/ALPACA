@@ -21,6 +21,7 @@ interface RoomMainStudyDetailProps {
   setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
   setProblemListRes: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsStudyExist: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface ToSolveProblem {
@@ -59,6 +60,7 @@ function RoomMainStudyDetail({
   setFinishedAt,
   setProblemListRes,
   setIsEdit,
+  setIsStudyExist,
 }: RoomMainStudyDetailProps) {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -66,28 +68,31 @@ function RoomMainStudyDetail({
   const getScheduleProblems = async () => {
     try {
       const scheduleId = dateRange[selectedDayIdx].schedule?.id;
-      // const res = await customAxios({
-      //   method: 'get',
-      //   url: `/schedule/${scheduleId}`,
-      // });
+      const res = await customAxios({
+        method: 'get',
+        url: `/schedule/${scheduleId}`,
+      });
 
-      const res = DUMMY_SCHEDULE_RES_DATA;
-
-      console.log(res);
-      // setStartedAt(new Date(res.data.startedAt));
-      // setFinishedAt(new Date(res.data.finishedAt));
-      // setProblemListRes(res.data.problemListRes);
-      setStartedAt(new Date(res.startedAt));
-      setFinishedAt(new Date(res.finishedAt));
-      setProblemListRes(res.problemListRes);
-    } catch (e) {
-      console.log(e);
+      setStartedAt(new Date(res.data.startedAt));
+      setFinishedAt(new Date(res.data.finishedAt));
+      setProblemListRes(res.data.problemListRes);
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 
-  const deleteStudy = () => {};
+  const deleteStudy = async () => {
+    try {
+      const scheduleId = dateRange[selectedDayIdx].schedule?.id;
+      await customAxios({ method: 'delete', url: `/schedule/${scheduleId}` });
+      setIsStudyExist(false);
+    } catch (e: any) {
+      console.log(e.response);
+    }
+  };
 
   useEffect(() => {
+    console.log('selectedDay: ', selectedDay);
     getScheduleProblems();
   }, [selectedDay]);
 
@@ -100,7 +105,7 @@ function RoomMainStudyDetail({
             <CBtn
               height="100%"
               content={<Delete sx={{ color: theme.palette.icon }} />}
-              onClick={() => {}}
+              onClick={deleteStudy}
             />
             <CBtn
               height="100%"

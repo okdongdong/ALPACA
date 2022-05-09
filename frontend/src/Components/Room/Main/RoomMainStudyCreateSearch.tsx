@@ -1,9 +1,10 @@
-import { Add } from '@mui/icons-material';
-import { alpha, IconButton, styled, useTheme } from '@mui/material';
+import { Add, ArrowDropDown } from '@mui/icons-material';
+import { alpha, Collapse, IconButton, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { customAxios, solvedAcAxios } from '../../../Lib/customAxios';
 import CProblem from '../../Commons/CProblem';
 import CSearchBar from '../../Commons/CSearchBar';
+import RoomMainStudyCreateSearchFilter from './RoomMainStudyCreateSearchFilter';
 import { ProblemRes } from './RoomMainStudyDetail';
 
 interface RoomMainStudyCreateSearchProps {
@@ -21,6 +22,13 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
   marginRight: theme.spacing(2),
 }));
 
+const FilterBox = styled(Collapse)(({ theme }) => ({
+  padding: theme.spacing(1),
+  marginBottom: theme.spacing(1.5),
+  borderRadius: 10,
+  backgroundColor: theme.palette.bg,
+}));
+
 const ProblemBox = styled('div')(({ theme }) => ({
   height: '20vh',
   borderRadius: 10,
@@ -35,6 +43,7 @@ function RoomMainStudyCreateSearch({
 }: RoomMainStudyCreateSearchProps) {
   const theme = useTheme();
   const [query, setQuery] = useState<string>('');
+  const [isFilter, setIsFilter] = useState<boolean>(false);
 
   const addProblem = (idx: number) => {
     const tempProblemList = [...problemList];
@@ -45,13 +54,8 @@ function RoomMainStudyCreateSearch({
     setAddedProblemList(newAddedProblemList);
   };
 
+  // solvedAC api를 사용해 문제 검색
   const searchProblem = async () => {
-    // const res = await customAxios({
-    //   method: 'get',
-    //   url: '/problem',
-    //   params: { problemNumber: query },
-    // });
-
     const res = await solvedAcAxios({
       method: 'get',
       url: '/search/problem',
@@ -61,11 +65,11 @@ function RoomMainStudyCreateSearch({
 
     const resProblems: ProblemRes[] = [];
 
-    res.data.items.map((item: any) => {
+    res.data.items.forEach((item: any) => {
       // 이미 추가되지 않은 문제만 출력해줌
       if (!addedProblemList.some((problem) => problem.problemNumber === item.problemNumber)) {
         resProblems.push({
-          problemNumber: item.problemNumber,
+          problemNumber: item.problemId,
           title: item.titleKo,
           level: item.level,
         });
@@ -75,13 +79,24 @@ function RoomMainStudyCreateSearch({
     setProblemList(resProblems);
   };
 
+  const onFilterHandler = () => {
+    setIsFilter((prev) => !prev);
+  };
+
   return (
     <div style={{ height: '50%' }}>
       <CSearchBar
         onChange={setQuery}
         onSearch={searchProblem}
+        filter
+        filterOn={isFilter}
+        onFilter={onFilterHandler}
         placeholder="문제를 검색해서 추가할 수 있습니다."
       />
+      <FilterBox in={isFilter}>
+        <RoomMainStudyCreateSearchFilter setQuery={setQuery} />
+      </FilterBox>
+
       <ProblemBox className="scroll-box">
         {problemList.map((problem, idx) => (
           <CProblem

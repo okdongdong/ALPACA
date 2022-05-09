@@ -3,11 +3,12 @@ import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
-import { Stack } from '@mui/material';
+import { Divider, Stack, styled } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { MemberDict } from '../../../Pages/Room/RoomMain';
 import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
+import CProfile from '../../Commons/CProfile';
 
 interface RoomMainChattingProps {
   roomId: string | undefined;
@@ -16,11 +17,17 @@ interface RoomMainChattingProps {
 }
 
 interface ReceiveMessage {
-  nickname: string;
+  userId: number;
   chatId: string;
   content: string;
   timeStamp: string;
 }
+
+const MessageBox = styled('div')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}));
 
 let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/api/v1/ws`);
 
@@ -31,10 +38,18 @@ const header = {
   Authorization: token,
 };
 
+const options = {
+  root: null, // 기본 null, 관찰대상의 부모요소를 지정
+  rootMargin: '0px', // 관찰하는 뷰포트의 마진 지정
+  threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
+};
+
 function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   const dispatch = useDispatch();
 
+  // 채팅 인피니티 스크롤 관련
   const scrollRef = useRef<HTMLDivElement>(null);
+  const topCheckRef = useRef<HTMLDivElement>(null);
   const infiniteRef = useRef<HTMLDivElement>(null);
 
   const userId = useSelector((state: any) => state.account.userId);
@@ -45,12 +60,6 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   const [page, setPage] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const options = {
-    root: scrollRef.current, // 기본 null, 관찰대상의 부모요소를 지정
-    rootMargin: '20px', // 관찰하는 뷰포트의 마진 지정
-    threshold: 1.0, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
-  };
 
   const wsSendMessage = () => {
     if (client && client.connected) {
@@ -63,10 +72,11 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   };
 
   const wsConnect = () => {
+    console.log('-----------소켓연결시도-----------');
     client.connect(
       header,
       (res) => {
-        console.log('연결성공', res);
+        console.log('-----------연결성공!!-----------', res);
 
         client.subscribe(
           `/sub/chat/study/${roomId}`,
@@ -78,10 +88,9 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
         );
       },
       (err) => {
-        console.log('err', err);
+        console.log('-----------연결실패!!-----------', err);
       },
     );
-    console.log(4444444, client);
   };
 
   const wsDisconnect = () => {
@@ -101,6 +110,7 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
     if (isLoading) return;
     setIsLoading(true);
     try {
+      const prevScrollHeight = scrollRef.current?.scrollHeight;
       const res = await customAxios({
         method: 'get',
         url: `/chat/study/${roomId}`,
@@ -111,13 +121,24 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
       if (res.data.last) {
         setIsFinished(true);
       }
+      console.log('scrollRef: ', scrollRef);
+      const nowScrollHeight = scrollRef.current?.scrollHeight;
 
+      console.log('scrollHeight: ', nowScrollHeight, prevScrollHeight);
+      if (!!prevScrollHeight && !!nowScrollHeight) {
+        scrollRef.current.scrollTo(0, res.data.numberOfElements * 43 + 10);
+      }
       console.log('page: ', page, ' / offsetId: ', offsetId);
       console.log(res);
     } catch (e: any) {
       console.log(e);
     }
     setIsLoading(false);
+  };
+
+  const getInitChat = async () => {
+    await getPrevChat();
+    scrollRef?.current?.scrollTo(0, 987654321);
   };
 
   const calDateTime = (nowTime: Date) => {
@@ -129,11 +150,10 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
 
   const infiniteHandler = async (entries: any) => {
     if (isLoading || isFinished) return;
-
     const target = entries[0];
     if (target.isIntersecting) {
       console.log('is InterSecting');
-      // getPrevChat();
+      getPrevChat();
     }
   };
 
@@ -146,8 +166,7 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   }, [infiniteHandler]);
 
   useEffect(() => {
-    console.log(11111, client);
-    getPrevChat();
+    getInitChat();
     if (!client.connected) {
       wsConnect();
     }
@@ -160,14 +179,35 @@ function RoomMainChat({ roomId, memberDict, offsetId }: RoomMainChattingProps) {
   return (
     <RoomMainComponentContainer>
       <button onClick={() => getPrevChat()}>버튼</button>
-      <Stack spacing={1} className="scroll-box" sx={{ height: '15vh' }} ref={scrollRef}>
-        <div style={{ height: 100, width: 100, backgroundColor: 'red' }} ref={infiniteRef}>
-          <h1>{isFinished ? '이전 기록이 없습니다.' : ''}</h1>
-        </div>
-        {chatList.map((chat, idx) => (
-          <div key={idx}>
-            {chat.nickname}:{chat.content}-{calDateTime(new Date(chat.timeStamp))}
+      <Stack
+        spacing={1}
+        className="scroll-box"
+        sx={{ height: '15vh', position: 'relative' }}
+        ref={scrollRef}>
+        {isFinished ? (
+          <Divider variant="middle">
+            <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
+          </Divider>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+            }}
+            ref={infiniteRef}>
+            <div style={{ height: 10, width: 200 }}></div>
           </div>
+        )}
+        {chatList.map((chat: ReceiveMessage, idx: number) => (
+          <MessageBox key={idx}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <CProfile
+                nickname={memberDict[chat.userId].nickname}
+                profileImg={memberDict[chat.userId].profileImg}
+              />
+              :{chat.content}
+            </div>
+            -{calDateTime(new Date(chat.timeStamp))}
+          </MessageBox>
         ))}
       </Stack>
       <RoomMainChatBar onChange={setMessage} onSendMessage={onSendMessageHandler} />

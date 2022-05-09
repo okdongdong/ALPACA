@@ -38,14 +38,14 @@ function RoomMainStudyCreateTime({
   // 시작시간을 종료시간보다 더 늦게 설정했을 때
   useEffect(() => {
     if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
-      setFinishedAt(startedAt);
+      setFinishedAt(new Date(startedAt));
     }
   }, [startedAt]);
 
   // 종료시간을 시작시간보다 더 빠르게 설정했을 때
   useEffect(() => {
     if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
-      setStartedAt(finishedAt);
+      setStartedAt(new Date(finishedAt));
     }
   }, [finishedAt]);
 

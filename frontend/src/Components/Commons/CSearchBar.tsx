@@ -10,13 +10,17 @@ import React, { KeyboardEvent } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 
 import CBtn from './CBtn';
+import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 
 interface CSearchBarProps {
   placeholder?: string;
   helperText?: string;
   backgroundColor?: string;
+  filter?: boolean;
+  filterOn?: boolean;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   onSearch?: () => void;
+  onFilter?: () => void;
 }
 
 const CustomInput = styled(Input)(({ theme }) => ({
@@ -27,8 +31,11 @@ function CSearchBar({
   placeholder = '',
   helperText = '',
   backgroundColor,
+  filter = false,
+  filterOn = false,
   onChange,
   onSearch = () => {},
+  onFilter = () => {},
 }: CSearchBarProps) {
   const theme = useTheme();
 
@@ -38,6 +45,10 @@ function CSearchBar({
 
   const onButtonClickHandler = () => {
     onSearch();
+  };
+
+  const onFilterClickHandler = () => {
+    onFilter();
   };
 
   const onKeyUpHandler = (event: KeyboardEvent<HTMLFormElement>) => {
@@ -76,6 +87,14 @@ function CSearchBar({
                 backgroundColor="rgba(0,0,0,0)"
                 onClick={onButtonClickHandler}
               />
+              {filter && (
+                <CBtn
+                  content={filterOn ? <ArrowDropUp /> : <ArrowDropDown />}
+                  height="25px"
+                  backgroundColor="rgba(0,0,0,0)"
+                  onClick={onFilterClickHandler}
+                />
+              )}
             </InputAdornment>
           }
         />

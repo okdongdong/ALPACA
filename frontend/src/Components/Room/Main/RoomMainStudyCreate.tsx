@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
 import CBtn from '../../Commons/CBtn';
+import { DailySchedule } from './RoomMainCalendar';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyCreateAddList from './RoomMainStudyCreateAddList';
 import RoomMainStudyCreateSearch from './RoomMainStudyCreateSearch';
@@ -16,9 +17,13 @@ interface RoomMainStudyCreateProps {
   startedAt: Date | null;
   finishedAt: Date | null;
   problemListRes: ProblemRes[];
+  selectedDayIdx: number;
+  dateRange: DailySchedule[];
   setStartedAt: React.Dispatch<React.SetStateAction<Date | null>>;
   setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
   setProblemListRes: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
+  setIsStudyExist: React.Dispatch<React.SetStateAction<boolean>>;
+  setDateRange: React.Dispatch<React.SetStateAction<DailySchedule[]>>;
 }
 
 interface AddStudyData {
@@ -36,9 +41,13 @@ function RoomMainStudyCreate({
   startedAt,
   finishedAt,
   problemListRes,
+  selectedDayIdx,
+  dateRange,
   setStartedAt,
   setFinishedAt,
   setProblemListRes,
+  setIsStudyExist,
+  setDateRange,
 }: RoomMainStudyCreateProps) {
   const { roomId } = useParams();
 
@@ -47,17 +56,19 @@ function RoomMainStudyCreate({
   const addStudy = async () => {
     try {
       const data: AddStudyData = {
-        startedAt: startedAt || selectedDay,
-        finishedAt: finishedAt || selectedDay,
+        startedAt: startedAt
+          ? new Date(selectedDay.toDateString() + ' ' + startedAt.toTimeString())
+          : selectedDay,
+        finishedAt: finishedAt
+          ? new Date(selectedDay.toDateString() + ' ' + finishedAt.toTimeString())
+          : selectedDay,
         studyId: roomId || '',
         toSolveProblems: [],
       };
 
-      problemListRes.map((problem) => {
+      problemListRes.forEach((problem) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
-
-      console.log(data);
 
       const res = await customAxios({
         method: 'post',
@@ -65,9 +76,17 @@ function RoomMainStudyCreate({
         data: data,
       });
 
-      console.log(res);
-    } catch (e) {
-      console.log(e);
+      const tempDateRange = [...dateRange];
+      tempDateRange[selectedDayIdx].schedule = {
+        id: res.data.message,
+        startedAt: data.startedAt,
+        finishedAt: data.finishedAt,
+      };
+
+      setDateRange(tempDateRange);
+      setIsStudyExist(true);
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 
@@ -80,7 +99,7 @@ function RoomMainStudyCreate({
         toSolveProblems: [],
       };
 
-      problemListRes.map((problem) => {
+      problemListRes.forEach((problem) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
 
