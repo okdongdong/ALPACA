@@ -135,22 +135,21 @@ public class ProblemService {
 
         if (user.getClassDecoration().equals("gold")) {
             if (user.getClassLevel() < 10) {
-                return selectClassProblem(user.getClassLevel()+1, user);
+                return getClassProblem(user.getClassLevel()+1, user);
             } else {
-                return selectRandomProblem(user);
+                return getRandomProblem(user);
             }
         } else {
-            return selectClassProblem(user.getClassLevel(), user);
+            return getClassProblem(user.getClassLevel(), user);
         }
     }
 
-    private List<Problem> selectClassProblem(Long classLevel, User user) {
+    private List<Problem> get3FromCandidate(List<Problem> candidateProblems, Long userId) {
         List<Problem> selectProblems = new ArrayList<>();
-        HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
-        List<Problem> candidateProblems = problemRepository.findAllByClassLevel(classLevel);
         HashSet<Integer> selectIndex = new HashSet<>();
-
+        HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(userId);
         Random random = new Random();
+
         while (selectProblems.size() < 3) {
             Integer newCandidate = random.nextInt(candidateProblems.size());
             if (selectIndex.contains(newCandidate)) {
@@ -160,37 +159,24 @@ public class ProblemService {
             if (solvedProblems.contains((long) newCandidate)) {
                 continue;
             }
-
             selectProblems.add(candidateProblems.get(newCandidate));
         }
         return selectProblems;
     }
 
-    private List<Problem> selectRandomProblem(User user) {
+    private List<Problem> getClassProblem(Long classLevel, User user) {
+        List<Problem> candidateProblems = problemRepository.findAllByClassLevel(classLevel);
+        return get3FromCandidate(candidateProblems, user.getId());
+    }
+
+    private List<Problem> getRandomProblem(User user) {
         List<Problem> candidateProblems = problemRepository.findAllByLevelGreaterThanEqual(user.getLevel());
         if (candidateProblems.size() == 0) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         } else if (candidateProblems.size() <= 3) {
             return candidateProblems;
         } else {
-            HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
-            HashSet<Integer> selectIndex = new HashSet<>();
-            Random random = new Random();
-
-            List<Problem> selectRandomProblems = new ArrayList<>();
-            while (selectRandomProblems.size() < 3) {
-                Integer newCandidate = random.nextInt(candidateProblems.size());
-                if (selectIndex.contains(newCandidate)) {
-                    continue;
-                }
-                selectIndex.add(newCandidate);
-                if (solvedProblems.contains((long) newCandidate)) {
-                    continue;
-                }
-
-                selectRandomProblems.add(candidateProblems.get(newCandidate));
-            }
-            return selectRandomProblems;
+            return get3FromCandidate(candidateProblems, user.getId());
         }
     }
 }
