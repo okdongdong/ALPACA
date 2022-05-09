@@ -1,23 +1,25 @@
 import { Settings } from '@mui/icons-material';
-import { Divider, IconButton, Stack, styled } from '@mui/material';
-import CProfile from '../../Commons/CProfile';
+import { Divider, Stack, styled } from '@mui/material';
+import { useState } from 'react';
+import { Member } from '../../../Pages/Room/RoomMain';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
+import RoomMainIntroductionMemberEdit from './RoomMainIntroductionMemberEdit';
+import RoomMainIntroductionMemberList from './RoomMainIntroductionMemberList';
 
 interface RoomMainIntroductionProps {
   info: string;
-  members: { nickname: string; profileImg: string }[];
+  members: Member[];
+  setMembers: React.Dispatch<React.SetStateAction<Member[]>>;
 }
 
 const IntroductionContainer = styled(Stack)(({ theme }) => ({
   width: '100%',
 }));
 
-const CustomIconButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.main,
-  color: theme.palette.icon,
-}));
+function RoomMainIntroduction({ info, members, setMembers }: RoomMainIntroductionProps) {
+  // 스터디원 관리
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
-function RoomMainIntroduction({ info, members }: RoomMainIntroductionProps) {
   return (
     <IntroductionContainer spacing={3}>
       <RoomMainComponentContainer>
@@ -26,18 +28,15 @@ function RoomMainIntroduction({ info, members }: RoomMainIntroductionProps) {
         <p>{info}</p>
       </RoomMainComponentContainer>
 
-      <RoomMainComponentContainer>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h4>스터디원</h4>
-          <CustomIconButton size="small">
-            <Settings />
-          </CustomIconButton>
-        </div>
-        <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
-        {members.map((member, idx) => (
-          <CProfile key={idx} nickname={member.nickname} profileImg={member.profileImg} />
-        ))}
-      </RoomMainComponentContainer>
+      {isEdit ? (
+        <RoomMainIntroductionMemberEdit
+          members={members}
+          setIsEdit={setIsEdit}
+          setMembers={setMembers}
+        />
+      ) : (
+        <RoomMainIntroductionMemberList members={members} setIsEdit={setIsEdit} />
+      )}
     </IntroductionContainer>
   );
 }

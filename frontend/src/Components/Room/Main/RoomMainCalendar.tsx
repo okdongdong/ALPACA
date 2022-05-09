@@ -2,14 +2,17 @@ import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import { Grid, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
+import { customAxios } from '../../../Lib/customAxios';
 import { Schedule } from '../../../Pages/Room/RoomMain';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
 
 interface RoomMainCalendarProps {
+  roomId: string | undefined;
   schedules: Schedule[];
   selectedDay: Date;
   dateRange: DailySchedule[];
+  setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
   setSelectedDay: React.Dispatch<React.SetStateAction<Date>>;
   setDateRange: React.Dispatch<React.SetStateAction<DailySchedule[]>>;
 }
@@ -29,22 +32,27 @@ const CalendarBox = styled(Grid)(({ theme }) => ({
   background: theme.palette.component,
   marginLeft: 0,
   marginTop: 0,
-  width:'100%',
+  width: '100%',
   paddingRight: theme.spacing(1),
   paddingBottom: theme.spacing(1),
   borderRadius: '0 0 10px 10px',
 }));
 
 function RoomMainCalendar({
+  roomId,
   schedules = [],
   selectedDay,
   dateRange,
+  setSchedules,
   setSelectedDay,
   setDateRange,
 }: RoomMainCalendarProps) {
   // 현재 보고 있는 달력의 달을 확인하기 위한 변수
   const theme = useTheme();
   const [nowDay, setNowDay] = useState<Date>(new Date());
+
+  // request최적화를 위해 설정
+  const [prevDay, setPrevDay] = useState<Date>(new Date());
 
   // 현재 달력의 날짜계산 및 스케줄저장을 위한 함수
   const getStartDate = () => {
@@ -56,14 +64,15 @@ function RoomMainCalendar({
     const tempDateRange = [];
     let scheduleIdx = 0;
 
+    console.log(schedules);
+
     for (let i = 0; i < 42; i++) {
       const temp: DailySchedule = {
         day: new Date(startDate),
       };
 
       if (scheduleIdx < schedules.length) {
-        console.log('schedules.length:', schedules.length);
-        let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
+        let scheduleDay = schedules[scheduleIdx].startedAt;
         if (
           temp.day.getFullYear() === scheduleDay.getFullYear() &&
           temp.day.getMonth() === scheduleDay.getMonth() &&
@@ -78,9 +87,44 @@ function RoomMainCalendar({
     setDateRange(tempDateRange);
   };
 
+  // 달이 변할때 스케줄을 가져오는 함수
+  const getMonthlySchedule = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/schedule/${roomId}/monthly`,
+        params: { month: 'APRIL', year: nowDay.getFullYear() },
+      });
+      console.log('change month: ', res);
+      const tempSchedules: Schedule[] = [];
+      res.data.forEach((schedule: Schedule) => {
+        const startedAt = new Date(schedule.startedAt);
+        const finishedAt = new Date(schedule.finishedAt);
+
+        tempSchedules.push({ id: schedule.id, startedAt, finishedAt });
+      });
+
+      setSchedules([...tempSchedules]);
+      getStartDate();
+    } catch (e: any) {
+      console.log(e.response);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      nowDay.getMonth() !== prevDay.getMonth() ||
+      nowDay.getFullYear() !== prevDay.getFullYear()
+    ) {
+      getMonthlySchedule();
+    }
+
+    setPrevDay(new Date(nowDay));
+  }, [nowDay, schedules]);
+
   useEffect(() => {
     getStartDate();
-  }, [nowDay, schedules]);
+  }, []);
 
   return (
     <Stack>

@@ -8,6 +8,7 @@ import CProfile from '../Commons/CProfile';
 import CSearchBar from '../Commons/CSearchBar';
 import alpaca from '../../Assets/Img/alpaca.png';
 import CInput from '../Commons/CInput';
+import Swal from 'sweetalert2';
 
 interface MemberInviteProps {
   roomId: string | undefined;
@@ -77,10 +78,33 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         .writeText(inviteCode)
         .then(() => {
           console.log('초대코드를 복사하는데 성공했습니다.');
+          Swal.fire({
+            title: '복사 성공',
+            text: '초대코드를 복사하는데 성공했습니다.',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
-        .catch(() => console.log('초대코드를 복사하는데 실패했습니다.'));
+
+        .catch(() => {
+          console.log('초대코드를 복사하는데 실패했습니다.');
+          Swal.fire({
+            title: '복사 실패',
+            text: '잠시 후 다시 시도해주세요..',
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        });
     } else {
-      return alert('복사하기가 지원되지 않는 브라우저입니다.');
+      Swal.fire({
+        title: '복사 실패',
+        text: '복사하기가 지원되지 않는 브라우저입니다.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 

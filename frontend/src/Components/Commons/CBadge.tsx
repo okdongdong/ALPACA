@@ -14,9 +14,10 @@ interface CBadgeProps {
   type?: 'user' | 'problem';
   width?: number;
   height?: number;
+  labelOff?: boolean;
 }
 
-function CBadge({ tier, type = 'user', width = 20, height = 25 }: CBadgeProps) {
+function CBadge({ tier, type = 'user', width = 20, height = 25, labelOff = false }: CBadgeProps) {
   const [tierText, setTierText] = useState<string | number>(0);
   const [tierColor, setTierColor] = useState<string>('#cdcdcd');
 
@@ -70,7 +71,7 @@ function CBadge({ tier, type = 'user', width = 20, height = 25 }: CBadgeProps) {
           transform: 'translate(-50%, -50%)',
           textAlign: 'center',
         }}>
-        {tierText}
+        {labelOff || tierText}
       </div>
     </div>
   );
