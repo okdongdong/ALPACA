@@ -18,4 +18,6 @@ public interface ProblemRepository extends MongoRepository<Problem,String> {
 
     List<Problem> findAllByClassLevel(Long classLevel);
 
+    List<Problem> findAllByLevelGreaterThanEqual(Long classLevel);
+
 }

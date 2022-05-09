@@ -18,8 +18,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.*;
 
@@ -134,43 +132,65 @@ public class ProblemService {
     public List<Problem> recommendProblem(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
-        Long classLevel = user.getClassLevel();
-        List<Problem> recommendList = new ArrayList<>();
-        if (classLevel < 10) {
-            return comparedProblem(classLevel+1,user,recommendList);
+
+        if (user.getClassDecoration().equals("gold")) {
+            if (user.getClassLevel() < 10) {
+                return selectClassProblem(user.getClassLevel()+1, user);
+            } else {
+                return selectRandomProblem(user);
+            }
         } else {
-            return comparedProblem(classLevel,user,recommendList);
+            return selectClassProblem(user.getClassLevel(), user);
         }
     }
 
-    private List<Problem> comparedProblem(Long classLevel,User user,List<Problem> recommendList){
-        List<Long> solvedProblemNumberList = solvedProblemRepository.findProblemNumbersByUser(user.getId());
-        List<Problem> problemList = problemRepository.findAllByClassLevel(classLevel);
-        Collections.shuffle(problemList);
-        for (Problem problem : problemList) {
-            if (!solvedProblemNumberList.contains(problem.getProblemNumber())) {
-                recommendList.add(problem);
-                if (recommendList.size() == 3) {
-                    break;
-                }
+    private List<Problem> selectClassProblem(Long classLevel, User user) {
+        List<Problem> selectProblems = new ArrayList<>();
+        HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
+        List<Problem> candidateProblems = problemRepository.findAllByClassLevel(classLevel);
+        HashSet<Integer> selectIndex = new HashSet<>();
+
+        Random random = new Random();
+        while (selectProblems.size() < 3) {
+            Integer newCandidate = random.nextInt(candidateProblems.size());
+            if (selectIndex.contains(newCandidate)) {
+                continue;
             }
-        }
-        if (recommendList.size() < 3) {
-            classLevel -=1;
-            if (classLevel==0){
-                List<Problem> unclassList =problemRepository.findAllByClassLevel(null);
-                Collections.shuffle(unclassList);
-                for (Problem problem : unclassList) {
-                    if (!solvedProblemNumberList.contains(problem.getProblemNumber())) {
-                        recommendList.add(problem);
-                        if (recommendList.size() == 3) {
-                            break;
-                        }
-                    }
-                }
+            selectIndex.add(newCandidate);
+            if (solvedProblems.contains((long) newCandidate)) {
+                continue;
             }
-            return comparedProblem(classLevel,user,recommendList);
+
+            selectProblems.add(candidateProblems.get(newCandidate));
         }
-        return recommendList;
+        return selectProblems;
+    }
+
+    private List<Problem> selectRandomProblem(User user) {
+        List<Problem> candidateProblems = problemRepository.findAllByLevelGreaterThanEqual(user.getLevel());
+        if (candidateProblems.size() == 0) {
+            throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
+        } else if (candidateProblems.size() <= 3) {
+            return candidateProblems;
+        } else {
+            HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
+            HashSet<Integer> selectIndex = new HashSet<>();
+            Random random = new Random();
+
+            List<Problem> selectRandomProblems = new ArrayList<>();
+            while (selectRandomProblems.size() < 3) {
+                Integer newCandidate = random.nextInt(candidateProblems.size());
+                if (selectIndex.contains(newCandidate)) {
+                    continue;
+                }
+                selectIndex.add(newCandidate);
+                if (solvedProblems.contains((long) newCandidate)) {
+                    continue;
+                }
+
+                selectRandomProblems.add(candidateProblems.get(newCandidate));
+            }
+            return selectRandomProblems;
+        }
     }
 }

@@ -42,6 +42,9 @@ public class User {
     @Column(name = "boj_id", unique = true)
     private String bojId;
 
+    @Column(name = "level")
+    private Long level;
+
     @Column(name = "class_level")
     private Long classLevel;
 

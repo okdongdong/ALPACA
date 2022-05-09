@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,7 @@ public interface SolvedProblemRepository extends JpaRepository<SolvedProblem, Lo
 
     @Query(nativeQuery = true, value = "SELECT problem_number FROM solved_problem WHERE user_id = :userId")
     List<Long> findProblemNumbersByUser(@Param("userId") Long userId);
+
+    @Query(nativeQuery = true, value = "SELECT problem_number FROM solved_problem WHERE user_id = :userId")
+    HashSet<Long> findProblemNumbersByUserId(@Param("userId")Long userId);
 }
