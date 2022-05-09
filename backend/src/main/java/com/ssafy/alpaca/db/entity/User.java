@@ -45,7 +45,6 @@ public class User {
     @Column(name = "class_level")
     private Long classLevel;
 
-    @NotBlank
     @Column(name = "class_decoration")
     private String classDecoration;
 

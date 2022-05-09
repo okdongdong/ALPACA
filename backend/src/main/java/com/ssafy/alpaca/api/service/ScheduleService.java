@@ -29,21 +29,57 @@ public class ScheduleService {
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final ProblemRepository problemRepository;
 
+    private User checkUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+    }
+
     private Schedule checkScheduleById(Long id) {
         return scheduleRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND)
         );
     }
 
-    public Long createSchedule(ScheduleReq scheduleReq) {
+    private Study checkStudyById(Long id) {
+        return studyRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+    }
+
+    private void checkIsStudyMember(User user, Study study) throws IllegalAccessException {
+        if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudy(user, study))) {
+            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+    }
+
+    private List<ProblemListRes> getProblemListByToSolveProblems(List<ToSolveProblem> toSolveProblems) {
+        List<ProblemListRes> problemListResList = new ArrayList<>();
+        for (ToSolveProblem toSolveProblem : toSolveProblems) {
+            Problem problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber()).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
+            );
+
+            problemListResList.add(
+                    ProblemListRes.builder()
+                            .problemNumber(problem.getProblemNumber())
+                            .title(problem.getTitle())
+                            .level(problem.getLevel())
+                            .build()
+            );
+        }
+        return problemListResList;
+    }
+
+    public Long createSchedule(String username, ScheduleReq scheduleReq) throws IllegalAccessException {
         if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
                 scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
-        Study study = studyRepository.findById(scheduleReq.getStudyId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
+        Study study = checkStudyById(scheduleReq.getStudyId());
+        User user = checkUserByUsername(username);
+        checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime = LocalDateTime.of(
                 scheduleReq.getStartedAt().getYear(),
@@ -75,10 +111,10 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public ScheduleRes getTodaySchedule(String username, Long studyId) {
-        Study study = studyRepository.findById(studyId).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
+    public ScheduleRes getTodaySchedule(String username, Long studyId) throws IllegalAccessException {
+        Study study = checkStudyById(studyId);
+        User user = checkUserByUsername(username);
+        checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime = LocalDateTime.now();
         LocalDateTime today = LocalDateTime.of(
@@ -93,16 +129,8 @@ public class ScheduleService {
         }
 
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(todaySchedule.get());
-        List<ProblemListRes> problemListRes = new ArrayList<>();
-        for (ToSolveProblem solveProblem : toSolveProblem) {
-            Problem problem = problemRepository.findByProblemNumber(solveProblem.getProblemNumber()).orElseThrow(
-                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
-            problemListRes.add(ProblemListRes.builder()
-                    .problemNumber(problem.getProblemNumber())
-                    .title(problem.getTitle())
-                    .level(problem.getLevel())
-                    .build());
-        }
+        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(toSolveProblem);
+
         return ScheduleRes.builder()
                 .startedAt(todaySchedule.get().getStartedAt())
                 .finishedAt(todaySchedule.get().getFinishedAt())
@@ -110,16 +138,14 @@ public class ScheduleService {
                 .build();
     }
 
-    public void updateSchedule(Long id, ScheduleUpdateReq scheduleUpdateReq) {
+    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
         if (scheduleUpdateReq.getFinishedAt().isBefore(scheduleUpdateReq.getStartedAt()) ||
                 scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
         Schedule schedule = checkScheduleById(id);
-        Study study = studyRepository.findById(schedule.getStudy().getId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
+        Study study = schedule.getStudy();
 
         LocalDateTime localDateTime = LocalDateTime.of(
                 scheduleUpdateReq.getStartedAt().getYear(),
@@ -132,7 +158,10 @@ public class ScheduleService {
             throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
-//      스터디장만 수정 가능
+//      스터디원만 수정 가능
+        User user = checkUserByUsername(username);
+        checkIsStudyMember(user, study);
+
         schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
         schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         scheduleRepository.save(schedule);
@@ -148,16 +177,8 @@ public class ScheduleService {
     public ScheduleRes getSchedule(Long id) {
         Schedule schedule = checkScheduleById(id);
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(schedule);
-        List<ProblemListRes> problemListRes = new ArrayList<>();
-        for (ToSolveProblem solveProblem : toSolveProblem) {
-            Problem problem = problemRepository.findByProblemNumber(solveProblem.getProblemNumber()).orElseThrow(
-                    () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
-            problemListRes.add(ProblemListRes.builder()
-                            .problemNumber(problem.getProblemNumber())
-                            .title(problem.getTitle())
-                            .level(problem.getLevel())
-                            .build());
-        }
+        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(toSolveProblem);
+
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
@@ -165,15 +186,10 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Month month) throws IllegalAccessException {
-        Study study = studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
-        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
-                () -> new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER));
+    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Integer month) throws IllegalAccessException {
+        Study study = checkStudyById(id);
+        User user = checkUserByUsername(username);
+        checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
@@ -181,15 +197,11 @@ public class ScheduleService {
     }
 
     public void deleteSchedule(String username, Long id) throws IllegalAccessException {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        User user = checkUserByUsername(username);
         Schedule schedule = checkScheduleById(id);
-        MyStudy myStudy = myStudyRepository.findByUserAndStudy(user, schedule.getStudy()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-        );
+        Study study = schedule.getStudy();
 
-        if (Boolean.TRUE.equals(!myStudy.getIsRoomMaker())) {
+        if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
             throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
