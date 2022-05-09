@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import SideBar from '../../Components/Bars/SideBar';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 const MainLayout = () => {
   const theme = useTheme();
@@ -31,16 +32,33 @@ const MainLayout = () => {
     overflow: 'auto',
   });
 
+  const MMainDiv = styled('div')({
+    height: '100%',
+    minHeight: '94vh',
+    width: '100%',
+    background: theme.palette.bg,
+  });
   return (
-    <RootStyle>
-      {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
-
-      <MainStyle>
-        <MainDiv>
+    <>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
+        <RootStyle>
+          {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
+          <MainStyle>
+            <MainDiv>
+              <Outlet />
+            </MainDiv>
+          </MainStyle>
+        </RootStyle>
+      </BrowserView>
+      <MobileView>
+        {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : (
+          <div style={{ height: '6vh' }}>Navbar</div>
+        )}
+        <MMainDiv>
           <Outlet />
-        </MainDiv>
-      </MainStyle>
-    </RootStyle>
+        </MMainDiv>
+      </MobileView>
+    </>
   );
 };
 

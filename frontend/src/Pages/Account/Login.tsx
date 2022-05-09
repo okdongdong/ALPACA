@@ -94,15 +94,16 @@ function Login(props: any) {
         </CContainerWithLogo>
       </BrowserView>
       <MobileView>
-        <div style={{ height: '6vh' }}>Navbar</div>
         <CContainerWithLogo onKeyPress={onkeyPressHandler}>
           <CInput onChange={setUsername} label="ID" />
+          <div style={{ height: '6vh' }}></div>
           <CInput type="password" onChange={setPassword} label="PASSWORD" />
           <div
             style={{
               width: '100%',
               justifyContent: 'space-between',
               display: 'flex',
+              marginTop: '10vh',
             }}>
             <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
             <CBtn

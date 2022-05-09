@@ -6,6 +6,7 @@ import StudyCreate from '../Dialogs/StudyCreate';
 import { styled, useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 const CIconButton = styled(IconButton)(({ theme }) => ({
   margin: '10px',
@@ -14,9 +15,11 @@ const CIconButton = styled(IconButton)(({ theme }) => ({
   background: theme.palette.main,
   height: '200px',
   width: '200px',
-  '&:hover': {
-    background: theme.palette.main + '90',
-  },
+}));
+
+const MIconButton = styled(IconButton)(({ theme }) => ({
+  background: 'none',
+  marginLeft: '90%',
 }));
 
 function MainRooms() {
@@ -61,57 +64,110 @@ function MainRooms() {
   };
 
   return (
-    <Box p="5">
-      <Grid container spacing={2} direction="row">
-        {studyList.slice(0, 3).map((study: any, i: number) => {
-          return (
-            <Stack key={i}>
-              <MainRoomsDetail detail={study} page={page} callback={pinData} />
-            </Stack>
-          );
-        })}
-        <CIconButton onClick={handleClickOpen}>
-          <AddIcon
+    <>
+      <BrowserView>
+        <Box p="5">
+          <Grid container spacing={2} direction="row">
+            {studyList.slice(0, 3).map((study: any, i: number) => {
+              return (
+                <Stack key={i}>
+                  <MainRoomsDetail detail={study} page={page} callback={pinData} />
+                </Stack>
+              );
+            })}
+            <CIconButton onClick={handleClickOpen}>
+              <AddIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                  height: '100px',
+                  width: '100px',
+                }}
+              />
+            </CIconButton>
+            <StudyCreate
+              open={open}
+              page={page}
+              studyList={studyList}
+              callback={newData}
+              onClose={() => {
+                setOpen(false);
+              }}
+            />
+          </Grid>
+          <Pagination
+            count={count}
+            size="large"
+            page={page}
+            onChange={handleChange}
             sx={{
-              minWidth: 0,
+              display: 'flex',
               justifyContent: 'center',
-              color: '#FFFFFF',
-              height: '100px',
-              width: '100px',
+              alignItems: 'center',
+              '& .MuiPagination-ul': {
+                '& .MuiPaginationItem-root': {
+                  color: theme.palette.txt,
+                  '&.Mui-selected': {
+                    background: theme.palette.main,
+                    color: theme.palette.txt,
+                  },
+                },
+              },
             }}
           />
-        </CIconButton>
-        <StudyCreate
-          open={open}
-          page={page}
-          studyList={studyList}
-          callback={newData}
-          onClose={() => {
-            setOpen(false);
-          }}
-        />
-      </Grid>
-      <Pagination
-        count={count}
-        size="large"
-        page={page}
-        onChange={handleChange}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          '& .MuiPagination-ul': {
-            '& .MuiPaginationItem-root': {
-              color: theme.palette.txt,
-              '&.Mui-selected': {
-                background: theme.palette.main,
+        </Box>
+      </BrowserView>
+      <MobileView>
+        <Box p="5">
+          <MIconButton onClick={handleClickOpen}>
+            <AddIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: 'center',
                 color: theme.palette.txt,
+              }}
+            />
+          </MIconButton>
+          <StudyCreate
+            open={open}
+            page={page}
+            studyList={studyList}
+            callback={newData}
+            onClose={() => {
+              setOpen(false);
+            }}
+          />
+          {studyList.map((study: any, i: number) => {
+            return (
+              <Stack key={i}>
+                <MainRoomsDetail detail={study} page={page} callback={pinData} />
+              </Stack>
+            );
+          })}
+          <Pagination
+            count={count}
+            size="large"
+            page={page}
+            onChange={handleChange}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              '& .MuiPagination-ul': {
+                '& .MuiPaginationItem-root': {
+                  color: theme.palette.txt,
+                  '&.Mui-selected': {
+                    background: theme.palette.main,
+                    color: theme.palette.txt,
+                  },
+                },
               },
-            },
-          },
-        }}
-      />
-    </Box>
+            }}
+          />
+        </Box>
+      </MobileView>
+    </>
   );
 }
 export default MainRooms;

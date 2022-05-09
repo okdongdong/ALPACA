@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import { logout } from '../../Redux/accountReducer';
 import EditPassword from './EditPassword';
+import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
@@ -20,6 +21,7 @@ import Peachpink from '../../Assets/Img/Peachpink.png';
 import { setLoading } from '../../Redux/commonReducer';
 import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
 import FormHelperText from '@mui/material/FormHelperText';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 const WButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
@@ -57,6 +59,15 @@ const CustomContent = styled('div')(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: theme.palette.bg,
+}));
+
+const MContent = styled('div')(({ theme }) => ({
+  display: 'Grid',
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: theme.palette.bg,
+  width: '100%',
+  height: '100%',
 }));
 
 const ThemeButton = styled('button')(({ theme }) => ({
@@ -246,81 +257,292 @@ function EditProfile({ onClose, open }: EditProfileProps) {
   }, [newNickname]);
 
   return (
-    <Dialog onClose={cancleClose} open={open} maxWidth="lg">
-      <CustomContent>
-        <Grid
-          sx={{ minWidth: 720, display: 'flex', justifyContent: 'center', position: 'relative' }}>
-          <img src={imgData ? imgData : userInfo.profileImg} className={styles.profileimg} alt="" />
-          <Box sx={{ position: 'absolute', bottom: 0, right: 250 }}>
-            <label htmlFor="icon-button-file">
-              <ProfileSearch
-                accept="image/*"
-                id="icon-button-file"
-                type="file"
-                onChange={imageChange}
-                ref={imgRef}
-              />
-              <IconButton
-                aria-label="upload picture"
-                component="span"
-                sx={{
-                  minHeight: 48,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: '50%',
-                  background: theme.palette.main,
-                  height: '50px',
-                  width: '50px',
-                  '&:hover': {
-                    background: theme.palette.main + '90',
-                  },
-                }}>
-                <EditIcon
-                  sx={{
-                    minWidth: 0,
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                  }}
-                />
-              </IconButton>
-            </label>
-          </Box>
-        </Grid>
-        <Grid container spacing={2}>
-          <Grid item xs={6} container sx={{ position: 'relative' }}>
-            <CInputWithBtn
-              onChange={setNewNickname}
-              label="닉네임"
-              buttonContent={'중복확인'}
-              onButtonClick={nicknameDuplicateCheck}
-              helperText={nicknameMessage}
-              value={newNickname}
-              buttonDisable={!!nicknameMessage}
-            />
-            <FormHelperText
+    <>
+      <BrowserView>
+        <Dialog onClose={cancleClose} open={open} maxWidth="lg">
+          <CustomContent>
+            <Grid
               sx={{
-                color: theme.palette.main,
-                fontWeight: '400',
-                position: 'absolute',
-                top: '50%',
-                right: '22%',
+                minWidth: 720,
+                display: 'flex',
+                justifyContent: 'center',
+                position: 'relative',
               }}>
-              {nicknameOkMessage}
-            </FormHelperText>
-            {/* <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+              <img
+                src={imgData ? imgData : userInfo.profileImg}
+                className={styles.profileimg}
+                alt=""
+              />
+              <Box sx={{ position: 'absolute', bottom: 0, right: 250 }}>
+                <label htmlFor="icon-button-file">
+                  <ProfileSearch
+                    accept="image/*"
+                    id="icon-button-file"
+                    type="file"
+                    onChange={imageChange}
+                    ref={imgRef}
+                  />
+                  <IconButton
+                    aria-label="upload picture"
+                    component="span"
+                    sx={{
+                      minHeight: 48,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: '50%',
+                      background: theme.palette.main,
+                      height: '50px',
+                      width: '50px',
+                      '&:hover': {
+                        background: theme.palette.main + '90',
+                      },
+                    }}>
+                    <EditIcon
+                      sx={{
+                        minWidth: 0,
+                        justifyContent: 'center',
+                        color: '#FFFFFF',
+                      }}
+                    />
+                  </IconButton>
+                </label>
+              </Box>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={6} container sx={{ position: 'relative' }}>
+                <CInputWithBtn
+                  onChange={setNewNickname}
+                  label="닉네임"
+                  buttonContent={'중복확인'}
+                  onButtonClick={nicknameDuplicateCheck}
+                  helperText={nicknameMessage}
+                  value={newNickname}
+                  buttonDisable={!!nicknameMessage}
+                />
+                <FormHelperText
+                  sx={{
+                    color: theme.palette.main,
+                    fontWeight: '400',
+                    position: 'absolute',
+                    top: '50%',
+                    right: '22%',
+                  }}>
+                  {nicknameOkMessage}
+                </FormHelperText>
+                {/* <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
               <Clabel>닉네임</Clabel>
             </Grid>
             <Grid item xs={8}>
               <TInput onChange={inputNickname} sx={{ minWidth: '100%' }} value={nickname}></TInput>
             </Grid> */}
-          </Grid>
-          <Grid item xs={6}>
+              </Grid>
+              <Grid item xs={6}>
+                <Grid container>
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+                    <Clabel>선호언어</Clabel>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <FormControl variant="standard" sx={{ minWidth: '100%' }}>
+                      <CSelect
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={stacks}
+                        onChange={handleChange}>
+                        <MenuItem value="python3">python3</MenuItem>
+                        <MenuItem value="Java">Java</MenuItem>
+                        <MenuItem value="C">C</MenuItem>
+                        <MenuItem value="C++">C++</MenuItem>
+                      </CSelect>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
             <Grid container>
-              <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+                <Clabel>자기소개</Clabel>
+              </Grid>
+              <Grid item xs={10}>
+                <TInput
+                  multiline={true}
+                  maxRows={4}
+                  sx={{ minWidth: '100%' }}
+                  onChange={inputIntro}
+                  value={introduction}></TInput>
+              </Grid>
+            </Grid>
+
+            <div>
+              <Clabel htmlFor="" sx={{ marginLeft: 4 }}>
+                테마
+              </Clabel>
+              <Grid
+                sx={{
+                  paddingTop: 1,
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  alignItem: 'center',
+                }}>
+                <ThemeButton
+                  onClick={() => setThemeSelect('basic')}
+                  sx={{
+                    background: themeSelect === 'basic' ? theme.palette.main : theme.palette.bg,
+                  }}>
+                  <img src={Basic} alt="" />
+                  <br />
+                  <label htmlFor="">기본</label>
+                </ThemeButton>
+                <ThemeButton
+                  onClick={() => setThemeSelect('dark')}
+                  sx={{
+                    background: themeSelect === 'dark' ? theme.palette.main : theme.palette.bg,
+                  }}>
+                  <img src={Dark} alt="" />
+                  <br />
+                  <label htmlFor="">다크</label>
+                </ThemeButton>
+                <ThemeButton
+                  onClick={() => setThemeSelect('olivegreen')}
+                  sx={{
+                    background:
+                      themeSelect === 'olivegreen' ? theme.palette.main : theme.palette.bg,
+                  }}>
+                  <img src={Olivegreen} alt="" />
+                  <br />
+                  <label htmlFor="">올리브그린</label>
+                </ThemeButton>
+                <ThemeButton
+                  onClick={() => setThemeSelect('peachpink')}
+                  sx={{
+                    background: themeSelect === 'peachpink' ? theme.palette.main : theme.palette.bg,
+                  }}>
+                  <img src={Peachpink} alt="" />
+                  <br />
+                  <label htmlFor="">피치핑크</label>
+                </ThemeButton>
+              </Grid>
+            </div>
+            <Grid container>
+              <Grid item xs={8}>
+                <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
+                  탈퇴
+                </WButton>
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                sx={{
+                  paddingTop: 1,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItem: 'center',
+                }}>
+                <CButton onClick={dialogOpen} sx={{ height: 35, width: 110 }}>
+                  비밀번호 변경
+                </CButton>
+                <EditPassword open={openEditPassword} onClose={dialogClose}></EditPassword>
+                <CButton
+                  onClick={editDataClose}
+                  sx={{ height: 35, width: 50 }}
+                  disabled={!isNicknameChecked}>
+                  수정
+                </CButton>
+              </Grid>
+            </Grid>
+
+            <IconButton
+              component="span"
+              sx={{ position: 'absolute', top: 40, right: 40 }}
+              onClick={cancleClose}>
+              <ClearIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.txt,
+                }}
+              />
+            </IconButton>
+          </CustomContent>
+        </Dialog>
+      </BrowserView>
+      <MobileView>
+        <Dialog onClose={cancleClose} open={open} fullScreen>
+          <MContent>
+            <DialogTitle sx={{ textAlign: 'center' }}>프로필 수정</DialogTitle>
+            <Grid
+              sx={{
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <img
+                src={imgData ? imgData : userInfo.profileImg}
+                className={styles.profileimg}
+                alt=""
+                style={{ height: '12vh', width: '12vh' }}
+              />
+              <Box sx={{ position: 'absolute', bottom: 0, left: '55%' }}>
+                <label htmlFor="icon-button-file">
+                  <ProfileSearch
+                    accept="image/*"
+                    id="icon-button-file"
+                    type="file"
+                    onChange={imageChange}
+                    ref={imgRef}
+                  />
+                  <IconButton
+                    aria-label="upload picture"
+                    component="span"
+                    sx={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: '50%',
+                      background: theme.palette.main,
+                      height: '35px',
+                      width: '35px',
+                    }}>
+                    <EditIcon
+                      sx={{
+                        minWidth: 0,
+                        justifyContent: 'center',
+                        color: '#FFFFFF',
+                      }}
+                    />
+                  </IconButton>
+                </label>
+              </Box>
+            </Grid>
+            <Grid sx={{ position: 'relative', height: '12vh', minWidth: '230px', width: '100%' }}>
+              <CInputWithBtn
+                onChange={setNewNickname}
+                label="닉네임"
+                buttonContent={'중복확인'}
+                onButtonClick={nicknameDuplicateCheck}
+                helperText={nicknameMessage}
+                value={newNickname}
+                buttonDisable={!!nicknameMessage}
+              />
+              <FormHelperText
+                sx={{
+                  color: theme.palette.main,
+                  fontWeight: '400',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '22%',
+                }}>
+                {nicknameOkMessage}
+              </FormHelperText>
+            </Grid>
+            <Grid container sx={{ height: '12vh' }}>
+              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
                 <Clabel>선호언어</Clabel>
               </Grid>
-              <Grid item xs={8}>
-                <FormControl variant="standard" sx={{ minWidth: '100%' }}>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{ minWidth: '230px', width: '100%' }}>
                   <CSelect
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
@@ -334,113 +556,108 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                 </FormControl>
               </Grid>
             </Grid>
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <Clabel>자기소개</Clabel>
-          </Grid>
-          <Grid item xs={10}>
-            <TInput
-              multiline={true}
-              maxRows={4}
-              sx={{ minWidth: '100%' }}
-              onChange={inputIntro}
-              value={introduction}></TInput>
-          </Grid>
-        </Grid>
+            <Grid container sx={{ height: '12vh', alignContent: 'center' }}>
+              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
+                <Clabel>자기소개</Clabel>
+              </Grid>
+              <Grid item xs={12}>
+                <TInput
+                  multiline={true}
+                  maxRows={4}
+                  onChange={inputIntro}
+                  value={introduction}
+                  sx={{ minWidth: '230px', width: '100%' }}></TInput>
+              </Grid>
+            </Grid>
+            <div>
+              <Clabel htmlFor="">테마</Clabel>
+              <Grid
+                container
+                sx={{
+                  paddingTop: 1,
+                  paddingBottom: 1,
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                }}>
+                <CButton
+                  onClick={() => setThemeSelect('basic')}
+                  sx={{
+                    background:
+                      themeSelect === 'basic' ? theme.palette.main : theme.palette.component,
+                  }}>
+                  기본
+                </CButton>
+                <CButton
+                  onClick={() => setThemeSelect('dark')}
+                  sx={{
+                    background:
+                      themeSelect === 'dark' ? theme.palette.main : theme.palette.component,
+                  }}>
+                  다크
+                </CButton>
+                <CButton
+                  onClick={() => setThemeSelect('olivegreen')}
+                  sx={{
+                    background:
+                      themeSelect === 'olivegreen' ? theme.palette.main : theme.palette.component,
+                  }}>
+                  올리브그린
+                </CButton>
+                <CButton
+                  onClick={() => setThemeSelect('peachpink')}
+                  sx={{
+                    background:
+                      themeSelect === 'peachpink' ? theme.palette.main : theme.palette.component,
+                  }}>
+                  피치핑크
+                </CButton>
+              </Grid>
+              <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
+                <img src={themeSelect === 'basic' ? Basic : ''} alt="" />
+                <img src={themeSelect === 'dark' ? Dark : ''} alt="" />
+                <img src={themeSelect === 'olivegreen' ? Olivegreen : ''} alt="" />
+                <img src={themeSelect === 'peachpink' ? Peachpink : ''} alt="" />
+              </Grid>
+            </div>
+            <Grid
+              container
+              sx={{
+                paddingTop: 1,
+                marginBottom: '4vh',
+                display: 'flex',
+                justifyContent: 'space-around',
+              }}>
+              <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
+                탈퇴
+              </WButton>
+              <CButton onClick={dialogOpen} sx={{ height: 35, width: 110 }}>
+                비밀번호 변경
+              </CButton>
+              <EditPassword open={openEditPassword} onClose={dialogClose}></EditPassword>
+              <CButton
+                onClick={editDataClose}
+                sx={{ height: 35, width: 50 }}
+                disabled={!isNicknameChecked}>
+                수정
+              </CButton>
+            </Grid>
 
-        <div>
-          <Clabel htmlFor="" sx={{ marginLeft: 4 }}>
-            테마
-          </Clabel>
-          <Grid
-            sx={{
-              paddingTop: 1,
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignItem: 'center',
-            }}>
-            <ThemeButton
-              onClick={() => setThemeSelect('basic')}
-              sx={{
-                background: themeSelect === 'basic' ? theme.palette.main : theme.palette.bg,
-              }}>
-              <img src={Basic} alt="" />
-              <br />
-              <label htmlFor="">기본</label>
-            </ThemeButton>
-            <ThemeButton
-              onClick={() => setThemeSelect('dark')}
-              sx={{
-                background: themeSelect === 'dark' ? theme.palette.main : theme.palette.bg,
-              }}>
-              <img src={Dark} alt="" />
-              <br />
-              <label htmlFor="">다크</label>
-            </ThemeButton>
-            <ThemeButton
-              onClick={() => setThemeSelect('olivegreen')}
-              sx={{
-                background: themeSelect === 'olivegreen' ? theme.palette.main : theme.palette.bg,
-              }}>
-              <img src={Olivegreen} alt="" />
-              <br />
-              <label htmlFor="">올리브그린</label>
-            </ThemeButton>
-            <ThemeButton
-              onClick={() => setThemeSelect('peachpink')}
-              sx={{
-                background: themeSelect === 'peachpink' ? theme.palette.main : theme.palette.bg,
-              }}>
-              <img src={Peachpink} alt="" />
-              <br />
-              <label htmlFor="">피치핑크</label>
-            </ThemeButton>
-          </Grid>
-        </div>
-        <Grid container>
-          <Grid item xs={8}>
-            <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
-              탈퇴
-            </WButton>
-          </Grid>
-          <Grid
-            item
-            xs={4}
-            sx={{
-              paddingTop: 1,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItem: 'center',
-            }}>
-            <CButton onClick={dialogOpen} sx={{ height: 35, width: 110 }}>
-              비밀번호 변경
-            </CButton>
-            <EditPassword open={openEditPassword} onClose={dialogClose}></EditPassword>
-            <CButton
-              onClick={editDataClose}
-              sx={{ height: 35, width: 50 }}
-              disabled={!isNicknameChecked}>
-              수정
-            </CButton>
-          </Grid>
-        </Grid>
-
-        <IconButton
-          component="span"
-          sx={{ position: 'absolute', top: 40, right: 40 }}
-          onClick={cancleClose}>
-          <ClearIcon
-            sx={{
-              minWidth: 0,
-              justifyContent: 'center',
-              color: theme.palette.txt,
-            }}
-          />
-        </IconButton>
-      </CustomContent>
-    </Dialog>
+            <IconButton
+              component="span"
+              sx={{ position: 'absolute', top: 25, right: 25 }}
+              onClick={cancleClose}>
+              <ClearIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.txt,
+                }}
+              />
+            </IconButton>
+          </MContent>
+        </Dialog>
+      </MobileView>
+    </>
   );
 }
 

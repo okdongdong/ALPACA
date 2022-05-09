@@ -13,7 +13,7 @@ const RootStyle = styled('div')({
 function AccountLayout() {
   return (
     <>
-      <BrowserView>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
         <RootStyle>
           <Outlet />
         </RootStyle>

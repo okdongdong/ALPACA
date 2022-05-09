@@ -57,7 +57,8 @@ function CContainerWithLogo({ children, onKeyPress = () => {} }: CContainerWithL
           sx={{
             backgroundColor: theme.palette.bg,
             textAlign: 'center',
-            height: '94vh',
+            height: '100%',
+            minHeight: '100vh',
           }}>
           <div style={{ height: '20vh', paddingTop: '10vh' }}>
             {themeType === 'dark' ? (
@@ -66,7 +67,7 @@ function CContainerWithLogo({ children, onKeyPress = () => {} }: CContainerWithL
               <img src={Logo} alt="Logo" style={{ height: '6vh' }} />
             )}
           </div>
-          <Stack>
+          <Stack sx={{ marginTop: '6vh', px: '2vh' }}>
             <form
               onKeyUp={onKeyUpHandler}
               onSubmit={(event) => {

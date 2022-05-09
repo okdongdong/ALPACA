@@ -59,7 +59,7 @@ type codeEditorProps = {
 function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEditorProps) {
   const { roomId } = useParams();
   const ydoc = new Y.Doc();
-  const provider = new WebsocketProvider(process.env.REACT_APP_YJS_DOCS || '', roomId || '1', ydoc);
+  const provider = new WebsocketProvider('wss://k6e106.p.ssafy.io/yjs' || '', roomId || '1', ydoc);
   const ytext = ydoc.getText('monaco');
   const theme = useTheme();
   const editorRef = useRef(null);

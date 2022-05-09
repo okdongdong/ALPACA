@@ -8,6 +8,7 @@ import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
 import BojIdSearch from '../../Components/Dialogs/BojIdSearch';
 import { customAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/commonReducer';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 function Signup() {
   // 사용할 hook 선언
@@ -178,69 +179,146 @@ function Signup() {
   }, [nickname]);
 
   return (
-    <CContainerWithLogo onKeyPress={onkeyPressHandler}>
-      <BojIdSearch open={open} setOpen={setOpen} setBojId={setBojId} />
-      <CInputWithBtn
-        onChange={setUsername}
-        label="ID"
-        buttonContent={isUsernameChecked ? '수정하기' : '중복확인'}
-        onButtonClick={usernameDuplicateCheck}
-        readOnly={isUsernameChecked}
-        helperText={usernameMessage}
-        buttonDisable={!!usernameMessage}
-      />
-      <CInput
-        type="password"
-        onChange={setPassword}
-        label="PASSWORD"
-        helperText={passwordMessage}
-      />
-      <CInput
-        type="password"
-        onChange={setPasswordCheck}
-        label="PASSWORD CONFIRM"
-        helperText={passwordCheckMessage}
-      />
-      <CInputWithBtn
-        onChange={setNickname}
-        label="NICKNAME"
-        buttonContent={isNicknameChecked ? '수정하기' : '중복확인'}
-        onButtonClick={nicknameDuplicateCheck}
-        readOnly={isNicknameChecked}
-        helperText={nicknameMessage}
-        buttonDisable={!!nicknameMessage}
-      />
-      <CInputWithBtn
-        onChange={setBojId}
-        label="BOJ ID"
-        buttonContent="ID검색"
-        onButtonClick={() => setOpen(true)}
-        readOnly={true}
-        value={bojId}
-      />
-      <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
-        <CBtn
-          width="30%"
-          content="뒤로가기"
-          onClick={() => navigate(-1)}
-          backgroundColor="rgba(0,0,0,0)"
-        />
-        <CBtn
-          width="30%"
-          content="회원가입"
-          onClick={signup}
-          // 회원가입 유효성 검사 통과시에만 활성화
-          disabled={
-            !!usernameMessage ||
-            !!passwordMessage ||
-            !!passwordCheckMessage ||
-            !!nicknameMessage ||
-            isUsernameChecked === false ||
-            isNicknameChecked === false
-          }
-        />
-      </div>
-    </CContainerWithLogo>
+    <>
+      <BrowserView>
+        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+          <BojIdSearch open={open} setOpen={setOpen} setBojId={setBojId} />
+          <CInputWithBtn
+            onChange={setUsername}
+            label="ID"
+            buttonContent={isUsernameChecked ? '수정하기' : '중복확인'}
+            onButtonClick={usernameDuplicateCheck}
+            readOnly={isUsernameChecked}
+            helperText={usernameMessage}
+            buttonDisable={!!usernameMessage}
+          />
+          <CInput
+            type="password"
+            onChange={setPassword}
+            label="PASSWORD"
+            helperText={passwordMessage}
+          />
+          <CInput
+            type="password"
+            onChange={setPasswordCheck}
+            label="PASSWORD CONFIRM"
+            helperText={passwordCheckMessage}
+          />
+          <CInputWithBtn
+            onChange={setNickname}
+            label="NICKNAME"
+            buttonContent={isNicknameChecked ? '수정하기' : '중복확인'}
+            onButtonClick={nicknameDuplicateCheck}
+            readOnly={isNicknameChecked}
+            helperText={nicknameMessage}
+            buttonDisable={!!nicknameMessage}
+          />
+          <CInputWithBtn
+            onChange={setBojId}
+            label="BOJ ID"
+            buttonContent="ID검색"
+            onButtonClick={() => setOpen(true)}
+            readOnly={true}
+            value={bojId}
+          />
+          <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
+            <CBtn
+              width="30%"
+              content="뒤로가기"
+              onClick={() => navigate(-1)}
+              backgroundColor="rgba(0,0,0,0)"
+            />
+            <CBtn
+              width="30%"
+              content="회원가입"
+              onClick={signup}
+              // 회원가입 유효성 검사 통과시에만 활성화
+              disabled={
+                !!usernameMessage ||
+                !!passwordMessage ||
+                !!passwordCheckMessage ||
+                !!nicknameMessage ||
+                isUsernameChecked === false ||
+                isNicknameChecked === false
+              }
+            />
+          </div>
+        </CContainerWithLogo>
+      </BrowserView>
+      {/* mobile */}
+      <MobileView>
+        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+          <BojIdSearch open={open} setOpen={setOpen} setBojId={setBojId} />
+          <CInputWithBtn
+            onChange={setUsername}
+            label="ID"
+            buttonContent={isUsernameChecked ? '수정하기' : '중복확인'}
+            onButtonClick={usernameDuplicateCheck}
+            readOnly={isUsernameChecked}
+            helperText={usernameMessage}
+            buttonDisable={!!usernameMessage}
+          />
+          <CInput
+            type="password"
+            onChange={setPassword}
+            label="PASSWORD"
+            helperText={passwordMessage}
+          />
+          <CInput
+            type="password"
+            onChange={setPasswordCheck}
+            label="PASSWORD CONFIRM"
+            helperText={passwordCheckMessage}
+          />
+          <CInputWithBtn
+            onChange={setNickname}
+            label="NICKNAME"
+            buttonContent={isNicknameChecked ? '수정하기' : '중복확인'}
+            onButtonClick={nicknameDuplicateCheck}
+            readOnly={isNicknameChecked}
+            helperText={nicknameMessage}
+            buttonDisable={!!nicknameMessage}
+          />
+          <CInputWithBtn
+            onChange={setBojId}
+            label="BOJ ID"
+            buttonContent="ID검색"
+            onButtonClick={() => setOpen(true)}
+            readOnly={true}
+            value={bojId}
+          />
+          <div
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              display: 'flex',
+              marginTop: '6vh',
+              marginBottom: '5vh',
+            }}>
+            <CBtn
+              width="30%"
+              content="뒤로가기"
+              onClick={() => navigate(-1)}
+              backgroundColor="rgba(0,0,0,0)"
+            />
+            <CBtn
+              width="30%"
+              content="회원가입"
+              onClick={signup}
+              // 회원가입 유효성 검사 통과시에만 활성화
+              disabled={
+                !!usernameMessage ||
+                !!passwordMessage ||
+                !!passwordCheckMessage ||
+                !!nicknameMessage ||
+                isUsernameChecked === false ||
+                isNicknameChecked === false
+              }
+            />
+          </div>
+        </CContainerWithLogo>
+      </MobileView>
+    </>
   );
 }
 

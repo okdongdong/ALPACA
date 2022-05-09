@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import styles from './MainIntroductionProfile.module.css';
 import EditProfile from '../Dialogs/EditProfile';
 import { useSelector } from 'react-redux';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 const ProfileDiv = styled('div')({
   position: 'relative',
@@ -42,19 +43,46 @@ function MainIntroductionProfile() {
   };
 
   return (
-    <ProfileDiv>
-      <img src={userInfo.profileImg} className={styles.profileimg} alt="" />
-      <CIconButton aria-label="EditIcon" onClick={handleClickOpen}>
-        <EditIcon
-          sx={{
-            minWidth: 0,
-            justifyContent: 'center',
-            color: '#FFFFFF',
-          }}
-        />
-      </CIconButton>
-      <EditProfile open={open} onClose={handleClose} />
-    </ProfileDiv>
+    <>
+      <BrowserView>
+        <ProfileDiv>
+          <img src={userInfo.profileImg} className={styles.profileimg} alt="" />
+          <CIconButton aria-label="EditIcon" onClick={handleClickOpen}>
+            <EditIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: 'center',
+                color: '#FFFFFF',
+              }}
+            />
+          </CIconButton>
+          <EditProfile open={open} onClose={handleClose} />
+        </ProfileDiv>
+      </BrowserView>
+      <MobileView>
+        <ProfileDiv>
+          <img
+            src={userInfo.profileImg}
+            className={styles.profileimg}
+            alt=""
+            style={{ height: '12vh', width: '12vh', marginLeft: '35px' }}
+          />
+          <CIconButton
+            aria-label="EditIcon"
+            onClick={handleClickOpen}
+            sx={{ height: '5vh', width: '5vh', minHeight: 0 }}>
+            <EditIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: 'center',
+                color: '#FFFFFF',
+              }}
+            />
+          </CIconButton>
+          <EditProfile open={open} onClose={handleClose} />
+        </ProfileDiv>
+      </MobileView>
+    </>
   );
 }
 
