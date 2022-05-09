@@ -29,8 +29,9 @@ public class ScheduleController {
             notes = "스터디룸에서 일정을 추가한다."
     )
     @PostMapping()
-    public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) {
-        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(scheduleReq)));
+    public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(username, scheduleReq)));
     }
 
     @ApiOperation(
@@ -38,7 +39,7 @@ public class ScheduleController {
             notes = "오늘 예정된 스터디의 문제들을 조회한다."
     )
     @GetMapping("/{id}/today")
-    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) {
+    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(scheduleService.getTodaySchedule(username, id));
     }
@@ -49,8 +50,9 @@ public class ScheduleController {
     )
     @ApiImplicitParam( name = "id", value = "수정할 일정의 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) {
-        scheduleService.updateSchedule(id, scheduleUpdateReq);
+    public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        scheduleService.updateSchedule(username, id, scheduleUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
