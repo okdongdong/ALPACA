@@ -9,6 +9,7 @@ import { setUserInfo } from '../../Redux/accountReducer';
 import { setLoading } from '../../Redux/commonReducer';
 import { setTheme } from '../../Redux/themeReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 function Login(props: any) {
   const navigate = useNavigate();
@@ -76,19 +77,44 @@ function Login(props: any) {
   };
 
   return (
-    <CContainerWithLogo onKeyPress={onkeyPressHandler}>
-      <CInput onChange={setUsername} label="ID" />
-      <CInput type="password" onChange={setPassword} label="PASSWORD" />
-      <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
-        <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
-        <CBtn
-          width="30%"
-          content="로그인"
-          onClick={login}
-          disabled={username === '' || password === ''}
-        />
-      </div>
-    </CContainerWithLogo>
+    <>
+      <BrowserView>
+        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+          <CInput onChange={setUsername} label="ID" />
+          <CInput type="password" onChange={setPassword} label="PASSWORD" />
+          <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
+            <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
+            <CBtn
+              width="30%"
+              content="로그인"
+              onClick={login}
+              disabled={username === '' || password === ''}
+            />
+          </div>
+        </CContainerWithLogo>
+      </BrowserView>
+      <MobileView>
+        <div style={{ height: '6vh' }}>Navbar</div>
+        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+          <CInput onChange={setUsername} label="ID" />
+          <CInput type="password" onChange={setPassword} label="PASSWORD" />
+          <div
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              display: 'flex',
+            }}>
+            <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
+            <CBtn
+              width="30%"
+              content="로그인"
+              onClick={login}
+              disabled={username === '' || password === ''}
+            />
+          </div>
+        </CContainerWithLogo>
+      </MobileView>
+    </>
   );
 }
 
