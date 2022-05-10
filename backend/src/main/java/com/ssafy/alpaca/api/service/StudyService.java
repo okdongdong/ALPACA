@@ -142,7 +142,7 @@ public class StudyService {
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-        Chat chat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
+        Optional<Chat> optChat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
         return StudyRes.builder()
                 .title(study.getTitle())
                 .info(study.getTitle())
@@ -154,7 +154,7 @@ public class StudyService {
                                 .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
                                 .build()).collect(Collectors.toList()))
                 .scheduleListRes(ScheduleListRes.of(schedules))
-                .offsetId(chat.getId())
+                .offsetId(optChat.map(Chat::getId).orElse(null))
                 .build();
     }
 
