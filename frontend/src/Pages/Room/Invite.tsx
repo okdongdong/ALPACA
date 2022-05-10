@@ -73,7 +73,7 @@ function Invite() {
         </div>
         <div>수락하시겠습니까?</div>
         <div style={{ justifyContent: 'center', display: 'flex' }}>
-          {isLogin ? (
+          {!isLogin ? (
             <Stack>
               <CBtn height="100%" onClick={() => navigate('/login', { state: pathname })}>
                 로그인

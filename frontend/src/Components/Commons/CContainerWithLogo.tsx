@@ -12,6 +12,7 @@ interface CContainerWithLogoProps {
 
 const CustomContainer = styled(Container)(({ theme }) => ({
   backgroundColor: theme.palette.bg,
+  width: '450px',
   padding: theme.spacing(4, 8),
   textAlign: 'center',
 }));
@@ -31,7 +32,7 @@ function CContainerWithLogo({ children, onKeyPress = () => {} }: CContainerWithL
   return (
     <>
       <BrowserView>
-        <CustomContainer maxWidth="xs">
+        <CustomContainer>
           <Stack spacing={6}>
             <div>
               {themeType === 'dark' ? (

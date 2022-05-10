@@ -89,7 +89,7 @@ function RoomMain() {
       const timeDiff = selectedDay.getTime() - dateRange[0].day.getTime();
       const dateDiff = Math.ceil(timeDiff / DAY_TO_MILLISEC);
       dispatch(setSelectedDayIdx(dateDiff));
-      dispatch(setIsStudyExist(Boolean(dateRange[dateDiff].schedule)));
+      dispatch(setIsStudyExist(Boolean(dateRange[dateDiff]?.schedule)));
     }
     // 날짜가 변경되면 수정모드 해제 및 추가된문제 초기화
     dispatch(setIsEdit(false));

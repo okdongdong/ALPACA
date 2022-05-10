@@ -2,7 +2,7 @@ import { Collapse, Stack, styled, Switch, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { setLoading } from '../../../Redux/commonReducer';
 import CBtn from '../../Commons/CBtn';
@@ -17,6 +17,7 @@ function RoomMainSetting() {
   const { roomId } = useParams();
   const theme = useTheme();
   const dispatch = useDispatch();
+  const cAlert = useAlert();
   const isSetting = useSelector((state: any) => state.room.isSetting);
 
   const [alarmOn, setAlarmOn] = useState<boolean>(true);
@@ -52,7 +53,7 @@ function RoomMainSetting() {
   };
 
   const deleteHandler = async () => {
-    const result = await Swal.fire({
+    const result = await cAlert.fire({
       title: '스터디 삭제하시겠습니까?',
       text: '스터디가 영구적으로 삭제됩니다.',
       icon: 'warning',
@@ -69,13 +70,13 @@ function RoomMainSetting() {
 
     if (result.isConfirmed) {
       const res = await deleteStudy();
-      if (res) Swal.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success');
-      else Swal.fire('삭제 실패!', '잠시 후 다시 시도해주세요.', 'error');
+      if (res) cAlert.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success');
+      else cAlert.fire('삭제 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
 
   const leaveHandler = async () => {
-    const result = await Swal.fire({
+    const result = await cAlert.fire({
       title: '스터디를 탈퇴하시겠습니까?',
       text: '스터디를 떠납니다.',
       icon: 'warning',
@@ -92,8 +93,8 @@ function RoomMainSetting() {
 
     if (result.isConfirmed) {
       const res = await leaveStudy();
-      if (res) Swal.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success');
-      else Swal.fire('탈퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
+      if (res) cAlert.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success');
+      else cAlert.fire('탈퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
 

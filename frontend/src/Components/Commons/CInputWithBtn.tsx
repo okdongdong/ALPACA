@@ -1,5 +1,13 @@
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import { FormControl, FormHelperText, Grid, Input, InputAdornment, styled } from '@mui/material';
+import {
+  FormControl,
+  FormHelperText,
+  Grid,
+  Input,
+  InputAdornment,
+  styled,
+  useTheme,
+} from '@mui/material';
 import React from 'react';
 import CBtn from './CBtn';
 import { BrowserView, MobileView } from 'react-device-detect';
@@ -8,6 +16,7 @@ interface CInputWithBtnProps {
   label: string;
   buttonContent: string | ReactJSXElement;
   placeholder?: string;
+  isError?: boolean;
   helperText?: string;
   buttonBackgroundColor?: string;
   value?: string;
@@ -38,6 +47,7 @@ function CInputWithBtn({
   placeholder = '',
   helperText = '',
   buttonBackgroundColor = '',
+  isError = true,
   value,
   readOnly = false,
   disabled = false,
@@ -45,6 +55,8 @@ function CInputWithBtn({
   onChange,
   onButtonClick,
 }: CInputWithBtnProps) {
+  const theme = useTheme();
+
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
@@ -61,7 +73,7 @@ function CInputWithBtn({
             <label htmlFor={`${label}-label`}>{label}</label>
           </Grid>
           <Grid item xs={8}>
-            <FormControl variant="standard" error={!!helperText} fullWidth>
+            <FormControl variant="standard" error={!!helperText && isError} fullWidth>
               <CustomInput
                 id={`${label}-label`}
                 onChange={onChangeHandler}
@@ -84,7 +96,7 @@ function CInputWithBtn({
                   </InputAdornment>
                 }
               />
-              <FormHelperText>{helperText}</FormHelperText>
+              <FormHelperText sx={{ color: theme.palette.txt }}>{helperText}</FormHelperText>
             </FormControl>
           </Grid>
         </CustomGridContainer>
@@ -95,7 +107,7 @@ function CInputWithBtn({
             <label htmlFor={`${label}-label`}>{label}</label>
           </Grid>
           <Grid item xs={12}>
-            <FormControl variant="standard" error={!!helperText} fullWidth>
+            <FormControl variant="standard" error={!!helperText && isError} fullWidth>
               <CustomInput
                 id={`${label}-label`}
                 onChange={onChangeHandler}
@@ -118,7 +130,7 @@ function CInputWithBtn({
                   </InputAdornment>
                 }
               />
-              <FormHelperText>{helperText}</FormHelperText>
+              <FormHelperText sx={{ color: theme.palette.txt }}>{helperText}</FormHelperText>
             </FormControl>
           </Grid>
         </CustomGridContainer>
