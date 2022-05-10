@@ -57,7 +57,7 @@ function MainIntroductionContent() {
             <Clabel htmlFor="">닉네임</Clabel>
           </div>
           <CustomContainer sx={{ marginBottom: '1vh' }}>
-            <TInput sx={{ width: '100%', minWidth: '230px' }} value={userInfo.nickname}></TInput>
+            <TInput sx={{ width: '100%' }} value={userInfo.nickname}></TInput>
           </CustomContainer>
           <div>
             <Clabel htmlFor="">자기소개</Clabel>
