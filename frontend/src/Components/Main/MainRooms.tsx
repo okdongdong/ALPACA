@@ -18,8 +18,9 @@ const CIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const MIconButton = styled(IconButton)(({ theme }) => ({
+  display: 'inline-block',
   background: 'none',
-  marginLeft: '90%',
+  marginLeft: 'auto',
 }));
 
 function MainRooms() {
@@ -118,17 +119,19 @@ function MainRooms() {
           />
         </Box>
       </BrowserView>
-      <MobileView>
-        <Box p="5">
-          <MIconButton onClick={handleClickOpen}>
-            <AddIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: 'center',
-                color: theme.palette.txt,
-              }}
-            />
-          </MIconButton>
+      <MobileView style={{ width: '100%' }}>
+        <Box p="5" sx={{ width: '100%' }}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
+            <MIconButton onClick={handleClickOpen}>
+              <AddIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.txt,
+                }}
+              />
+            </MIconButton>
+          </div>
           <StudyCreate
             open={open}
             page={page}
