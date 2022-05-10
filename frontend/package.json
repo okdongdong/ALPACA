@@ -20,6 +20,7 @@
     "monaco-editor": "^0.33.0",
     "openvidu-browser": "^2.21.0",
     "react": "^18.0.0",
+    "react-device-detect": "^2.2.2",
     "react-dom": "^18.0.0",
     "react-redux": "^8.0.0",
     "react-router-dom": "^6.3.0",
@@ -29,8 +30,8 @@
     "redux-persist": "^6.0.0",
     "sockjs-client": "^1.6.0",
     "stompjs": "^2.3.3",
-    "webstomp-client": "^1.2.6",
     "sweetalert2": "^11.4.10",
+    "webstomp-client": "^1.2.6",
     "y-monaco": "^0.1.3",
     "y-websocket": "^1.4.3",
     "yjs": "^13.5.35"

@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { customAxios } from '../../Lib/customAxios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 function escapeRegExp(value: string): string {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
@@ -229,6 +230,27 @@ const columnsData = [
   },
 ];
 
+const McolumsData = [
+  {
+    field: 'level',
+    type: 'number',
+    width: 40,
+    renderCell: (params: any) => {
+      return <CBadge tier={params.value}></CBadge>;
+    },
+  },
+  { field: 'problemNumber', type: 'number', headerName: '문제번호', width: 100 },
+  { field: 'title', headerName: '문제 이름', width: 150 },
+  {
+    field: 'startedAt',
+    headerName: '스터디 날짜',
+    width: 120,
+    renderCell: (params: any) => {
+      return `${params.value.substring(0, 10)}`;
+    },
+  },
+];
+
 const testdata = [
   {
     id: 1,
@@ -411,25 +433,59 @@ function ProblemManage() {
   }, [testdata]);
 
   return (
-    <Box sx={{ height: '75vh', width: 960 }}>
-      <StripedDataGrid
-        disableColumnMenu
-        hideFooter
-        sx={{ '& .MuiDataGrid-columnHeaderTitleContainer': { justifyContent: 'center' } }}
-        components={{ Toolbar: QuickSearchToolbar }}
-        rows={rows}
-        getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
-        columns={columnsData}
-        componentsProps={{
-          toolbar: {
-            value: searchText,
-            onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
-              requestSearch(event.target.value),
-            clearSearch: () => requestSearch(''),
-          },
-        }}
-      />
-    </Box>
+    <>
+      <BrowserView>
+        <Box sx={{ height: '75vh', width: 960 }}>
+          <StripedDataGrid
+            disableColumnMenu
+            hideFooter
+            sx={{ '& .MuiDataGrid-columnHeaderTitleContainer': { justifyContent: 'center' } }}
+            components={{ Toolbar: QuickSearchToolbar }}
+            rows={rows}
+            getRowClassName={(params) =>
+              params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+            }
+            columns={columnsData}
+            componentsProps={{
+              toolbar: {
+                value: searchText,
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  requestSearch(event.target.value),
+                clearSearch: () => requestSearch(''),
+              },
+            }}
+          />
+        </Box>
+      </BrowserView>
+      <MobileView>
+        <Box sx={{ height: '75vh' }}>
+          <StripedDataGrid
+            disableColumnMenu
+            hideFooter
+            sx={{
+              '& .MuiDataGrid-columnHeaderTitleContainer': {
+                justifyContent: 'center',
+                fontSize: '12px',
+              },
+            }}
+            components={{ Toolbar: QuickSearchToolbar }}
+            rows={rows}
+            getRowClassName={(params) =>
+              params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+            }
+            columns={McolumsData}
+            componentsProps={{
+              toolbar: {
+                value: searchText,
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  requestSearch(event.target.value),
+                clearSearch: () => requestSearch(''),
+              },
+            }}
+          />
+        </Box>
+      </MobileView>
+    </>
   );
 }
 

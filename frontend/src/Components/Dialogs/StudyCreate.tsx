@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 export interface StudyCreateProps {
   open: boolean;
@@ -53,6 +54,14 @@ const CustomContent = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.bg,
 }));
 
+const MContent = styled('div')(({ theme }) => ({
+  display: 'Grid',
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: theme.palette.bg,
+  width: '100%',
+  height: '100%',
+}));
 const MemberArray = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'left',
@@ -187,93 +196,208 @@ function StudyCreate(props: StudyCreateProps) {
   };
 
   return (
-    <Dialog onClose={cancleClose} open={open} maxWidth="lg">
-      <CustomContent>
-        <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
-        <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
-          <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <Clabel>스터디 이름</Clabel>
-          </Grid>
-          <Grid item xs={10}>
-            <FormControl variant="standard" error={!!nameMessage} fullWidth>
-              <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeName}></TInput>
-              <FormHelperText>{nameMessage}</FormHelperText>
-            </FormControl>
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <Clabel>스터디 소개</Clabel>
-          </Grid>
-          <Grid item xs={10}>
-            <FormControl variant="standard" error={!!introMessage} fullWidth>
-              <TInput multiline={true} sx={{ minWidth: '100%' }} onChange={onChangeIntro}></TInput>
-              <FormHelperText>{introMessage}</FormHelperText>
-            </FormControl>
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-            <Clabel>스터디원</Clabel>
-          </Grid>
-          <Grid item xs={10}>
-            <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
-            <Demo>
-              <List
-                sx={{
-                  position: 'relative',
-                  overflow: 'auto',
-                  maxHeight: 200,
-                }}>
-                {getUser.map((item: any) => {
-                  return (
-                    <ListItem key={item.id}>
-                      <ListItemButton
-                        onClick={() => {
-                          setMemberList((memberList) => {
-                            if (
-                              !memberList.some((samedata) => {
-                                return samedata.id === item.id;
-                              })
-                            )
-                              return [...memberList, item];
-                            else return [...memberList];
-                          });
-                        }}>
-                        <ListItemAvatar>
-                          <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
-                        </ListItemAvatar>
-                        <ListItemText primary={item.nickname} sx={{ color: theme.palette.txt }} />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
-              </List>
-            </Demo>
-            <MemberArray>
-              {memberList.map((data: any) => {
-                return (
-                  <ListChip key={data.id}>
-                    <CChip
-                      avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
-                      label={data.nickname}
-                      onDelete={handleDelete(data)}
-                    />
-                  </ListChip>
-                );
-              })}
-            </MemberArray>
-          </Grid>
-        </Grid>
-        <Grid item sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-          <CBtn content="닫기" onClick={cancleClose}></CBtn>
-          <CBtn
-            content="확인"
-            onClick={handleClose}
-            disabled={!!nameMessage || !!introMessage}></CBtn>
-        </Grid>
-      </CustomContent>
-    </Dialog>
+    <>
+      <BrowserView>
+        <Dialog onClose={cancleClose} open={open} maxWidth="lg">
+          <CustomContent>
+            <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
+            <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
+              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+                <Clabel>스터디 이름</Clabel>
+              </Grid>
+              <Grid item xs={10}>
+                <FormControl variant="standard" error={!!nameMessage} fullWidth>
+                  <TInput
+                    multiline={true}
+                    sx={{ minWidth: '100%' }}
+                    onChange={onChangeName}></TInput>
+                  <FormHelperText>{nameMessage}</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+                <Clabel>스터디 소개</Clabel>
+              </Grid>
+              <Grid item xs={10}>
+                <FormControl variant="standard" error={!!introMessage} fullWidth>
+                  <TInput
+                    multiline={true}
+                    sx={{ minWidth: '100%' }}
+                    onChange={onChangeIntro}></TInput>
+                  <FormHelperText>{introMessage}</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+                <Clabel>스터디원</Clabel>
+              </Grid>
+              <Grid item xs={10}>
+                <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
+                <Demo>
+                  <List
+                    sx={{
+                      position: 'relative',
+                      overflow: 'auto',
+                      maxHeight: 200,
+                    }}>
+                    {getUser.map((item: any) => {
+                      return (
+                        <ListItem key={item.id}>
+                          <ListItemButton
+                            onClick={() => {
+                              setMemberList((memberList) => {
+                                if (
+                                  !memberList.some((samedata) => {
+                                    return samedata.id === item.id;
+                                  })
+                                )
+                                  return [...memberList, item];
+                                else return [...memberList];
+                              });
+                            }}>
+                            <ListItemAvatar>
+                              <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={item.nickname}
+                              sx={{ color: theme.palette.txt }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Demo>
+                <MemberArray>
+                  {memberList.map((data: any) => {
+                    return (
+                      <ListChip key={data.id}>
+                        <CChip
+                          avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
+                          label={data.nickname}
+                          onDelete={handleDelete(data)}
+                        />
+                      </ListChip>
+                    );
+                  })}
+                </MemberArray>
+              </Grid>
+            </Grid>
+            <Grid
+              item
+              sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+              <CBtn content="닫기" onClick={cancleClose}></CBtn>
+              <CBtn
+                content="확인"
+                onClick={handleClose}
+                disabled={!!nameMessage || !!introMessage}></CBtn>
+            </Grid>
+          </CustomContent>
+        </Dialog>
+      </BrowserView>
+      <MobileView>
+        <Dialog onClose={cancleClose} open={open} fullScreen>
+          <MContent>
+            <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
+            <Grid container sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
+                <Clabel>스터디 이름</Clabel>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" error={!!nameMessage} fullWidth>
+                  <TInput
+                    multiline={true}
+                    sx={{ minWidth: '100%' }}
+                    onChange={onChangeName}></TInput>
+                  <FormHelperText>{nameMessage}</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
+                <Clabel>스터디 소개</Clabel>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" error={!!introMessage} fullWidth>
+                  <TInput
+                    multiline={true}
+                    sx={{ minWidth: '100%' }}
+                    onChange={onChangeIntro}></TInput>
+                  <FormHelperText>{introMessage}</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
+                <Clabel>스터디원</Clabel>
+              </Grid>
+              <Grid item xs={12}>
+                <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
+                <Demo>
+                  <List
+                    sx={{
+                      position: 'relative',
+                      overflow: 'auto',
+                      maxHeight: 200,
+                    }}>
+                    {getUser.map((item: any) => {
+                      return (
+                        <ListItem key={item.id}>
+                          <ListItemButton
+                            onClick={() => {
+                              setMemberList((memberList) => {
+                                if (
+                                  !memberList.some((samedata) => {
+                                    return samedata.id === item.id;
+                                  })
+                                )
+                                  return [...memberList, item];
+                                else return [...memberList];
+                              });
+                            }}>
+                            <ListItemAvatar>
+                              <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={item.nickname}
+                              sx={{ color: theme.palette.txt }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Demo>
+                <MemberArray>
+                  {memberList.map((data: any) => {
+                    return (
+                      <ListChip key={data.id}>
+                        <CChip
+                          avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
+                          label={data.nickname}
+                          onDelete={handleDelete(data)}
+                        />
+                      </ListChip>
+                    );
+                  })}
+                </MemberArray>
+              </Grid>
+            </Grid>
+            <Grid
+              item
+              sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+              <CBtn content="닫기" onClick={cancleClose}></CBtn>
+              <CBtn
+                content="확인"
+                onClick={handleClose}
+                disabled={!!nameMessage || !!introMessage}></CBtn>
+            </Grid>
+          </MContent>
+        </Dialog>
+      </MobileView>
+    </>
   );
 }
 

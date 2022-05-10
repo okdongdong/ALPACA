@@ -1,5 +1,6 @@
 import { FormControl, FormHelperText, Grid, Input, styled } from '@mui/material';
 import React from 'react';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 interface CInputProps {
   label: string;
@@ -34,24 +35,48 @@ function CInput({
   };
 
   return (
-    <CustomGridContainer container>
-      <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-        <label htmlFor={`${label}-label`}>{label}</label>
-      </Grid>
-      <Grid item xs={8}>
-        <FormControl variant="standard" error={!!helperText} fullWidth>
-          <CustomInput
-            id={`${label}-label`}
-            onChange={onChangeHandler}
-            type={type}
-            placeholder={placeholder}
-            fullWidth
-            autoComplete={label}
-          />
-          <FormHelperText>{helperText}</FormHelperText>
-        </FormControl>
-      </Grid>
-    </CustomGridContainer>
+    <>
+      <BrowserView>
+        <CustomGridContainer container>
+          <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
+            <label htmlFor={`${label}-label`}>{label}</label>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl variant="standard" error={!!helperText} fullWidth>
+              <CustomInput
+                id={`${label}-label`}
+                onChange={onChangeHandler}
+                type={type}
+                placeholder={placeholder}
+                fullWidth
+                autoComplete={label}
+              />
+              <FormHelperText>{helperText}</FormHelperText>
+            </FormControl>
+          </Grid>
+        </CustomGridContainer>
+      </BrowserView>
+      <MobileView>
+        <CustomGridContainer container>
+          <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
+            <label htmlFor={`${label}-label`}>{label}</label>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl variant="standard" error={!!helperText} fullWidth>
+              <CustomInput
+                id={`${label}-label`}
+                onChange={onChangeHandler}
+                type={type}
+                placeholder={placeholder}
+                fullWidth
+                autoComplete={label}
+              />
+              <FormHelperText>{helperText}</FormHelperText>
+            </FormControl>
+          </Grid>
+        </CustomGridContainer>
+      </MobileView>
+    </>
   );
 }
 
