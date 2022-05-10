@@ -72,8 +72,7 @@ public class ScheduleService {
     }
 
     public Long createSchedule(String username, ScheduleReq scheduleReq) throws IllegalAccessException {
-        if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
-                scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
+        if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt())) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
