@@ -72,8 +72,21 @@ public class ScheduleService {
     }
 
     public Long createSchedule(String username, ScheduleReq scheduleReq) throws IllegalAccessException {
-        if (scheduleReq.getFinishedAt().isBefore(scheduleReq.getStartedAt()) ||
-                scheduleReq.getFinishedAt().isEqual(scheduleReq.getStartedAt())) {
+        LocalDateTime finishedAt = LocalDateTime.of(
+                scheduleReq.getFinishedAt().getYear(),
+                scheduleReq.getFinishedAt().getMonth(),
+                scheduleReq.getFinishedAt().getDayOfMonth(),
+                scheduleReq.getFinishedAt().getHour(),
+                scheduleReq.getFinishedAt().getMinute()
+        );
+        LocalDateTime startedAt = LocalDateTime.of(
+                scheduleReq.getStartedAt().getYear(),
+                scheduleReq.getStartedAt().getMonth(),
+                scheduleReq.getStartedAt().getDayOfMonth(),
+                scheduleReq.getStartedAt().getHour(),
+                scheduleReq.getStartedAt().getMinute()
+        );
+        if (finishedAt.isBefore(startedAt)) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
@@ -93,8 +106,8 @@ public class ScheduleService {
 
         Schedule schedule = Schedule.builder()
                         .study(study)
-                        .startedAt(scheduleReq.getStartedAt())
-                        .finishedAt(scheduleReq.getFinishedAt())
+                        .startedAt(startedAt)
+                        .finishedAt(finishedAt)
                         .build();
         List<ToSolveProblem> toSolveProblems = new ArrayList<>();
         for (Long number : scheduleReq.getToSolveProblems()) {
@@ -139,8 +152,21 @@ public class ScheduleService {
     }
 
     public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
-        if (scheduleUpdateReq.getFinishedAt().isBefore(scheduleUpdateReq.getStartedAt()) ||
-                scheduleUpdateReq.getFinishedAt().isEqual(scheduleUpdateReq.getStartedAt())) {
+        LocalDateTime finishedAt = LocalDateTime.of(
+                scheduleUpdateReq.getFinishedAt().getYear(),
+                scheduleUpdateReq.getFinishedAt().getMonth(),
+                scheduleUpdateReq.getFinishedAt().getDayOfMonth(),
+                scheduleUpdateReq.getFinishedAt().getHour(),
+                scheduleUpdateReq.getFinishedAt().getMinute()
+        );
+        LocalDateTime startedAt = LocalDateTime.of(
+                scheduleUpdateReq.getStartedAt().getYear(),
+                scheduleUpdateReq.getStartedAt().getMonth(),
+                scheduleUpdateReq.getStartedAt().getDayOfMonth(),
+                scheduleUpdateReq.getStartedAt().getHour(),
+                scheduleUpdateReq.getStartedAt().getMinute()
+        );
+        if (finishedAt.isBefore(startedAt)) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
 
@@ -162,8 +188,8 @@ public class ScheduleService {
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
-        schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
-        schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
+        schedule.setStartedAt(startedAt);
+        schedule.setFinishedAt(finishedAt);
         scheduleRepository.save(schedule);
         for (Long number : scheduleUpdateReq.getToSolveProblems()) {
             toSolveProblemRepository.save(

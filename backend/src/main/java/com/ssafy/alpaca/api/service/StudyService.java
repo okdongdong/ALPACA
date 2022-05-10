@@ -150,6 +150,7 @@ public class StudyService {
                 .members(myStudies.stream().map(myStudy -> StudyRes.Member.builder()
                                 .userId(myStudy.getUser().getId())
                                 .nickname(myStudy.getUser().getNickname())
+                                .bojId(myStudy.getUser().getBojId())
                                 .isRoomMaker(myStudy.getIsRoomMaker())
                                 .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
                                 .build()).collect(Collectors.toList()))
