@@ -3,7 +3,7 @@ import { Divider, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { setLoading } from '../../../Redux/commonReducer';
 import { Member } from '../../../Redux/roomReducer';
@@ -25,9 +25,8 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 
 function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMemberEditProps) {
   const { roomId } = useParams();
-  const theme = useTheme();
   const dispatch = useDispatch();
-
+  const cAlert = useAlert();
   const userId = useSelector((state: any) => state.account.userId);
   const members = useSelector((state: any) => state.room.members);
 
@@ -76,42 +75,40 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
   };
 
   const onClickHandler = async (memberId: number) => {
-    const result = await Swal.fire({
+    const result = await cAlert.fire({
       title: '방장을 양도하시겠습니까?',
       text: '방장 권한을 양도합니다.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: theme.palette.main,
-      cancelButtonColor: theme.palette.component,
       confirmButtonText: '양도',
       cancelButtonText: '취소',
-      customClass: {
-        // cancelButton: classes.customCancelButton,
-      },
-      reverseButtons: true,
+      color: 'rgb(255,0,0)',
     });
 
     if (result.isConfirmed) {
       const res = await empowerMember(memberId);
       if (res) {
         setIsEdit(false);
-        Swal.fire('양도 성공!', '방장 권한을 양도했습니다.', 'success');
+        cAlert.fire({
+          title: '양도 성공!',
+          text: '방장 권한을 양도했습니다.',
+          icon: 'success',
+          confirmButtonText: '닫기',
+        });
       } else if (!!errorMessage)
-        Swal.fire('양도 실패!', errorMessage, 'error').then(() => {
+        cAlert.fire('양도 실패!', errorMessage, 'error').then(() => {
           setErrorMessage('');
         });
-      else Swal.fire('양도 실패!', '잠시 후 다시 시도해주세요.', 'error');
+      else cAlert.fire('양도 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
 
   const onDeleteHandler = async (memberId: number) => {
-    const result = await Swal.fire({
+    const result = await cAlert.fire({
       title: '멤버를 강퇴하시겠습니까?',
       text: '더 이상 함께할 수 없어요 ㅠㅠ',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: theme.palette.warn,
-      cancelButtonColor: theme.palette.component,
       confirmButtonText: '강퇴',
       cancelButtonText: '취소',
       customClass: {
@@ -122,12 +119,12 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
 
     if (result.isConfirmed) {
       const res = await expulsionMember(memberId);
-      if (res) Swal.fire('강퇴 성공!', '멤버를 강퇴했습니다.', 'success');
+      if (res) cAlert.fire('강퇴 성공!', '멤버를 강퇴했습니다.', 'success');
       else if (!!errorMessage)
-        Swal.fire('양도 실패!', errorMessage, 'error').then(() => {
+        cAlert.fire('양도 실패!', errorMessage, 'error').then(() => {
           setErrorMessage('');
         });
-      else Swal.fire('강퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
+      else cAlert.fire('강퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
 

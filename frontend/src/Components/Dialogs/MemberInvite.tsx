@@ -8,7 +8,7 @@ import CProfile from '../Commons/CProfile';
 import CSearchBar from '../Commons/CSearchBar';
 import alpaca from '../../Assets/Img/alpaca.png';
 import CInput from '../Commons/CInput';
-import Swal from 'sweetalert2';
+import useAlert from '../../Hooks/useAlert';
 
 interface MemberInviteProps {
   roomId: string | undefined;
@@ -50,7 +50,7 @@ const CustomInput = styled(Input)(({ theme }) => ({
 
 function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   const dispatch = useDispatch();
-
+  const cAlert = useAlert();
   const [nickname, setNickname] = useState<string>('');
   const [userList, setUserList] = useState<UserInfo[]>([]);
   const [inviteCode, setInviteCode] = useState('ㅁㄴㅇㄹㄴㄴㅇㄹ');
@@ -75,10 +75,10 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
     if (navigator.clipboard) {
       // IE는 사용 못하고, 크롬은 66버전 이상일때 사용 가능
       navigator.clipboard
-        .writeText(inviteCode)
+        .writeText(`${process.env.REACT_APP_CLIENT_URL}/invite/${inviteCode}`)
         .then(() => {
           console.log('초대코드를 복사하는데 성공했습니다.');
-          Swal.fire({
+          cAlert.fire({
             title: '복사 성공',
             text: '초대코드를 복사하는데 성공했습니다.',
             icon: 'success',
@@ -89,7 +89,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
 
         .catch(() => {
           console.log('초대코드를 복사하는데 실패했습니다.');
-          Swal.fire({
+          cAlert.fire({
             title: '복사 실패',
             text: '잠시 후 다시 시도해주세요..',
             icon: 'error',
@@ -98,7 +98,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
           });
         });
     } else {
-      Swal.fire({
+      cAlert.fire({
         title: '복사 실패',
         text: '복사하기가 지원되지 않는 브라우저입니다.',
         icon: 'error',

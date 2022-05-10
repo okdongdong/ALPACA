@@ -10,12 +10,13 @@ import { setLoading } from '../../Redux/commonReducer';
 import { setTheme } from '../../Redux/themeReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
 import { BrowserView, MobileView } from 'react-device-detect';
+import useAlert from '../../Hooks/useAlert';
 
 function Login(props: any) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-
+  const cAlert = useAlert();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -63,7 +64,15 @@ function Login(props: any) {
         navigate('/');
       }
     } catch (e: any) {
-      console.log(e);
+      cAlert.fire({
+        title: '로그인 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        // timer: 1500,
+      });
+
+      console.log('loginError:', e.response);
     }
 
     dispatch(setLoading(false));
