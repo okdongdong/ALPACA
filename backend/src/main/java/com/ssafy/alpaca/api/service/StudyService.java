@@ -188,6 +188,7 @@ public class StudyService {
                 continue;
             }
             problemListRes.add(ProblemListRes.builder()
+                    .id(toSolveProblem.getId())
                     .problemNumber(problem.get().getProblemNumber())
                     .title(problem.get().getTitle())
                     .level(problem.get().getLevel())
