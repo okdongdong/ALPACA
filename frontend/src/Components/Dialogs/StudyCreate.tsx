@@ -55,9 +55,6 @@ const CustomContent = styled('div')(({ theme }) => ({
 }));
 
 const MContent = styled('div')(({ theme }) => ({
-  display: 'Grid',
-  justifyContent: 'center',
-  alignItems: 'center',
   backgroundColor: theme.palette.bg,
   width: '100%',
   height: '100%',
@@ -197,7 +194,7 @@ function StudyCreate(props: StudyCreateProps) {
 
   return (
     <>
-      <BrowserView>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
         <Dialog onClose={cancleClose} open={open} maxWidth="lg">
           <CustomContent>
             <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
@@ -300,36 +297,34 @@ function StudyCreate(props: StudyCreateProps) {
       <MobileView>
         <Dialog onClose={cancleClose} open={open} fullScreen>
           <MContent>
-            <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
-            <Grid container sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CDialogTitle sx={{ textAlign: 'center', marginBottom: '10vh' }}>
+              스터디 개설
+            </CDialogTitle>
+            <Grid
+              container
+              sx={{ display: 'flex', justifyContent: 'center', width: '100%', padding: 1 }}>
               <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
                 <Clabel>스터디 이름</Clabel>
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" error={!!nameMessage} fullWidth>
-                  <TInput
-                    multiline={true}
-                    sx={{ minWidth: '100%' }}
-                    onChange={onChangeName}></TInput>
+                  <TInput multiline={true} sx={{ Width: '100%' }} onChange={onChangeName}></TInput>
                   <FormHelperText>{nameMessage}</FormHelperText>
                 </FormControl>
               </Grid>
             </Grid>
-            <Grid container>
+            <Grid container sx={{ padding: 1 }}>
               <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
                 <Clabel>스터디 소개</Clabel>
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" error={!!introMessage} fullWidth>
-                  <TInput
-                    multiline={true}
-                    sx={{ minWidth: '100%' }}
-                    onChange={onChangeIntro}></TInput>
+                  <TInput multiline={true} onChange={onChangeIntro}></TInput>
                   <FormHelperText>{introMessage}</FormHelperText>
                 </FormControl>
               </Grid>
             </Grid>
-            <Grid container>
+            <Grid container sx={{ padding: 1 }}>
               <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
                 <Clabel>스터디원</Clabel>
               </Grid>

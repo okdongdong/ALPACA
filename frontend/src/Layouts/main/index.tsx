@@ -35,7 +35,6 @@ const MainLayout = () => {
 
   const MMainDiv = styled('div')({
     height: '100%',
-    minHeight: '94vh',
     width: '100%',
     background: theme.palette.bg,
     overflow: 'auto',
@@ -52,7 +51,7 @@ const MainLayout = () => {
           </MainStyle>
         </RootStyle>
       </BrowserView>
-      <MobileView>
+      <MobileView style={{ width: '100%', height: '100%' }}>
         {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <NavBar />}
         <MMainDiv>
           <Outlet />

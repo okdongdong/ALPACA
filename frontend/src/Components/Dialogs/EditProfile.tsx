@@ -68,6 +68,7 @@ const MContent = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.bg,
   width: '100%',
   height: '100%',
+  minHeight: '100vh',
 }));
 
 const ThemeButton = styled('button')(({ theme }) => ({
@@ -258,7 +259,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
 
   return (
     <>
-      <BrowserView>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
         <Dialog onClose={cancleClose} open={open} maxWidth="lg">
           <CustomContent>
             <Grid
@@ -613,17 +614,17 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                 </CButton>
               </Grid>
               <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
-                <img src={themeSelect === 'basic' ? Basic : ''} alt="" />
-                <img src={themeSelect === 'dark' ? Dark : ''} alt="" />
-                <img src={themeSelect === 'olivegreen' ? Olivegreen : ''} alt="" />
-                <img src={themeSelect === 'peachpink' ? Peachpink : ''} alt="" />
+                {themeSelect === 'basic' ? <img src={Basic} alt="" /> : null}
+                {themeSelect === 'dark' ? <img src={Dark} alt="" /> : null}
+                {themeSelect === 'olivegreen' ? <img src={Olivegreen} alt="" /> : null}
+                {themeSelect === 'peachpink' ? <img src={Peachpink} alt="" /> : null}
               </Grid>
             </div>
             <Grid
               container
               sx={{
                 paddingTop: 1,
-                marginBottom: '4vh',
+                marginBottom: '5vh',
                 display: 'flex',
                 justifyContent: 'space-around',
               }}>

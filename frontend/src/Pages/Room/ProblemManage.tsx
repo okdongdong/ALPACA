@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Avatar, AvatarGroup, Grid } from '@mui/material';
+import { Button, Box, Avatar, AvatarGroup, Grid, Modal, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import { DataGrid, gridClasses } from '@mui/x-data-grid';
+import { DataGrid, gridClasses, GridRowsProp } from '@mui/x-data-grid';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled, useTheme } from '@mui/material/styles';
@@ -14,10 +14,6 @@ import MenuItem from '@mui/material/MenuItem';
 import { customAxios } from '../../Lib/customAxios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-}
 
 interface QuickSearchToolbarProps {
   clearSearch: () => void;
@@ -76,6 +72,24 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
     </Grid>
   );
 }
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+const MBox = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  backgroundColor: theme.palette.bg,
+  border: `2px solid ${theme.palette.bg}`,
+  padding: 4,
+  display: 'Grid',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
   '& 	.MuiDataGrid-columnHeader': {
@@ -234,176 +248,35 @@ const McolumsData = [
   {
     field: 'level',
     type: 'number',
-    width: 40,
+    flex: 1,
     renderCell: (params: any) => {
       return <CBadge tier={params.value}></CBadge>;
     },
   },
-  { field: 'problemNumber', type: 'number', headerName: '문제번호', width: 100 },
-  { field: 'title', headerName: '문제 이름', width: 150 },
+  { field: 'problemNumber', type: 'number', headerName: '문제번호', flex: 2 },
+  { field: 'title', headerName: '문제 이름', flex: 4 },
   {
     field: 'startedAt',
     headerName: '스터디 날짜',
-    width: 120,
+    flex: 3,
     renderCell: (params: any) => {
       return `${params.value.substring(0, 10)}`;
     },
   },
 ];
 
-const testdata = [
-  {
-    id: 1,
-    level: 5,
-    problemNumber: 1000,
-    solvedMemberList: [
-      {
-        id: 1,
-        nickname: 'test111',
-        profileImg: '',
-      },
-      {
-        id: 32,
-        nickname: 'test11',
-        profileImg: '',
-      },
-      {
-        id: 33,
-        nickname: 'test11',
-        profileImg: '',
-      },
-      {
-        id: 22,
-        nickname: 'test11',
-        profileImg: '',
-      },
-      {
-        nickname: 'test22',
-        profileImg: '',
-      },
-      {
-        nickname: 'test33',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-01T08:46:48.792Z',
-    title: '테스트1',
-  },
-  {
-    id: 2,
-    level: 7,
-    problemNumber: 10931,
-    solvedMemberList: [
-      {
-        nickname: 'test15',
-        profileImg: '',
-      },
-      {
-        nickname: 'test24',
-        profileImg: '',
-      },
-      {
-        nickname: 'test33',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-04T05:40:48.792Z',
-    title: '테스트2',
-  },
-  {
-    id: 3,
-    level: 9,
-    problemNumber: 3213,
-    solvedMemberList: [
-      {
-        nickname: 'test71',
-        profileImg: '',
-      },
-      {
-        nickname: 'test27',
-        profileImg: '',
-      },
-      {
-        nickname: 'test5',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-04T03:40:48.792Z',
-    title: '1테스트',
-  },
-  {
-    id: 4,
-    level: 10,
-    problemNumber: 4800,
-    solvedMemberList: [
-      {
-        nickname: 'test13',
-        profileImg: '',
-      },
-      {
-        nickname: 'test22',
-        profileImg: '',
-      },
-      {
-        nickname: 'test73',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-01T08:40:48.792Z',
-    title: '2테스트',
-  },
-  {
-    id: 5,
-    level: 4,
-    problemNumber: 3000,
-    solvedMemberList: [
-      {
-        nickname: 'test51',
-        profileImg: '',
-      },
-      {
-        nickname: 'test21',
-        profileImg: '',
-      },
-      {
-        nickname: 'test32',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-04T08:40:48.792Z',
-    title: '1번문제',
-  },
-  {
-    id: 6,
-    level: 6,
-    problemNumber: 2000,
-    solvedMemberList: [
-      {
-        nickname: 'test41',
-        profileImg: '',
-      },
-      {
-        nickname: 'test32',
-        profileImg: '',
-      },
-      {
-        nickname: 'test32',
-        profileImg: '',
-      },
-    ],
-    startedAt: '2022-05-02T08:40:48.792Z',
-    title: '토스트1',
-  },
-];
-
 function ProblemManage() {
+  const navigate = useNavigate();
+  const { roomId } = useParams();
   const params = useParams();
   const [searchText, setSearchText] = useState('');
-  const [rows, setRows] = useState<any[]>(testdata);
+  const [rowData, setRowData] = useState<any>();
+  const [data, setData] = useState<any>([]);
+  const [rows, setRows] = useState<any[]>(data);
   const requestSearch = (searchValue: string) => {
     setSearchText(searchValue);
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
-    const filteredRows = testdata.filter((row: any) => {
+    const filteredRows = data.filter((row: any) => {
       return Object.keys(row).some((field: any) => {
         return searchRegex.test(row[field].toString());
       });
@@ -411,14 +284,18 @@ function ProblemManage() {
     setRows(filteredRows);
   };
 
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+
   const problemsData = async () => {
     try {
       const res = await customAxios({
         method: 'get',
         url: `/study/${params.roomId}/problems`,
       });
-      console.log(res);
-      // setRows(res.data);
+      console.log(res.data);
+      const rowdata: GridRowsProp = res.data;
+      setData(rowdata);
     } catch (e) {
       console.log(e);
     }
@@ -429,8 +306,18 @@ function ProblemManage() {
   }, []);
 
   useEffect(() => {
-    setRows(testdata);
-  }, [testdata]);
+    setRows(data);
+  }, [data]);
+
+  const handleOnClick = (nowrow: any) => {
+    console.log(nowrow);
+    setRowData(nowrow);
+    setOpen(true);
+  };
+
+  const goCode = (userId: number) => {
+    navigate(`/codes/${rowData?.problemNumber}/${userId}`, { state: roomId });
+  };
 
   return (
     <>
@@ -457,7 +344,7 @@ function ProblemManage() {
           />
         </Box>
       </BrowserView>
-      <MobileView>
+      <MobileView style={{ width: '100%', height: '100%' }}>
         <Box sx={{ height: '75vh' }}>
           <StripedDataGrid
             disableColumnMenu
@@ -465,7 +352,7 @@ function ProblemManage() {
             sx={{
               '& .MuiDataGrid-columnHeaderTitleContainer': {
                 justifyContent: 'center',
-                fontSize: '12px',
+                fontSize: '11px',
               },
             }}
             components={{ Toolbar: QuickSearchToolbar }}
@@ -482,8 +369,47 @@ function ProblemManage() {
                 clearSearch: () => requestSearch(''),
               },
             }}
+            onRowClick={(param) => handleOnClick(param.row)}
           />
         </Box>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description">
+          <MBox>
+            <Typography id="server-modal-title" variant="h6" component="h2">
+              {rowData?.title}
+            </Typography>
+            <div style={{ paddingTop: '10px', display: 'flex' }}>
+              <CBadge tier={rowData?.level}></CBadge>
+              <Typography id="server-modal-description">{rowData?.problemNumber}</Typography>
+            </div>
+            <Typography id="server-modal-description">
+              {rowData?.startedAt.substring(0, 10)}
+            </Typography>
+
+            {rowData?.solvedMemberList.map((member: any, i: number) => {
+              return (
+                <MenuItem
+                  sx={{
+                    width: 200,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                  key={i}>
+                  <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
+                  <CBtn
+                    content="코드"
+                    onClick={() => {
+                      goCode(member.id);
+                    }}></CBtn>
+                </MenuItem>
+              );
+            })}
+          </MBox>
+        </Modal>
       </MobileView>
     </>
   );
