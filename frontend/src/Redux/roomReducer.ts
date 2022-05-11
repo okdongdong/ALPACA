@@ -177,7 +177,7 @@ const roomSlice = createSlice({
 
 const calDailySchedule = (dateRange: DailySchedule[], schedules: Schedule[]) => {
   let scheduleIdx = 0;
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < dateRange.length; i++) {
     if (scheduleIdx < schedules.length) {
       let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
       if (
