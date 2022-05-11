@@ -1,5 +1,5 @@
 import { Remove } from '@mui/icons-material';
-import { Divider, IconButton, Stack, styled, useTheme } from '@mui/material';
+import { Divider, IconButton, Stack, styled } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -147,7 +147,7 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
               justifyContent: 'space-between',
             }}>
             <CProfile nickname={member.nickname} profileImg={member.profileImg} />
-            {!member.isRoomMaker && (
+            {!member.roomMaker && (
               <IconButton onClick={() => onClickHandler(member.userId)}>
                 <CCrown width={20} height={20} color="#cdcdcd" />
               </IconButton>

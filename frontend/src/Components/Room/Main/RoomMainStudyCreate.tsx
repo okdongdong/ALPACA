@@ -2,10 +2,12 @@ import { Divider, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import {
   addSchedule,
   resetProblemList,
+  setIsEdit,
   setIsStudyExist,
   setProblemListRes,
 } from '../../../Redux/roomReducer';
@@ -26,7 +28,7 @@ interface AddStudyData {
 
 function RoomMainStudyCreate() {
   const { roomId } = useParams();
-
+  const cAlert = useAlert();
   const dispatch = useDispatch();
 
   const selectedDay = useSelector((state: any) => state.room.selectedDay);
@@ -73,6 +75,13 @@ function RoomMainStudyCreate() {
       dispatch(addSchedule({ idx, schedule }));
       dispatch(setIsStudyExist(true));
     } catch (e: any) {
+      cAlert.fire({
+        title: '스터디 추가 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
       console.log(e.response);
     }
   };
@@ -96,9 +105,16 @@ function RoomMainStudyCreate() {
         url: `/schedule/${scheduleId}`,
         data: data,
       });
-
-      console.log(res);
+      console.log('updated:', res);
+      dispatch(setIsEdit(false));
     } catch (e: any) {
+      cAlert.fire({
+        title: '스터디 변경 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
       console.log(e.response);
     }
   };
@@ -129,7 +145,7 @@ function RoomMainStudyCreate() {
         />
         <div style={{ width: '100%', justifyContent: 'end', display: 'flex' }}>
           <CBtn width={130} height="100%" onClick={onClickHandler}>
-            스터디등록
+            {isEdit ? '스터디 수정' : '스터디 등록'}
           </CBtn>
         </div>
       </Stack>

@@ -24,7 +24,7 @@ function RoomMainIntroductionMemberList({ setIsEdit }: RoomMainIntroductionMembe
     <RoomMainComponentContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h4>스터디원</h4>
-        {members.some((member: Member) => member.userId === userId && member.isRoomMaker) && (
+        {members.some((member: Member) => member.userId === userId && member.roomMaker) && (
           <CustomIconButton size="small" onClick={() => setIsEdit(true)}>
             <Settings />
           </CustomIconButton>
@@ -41,7 +41,7 @@ function RoomMainIntroductionMemberList({ setIsEdit }: RoomMainIntroductionMembe
               justifyContent: 'space-between',
             }}>
             <CProfile nickname={member.nickname} profileImg={member.profileImg} />
-            {member.isRoomMaker && (
+            {member.roomMaker && (
               <div>
                 <CCrown width={25} height={25} color="#FFCD29" />
               </div>

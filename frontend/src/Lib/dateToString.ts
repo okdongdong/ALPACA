@@ -1,16 +1,16 @@
 const WEEK_DAY = ['일', '월', '화', '수', '목', '금', '토'];
 
-const dateToString = (date: Date | null) => {
+const dateToString = (date: Date | null | undefined) => {
+  if (!date) return '';
+
   const tempDate = dateToStringDate(date);
   const tempTime = dateToStringTime(date);
 
   return tempDate + tempTime;
 };
 
-export const dateToStringDate = (date: Date | null) => {
-  if (date === null) {
-    return '';
-  }
+export const dateToStringDate = (date: Date | null | undefined) => {
+  if (!date) return '';
 
   const tempDate =
     date.getFullYear() +
@@ -22,10 +22,8 @@ export const dateToStringDate = (date: Date | null) => {
   return tempDate;
 };
 
-export const dateToStringTime = (date: Date | null) => {
-  if (date === null) {
-    return '';
-  }
+export const dateToStringTime = (date: Date | null | undefined) => {
+  if (!date) return '';
 
   const tempMinutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 
@@ -35,10 +33,8 @@ export const dateToStringTime = (date: Date | null) => {
   return tempTime;
 };
 
-export const dateToStringTimeSimple = (date: Date | null) => {
-  if (date === null) {
-    return '';
-  }
+export const dateToStringTimeSimple = (date: Date | null | undefined) => {
+  if (!date) return '';
 
   const tempMinutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 
