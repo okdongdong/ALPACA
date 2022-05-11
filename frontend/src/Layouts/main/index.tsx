@@ -8,6 +8,7 @@ import { BrowserView, MobileView } from 'react-device-detect';
 const MainLayout = () => {
   const theme = useTheme();
   const APP_BAR_DESKTOP = 30;
+  const APP_BAR_MOBILE = 56;
   const { pathname } = useLocation();
   const RootStyle = styled('div')({
     height: '100%',
@@ -35,10 +36,10 @@ const MainLayout = () => {
 
   const MMainDiv = styled('div')({
     height: '100%',
-    minHeight: '94vh',
     width: '100%',
     background: theme.palette.bg,
     overflow: 'auto',
+    paddingTop: APP_BAR_MOBILE + 4,
   });
   return (
     <>
@@ -52,7 +53,7 @@ const MainLayout = () => {
           </MainStyle>
         </RootStyle>
       </BrowserView>
-      <MobileView>
+      <MobileView style={{ width: '100%', height: '100%' }}>
         {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <NavBar />}
         <MMainDiv>
           <Outlet />
