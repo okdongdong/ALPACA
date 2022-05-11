@@ -8,6 +8,7 @@ import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
+import com.ssafy.alpaca.db.entity.Study;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -171,6 +172,16 @@ public class StudyController {
     public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
+    }
+
+    @ApiOperation(
+            value = "초대코드로 스터디 정보 조회",
+            notes = "주어진 초대코드를 통해 스터디의 방장과 스터디 정보를 조회한다."
+    )
+    @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = Long.class )
+    @PostMapping("/inviteInfo")
+    public ResponseEntity<Study> inviteUserCode(@RequestParam String inviteCode) {
+        return ResponseEntity.ok(studyService.getInviteInfo(inviteCode));
     }
 
     @ApiOperation(

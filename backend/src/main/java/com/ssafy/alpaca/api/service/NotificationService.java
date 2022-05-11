@@ -50,14 +50,13 @@ public class NotificationService {
     public void notifyAddScheduleEvent(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 ()-> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        Study study = schedule.getStudy();
-        List<MyStudy> myStudyList = myStudyRepository.findAllByStudy(study);
+        List<MyStudy> myStudyList = myStudyRepository.findAllByStudy(schedule.getStudy());
         for (MyStudy myStudy:myStudyList){
             Long userId = myStudy.getUser().getId();
             if (sseEmitters.containsKey(userId)){
                 SseEmitter sseEmitter = sseEmitters.get(userId);
                 try {
-                    sseEmitter.send(SseEmitter.event().name("addSchedule").data("스케쥴이 추가되었습니다"));
+                    sseEmitter.send(SseEmitter.event().name("addSchedule").data("일정이 추가되었습니다"));
                 } catch (Exception e) {
                     sseEmitters.remove(userId);
                 }

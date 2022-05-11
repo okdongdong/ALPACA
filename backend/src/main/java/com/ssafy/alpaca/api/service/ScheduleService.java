@@ -122,7 +122,6 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
         toSolveProblemRepository.saveAll(toSolveProblems);
-        notificationService.notifyAddScheduleEvent(schedule.getId());
         return schedule.getId();
     }
 

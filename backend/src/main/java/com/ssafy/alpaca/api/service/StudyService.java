@@ -327,6 +327,14 @@ public class StudyService {
         return newInviteCode;
     }
 
+    public Study getInviteInfo(String inviteCode) {
+        StudyCode studyCode = studyCodeRedisRepository.findById(inviteCode).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
+        );
+
+        return checkStudyById(studyCode.getStudyId());
+    }
+
     public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
