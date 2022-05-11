@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
+import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -23,6 +24,7 @@ public class ScheduleController {
 
     private final UserService userService;
     private final ScheduleService scheduleService;
+    private final NotificationService notificationService;
 
     @ApiOperation(
             value = "스터디 일정 추가",
@@ -31,7 +33,9 @@ public class ScheduleController {
     @PostMapping()
     public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(username, scheduleReq)));
+        Long scheduleId = scheduleService.createSchedule(username, scheduleReq);
+        notificationService.notifyAddScheduleEvent(scheduleId);
+        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleId));
     }
 
     @ApiOperation(

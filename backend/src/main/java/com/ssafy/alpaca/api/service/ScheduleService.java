@@ -28,6 +28,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final ProblemRepository problemRepository;
+    private final NotificationService notificationService;
 
     private User checkUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(
