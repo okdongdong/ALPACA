@@ -191,13 +191,31 @@ public class ScheduleService {
         schedule.setStartedAt(startedAt);
         schedule.setFinishedAt(finishedAt);
         scheduleRepository.save(schedule);
-        for (Long number : scheduleUpdateReq.getToSolveProblems()) {
-            toSolveProblemRepository.save(
-                    ToSolveProblem.builder()
-                            .schedule(schedule)
-                            .problemNumber(number)
-                            .build());
+        HashSet<Long> originProblems = toSolveProblemRepository.findProblemNumbersByScheduleId(schedule.getId());
+        HashSet<Long> newProblems = new HashSet<>(scheduleUpdateReq.getToSolveProblems());
+
+        List<ToSolveProblem> saveList = new ArrayList<>();
+        List<ToSolveProblem> deleteList = new ArrayList<>();
+
+        for (Long originProblem : originProblems) {
+            if (newProblems.contains(originProblem)) {
+                continue;
+            }
+            toSolveProblemRepository.findByScheduleAndProblemNumber(schedule, originProblem).ifPresent(deleteList::add);
         }
+
+        for (Long newProblem : newProblems) {
+            if (originProblems.contains(newProblem)) {
+                continue;
+            }
+            saveList.add(ToSolveProblem.builder()
+                    .schedule(schedule)
+                    .problemNumber(newProblem)
+                    .build());
+        }
+
+        toSolveProblemRepository.saveAll(saveList);
+        toSolveProblemRepository.deleteAll(deleteList);
     }
 
     public ScheduleRes getSchedule(Long id) {
