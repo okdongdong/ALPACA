@@ -2,10 +2,12 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
+import com.ssafy.alpaca.db.document.TodayProblem;
 import com.ssafy.alpaca.db.entity.SolvedProblem;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.ProblemRepository;
 import com.ssafy.alpaca.db.repository.SolvedProblemRepository;
+import com.ssafy.alpaca.db.repository.TodayProblemRepository;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ public class ProblemService {
     private final UserRepository userRepository;
     private final ProblemRepository problemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
+    private final TodayProblemRepository todayProblemRepository;
 
     private JSONObject getJsonDataFromURL(HttpURLConnection httpURLConnection) throws IOException, ParseException {
         httpURLConnection.setRequestMethod("GET");
@@ -135,14 +139,31 @@ public class ProblemService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
-        if (user.getClassDecoration().equals("gold")) {
-            if (user.getClassLevel() < 10) {
-                return getClassProblem(user.getClassLevel()+1, user);
-            } else {
-                return getRandomProblem(user);
-            }
+        Optional<TodayProblem> todayProblem = todayProblemRepository.findByUserId(user.getId());
+        if (todayProblem.isPresent() && todayProblem.get().getDate().isEqual(LocalDate.now())) {
+            return todayProblem.get().getProblems();
         } else {
-            return getClassProblem(user.getClassLevel(), user);
+            List<Problem> problems;
+            if (user.getClassDecoration().equals("gold")) {
+                if (user.getClassLevel() < 10) {
+                    problems = getClassProblem(user.getClassLevel()+1, user);
+                } else {
+                    problems = getRandomProblem(user);
+                }
+            } else {
+                problems = getClassProblem(user.getClassLevel(), user);
+            }
+            if (todayProblem.isEmpty()) {
+                todayProblemRepository.save(TodayProblem.builder()
+                        .userId(user.getId())
+                        .problems(problems)
+                        .date(LocalDate.now()).build());
+                return problems;
+            }
+            todayProblem.get().setDate(LocalDate.now());
+            todayProblem.get().setProblems(problems);
+            todayProblemRepository.save(todayProblem.get());
+            return problems;
         }
     }
 
