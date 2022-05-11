@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
 import {
   Schedule,
+  setDailySchedule,
   setDateRange,
   setSchedules,
   setSelectedDayIdx,
@@ -49,7 +50,7 @@ function RoomMainCalendar() {
   // request최적화를 위해 설정
   const [prevDay, setPrevDay] = useState<Date>(new Date());
 
-  // 현재 달력의 날짜계산 및 스케줄저장을 위한 함수
+  // 현재 달력의 날짜계산
   const getStartDate = () => {
     const startDate = new Date();
     startDate.setMonth(nowDay.getMonth());
@@ -57,27 +58,14 @@ function RoomMainCalendar() {
     startDate.setDate(-startDate.getDay() + 1);
 
     const tempDateRange = [];
-    let scheduleIdx = 0;
 
     for (let i = 0; i < 42; i++) {
       const temp: DailySchedule = {
         day: new Date(startDate),
       };
-
-      if (scheduleIdx < schedules.length) {
-        let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
-        if (
-          temp.day.getFullYear() === scheduleDay.getFullYear() &&
-          temp.day.getMonth() === scheduleDay.getMonth() &&
-          temp.day.getDate() === scheduleDay.getDate()
-        ) {
-          temp.schedule = schedules[scheduleIdx++];
-        }
-      }
       tempDateRange.push(temp);
       startDate.setDate(startDate.getDate() + 1);
     }
-    console.log('schedules: ', schedules);
     dispatch(setDateRange(tempDateRange));
   };
 
@@ -114,11 +102,15 @@ function RoomMainCalendar() {
     }
 
     setPrevDay(new Date(nowDay));
-  }, [nowDay, schedules]);
+  }, [nowDay]);
 
   useEffect(() => {
     getStartDate();
   }, []);
+
+  useEffect(() => {
+    dispatch(setDailySchedule());
+  }, [schedules]);
 
   return (
     <Stack>

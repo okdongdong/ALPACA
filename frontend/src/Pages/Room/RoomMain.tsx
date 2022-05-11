@@ -67,7 +67,9 @@ function RoomMain() {
       });
       dispatch(setMemberDict(tempDict));
       console.log('userDict:', tempDict);
-    } catch (e) {}
+    } catch (e: any) {
+      console.log(e.response);
+    }
   };
 
   // 페이지 랜더링시 스터디 기본정보를 가져옴

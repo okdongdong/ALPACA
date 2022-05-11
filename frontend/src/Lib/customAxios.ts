@@ -42,10 +42,12 @@ const failureResponse = async (error: any) => {
   }
 
   if (
-    error.response.status === 401 &&
-    error.response.data.message === '토큰이 만료되었습니다.' &&
+    error.response.status === 500 &&
+    // error.response.data.message === '토큰이 만료되었습니다.' &&
     !originalRequest._retry
   ) {
+    console.log('-----------Reissue');
+
     originalRequest._retry = true;
     return unauthorizedError(error);
   }
