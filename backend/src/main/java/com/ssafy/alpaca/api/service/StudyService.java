@@ -39,6 +39,7 @@ public class StudyService {
     private final MyStudyRepository myStudyRepository;
     private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final CodeRepository codeRepository;
     private final InviteCodeRedisRepository inviteCodeRedisRepository;
     private final StudyCodeRedisRepository studyCodeRedisRepository;
     private final ChatRepository chatRepository;
@@ -174,7 +175,10 @@ public class StudyService {
                 .build());
     }
 
-    public List<ProblemListRes> getStudyProblem(Long id){
+    public List<ProblemListRes> getStudyProblem(String username, Long id){
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        List<MyStudy> myStudy = myStudyRepository.findAllByStudy(study);
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
         List<ToSolveProblem> problemList = new ArrayList<>();
         for(Schedule schedule:scheduleList){
@@ -187,24 +191,23 @@ public class StudyService {
             if (problem.isEmpty()) {
                 continue;
             }
+            List<User> users = new ArrayList<>();
+            for (MyStudy ms : myStudy) {
+                if (codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId())) {
+                    users.add(ms.getUser());
+                }
+            }
             problemListRes.add(ProblemListRes.builder()
                     .id(toSolveProblem.getId())
                     .problemNumber(problem.get().getProblemNumber())
                     .title(problem.get().getTitle())
                     .level(problem.get().getLevel())
+                    .isSolved(solvedProblemRepository.existsByUserAndProblemNumber(user, problem.get().getProblemNumber()))
                     .startedAt(toSolveProblem.getSchedule().getStartedAt())
-                    .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemNumber(toSolveProblem.getProblemNumber())))
+                    .solvedMemberList(users)
                     .build());
         }
         return problemListRes;
-//        return problemList.stream().map(toSolveProblem -> ProblemListRes.builder()
-//                .id(toSolveProblem.getProblemId())
-//                .number(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
-//                .title(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getTitle())
-//                .level(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getLevel())
-//                .startedAt(toSolveProblem.getSchedule().getStartedAt())
-//                .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
-//                .build()).collect(Collectors.toList());
     }
 
     public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) throws IllegalAccessException {
