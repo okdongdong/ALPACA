@@ -10,6 +10,7 @@ import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroductio
 import RoomMainSetting from '../../Components/Room/Main/RoomMainSetting';
 import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
 import RoomMainStudyDetail from '../../Components/Room/Main/RoomMainStudyDetail';
+import RoomStudyLivePreview from '../../Components/Room/StudyLive/RoomStudyLivePreview';
 import { customAxios } from '../../Lib/customAxios';
 import {
   setRoomInfo,
@@ -46,6 +47,9 @@ function RoomMain() {
 
   // 초대 dialog open
   const [open, setOpen] = useState<boolean>(false);
+
+  // preview dialog open
+  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
 
   // 스터디룸 정보조회
   const getRoomInfo = async () => {
@@ -136,7 +140,8 @@ function RoomMain() {
                 width="100%"
                 height="100%"
                 onClick={() => {
-                  navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
+                  setPreviewOpen(true);
+                  // navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
                 }}>
                 스터디 라이브 입장
               </CBtn>
@@ -145,6 +150,7 @@ function RoomMain() {
         </Grid>
       </Grid>
       <RoomMainSetting />
+      <RoomStudyLivePreview open={previewOpen} setOpen={setPreviewOpen} />
     </Box>
   );
 }

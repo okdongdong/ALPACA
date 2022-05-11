@@ -43,6 +43,7 @@ function StudyLive() {
   const ReduxOVForScreen = useSelector((state: any) => state.openvidu.OVForScreen);
   const nickname = useSelector((state: any) => state.account.nickname);
   const mainUser = useSelector((state: any) => state.openvidu.mainUser);
+  const constraints = useSelector((state: any) => state.openvidu.constraints);
 
   useEffect(() => {
     OVForCamera = ReduxOVForCamera || tmpOVForCamera;
@@ -186,10 +187,7 @@ function StudyLive() {
     var videoDevices = devices.filter((device: any) => device.kind === 'videoinput');
 
     let cameraPublisher = OVForCamera.initPublisher('', {
-      audioSource: undefined,
-      videoSource: videoDevices[0].deviceId,
-      publishAudio: false,
-      publishVideo: true,
+      ...constraints,
       resolution: '640x480',
       frameRate: 30,
       insertMode: 'APPEND',
