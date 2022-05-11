@@ -15,15 +15,10 @@ import {
   setRoomInfo,
   setMemberDict,
   setSchedules,
-  setSelectedDayIdx,
-  setIsStudyExist,
-  setIsEdit,
-  setProblemListRes,
   Schedule,
   Member,
   MemberDict,
-  resetRoomInfo,
-  setScheduleId,
+  changeSelectedDay,
 } from '../../Redux/roomReducer';
 
 const RoomTitle = styled('h1')(({ theme }) => ({
@@ -38,8 +33,6 @@ function RoomMain() {
   const dispatch = useDispatch();
 
   const title = useSelector((state: any) => state.room.title);
-  const dateRange = useSelector((state: any) => state.room.dateRange);
-  const selectedDay = useSelector((state: any) => state.room.selectedDay);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const isStudyExist = useSelector((state: any) => state.room.isStudyExist);
   const isEdit = useSelector((state: any) => state.room.isEdit);
@@ -82,22 +75,10 @@ function RoomMain() {
     getRoomInfo();
   }, []);
 
-  // 현재 선택한 날짜에 스터디가 존재하는지 확인
   useEffect(() => {
-    if (dateRange.length > 0) {
-      const DAY_TO_MILLISEC = 24 * 60 * 60 * 1000;
-      const timeDiff = selectedDay.getTime() - dateRange[0].day.getTime();
-      const dateDiff = Math.ceil(timeDiff / DAY_TO_MILLISEC);
-      dispatch(setSelectedDayIdx(dateDiff));
-      dispatch(setIsStudyExist(Boolean(dateRange[dateDiff]?.schedule)));
-    }
     // 날짜가 변경되면 수정모드 해제 및 추가된문제 초기화
-    dispatch(setIsEdit(false));
-    dispatch(setProblemListRes([]));
-  }, [selectedDay]);
-
-  useEffect(() => {
-    dispatch(setScheduleId(dateRange[selectedDayIdx]?.schedule?.id));
+    // 현재 선택한 날짜에 스터디가 존재하는지 확인
+    dispatch(changeSelectedDay(selectedDayIdx));
   }, [selectedDayIdx]);
 
   return (

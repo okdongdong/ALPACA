@@ -5,8 +5,12 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
-import { setLoading } from '../../../Redux/commonReducer';
-import { Schedule, setDateRange, setSchedules } from '../../../Redux/roomReducer';
+import {
+  Schedule,
+  setDateRange,
+  setSchedules,
+  setSelectedDayIdx,
+} from '../../../Redux/roomReducer';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
 
@@ -55,8 +59,6 @@ function RoomMainCalendar() {
     const tempDateRange = [];
     let scheduleIdx = 0;
 
-    console.log(schedules);
-
     for (let i = 0; i < 42; i++) {
       const temp: DailySchedule = {
         day: new Date(startDate),
@@ -75,13 +77,13 @@ function RoomMainCalendar() {
       tempDateRange.push(temp);
       startDate.setDate(startDate.getDate() + 1);
     }
+    console.log('schedules: ', schedules);
     dispatch(setDateRange(tempDateRange));
   };
 
   // 달이 변할때 스케줄을 가져오는 함수
   const getMonthlySchedule = async () => {
     getStartDate();
-    dispatch(setLoading(true));
     try {
       const res = await customAxios({
         method: 'get',
@@ -101,7 +103,6 @@ function RoomMainCalendar() {
     } catch (e: any) {
       console.log(e.response);
     }
-    dispatch(setLoading(false));
   };
 
   useEffect(() => {
@@ -148,7 +149,7 @@ function RoomMainCalendar() {
             dailySchedule={dailySchedule}
             key={idx}
             nowDay={nowDay}
-            setNowDay={setNowDay}
+            onClick={() => dispatch(setSelectedDayIdx(idx))}
           />
         ))}
       </CalendarBox>

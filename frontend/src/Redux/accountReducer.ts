@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+interface Study {
+  id: number;
+  title: string;
+  pinnedTime: string;
+  profileImgList: string;
+}
+
 interface UserInfo {
   userId: string;
   username: string;
@@ -8,7 +15,7 @@ interface UserInfo {
   profileImg: string | null;
   bojId: string;
   preferredLanguage: string;
-  studies: string[];
+  studies: Study[];
   isLogin: boolean;
   studyCount: number;
 }
@@ -39,9 +46,13 @@ const accountSlice = createSlice({
         ...initialState,
       };
     },
+    deleteStudyUserInfo: (state, action) => {
+      state.studies = state.studies.filter((study) => study.id !== parseInt(action.payload));
+      state.studyCount -= 1;
+    },
   },
 });
 
-export const { setUserInfo, logout } = accountSlice.actions;
+export const { setUserInfo, logout, deleteStudyUserInfo } = accountSlice.actions;
 
 export default accountSlice.reducer;

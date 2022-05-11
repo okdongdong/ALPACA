@@ -56,14 +56,16 @@ function RoomMainChat() {
   const [page, setPage] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isGetPrevChat, setIsGetPrevChat] = useState<boolean>(false);
 
   const wsSendMessage = () => {
+    if (!message) return;
+
     if (client && client.connected) {
       console.log('Send message:' + message);
-
       const temp = { userId, studyId: roomId, content: message };
-
       client.send(`/pub/chat/study`, JSON.stringify(temp), {});
+      setMessage('');
     }
   };
 
@@ -94,18 +96,17 @@ function RoomMainChat() {
   };
 
   const onSendMessageHandler = () => {
+    setIsGetPrevChat(false);
     wsSendMessage();
-    if (scrollRef.current !== null) {
-      scrollRef.current.scrollTo(0, scrollRef.current.scrollHeight);
-    }
-    console.log(scrollRef);
+    console.log('scrollRef: ', scrollRef);
   };
 
   const getPrevChat = async () => {
-    if (isFinished) return;
-    if (isLoading) return;
+    console.log('isFinished: ', isFinished, ' / isLoading: ', isLoading, ' / offsetId: ', offsetId);
+    if (isFinished || isLoading) return;
     if (!offsetId) return;
     setIsLoading(true);
+    setIsGetPrevChat(true);
     try {
       const prevScrollHeight = scrollRef.current?.scrollHeight;
       const res = await customAxios({
@@ -155,12 +156,10 @@ function RoomMainChat() {
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(infiniteHandler, options);
-    if (infiniteRef.current !== null && !offsetId) {
-      observer.observe(infiniteRef.current);
+    if (!isGetPrevChat) {
+      scrollRef?.current?.scrollTo(0, scrollRef.current.scrollHeight);
     }
-    return () => observer.disconnect();
-  }, [infiniteHandler]);
+  }, [chatList.length]);
 
   useEffect(() => {
     getInitChat();
@@ -173,6 +172,15 @@ function RoomMainChat() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(infiniteHandler, options);
+    if (infiniteRef.current !== null) {
+      observer.observe(infiniteRef.current);
+    }
+    return () => observer.disconnect();
+  }, [infiniteHandler]);
+
   return (
     <RoomMainComponentContainer>
       <Stack
@@ -206,7 +214,7 @@ function RoomMainChat() {
           </MessageBox>
         ))}
       </Stack>
-      <RoomMainChatBar onChange={setMessage} onSendMessage={onSendMessageHandler} />
+      <RoomMainChatBar value={message} onChange={setMessage} onSendMessage={onSendMessageHandler} />
     </RoomMainComponentContainer>
   );
 }
