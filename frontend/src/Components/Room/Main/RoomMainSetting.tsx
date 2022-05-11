@@ -1,10 +1,11 @@
 import { Collapse, Stack, styled, Switch, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { setLoading } from '../../../Redux/commonReducer';
+import { deleteStudyUserInfo } from '../../../Redux/accountReducer';
 import CBtn from '../../Commons/CBtn';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 
@@ -16,6 +17,7 @@ const CustomBox = styled(Stack)(({ theme }) => ({
 function RoomMainSetting() {
   const { roomId } = useParams();
   const theme = useTheme();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const cAlert = useAlert();
   const isSetting = useSelector((state: any) => state.room.isSetting);
@@ -31,10 +33,12 @@ function RoomMainSetting() {
     try {
       const res = await customAxios({ method: 'delete', url: `/study/${roomId}` });
       dispatch(setLoading(false));
+      dispatch(deleteStudyUserInfo(roomId));
       if (res.status === 200) return true;
     } catch (e: any) {
       console.log('error: ', e.response);
     }
+
     dispatch(setLoading(false));
     return false;
   };
@@ -44,6 +48,7 @@ function RoomMainSetting() {
     try {
       const res = await customAxios({ method: 'delete', url: `/study/exit/${roomId}` });
       dispatch(setLoading(false));
+      dispatch(deleteStudyUserInfo(roomId));
       if (res.status === 200) return true;
     } catch (e: any) {
       console.log('error: ', e.response);
@@ -70,7 +75,8 @@ function RoomMainSetting() {
 
     if (result.isConfirmed) {
       const res = await deleteStudy();
-      if (res) cAlert.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success');
+      if (res)
+        cAlert.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success').then(() => navigate('/'));
       else cAlert.fire('삭제 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
@@ -93,7 +99,8 @@ function RoomMainSetting() {
 
     if (result.isConfirmed) {
       const res = await leaveStudy();
-      if (res) cAlert.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success');
+      if (res)
+        cAlert.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success').then(() => navigate('/'));
       else cAlert.fire('탈퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };

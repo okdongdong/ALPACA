@@ -52,13 +52,15 @@ function RoomMainStudyDetail() {
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
 
   const getScheduleProblems = async () => {
+    const scheduleId = dateRange[selectedDayIdx].schedule?.id;
+    if (scheduleId === undefined) return;
+
     try {
-      const scheduleId = dateRange[selectedDayIdx].schedule?.id;
       const res = await customAxios({
         method: 'get',
         url: `/schedule/${scheduleId}`,
       });
-
+      console.log('getScheduleProblems: ', res);
       dispatch(setStartedAt(new Date(res.data.startedAt)));
       dispatch(setFinishedAt(new Date(res.data.finishedAt)));
       dispatch(setProblemListRes(res.data.problemListRes));
@@ -78,9 +80,9 @@ function RoomMainStudyDetail() {
   };
 
   useEffect(() => {
-    console.log('selectedDay: ', selectedDay);
+    console.log('selectedDay: ', dateRange[selectedDayIdx]?.day);
     getScheduleProblems();
-  }, [selectedDay]);
+  }, [selectedDayIdx]);
 
   return (
     <RoomMainComponentContainer height="100%">

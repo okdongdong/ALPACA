@@ -1,13 +1,12 @@
-import { alpha, Button, Divider, Grid, Stack, styled, useTheme } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { alpha, Button, Grid, Stack, styled, useTheme } from '@mui/material';
+import { useSelector } from 'react-redux';
 import { dateToStringTimeSimple } from '../../../Lib/dateToString';
-import { setSelectedDay } from '../../../Redux/roomReducer';
 import { DailySchedule } from './RoomMainCalendar';
 
 interface RoomMainCalendarDayProps {
   dailySchedule: DailySchedule;
   nowDay: Date;
-  setNowDay: React.Dispatch<React.SetStateAction<Date>>;
+  onClick: () => void;
 }
 
 const DayBox = styled(Button)(({ theme }) => ({
@@ -23,17 +22,10 @@ const DayBox = styled(Button)(({ theme }) => ({
   },
 }));
 
-function RoomMainCalendarDay({ dailySchedule, nowDay, setNowDay }: RoomMainCalendarDayProps) {
+function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalendarDayProps) {
   const theme = useTheme();
-  const dispatch = useDispatch();
 
   const selectedDay = useSelector((state: any) => state.room.selectedDay);
-
-  const onClickHandler = () => {
-    console.log('dailySchedule: ', dailySchedule.day);
-    dispatch(setSelectedDay(new Date(dailySchedule.day)));
-    setNowDay(new Date(dailySchedule.day));
-  };
 
   return (
     <Grid item xs={1}>
@@ -46,9 +38,11 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, setNowDay }: RoomMainCalen
               ? ''
               : alpha(theme.palette.bg, 0.6),
         }}
-        onClick={onClickHandler}>
+        onClick={onClick}>
         <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
           <div style={{ color: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+            {dailySchedule.day.getMonth() === nowDay.getMonth() ||
+              `${dailySchedule.day.getMonth() + 1}/`}
             {dailySchedule.day.getDate()}
           </div>
           <div

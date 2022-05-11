@@ -3,7 +3,12 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { customAxios } from '../../../Lib/customAxios';
-import { addSchedule, setIsStudyExist } from '../../../Redux/roomReducer';
+import {
+  addSchedule,
+  resetProblemList,
+  setIsStudyExist,
+  setProblemListRes,
+} from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyCreateAddList from './RoomMainStudyCreateAddList';
@@ -46,19 +51,16 @@ function RoomMainStudyCreate() {
         studyId: roomId || '',
         toSolveProblems: [],
       };
-      console.log(1111);
 
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
-      console.log(2222);
 
       const res = await customAxios({
         method: 'post',
         url: '/schedule',
         data: data,
       });
-      console.log(3333);
       console.log('added:', res);
 
       const idx = selectedDayIdx;
@@ -68,7 +70,6 @@ function RoomMainStudyCreate() {
         finishedAt: data.finishedAt,
       };
 
-      console.log(44444);
       dispatch(addSchedule({ idx, schedule }));
       dispatch(setIsStudyExist(true));
     } catch (e: any) {
@@ -97,8 +98,8 @@ function RoomMainStudyCreate() {
       });
 
       console.log(res);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 

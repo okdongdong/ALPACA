@@ -66,7 +66,7 @@ export interface RoomInfo {
   offsetId: string;
 
   // 선택된 스케줄 아이디
-  scheduleId: number;
+  scheduleId: number | undefined;
 
   // 세팅창 오픈
   isSetting: boolean;
@@ -155,6 +155,15 @@ const roomSlice = createSlice({
     memberQueryCheck: (state, action) => {
       state.members[action.payload.idx].isQuery = action.payload.isChecked;
     },
+    resetProblemList: (state) => {
+      state.problemListRes = [];
+    },
+    changeSelectedDay: (state, action) => {
+      state.isEdit = false;
+      state.problemListRes = [];
+      state.isStudyExist = Boolean(state.dateRange[action.payload]?.schedule);
+      state.scheduleId = state.dateRange[action.payload]?.schedule?.id;
+    },
   },
 });
 
@@ -179,6 +188,8 @@ export const {
   addSchedule,
   settingOn,
   memberQueryCheck,
+  resetProblemList,
+  changeSelectedDay,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

@@ -25,6 +25,10 @@ interface CSearchBarProps {
 
 const CustomInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
+  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:after': {
+    borderBottom: `2px solid ${theme.palette.accent}`,
+  },
 }));
 
 function CSearchBar({
