@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.TokenRes;
+import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final ProblemService problemService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @ApiOperation(
@@ -69,6 +71,7 @@ public class AuthController {
     public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) throws IllegalAccessException {
         TokenRes tokenRes = userService.login(loginReq);
         LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
+        problemService.refreshSolvedAc(loginReq.getUsername());
         return ResponseEntity.ok(LoginRes.of(tokenRes, loginRes));
     }
 
