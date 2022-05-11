@@ -212,16 +212,22 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Integer month) throws IllegalAccessException {
+    public List<ScheduleListRes> getScheduleList(String username, Long id, Integer year, Integer month, Integer day) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime;
-        localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
-        localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
-        return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, localDateTime, localDateTime.plusDays(42)));
+        if (day == null) {
+            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
+            return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
+                    study, localDateTime, localDateTime.plusDays(42)));
+        } else {
+            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
+                    study, localDateTime, localDateTime.plusDays(7)));
+        }
     }
 
     public void deleteSchedule(String username, Long id) throws IllegalAccessException {
