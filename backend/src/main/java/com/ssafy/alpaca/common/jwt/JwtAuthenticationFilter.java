@@ -38,14 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = getToken(request, "Authorization");
         String requestURI = request.getRequestURI();
-
         if (accessToken != null && !requestURI.equals("/api/v1/auth/reissue")) {
             // 로그아웃에 사용된 토큰인지 확인
             checkLogout(accessToken);
 
             // 토큰에서 사용자 정보(이름)을 가져옴
             try {
-
                 String username = jwtTokenUtil.getUsername(accessToken);
                 log.info("username {}",username);
                 if (username != null) {
@@ -56,8 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     validateAccessToken(accessToken);
                     // SecurityContext에 Authentication 객체를 저장
                     processSecurity(request, userDetails);
-
-                    filterChain.doFilter(request, response);
 
                 }
             } catch (JwtFilterException e) {
@@ -73,7 +69,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.getWriter().write(result);
             }
         }
-
         if (requestURI.equals("/api/v1/auth/reissue")) {
             String refreshToken = getToken(request,"RefreshToken");
             String username = jwtTokenUtil.getUsername(refreshToken);
@@ -86,8 +81,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // SecurityContext에 Authentication 객체를 저장
                 processSecurity(request, userDetails);
             }
-        filterChain.doFilter(request, response);
         }
+        filterChain.doFilter(request, response);
     }
 
     private String getToken(HttpServletRequest request, String header) {
