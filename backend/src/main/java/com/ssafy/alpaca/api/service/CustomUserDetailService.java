@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.common.etc.CacheKey;
 import com.ssafy.alpaca.common.etc.CustomUserDetails;
+import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.entity.User;
 import com.ssafy.alpaca.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Cacheable(value = CacheKey.USER, key = "#username", unless = "#result == null")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("ExceptionUtil.USER_NOT_FOUND"));
+                .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         return CustomUserDetails.of(user);
     }
 }

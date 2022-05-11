@@ -15,7 +15,7 @@ export const dateToStringDate = (date: Date | null) => {
   const tempDate =
     date.getFullYear() +
     '.' +
-    date.getMonth() +
+    (date.getMonth() + 1) +
     '.' +
     date.getDate() +
     ` (${WEEK_DAY[date.getDay()]}) `;

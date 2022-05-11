@@ -30,20 +30,17 @@ public class StudyRes {
 
     @Builder
     public static class Member {
+
         public Long userId;
+
         public String nickname;
+
+        public String bojId;
+
         public boolean isRoomMaker;
+
         public String profileImg;
 
-        public static List<Member> of(List<MyStudy> list) {
-            return  list.stream().map(
-                    myStudy -> Member.builder()
-                            .userId(myStudy.getUser().getId())
-                            .nickname(myStudy.getUser().getNickname())
-                            .isRoomMaker(myStudy.getIsRoomMaker())
-                            .build()
-            ).collect(Collectors.toList());
-        }
     }
 
 }

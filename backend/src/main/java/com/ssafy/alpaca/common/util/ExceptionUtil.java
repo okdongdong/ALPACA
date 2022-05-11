@@ -14,6 +14,7 @@ public class ExceptionUtil {
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     public static final String NOT_MYSELF = "본인이 아닙니다.";
     public static final String USER_PW_INVALID = "비밀번호가 일치하지 않습니다.";
+    public static final String INVALID_AUTH_TOKEN = "토큰이 만료되었습니다.";
     public static final String INVALID_REFRESH_TOKEN = "리프레시 토큰이 유효하지 않습니다";
     public static final String MISMATCH_REFRESH_TOKEN = "리프레시 토큰의 사용자 정보가 일치하지 않습니다";
     public static final String UNAUTHORIZED_USER = "권한이 없는 사용자 입니다";

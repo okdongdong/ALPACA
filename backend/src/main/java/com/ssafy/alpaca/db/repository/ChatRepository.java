@@ -8,10 +8,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ChatRepository extends MongoRepository<Chat, String> {
     @Query("{'_id': {$lt : ?0}, 'studyId': ?1 }")
     Slice<Chat> findPartByStudyId(ObjectId id, Long studyId, Pageable pageable);
 
-    Chat findDistinctFirstByStudyIdOrderByIdDesc(Long studyId);
+    Optional<Chat> findDistinctFirstByStudyIdOrderByIdDesc(Long studyId);
 }

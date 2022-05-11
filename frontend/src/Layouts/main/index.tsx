@@ -2,10 +2,13 @@ import { Outlet } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import SideBar from '../../Components/Bars/SideBar';
+import NavBar from '../../Components/Bars/NavBar';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 const MainLayout = () => {
   const theme = useTheme();
   const APP_BAR_DESKTOP = 30;
+  const APP_BAR_MOBILE = 56;
   const { pathname } = useLocation();
   const RootStyle = styled('div')({
     height: '100%',
@@ -31,16 +34,32 @@ const MainLayout = () => {
     overflow: 'auto',
   });
 
+  const MMainDiv = styled('div')({
+    height: '100%',
+    width: '100%',
+    background: theme.palette.bg,
+    overflow: 'auto',
+    paddingTop: APP_BAR_MOBILE + 4,
+  });
   return (
-    <RootStyle>
-      {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
-
-      <MainStyle>
-        <MainDiv>
+    <>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
+        <RootStyle>
+          {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
+          <MainStyle>
+            <MainDiv>
+              <Outlet />
+            </MainDiv>
+          </MainStyle>
+        </RootStyle>
+      </BrowserView>
+      <MobileView style={{ width: '100%', height: '100%' }}>
+        {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <NavBar />}
+        <MMainDiv>
           <Outlet />
-        </MainDiv>
-      </MainStyle>
-    </RootStyle>
+        </MMainDiv>
+      </MobileView>
+    </>
   );
 };
 

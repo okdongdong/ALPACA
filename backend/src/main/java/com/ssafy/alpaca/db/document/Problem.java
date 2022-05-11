@@ -26,8 +26,11 @@ public class Problem {
 
     private String title;
 
-    @Field(targetType = FieldType.INT32)
+    @Field(targetType = FieldType.INT64)
     private Long level;
+
+    @Field(targetType = FieldType.INT64)
+    private Long classLevel;
 
     @Field(targetType = FieldType.ARRAY)
     private List<String> inputs;

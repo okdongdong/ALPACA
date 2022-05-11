@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 export interface StudyCreateProps {
   detail: any;
@@ -27,6 +28,15 @@ const NameLabel = styled('label')(({ theme }) => ({
   transform: 'translate(-50%,0)',
 }));
 
+const MNameLabel = styled('label')(({ theme }) => ({
+  color: theme.palette.txt,
+  textAlign: 'left',
+  width: '200px',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  marginLeft: '35px',
+}));
+
 const CButton = styled(Button)(({ theme }) => ({
   minHeight: 48,
   display: 'Grid',
@@ -37,6 +47,16 @@ const CButton = styled(Button)(({ theme }) => ({
   background: theme.palette.main,
   height: '200px',
   width: '200px',
+  position: 'relative',
+  '&:hover': {
+    background: theme.palette.main + '90',
+  },
+}));
+const MButton = styled(Button)(({ theme }) => ({
+  minHeight: 48,
+  background: theme.palette.main,
+  height: '6vh',
+  width: '100%',
   position: 'relative',
   '&:hover': {
     background: theme.palette.main + '90',
@@ -83,36 +103,78 @@ function MainRoomsDetail(props: StudyCreateProps) {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
-      <PushPinIcon
-        sx={{
-          position: 'absolute',
-          top: 12,
-          left: 12,
-          color:
-            props.detail.pinnedTime === '0001-01-01T06:00:00' || props.detail.pinnedTime === null
-              ? theme.palette.bg
-              : theme.palette.component_accent,
-          margin: 0,
-          padding: 0,
-          height: '35px',
-          width: '35px',
-          zIndex: 1,
-        }}
-        onClick={pinStudy}></PushPinIcon>
-      <CButton onClick={goStudy}>
-        <Grid container sx={{ padding: 2 }}>
-          {temp.map((item: string, i: number) => {
-            return (
-              <Grid item xs={6} key={i} sx={{ padding: 0 }}>
-                <img src={!!item ? item : alpaca} className={styles.profileimg_mini} alt="" />
-              </Grid>
-            );
-          })}
-        </Grid>
-        <NameLabel sx={{ px: '8px' }}>{props.detail.title}</NameLabel>
-      </CButton>
-    </div>
+    <>
+      <BrowserView>
+        <div style={{ position: 'relative' }}>
+          <PushPinIcon
+            sx={{
+              position: 'absolute',
+              top: 12,
+              left: 12,
+              color:
+                props.detail.pinnedTime === '0001-01-01T06:00:00' ||
+                props.detail.pinnedTime === null
+                  ? theme.palette.bg
+                  : theme.palette.component_accent,
+              margin: 0,
+              padding: 0,
+              height: '35px',
+              width: '35px',
+              zIndex: 1,
+            }}
+            onClick={pinStudy}></PushPinIcon>
+          <CButton onClick={goStudy}>
+            <Grid container sx={{ padding: 2 }}>
+              {temp.map((item: string, i: number) => {
+                return (
+                  <Grid item xs={6} key={i} sx={{ padding: 0 }}>
+                    <img src={!!item ? item : alpaca} className={styles.profileimg_mini} alt="" />
+                  </Grid>
+                );
+              })}
+            </Grid>
+            <NameLabel sx={{ px: '8px' }}>{props.detail.title}</NameLabel>
+          </CButton>
+        </div>
+      </BrowserView>
+      <MobileView>
+        <div style={{ position: 'relative' }}>
+          <PushPinIcon
+            sx={{
+              position: 'absolute',
+              top: 10,
+              left: 5,
+              color:
+                props.detail.pinnedTime === '0001-01-01T06:00:00' ||
+                props.detail.pinnedTime === null
+                  ? theme.palette.bg
+                  : theme.palette.component_accent,
+              margin: 0,
+              padding: 0,
+              height: '25px',
+              width: '25px',
+              zIndex: 1,
+            }}
+            onClick={pinStudy}></PushPinIcon>
+          <MButton onClick={goStudy}>
+            <MNameLabel>{props.detail.title}</MNameLabel>
+            <Grid container sx={{ padding: 2 }}>
+              {temp.map((item: string, i: number) => {
+                return (
+                  <img
+                    key={i}
+                    src={!!item ? item : alpaca}
+                    className={styles.profileimg_mini}
+                    alt=""
+                    style={{ height: '5vh', width: '5vh' }}
+                  />
+                );
+              })}
+            </Grid>
+          </MButton>
+        </div>
+      </MobileView>
+    </>
   );
 }
 
