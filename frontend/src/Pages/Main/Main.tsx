@@ -7,7 +7,8 @@ function Main() {
   return (
     <div>
       <MainIntroduction />
-      <MainHeatmapChart />
+      <div style={{ height: '6vh' }}>추천문제</div>
+      <div style={{ height: '6vh' }}>이번주 스터디</div>
       <MainRooms />
     </div>
   );

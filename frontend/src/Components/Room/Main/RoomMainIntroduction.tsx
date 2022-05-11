@@ -1,23 +1,20 @@
-import { Settings } from '@mui/icons-material';
-import { Divider, IconButton, Stack, styled } from '@mui/material';
-import CProfile from '../../Commons/CProfile';
+import { Divider, Stack, styled } from '@mui/material';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
-
-interface RoomMainIntroductionProps {
-  info: string;
-  members: { nickname: string; profileImg: string }[];
-}
+import RoomMainIntroductionMemberEdit from './RoomMainIntroductionMemberEdit';
+import RoomMainIntroductionMemberList from './RoomMainIntroductionMemberList';
 
 const IntroductionContainer = styled(Stack)(({ theme }) => ({
   width: '100%',
 }));
 
-const CustomIconButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.main,
-  color: theme.palette.icon,
-}));
+function RoomMainIntroduction() {
+  const info = useSelector((state: any) => state.room.info);
 
-function RoomMainIntroduction({ info, members }: RoomMainIntroductionProps) {
+  // 스터디원 관리
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+
   return (
     <IntroductionContainer spacing={3}>
       <RoomMainComponentContainer>
@@ -26,18 +23,11 @@ function RoomMainIntroduction({ info, members }: RoomMainIntroductionProps) {
         <p>{info}</p>
       </RoomMainComponentContainer>
 
-      <RoomMainComponentContainer>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h4>스터디원</h4>
-          <CustomIconButton size="small">
-            <Settings />
-          </CustomIconButton>
-        </div>
-        <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
-        {members.map((member, idx) => (
-          <CProfile key={idx} nickname={member.nickname} profileImg={member.profileImg} />
-        ))}
-      </RoomMainComponentContainer>
+      {isEdit ? (
+        <RoomMainIntroductionMemberEdit setIsEdit={setIsEdit} />
+      ) : (
+        <RoomMainIntroductionMemberList setIsEdit={setIsEdit} />
+      )}
     </IntroductionContainer>
   );
 }

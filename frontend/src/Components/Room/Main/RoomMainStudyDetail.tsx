@@ -1,27 +1,19 @@
 import { Delete, Edit } from '@mui/icons-material';
 import { Divider, Stack, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { DUMMY_SCHEDULE_RES_DATA } from '../../../Assets/dummyData/dummyData';
+import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
+import {
+  setFinishedAt,
+  setIsEdit,
+  setIsStudyExist,
+  setProblemListRes,
+  setStartedAt,
+} from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
-import { DailySchedule } from './RoomMainCalendar';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyDetailProblemItem from './RoomMainStudyDetailProblemItem';
-
-interface RoomMainStudyDetailProps {
-  selectedDay: Date;
-  selectedDayIdx: number;
-  dateRange: DailySchedule[];
-  startedAt: Date | null;
-  finishedAt: Date | null;
-  problemListRes: ProblemRes[];
-  setStartedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-  setFinishedAt: React.Dispatch<React.SetStateAction<Date | null>>;
-  setProblemListRes: React.Dispatch<React.SetStateAction<ProblemRes[]>>;
-  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 export interface ToSolveProblem {
   id: string;
@@ -48,48 +40,49 @@ export interface ProblemRes {
   solvedMemberList?: SolvedMemeberList[];
 }
 
-function RoomMainStudyDetail({
-  selectedDay,
-  selectedDayIdx,
-  dateRange,
-  startedAt,
-  finishedAt,
-  problemListRes,
-  setStartedAt,
-  setFinishedAt,
-  setProblemListRes,
-  setIsEdit,
-}: RoomMainStudyDetailProps) {
+function RoomMainStudyDetail() {
   const theme = useTheme();
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
+  const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
+  const dateRange = useSelector((state: any) => state.room.dateRange);
+  const startedAt = useSelector((state: any) => state.room.startedAt);
+  const finishedAt = useSelector((state: any) => state.room.finishedAt);
+  const problemListRes = useSelector((state: any) => state.room.problemListRes);
 
   const getScheduleProblems = async () => {
+    const scheduleId = dateRange[selectedDayIdx].schedule?.id;
+    if (scheduleId === undefined) return;
+
     try {
-      const scheduleId = dateRange[selectedDayIdx].schedule?.id;
-      // const res = await customAxios({
-      //   method: 'get',
-      //   url: `/schedule/${scheduleId}`,
-      // });
-
-      const res = DUMMY_SCHEDULE_RES_DATA;
-
-      console.log(res);
-      // setStartedAt(new Date(res.data.startedAt));
-      // setFinishedAt(new Date(res.data.finishedAt));
-      // setProblemListRes(res.data.problemListRes);
-      setStartedAt(new Date(res.startedAt));
-      setFinishedAt(new Date(res.finishedAt));
-      setProblemListRes(res.problemListRes);
-    } catch (e) {
-      console.log(e);
+      const res = await customAxios({
+        method: 'get',
+        url: `/schedule/${scheduleId}`,
+      });
+      console.log('getScheduleProblems: ', res);
+      dispatch(setStartedAt(new Date(res.data.startedAt)));
+      dispatch(setFinishedAt(new Date(res.data.finishedAt)));
+      dispatch(setProblemListRes(res.data.problemListRes));
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 
-  const deleteStudy = () => {};
+  const deleteStudy = async () => {
+    try {
+      const scheduleId = dateRange[selectedDayIdx].schedule?.id;
+      await customAxios({ method: 'delete', url: `/schedule/${scheduleId}` });
+      dispatch(setIsStudyExist(false));
+    } catch (e: any) {
+      console.log(e.response);
+    }
+  };
 
   useEffect(() => {
+    console.log('selectedDay: ', dateRange[selectedDayIdx]?.day);
     getScheduleProblems();
-  }, [selectedDay]);
+  }, [selectedDayIdx]);
 
   return (
     <RoomMainComponentContainer height="100%">
@@ -100,13 +93,13 @@ function RoomMainStudyDetail({
             <CBtn
               height="100%"
               content={<Delete sx={{ color: theme.palette.icon }} />}
-              onClick={() => {}}
+              onClick={deleteStudy}
             />
             <CBtn
               height="100%"
               content={<Edit sx={{ color: theme.palette.icon }} />}
               onClick={() => {
-                setIsEdit(true);
+                dispatch(setIsEdit(true));
               }}
             />
           </Stack>
@@ -118,7 +111,7 @@ function RoomMainStudyDetail({
         <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
         <Divider variant="middle" />
         <Stack className="scroll-box" spacing={1} sx={{ height: '55vh' }}>
-          {problemListRes.map((problem, idx) => (
+          {problemListRes.map((problem: ProblemRes, idx: number) => (
             <RoomMainStudyDetailProblemItem
               key={idx}
               problemId={problem.problemNumber}

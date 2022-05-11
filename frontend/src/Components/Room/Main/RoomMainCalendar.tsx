@@ -2,17 +2,17 @@ import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import { Grid, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Schedule } from '../../../Pages/Room/RoomMain';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { customAxios } from '../../../Lib/customAxios';
+import {
+  Schedule,
+  setDateRange,
+  setSchedules,
+  setSelectedDayIdx,
+} from '../../../Redux/roomReducer';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
-
-interface RoomMainCalendarProps {
-  schedules: Schedule[];
-  selectedDay: Date;
-  dateRange: DailySchedule[];
-  setSelectedDay: React.Dispatch<React.SetStateAction<Date>>;
-  setDateRange: React.Dispatch<React.SetStateAction<DailySchedule[]>>;
-}
 
 export interface DailySchedule {
   day: Date;
@@ -29,22 +29,25 @@ const CalendarBox = styled(Grid)(({ theme }) => ({
   background: theme.palette.component,
   marginLeft: 0,
   marginTop: 0,
-  width:'100%',
+  width: '100%',
   paddingRight: theme.spacing(1),
   paddingBottom: theme.spacing(1),
   borderRadius: '0 0 10px 10px',
 }));
 
-function RoomMainCalendar({
-  schedules = [],
-  selectedDay,
-  dateRange,
-  setSelectedDay,
-  setDateRange,
-}: RoomMainCalendarProps) {
-  // 현재 보고 있는 달력의 달을 확인하기 위한 변수
+function RoomMainCalendar() {
+  const { roomId } = useParams();
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const dateRange = useSelector((state: any) => state.room.dateRange);
+  const schedules = useSelector((state: any) => state.room.schedules);
+
+  // 현재 보고 있는 달력의 달을 확인하기 위한 변수
   const [nowDay, setNowDay] = useState<Date>(new Date());
+
+  // request최적화를 위해 설정
+  const [prevDay, setPrevDay] = useState<Date>(new Date());
 
   // 현재 달력의 날짜계산 및 스케줄저장을 위한 함수
   const getStartDate = () => {
@@ -62,7 +65,6 @@ function RoomMainCalendar({
       };
 
       if (scheduleIdx < schedules.length) {
-        console.log('schedules.length:', schedules.length);
         let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
         if (
           temp.day.getFullYear() === scheduleDay.getFullYear() &&
@@ -75,12 +77,48 @@ function RoomMainCalendar({
       tempDateRange.push(temp);
       startDate.setDate(startDate.getDate() + 1);
     }
-    setDateRange(tempDateRange);
+    console.log('schedules: ', schedules);
+    dispatch(setDateRange(tempDateRange));
+  };
+
+  // 달이 변할때 스케줄을 가져오는 함수
+  const getMonthlySchedule = async () => {
+    getStartDate();
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/schedule/${roomId}/monthly`,
+        params: { month: nowDay.getMonth() + 1, year: nowDay.getFullYear() },
+      });
+      console.log('change month: ', res);
+      const tempSchedules: Schedule[] = [];
+      res.data.forEach((schedule: Schedule) => {
+        const startedAt = new Date(schedule.startedAt);
+        const finishedAt = new Date(schedule.finishedAt);
+
+        tempSchedules.push({ id: schedule.id, startedAt, finishedAt });
+      });
+
+      dispatch(setSchedules([...tempSchedules]));
+    } catch (e: any) {
+      console.log(e.response);
+    }
   };
 
   useEffect(() => {
-    getStartDate();
+    if (
+      nowDay.getMonth() !== prevDay.getMonth() ||
+      nowDay.getFullYear() !== prevDay.getFullYear()
+    ) {
+      getMonthlySchedule();
+    }
+
+    setPrevDay(new Date(nowDay));
   }, [nowDay, schedules]);
+
+  useEffect(() => {
+    getStartDate();
+  }, []);
 
   return (
     <Stack>
@@ -106,14 +144,12 @@ function RoomMainCalendar({
         columns={7}
         spacing={1}
         sx={{ paddingLeft: 0, paddingTop: theme.spacing(1) }}>
-        {dateRange.map((dailySchedule, idx) => (
+        {dateRange.map((dailySchedule: DailySchedule, idx: number) => (
           <RoomMainCalendarDay
             dailySchedule={dailySchedule}
             key={idx}
             nowDay={nowDay}
-            setNowDay={setNowDay}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
+            onClick={() => dispatch(setSelectedDayIdx(idx))}
           />
         ))}
       </CalendarBox>

@@ -1,13 +1,12 @@
-import { alpha, Button, Divider, Grid, Stack, styled, useTheme } from '@mui/material';
+import { alpha, Button, Grid, Stack, styled, useTheme } from '@mui/material';
+import { useSelector } from 'react-redux';
 import { dateToStringTimeSimple } from '../../../Lib/dateToString';
 import { DailySchedule } from './RoomMainCalendar';
 
 interface RoomMainCalendarDayProps {
   dailySchedule: DailySchedule;
   nowDay: Date;
-  selectedDay: Date;
-  setNowDay: React.Dispatch<React.SetStateAction<Date>>;
-  setSelectedDay: React.Dispatch<React.SetStateAction<Date>>;
+  onClick: () => void;
 }
 
 const DayBox = styled(Button)(({ theme }) => ({
@@ -23,19 +22,10 @@ const DayBox = styled(Button)(({ theme }) => ({
   },
 }));
 
-function RoomMainCalendarDay({
-  dailySchedule,
-  nowDay,
-  selectedDay,
-  setNowDay,
-  setSelectedDay,
-}: RoomMainCalendarDayProps) {
+function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalendarDayProps) {
   const theme = useTheme();
 
-  const onClickHandler = () => {
-    setSelectedDay(dailySchedule.day);
-    setNowDay(dailySchedule.day);
-  };
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
 
   return (
     <Grid item xs={1}>
@@ -48,10 +38,13 @@ function RoomMainCalendarDay({
               ? ''
               : alpha(theme.palette.bg, 0.6),
         }}
-        onClick={onClickHandler}>
+        onClick={onClick}>
         <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
-          <div>{dailySchedule.day.getDate()}</div>
-          <Divider variant="middle" sx={{ margin: 0 }} />
+          <div style={{ color: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+            {dailySchedule.day.getMonth() === nowDay.getMonth() ||
+              `${dailySchedule.day.getMonth() + 1}/`}
+            {dailySchedule.day.getDate()}
+          </div>
           <div
             style={{
               flexGrow: 1,
@@ -62,8 +55,8 @@ function RoomMainCalendarDay({
             }}>
             {!!dailySchedule.schedule && (
               <div>
-                <span>{dateToStringTimeSimple(dailySchedule.schedule.startedAt)}</span>
-                <span>~ {dateToStringTimeSimple(dailySchedule.schedule.finishedAt)}</span>
+                <span>{dateToStringTimeSimple(new Date(dailySchedule.schedule.startedAt))}</span>
+                <span>~ {dateToStringTimeSimple(new Date(dailySchedule.schedule.finishedAt))}</span>
               </div>
             )}
           </div>

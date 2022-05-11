@@ -14,17 +14,23 @@ interface CSearchBarProps {
   placeholder?: string;
   helperText?: string;
   backgroundColor?: string;
+  value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   onSendMessage: () => void;
 }
 
 const CustomInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
+  '&:before': { borderBottom: `0` },
+  '&:after': {
+    borderBottom: `1px solid ${theme.palette.accent}`,
+  },
 }));
 
 function RoomMainChatBar({
   placeholder = '',
   helperText = '',
+  value,
   backgroundColor,
   onChange,
   onSendMessage,
@@ -62,11 +68,11 @@ function RoomMainChatBar({
           marginBottom: 1,
         }}>
         <CustomInput
+          value={value}
           id="search-bar"
           onChange={onChangeHandler}
           placeholder={placeholder}
           fullWidth
-          autoComplete="search-bar"
           endAdornment={
             <InputAdornment position="end">
               <CBtn
