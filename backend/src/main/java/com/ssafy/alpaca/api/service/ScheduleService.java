@@ -217,9 +217,11 @@ public class ScheduleService {
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
-        LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime localDateTime;
+        localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+        localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
         return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, localDateTime.minusWeeks(1), localDateTime.plusMonths(1).plusWeeks(2)));
+                study, localDateTime, localDateTime.plusDays(42)));
     }
 
     public void deleteSchedule(String username, Long id) throws IllegalAccessException {
