@@ -2,7 +2,6 @@ package com.ssafy.alpaca.api.response;
 
 import lombok.*;
 
-import java.util.List;
 
 @Getter
 @Setter

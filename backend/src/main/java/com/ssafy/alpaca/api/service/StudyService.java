@@ -227,10 +227,10 @@ public class StudyService {
     public void checkMember(String username, Long userId, Long studyId) {
         Study study = checkStudyById(studyId);
         User user = checkUserByUsername(username);
-        User member = checkUserById(userId);
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-        boolean flagA = false, flagB = false;
+        boolean flagA = false;
+        boolean flagB = false;
         for (MyStudy myStudy : myStudies) {
             if (myStudy.getUser().getId().equals(userId)) {
                 flagA = true;

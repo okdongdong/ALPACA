@@ -34,8 +34,8 @@ public class StudyController {
             value = "스터디 개설",
             notes = "입력 정보에 따라 새로운 스터디를 생성한다."
     )
-    @PostMapping()
-    public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) throws IllegalAccessException {
+    @PostMapping
+    public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.createStudy(username, studyReq));
     }
@@ -67,7 +67,7 @@ public class StudyController {
             value = "스터디 추가 조회",
             notes = "pageable에 해당하는 스터디를 3개단위로 조회한다."
     )
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<Page<StudyListRes>> getMoreStudy(
             @PageableDefault(size = 3, sort = "pinnedTime", direction = Sort.Direction.DESC)Pageable pageable) {
         String username = userService.getCurrentUsername();
