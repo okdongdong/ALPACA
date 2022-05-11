@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public interface SolvedProblemRepository extends JpaRepository<SolvedProblem, Long> {
 
+    Boolean existsByUserAndProblemNumber(User user, Long problemNumber);
+
     @EntityGraph(attributePaths = "user")
     List<SolvedProblem> findAllByProblemNumber(Long problemNumber);
 

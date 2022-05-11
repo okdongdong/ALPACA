@@ -81,7 +81,8 @@ public class StudyController {
     @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}/problems")
     public ResponseEntity<List<ProblemListRes>> getStudyProblem(@PathVariable Long id){
-        return ResponseEntity.ok(studyService.getStudyProblem(id));
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getStudyProblem(username, id));
     }
 
     @ApiOperation(

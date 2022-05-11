@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.response;
 
+import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.SolvedProblem;
 import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
@@ -23,6 +24,8 @@ public class ProblemListRes {
 
     private Long level;
 
+    private Boolean isSolved;
+
     private LocalDateTime startedAt;
 
     private List<User> solvedMemberList;
@@ -30,4 +33,5 @@ public class ProblemListRes {
     public static List<User> of (List<SolvedProblem> list) {
         return list.stream().map(SolvedProblem::getUser).collect(Collectors.toList());
     }
+
 }
