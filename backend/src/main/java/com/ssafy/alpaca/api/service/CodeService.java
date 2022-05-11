@@ -129,7 +129,8 @@ public class CodeService {
             );
             List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-            boolean flagA = false, flagB = false;
+            boolean flagA = false;
+            boolean flagB = false;
             for (MyStudy myStudy : myStudies) {
                 if (myStudy.getUser().getId().equals(userId)) {
                     flagA = true;

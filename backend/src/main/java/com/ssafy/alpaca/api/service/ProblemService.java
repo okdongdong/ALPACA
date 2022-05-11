@@ -94,13 +94,13 @@ public class ProblemService {
                 URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + user.getBojId() + "&page=" + page);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 JSONObject jsonObject = getJsonDataFromURL(httpURLConnection);
-                long total_count = (long) jsonObject.get("count");
+                long totalCount = (long) jsonObject.get("count");
                 List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
                 for (JSONObject j : jsonObjects) {
                     solvedProblemList.add((Long) j.get("problemId"));
                 }
 
-                if (1 + total_count / 100 <= page) {
+                if (1 + totalCount / 100 <= page) {
                     httpURLConnection.disconnect();
                     break;
                 }
@@ -173,7 +173,7 @@ public class ProblemService {
 
     private List<Problem> getRandomProblem(User user) {
         List<Problem> candidateProblems = problemRepository.findAllByLevelGreaterThanEqual(user.getLevel());
-        if (candidateProblems.size() == 0) {
+        if (candidateProblems.isEmpty()) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         } else if (candidateProblems.size() <= 3) {
             return candidateProblems;

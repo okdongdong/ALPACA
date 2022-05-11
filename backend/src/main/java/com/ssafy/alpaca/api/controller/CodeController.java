@@ -7,7 +7,6 @@ import com.ssafy.alpaca.api.response.CodeRes;
 import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
-import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.api.response.CodeCompileRes;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
