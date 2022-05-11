@@ -9,6 +9,7 @@ import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -71,14 +72,19 @@ public class ScheduleController {
 
     @ApiOperation(
             value = "스터디 일정 리스트 조회",
-            notes = "특정 기간 (year, month)의 스터디 일정을 조회한다."
+            notes = "특정 기간 (year, month, day)의 스터디 일정을 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
-    @GetMapping("/{id}/monthly")
-    public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(
-            @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month) throws IllegalAccessException {
+    @ApiImplicitParams({
+            @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "year", value = "시작하는 해", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "month", value = "시작하는 달", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "day", value = "시작하는 날짜", dataTypeClass = Long.class ),
+    })
+    @GetMapping("/{id}/span")
+    public ResponseEntity<List<ScheduleListRes>> getScheduleList(
+            @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(scheduleService.getScheduleMonthList(username, id, year, month));
+        return ResponseEntity.ok(scheduleService.getScheduleList(username, id, year, month, day));
     }
 
     @ApiOperation(
