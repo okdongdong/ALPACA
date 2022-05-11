@@ -23,7 +23,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -175,6 +178,26 @@ public class StudyService {
                                 .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
                                 .collect(Collectors.toList()))
                 .build());
+    }
+
+    public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day) {
+        User user = checkUserByUsername(username);
+        LocalDateTime localDateTime;
+        List<Object[]> objects;
+        if (day == null) {
+            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(42));
+        } else {
+            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(7));
+        }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        return objects.stream().map(object -> ScheduleListRes.builder()
+                .id(Long.parseLong(object[0].toString()))
+                .startedAt(LocalDateTime.parse(object[1].toString(), dateTimeFormatter))
+                .finishedAt(LocalDateTime.parse(object[2].toString(), dateTimeFormatter))
+                .build()).collect(Collectors.toList());
     }
 
     public List<ProblemListRes> getStudyProblem(String username, Long id){

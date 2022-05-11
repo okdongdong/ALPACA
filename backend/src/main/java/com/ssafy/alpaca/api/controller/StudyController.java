@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.*;
 import com.ssafy.alpaca.api.response.ProblemListRes;
+import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.StudyRes;
 import com.ssafy.alpaca.api.service.StudyService;
@@ -72,6 +73,22 @@ public class StudyController {
             @PageableDefault(size = 3, sort = "pinnedTime", direction = Sort.Direction.DESC)Pageable pageable) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
+    }
+
+    @ApiOperation(
+            value = "스터디 일정 리스트 조회",
+            notes = "특정 기간 (year, month, day)의 스터디 일정을 조회한다."
+    )
+    @ApiImplicitParams({
+            @ApiImplicitParam( name = "year", value = "시작하는 해", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "month", value = "시작하는 달", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "day", value = "시작하는 날짜", dataTypeClass = Long.class ),
+    })
+    @GetMapping("/span")
+    public ResponseEntity<List<ScheduleListRes>> getScheduleList(
+            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) throws IllegalAccessException {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day));
     }
 
     @ApiOperation(
