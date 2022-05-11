@@ -93,7 +93,7 @@ function Signup() {
     }
 
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'get',
         url: `/auth/duplicated/nickname`,
         params: { nickname },
@@ -247,10 +247,8 @@ function Signup() {
               onClick={signup}
               // 회원가입 유효성 검사 통과시에만 활성화
               disabled={
-                !!usernameMessage ||
                 !!passwordMessage ||
                 !!passwordCheckMessage ||
-                !!nicknameMessage ||
                 isUsernameChecked === false ||
                 isNicknameChecked === false
               }
@@ -320,10 +318,8 @@ function Signup() {
               onClick={signup}
               // 회원가입 유효성 검사 통과시에만 활성화
               disabled={
-                !!usernameMessage ||
                 !!passwordMessage ||
                 !!passwordCheckMessage ||
-                !!nicknameMessage ||
                 isUsernameChecked === false ||
                 isNicknameChecked === false
               }
