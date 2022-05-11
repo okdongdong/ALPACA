@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Builder
 public class ProblemListRes {
 
+    private Long id;
+
     private Long problemNumber;
 
     private String title;

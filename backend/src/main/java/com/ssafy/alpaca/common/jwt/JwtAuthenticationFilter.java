@@ -1,10 +1,14 @@
 package com.ssafy.alpaca.common.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.alpaca.api.service.CustomUserDetailService;
+import com.ssafy.alpaca.common.exception.JwtFilterException;
+import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +22,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -32,26 +38,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = getToken(request, "Authorization");
         String requestURI = request.getRequestURI();
+
         if (accessToken != null && !requestURI.equals("/api/v1/auth/reissue")) {
             // 로그아웃에 사용된 토큰인지 확인
             checkLogout(accessToken);
 
             // 토큰에서 사용자 정보(이름)을 가져옴
-            String username = jwtTokenUtil.getUsername(accessToken);
-            if (username != null) {
-                UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
-                // 토큰이 가지고 있는 정보에 기록된 사용자가 인증받은 사용자인지 확인
-                equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
-                // 유효한 토큰인지 확인
-                validateAccessToken(accessToken);
-                // SecurityContext에 Authentication 객체를 저장
-                processSecurity(request, userDetails);
+            try {
+
+                String username = jwtTokenUtil.getUsername(accessToken);
+                log.info("username {}",username);
+                if (username != null) {
+                    UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
+                    // 토큰이 가지고 있는 정보에 기록된 사용자가 인증받은 사용자인지 확인
+                    equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
+                    // 유효한 토큰인지 확인
+                    validateAccessToken(accessToken);
+                    // SecurityContext에 Authentication 객체를 저장
+                    processSecurity(request, userDetails);
+
+                    filterChain.doFilter(request, response);
+
+                }
+            } catch (JwtFilterException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> map = new HashMap<>();
+                map.put("message", e.getMessage());
+                String result = objectMapper.writeValueAsString(map);
+                response.getWriter().write(result);
             }
         }
 
         if (requestURI.equals("/api/v1/auth/reissue")) {
             String refreshToken = getToken(request,"RefreshToken");
-
             String username = jwtTokenUtil.getUsername(refreshToken);
             if (username != null) {
                 UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
@@ -62,8 +86,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // SecurityContext에 Authentication 객체를 저장
                 processSecurity(request, userDetails);
             }
-        }
         filterChain.doFilter(request, response);
+        }
     }
 
     private String getToken(HttpServletRequest request, String header) {
@@ -88,7 +112,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void validateAccessToken(String accessToken) {
         if (Boolean.FALSE.equals(jwtTokenUtil.validateToken(accessToken))) {
-            throw new IllegalArgumentException("ExceptionUtil.INVALID_AUTH_TOKEN");
+            throw new IllegalArgumentException(ExceptionUtil.INVALID_AUTH_TOKEN);
         }
     }
 

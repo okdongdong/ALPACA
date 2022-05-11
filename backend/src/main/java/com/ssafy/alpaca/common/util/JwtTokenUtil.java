@@ -1,12 +1,10 @@
 package com.ssafy.alpaca.common.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.ssafy.alpaca.common.exception.JwtFilterException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -25,11 +23,17 @@ public class JwtTokenUtil {
     private String SECRET_KEY;
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey(SECRET_KEY))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey(SECRET_KEY))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+        catch(Exception e) {
+            throw new JwtFilterException(ExceptionUtil.INVALID_AUTH_TOKEN);
+        }
+
     }
 
     // 토큰에서 회원 정보 추출

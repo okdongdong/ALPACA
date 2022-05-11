@@ -17,6 +17,7 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
 
     Long countAllByUser(User user);
 
+    @EntityGraph(attributePaths = {"study"})
     List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
 
     Boolean existsByUserAndIsRoomMaker(User user, Boolean isRoomMaker);
@@ -25,8 +26,13 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
 
     Optional<MyStudy> findByUserAndStudy(User user, Study study);
 
+    Boolean existsByUserAndStudyAndIsRoomMaker(User user, Study study, Boolean check);
+
     @EntityGraph(attributePaths = {"user"})
     List<MyStudy> findAllByStudy(Study study);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<MyStudy> findTop4ByStudy(Study study);
 
     @EntityGraph(attributePaths = {"study"})
     Page<MyStudy> findAllByUser(User user, Pageable pageable);
