@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.response.ProblemRecommendRes;
 import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -56,7 +57,7 @@ public class ProblemController {
             notes = "자신의 class정보에 맞는 문제 3개를 추천받는다."
     )
     @GetMapping("/recommend")
-    public ResponseEntity<List<Problem>> recommendProblem(){
+    public ResponseEntity<List<ProblemRecommendRes>> recommendProblem(){
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(problemService.recommendProblem(username));
     }

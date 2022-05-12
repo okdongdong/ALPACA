@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.db.document;
 
+import com.ssafy.alpaca.api.response.ProblemRecommendRes;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,7 +25,7 @@ public class TodayProblem {
     private Long userId;
 
     @Field(targetType = FieldType.ARRAY)
-    private List<Problem> problems;
+    private List<ProblemRecommendRes> problemRecommendRes;
 
     @Field(targetType = FieldType.DATE_TIME)
     private LocalDate date;
