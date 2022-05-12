@@ -5,11 +5,11 @@ import Logo from '../../Assets/Img/Logo.png';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { logout } from '../../Redux/accountReducer';
 import { settingOn } from '../../Redux/roomReducer';
 import styles from './SideBar.module.css';
 
 import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
+import useLogout from '../../Hooks/useLogout';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function };
@@ -46,6 +46,7 @@ function SideBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const logout = useLogout();
 
   const userTheme = useSelector((state: any) => state.theme.themeType);
 
@@ -60,7 +61,7 @@ function SideBar() {
     }
   };
   const clickLogout = () => {
-    dispatch(logout());
+    logout();
   };
   const clickNotification = () => {};
 

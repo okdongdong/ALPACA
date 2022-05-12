@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../Redux/accountReducer';
 import {
   Menu,
   Home,
@@ -25,6 +24,7 @@ import {
   Person,
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import useLogout from '../../Hooks/useLogout';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function; text: string };
@@ -54,6 +54,7 @@ function NavBar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const myTheme = useSelector((state: any) => state.theme.themeType);
+  const logout = useLogout();
 
   const [leftOpen, setLeftOpen] = useState<boolean>(false);
   const [rightOpen, setRightOpen] = useState<boolean>(false);
@@ -70,7 +71,7 @@ function NavBar() {
     }
   };
   const clickLogout = () => {
-    dispatch(logout());
+    logout();
   };
   const clickNotification = () => {};
   const clickSettings = () => {};
