@@ -111,7 +111,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 99) {
       setHour(99);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setHour(0);
     } else {
       setHour(value);
@@ -121,7 +121,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 59) {
       setMinute(59);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setMinute(0);
     } else {
       setMinute(value);
@@ -131,7 +131,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 59) {
       setSecond(59);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setSecond(0);
     } else {
       setSecond(value);

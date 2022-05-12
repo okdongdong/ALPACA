@@ -18,6 +18,7 @@ import { Mic, MicOff, Videocam, VideocamOff, ArrowDropDown } from '@mui/icons-ma
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setConstraints as setReduxConstraints, Constraints } from '../../../Redux/openviduReducer';
+import useAlert from '../../../Hooks/useAlert';
 type PropsType = React.VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
 };
@@ -80,6 +81,7 @@ const PreviewDialog = styled(Dialog)(({ theme }) => ({
 
 function RoomStudyLivePreview({ open, setOpen }: PreviewType) {
   const theme = useTheme();
+  const cAlert = useAlert();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -102,7 +104,11 @@ function RoomStudyLivePreview({ open, setOpen }: PreviewType) {
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setVideoSrc(new MediaStream([mediaStream.getVideoTracks()[0]]));
     } catch (e) {
-      console.log(e);
+      cAlert.fire({
+        icon: 'error',
+        title: '미디어에 접근할 수 없습니다',
+        text: '권한을 확인해주세요',
+      });
     }
   };
   const stopUserMedia = () => {
@@ -134,14 +140,18 @@ function RoomStudyLivePreview({ open, setOpen }: PreviewType) {
     setAnchorEl(null);
   };
   const goToLive = () => {
+    stopUserMedia();
     const state: Constraints = {
-      audioSource: constraints.audio ? String(constraints.audio.deviceId) : undefined,
-      videoSource: constraints.video ? String(constraints.video.deviceId) : undefined,
+      audioSource: constraints.audio
+        ? String(constraints.audio.deviceId || audioDevices[0].deviceId)
+        : undefined,
+      videoSource: constraints.video
+        ? String(constraints.video.deviceId || videoDevices[0].deviceId)
+        : undefined,
       publishAudio: Boolean(constraints.audio),
       publishVideo: Boolean(constraints.video),
     };
     dispatch(setReduxConstraints(state));
-    stopUserMedia();
     navigate(`/room/${roomId}/live`, { state: roomId });
   };
 
