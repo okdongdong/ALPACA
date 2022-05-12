@@ -1,5 +1,6 @@
-import { Box, Grid, Stack, styled } from '@mui/material';
+import { Box, Grid, Stack, IconButton, Collapse } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import CBtn from '../../Components/Commons/CBtn';
@@ -20,6 +21,8 @@ import {
   MemberDict,
   changeSelectedDay,
 } from '../../Redux/roomReducer';
+import { BrowserView, MobileView } from 'react-device-detect';
+import DehazeIcon from '@mui/icons-material/Dehaze';
 
 const RoomTitle = styled('h1')(({ theme }) => ({
   color: theme.palette.txt,
@@ -27,10 +30,18 @@ const RoomTitle = styled('h1')(({ theme }) => ({
   paddingBottom: theme.spacing(3),
 }));
 
+const MRoomTitle = styled('h3')(({ theme }) => ({
+  color: theme.palette.txt,
+  textAlign: 'center',
+  paddingBottom: theme.spacing(3),
+  marginTop: '1vh',
+}));
+
 function RoomMain() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const title = useSelector((state: any) => state.room.title);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
@@ -39,6 +50,15 @@ function RoomMain() {
 
   // 초대 dialog open
   const [open, setOpen] = useState<boolean>(false);
+  // chat open
+  const [openChat, setOpenChat] = useState<boolean>(false);
+
+  const checkIn = () => {
+    setOpenChat((prev) => !prev);
+  };
+  const checkOut = () => {
+    setOpenChat((prev) => !prev);
+  };
 
   // 스터디룸 정보조회
   const getRoomInfo = async () => {
@@ -84,51 +104,98 @@ function RoomMain() {
   }, [selectedDayIdx]);
 
   return (
-    <Box sx={{ height: '100%', width: '100%' }}>
-      <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
-      <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
-        <Grid item xs={2}>
-          <RoomTitle>{title}</RoomTitle>
-          <RoomMainIntroduction />
-        </Grid>
-        <Grid item xs={6}>
-          <Stack spacing={3}>
-            <RoomMainCalendar />
-            <RoomMainChat />
-          </Stack>
-        </Grid>
-        <Grid item xs={4} sx={{ paddingRight: 4 }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              height: '100%',
+    <>
+      <BrowserView style={{ height: '100%', width: '100%' }}>
+        <Box sx={{ height: '100%', width: '100%' }}>
+          <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
+          <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
+            <Grid item xs={2}>
+              <RoomTitle>{title}</RoomTitle>
+              <RoomMainIntroduction />
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={3}>
+                <RoomMainCalendar />
+                <RoomMainChat />
+              </Stack>
+            </Grid>
+            <Grid item xs={4} sx={{ paddingRight: 4 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '100%',
+                }}>
+                {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
+                <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
+                  <CBtn
+                    width="100%"
+                    height="100%"
+                    onClick={() => {
+                      setOpen(true);
+                    }}>
+                    초대
+                  </CBtn>
+                  <CBtn
+                    width="100%"
+                    height="100%"
+                    onClick={() => {
+                      navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
+                    }}>
+                    스터디 라이브 입장
+                  </CBtn>
+                </Stack>
+              </div>
+            </Grid>
+          </Grid>
+          <RoomMainSetting />
+        </Box>
+      </BrowserView>
+      <MobileView style={{ height: '100%', width: '100%' }}>
+        <IconButton
+          onClick={checkIn}
+          sx={{
+            height: '3vh',
+            width: '100%',
+            position: 'fixed',
+            bottom: 0,
+            background: theme.palette.main,
+            borderRadius: '10px',
+            zIndex: 1,
+          }}>
+          <DehazeIcon sx={{ color: theme.palette.txt }} />
+        </IconButton>
+        <RoomMainSetting />
+        <MRoomTitle>{title}</MRoomTitle>
+        <RoomMainCalendar />
+        <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}></Stack>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+          }}>
+          {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
+          <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}></Stack>
+        </div>
+        <Collapse in={openChat} sx={{ position: 'absolute', zIndex: 2, bottom: 0, width: '100vw' }}>
+          <IconButton
+            onClick={checkOut}
+            aria-label="close"
+            sx={{
+              height: '3vh',
+              width: '100%',
+              background: theme.palette.main,
+              borderRadius: '10px',
             }}>
-            {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
-            <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
-              <CBtn
-                width="100%"
-                height="100%"
-                onClick={() => {
-                  setOpen(true);
-                }}>
-                초대
-              </CBtn>
-              <CBtn
-                width="100%"
-                height="100%"
-                onClick={() => {
-                  navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
-                }}>
-                스터디 라이브 입장
-              </CBtn>
-            </Stack>
-          </div>
-        </Grid>
-      </Grid>
-      <RoomMainSetting />
-    </Box>
+            <DehazeIcon sx={{ color: theme.palette.txt }} />
+          </IconButton>
+          <RoomMainChat />
+        </Collapse>
+      </MobileView>
+    </>
   );
 }
 
