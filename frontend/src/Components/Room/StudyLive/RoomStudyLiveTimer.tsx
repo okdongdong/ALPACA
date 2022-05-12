@@ -305,7 +305,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={hour} onChange={handleHour}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setHour((hour) => (hour < 0 ? 0 : hour - 1));
+                  setHour((hour) => (hour <= 0 ? 0 : hour - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>
@@ -321,7 +321,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={minute} onChange={handleMinute}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setMinute((minute) => (minute < 0 ? 0 : minute - 1));
+                  setMinute((minute) => (minute <= 0 ? 0 : minute - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>
@@ -337,7 +337,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={second} onChange={handleSecond}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setSecond((second) => (second < 0 ? 0 : second - 1));
+                  setSecond((second) => (second <= 0 ? 0 : second - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>
