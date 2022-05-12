@@ -102,11 +102,9 @@ const roomSlice = createSlice({
       schedules: action.payload.scheduleListRes,
     }),
     resetRoomInfo: (state) => ({ ...initialState }),
-    setTitle: (state, action) => {
-      state.title = action.payload;
-    },
-    setInfo: (state, action) => {
-      state.info = action.payload;
+    setRoomIntroduction: (state, action) => {
+      state.title = action.payload.title;
+      state.info = action.payload.info;
     },
     setMembers: (state, action) => {
       state.members = action.payload;
@@ -195,8 +193,7 @@ const calDailySchedule = (dateRange: DailySchedule[], schedules: Schedule[]) => 
 export const {
   setRoomInfo,
   resetRoomInfo,
-  setTitle,
-  setInfo,
+  setRoomIntroduction,
   setMembers,
   setMemberDict,
   setSchedules,
