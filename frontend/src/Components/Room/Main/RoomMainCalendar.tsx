@@ -14,6 +14,7 @@ import {
 } from '../../../Redux/roomReducer';
 import RoomMainCalendarDay from './RoomMainCalendarDay';
 import RoomMainCalendarWeek from './RoomMainCalendarWeek';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 export interface DailySchedule {
   day: Date;
@@ -113,39 +114,78 @@ function RoomMainCalendar() {
   }, [schedules]);
 
   return (
-    <Stack>
-      <CalendarTitle>
-        <IconButton
-          size="large"
-          onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() - 1)))}>
-          <ArrowBackIosNew />
-        </IconButton>
-        <div style={{ textAlign: 'center' }}>
-          <span>{nowDay.getFullYear()}년</span>
-          <h3>{nowDay.getMonth() + 1}월</h3>
-        </div>
-        <IconButton
-          size="large"
-          onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() + 1)))}>
-          <ArrowForwardIos />
-        </IconButton>
-      </CalendarTitle>
-      <RoomMainCalendarWeek />
-      <CalendarBox
-        container
-        columns={7}
-        spacing={1}
-        sx={{ paddingLeft: 0, paddingTop: theme.spacing(1) }}>
-        {dateRange.map((dailySchedule: DailySchedule, idx: number) => (
-          <RoomMainCalendarDay
-            dailySchedule={dailySchedule}
-            key={idx}
-            nowDay={nowDay}
-            onClick={() => dispatch(setSelectedDayIdx(idx))}
-          />
-        ))}
-      </CalendarBox>
-    </Stack>
+    <>
+      <BrowserView style={{ width: '100%', height: '100%' }}>
+        <Stack>
+          <CalendarTitle>
+            <IconButton
+              size="large"
+              onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() - 1)))}>
+              <ArrowBackIosNew />
+            </IconButton>
+            <div style={{ textAlign: 'center' }}>
+              <span>{nowDay.getFullYear()}년</span>
+              <h5>{nowDay.getMonth() + 1}월</h5>
+            </div>
+            <IconButton
+              size="large"
+              onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() + 1)))}>
+              <ArrowForwardIos />
+            </IconButton>
+          </CalendarTitle>
+          <RoomMainCalendarWeek />
+          <CalendarBox
+            container
+            columns={7}
+            spacing={1}
+            sx={{ paddingLeft: 0, paddingTop: theme.spacing(1) }}>
+            {dateRange.map((dailySchedule: DailySchedule, idx: number) => (
+              <RoomMainCalendarDay
+                dailySchedule={dailySchedule}
+                key={idx}
+                nowDay={nowDay}
+                onClick={() => dispatch(setSelectedDayIdx(idx))}
+              />
+            ))}
+          </CalendarBox>
+        </Stack>
+      </BrowserView>
+      <MobileView>
+        <Stack>
+          <CalendarTitle>
+            <IconButton
+              size="large"
+              onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() - 1)))}>
+              <ArrowBackIosNew />
+            </IconButton>
+            <div style={{ textAlign: 'center' }}>
+              <span>{nowDay.getFullYear()}년</span>
+              <h3>{nowDay.getMonth() + 1}월</h3>
+            </div>
+            <IconButton
+              size="large"
+              onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() + 1)))}>
+              <ArrowForwardIos />
+            </IconButton>
+          </CalendarTitle>
+          <RoomMainCalendarWeek />
+          <CalendarBox
+            container
+            columns={7}
+            spacing={1}
+            sx={{ paddingLeft: 0, paddingTop: theme.spacing(1) }}>
+            {dateRange.map((dailySchedule: DailySchedule, idx: number) => (
+              <RoomMainCalendarDay
+                dailySchedule={dailySchedule}
+                key={idx}
+                nowDay={nowDay}
+                onClick={() => dispatch(setSelectedDayIdx(idx))}
+              />
+            ))}
+          </CalendarBox>
+        </Stack>
+      </MobileView>
+    </>
   );
 }
 

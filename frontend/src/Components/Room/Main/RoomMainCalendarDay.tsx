@@ -2,6 +2,8 @@ import { alpha, Button, Grid, Stack, styled, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { dateToStringTimeSimple } from '../../../Lib/dateToString';
 import { DailySchedule } from './RoomMainCalendar';
+import { isMobile } from 'react-device-detect';
+import Brightness1Icon from '@mui/icons-material/Brightness1';
 
 interface RoomMainCalendarDayProps {
   dailySchedule: DailySchedule;
@@ -20,12 +22,29 @@ const DayBox = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.accent,
     color: theme.palette.icon,
   },
+  minWidth: 0,
 }));
 
 function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalendarDayProps) {
   const theme = useTheme();
 
   const selectedDay = useSelector((state: any) => state.room.selectedDay);
+
+  const renderItems = (timeData: DailySchedule) => {
+    if (isMobile) {
+      return (
+        <div>
+          <Brightness1Icon sx={{ color: theme.palette.component_accent }}></Brightness1Icon>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <span>{dateToStringTimeSimple(timeData?.schedule?.startedAt)}</span>
+        <span>~ {dateToStringTimeSimple(timeData?.schedule?.finishedAt)}</span>
+      </div>
+    );
+  };
 
   return (
     <Grid item xs={1}>
@@ -53,12 +72,7 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalenda
               alignItems: 'center',
               display: 'flex',
             }}>
-            {!!dailySchedule.schedule && (
-              <div>
-                <span>{dateToStringTimeSimple(new Date(dailySchedule.schedule.startedAt))}</span>
-                <span>~ {dateToStringTimeSimple(new Date(dailySchedule.schedule.finishedAt))}</span>
-              </div>
-            )}
+            {!!dailySchedule.schedule && <div>{renderItems(dailySchedule)}</div>}
           </div>
         </Stack>
       </DayBox>
