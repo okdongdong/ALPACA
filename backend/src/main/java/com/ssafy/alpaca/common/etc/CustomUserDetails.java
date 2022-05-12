@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
 
 @Getter
@@ -20,21 +21,19 @@ public class CustomUserDetails implements UserDetails {
 
     private String username;
     private String password;
-//    @Builder.Default
-//    private List<String> roles = new ArrayList<>();
+
 
     public static UserDetails of(User user) {
         return CustomUserDetails.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-//                .roles(user.getRoles())
                 .build();
     }
 
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
