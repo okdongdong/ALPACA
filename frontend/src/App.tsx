@@ -40,6 +40,7 @@ function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
+        <div id="background"></div>
         <NowLoading />
         <GlobalStyles />
         <Router isLogin={isLogin} />

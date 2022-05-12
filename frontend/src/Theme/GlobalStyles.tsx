@@ -13,7 +13,7 @@ export default function GlobalStyles() {
         html: {
           width: '100%',
           height: '100%',
-          background: theme.palette.main,
+          // background: theme.palette.main,
           color: theme.palette.txt,
           // WebkitOverflowScrolling: 'touch',
           // "&::-webkit-scrollbar": {
@@ -32,6 +32,15 @@ export default function GlobalStyles() {
         '#root': {
           width: '100%',
           height: '100%',
+        },
+        '#background': {
+          backgroundImage: `linear-gradient(12deg, #fff, ${theme.palette.main}, ${theme.palette.bg2}, #fff)`,
+          width: '400%',
+          height: '400%',
+          position: 'fixed',
+          top: '-150%',
+          left: '-150%',
+          zIndex: -1,
         },
       }}
     />
