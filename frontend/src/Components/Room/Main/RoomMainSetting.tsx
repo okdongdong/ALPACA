@@ -1,11 +1,12 @@
 import { Stack, useTheme } from '@mui/material';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { deleteStudyUserInfo } from '../../../Redux/accountReducer';
 import { setLoading } from '../../../Redux/commonReducer';
+import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 
 function RoomMainSetting() {
@@ -15,6 +16,9 @@ function RoomMainSetting() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const userId = useSelector((state: any) => state.account.userId);
+  const members = useSelector((state: any) => state.room.members);
 
   const deleteStudy = async () => {
     dispatch(setLoading(true));
@@ -95,7 +99,7 @@ function RoomMainSetting() {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <h1>스터디 설정</h1>
-      <Stack spacing={2} direction="row">
+      {members.some((member: Member) => member.userId === userId && member.roomMaker) ? (
         <CBtn
           color="#fff"
           backgroundColor={theme.palette.warn}
@@ -104,6 +108,7 @@ function RoomMainSetting() {
           }}>
           스터디 삭제
         </CBtn>
+      ) : (
         <CBtn
           color="#fff"
           backgroundColor={theme.palette.warn}
@@ -112,7 +117,7 @@ function RoomMainSetting() {
           }}>
           스터디 탈퇴
         </CBtn>
-      </Stack>
+      )}
     </div>
   );
 }

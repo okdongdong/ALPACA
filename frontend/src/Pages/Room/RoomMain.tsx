@@ -8,8 +8,7 @@ import MemberInvite from '../../Components/Dialogs/MemberInvite';
 import RoomMainCalendar from '../../Components/Room/Main/RoomMainCalendar';
 import RoomMainChat from '../../Components/Room/Main/RoomMainChat';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
-import RoomMainSetting from '../../Components/Room/Main/RoomMainSetting';
-import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
+import RoomSetting from '../../Components/Dialogs/RoomSetting';
 import RoomMainStudyDetail from '../../Components/Room/Main/RoomMainStudyDetail';
 import { customAxios } from '../../Lib/customAxios';
 import {
@@ -23,6 +22,7 @@ import {
 } from '../../Redux/roomReducer';
 import { BrowserView, MobileView } from 'react-device-detect';
 import DehazeIcon from '@mui/icons-material/Dehaze';
+import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
 
 const RoomTitle = styled('h1')(({ theme }) => ({
   color: theme.palette.txt,
@@ -108,27 +108,13 @@ function RoomMain() {
       <BrowserView style={{ height: '100%', width: '100%' }}>
         <Box sx={{ height: '100%', width: '100%' }}>
           <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
+          <RoomSetting setInviteOpen={setOpen} />
+
           <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
-            <Grid item xs={2}>
-              <RoomTitle>{title}</RoomTitle>
-              <RoomMainIntroduction />
-            </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Stack spacing={3}>
-                <RoomMainCalendar />
-                <RoomMainChat />
-              </Stack>
-            </Grid>
-            <Grid item xs={4} sx={{ paddingRight: 4 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                }}>
-                {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
                 <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
+                  <RoomTitle>{title}</RoomTitle>
                   <CBtn
                     width="100%"
                     height="100%"
@@ -143,13 +129,29 @@ function RoomMain() {
                     onClick={() => {
                       navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
                     }}>
-                    스터디 라이브 입장
+                    라이브 입장
                   </CBtn>
                 </Stack>
-              </div>
+                <RoomMainCalendar />
+                <RoomMainIntroduction />
+                <RoomMainChat />
+              </Stack>
+            </Grid>
+            <Grid item xs={4}>
+              <Stack spacing={3}>
+                {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
+              </Stack>
+            </Grid>
+            <Grid item xs={4} sx={{ paddingRight: 4 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '100%',
+                }}></div>
             </Grid>
           </Grid>
-          <RoomMainSetting />
         </Box>
       </BrowserView>
       <MobileView style={{ height: '100%', width: '100%' }}>
@@ -166,7 +168,8 @@ function RoomMain() {
           }}>
           <DehazeIcon sx={{ color: theme.palette.txt }} />
         </IconButton>
-        <RoomMainSetting />
+        <RoomSetting setInviteOpen={setOpen} />
+        <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
         <MRoomTitle>{title}</MRoomTitle>
         <RoomMainCalendar />
         <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}></Stack>
