@@ -9,7 +9,7 @@ import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
 import CProfile from '../../Commons/CProfile';
 import { useParams } from 'react-router-dom';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { isMobile } from 'react-device-detect';
 
 interface ReceiveMessage {
   userId: number;
@@ -185,97 +185,44 @@ function RoomMainChat() {
   }, [infiniteHandler]);
 
   return (
-    <>
-      <BrowserView style={{ width: '100%', height: '100%' }}>
-        <RoomMainComponentContainer>
-          <Stack
-            spacing={1}
-            className="scroll-box"
-            sx={{ height: '15vh', position: 'relative' }}
-            ref={scrollRef}>
-            {isError ? (
-              <Divider variant="middle">
-                <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
-              </Divider>
-            ) : isFinished ? (
-              <Divider variant="middle">
-                <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
-              </Divider>
-            ) : (
-              <div
-                style={{
-                  position: 'absolute',
-                }}
-                ref={infiniteRef}>
-                <div style={{ height: 10, width: 200 }}></div>
-              </div>
-            )}
-            {chatList.map((chat: ReceiveMessage, idx: number) => (
-              <MessageBox key={idx}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <CProfile
-                    nickname={memberDict[chat.userId]?.nickname}
-                    profileImg={memberDict[chat.userId]?.profileImg}
-                  />
-                  :{chat.content}
-                </div>
-                -{calDateTime(new Date(chat.timeStamp))}
-              </MessageBox>
-            ))}
-          </Stack>
-          <RoomMainChatBar
-            value={message}
-            onChange={setMessage}
-            onSendMessage={onSendMessageHandler}
-          />
-        </RoomMainComponentContainer>
-      </BrowserView>
-
-      <MobileView>
-        <RoomMainComponentContainer>
-          <Stack
-            spacing={1}
-            className="scroll-box"
-            sx={{ height: '70vh', position: 'relative' }}
-            ref={scrollRef}>
-            {isError ? (
-              <Divider variant="middle">
-                <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
-              </Divider>
-            ) : isFinished ? (
-              <Divider variant="middle">
-                <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
-              </Divider>
-            ) : (
-              <div
-                style={{
-                  position: 'absolute',
-                }}
-                ref={infiniteRef}>
-                <div style={{ height: 10, width: 200 }}></div>
-              </div>
-            )}
-            {chatList.map((chat: ReceiveMessage, idx: number) => (
-              <MessageBox key={idx}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <CProfile
-                    nickname={memberDict[chat.userId]?.nickname}
-                    profileImg={memberDict[chat.userId]?.profileImg}
-                  />
-                  :{chat.content}
-                </div>
-                -{calDateTime(new Date(chat.timeStamp))}
-              </MessageBox>
-            ))}
-          </Stack>
-          <RoomMainChatBar
-            value={message}
-            onChange={setMessage}
-            onSendMessage={onSendMessageHandler}
-          />
-        </RoomMainComponentContainer>
-      </MobileView>
-    </>
+    <RoomMainComponentContainer>
+      <Stack
+        spacing={1}
+        className="scroll-box"
+        sx={{ height: isMobile ? '70vh' : '15vh', position: 'relative' }}
+        ref={scrollRef}>
+        {isError ? (
+          <Divider variant="middle">
+            <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
+          </Divider>
+        ) : isFinished ? (
+          <Divider variant="middle">
+            <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
+          </Divider>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+            }}
+            ref={infiniteRef}>
+            <div style={{ height: 10, width: 200 }}></div>
+          </div>
+        )}
+        {chatList.map((chat: ReceiveMessage, idx: number) => (
+          <MessageBox key={idx}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <CProfile
+                nickname={memberDict[chat.userId]?.nickname}
+                profileImg={memberDict[chat.userId]?.profileImg}
+              />
+              :{chat.content}
+            </div>
+            {calDateTime(new Date(chat.timeStamp))}
+          </MessageBox>
+        ))}
+      </Stack>
+      <RoomMainChatBar value={message} onChange={setMessage} onSendMessage={onSendMessageHandler} />
+    </RoomMainComponentContainer>
   );
 }
 

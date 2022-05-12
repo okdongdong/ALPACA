@@ -59,7 +59,7 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalenda
         }}
         onClick={onClick}>
         <Stack justifyContent="space-between" sx={{ height: '100%', width: '100%' }}>
-          <div style={{ color: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+          <div style={{ color: theme.palette.txt, textAlign: 'left' }}>
             {dailySchedule.day.getMonth() === nowDay.getMonth() ||
               `${dailySchedule.day.getMonth() + 1}/`}
             {dailySchedule.day.getDate()}

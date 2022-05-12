@@ -1,5 +1,6 @@
-import { Dialog, DialogTitle, Divider, Stack, styled, useTheme } from '@mui/material';
+import { Dialog, DialogTitle, Stack, styled, useTheme } from '@mui/material';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { settingOn } from '../../Redux/roomReducer';
@@ -14,8 +15,8 @@ interface RoomSettingProps {
 const CustomBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.component,
   color: theme.palette.txt,
-  minWidth: 600,
-  padding: theme.spacing(3),
+  minWidth: isMobile ? 300 : 600,
+  padding: theme.spacing(isMobile ? 2 : 3),
 }));
 
 function RoomSetting({ setInviteOpen }: RoomSettingProps) {
@@ -29,8 +30,18 @@ function RoomSetting({ setInviteOpen }: RoomSettingProps) {
   };
 
   return (
-    <Dialog open={isSetting} onClose={onCloseHandler} maxWidth="lg">
-      <DialogTitle sx={{ backgroundColor: theme.palette.accent, color: theme.palette.icon }}>
+    <Dialog
+      open={isSetting}
+      onClose={onCloseHandler}
+      maxWidth="lg"
+      sx={{ '& .MuiDialog-paper': { margin: isMobile ? 0 : '' } }}>
+      <DialogTitle
+        sx={{
+          padding: 2,
+          fontSize: isMobile ? 12 : '',
+          backgroundColor: theme.palette.accent,
+          color: theme.palette.icon,
+        }}>
         <RoomMainSetting />
       </DialogTitle>
       <CustomBox spacing={2}>
