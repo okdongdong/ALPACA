@@ -2,7 +2,7 @@ package com.ssafy.alpaca.api.response;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Getter
@@ -16,7 +16,7 @@ public class StudyListRes {
 
     private String title;
 
-    private LocalDateTime pinnedTime;
+    private OffsetDateTime pinnedTime;
 
     private List<String> profileImgList;
 

@@ -4,7 +4,7 @@ import com.ssafy.alpaca.db.document.Code;
 import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,7 @@ public class CodeRes {
 
         private String language;
 
-        private LocalDateTime submittedAt;
+        private OffsetDateTime submittedAt;
 
         private String submittedCode;
 
