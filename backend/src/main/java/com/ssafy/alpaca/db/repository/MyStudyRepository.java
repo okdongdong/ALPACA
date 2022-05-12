@@ -34,6 +34,9 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
     Boolean existsByUserAndStudyAndIsRoomMaker(User user, Study study, Boolean check);
 
     @EntityGraph(attributePaths = {"user"})
+    MyStudy findTopByStudyAndIsRoomMaker(Study study, Boolean isRoomMaker);
+
+    @EntityGraph(attributePaths = {"user"})
     List<MyStudy> findAllByStudy(Study study);
 
     @EntityGraph(attributePaths = {"user"})

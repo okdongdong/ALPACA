@@ -318,20 +318,6 @@ public class StudyService {
         myStudyRepository.delete(myStudy);
     }
 
-    public void inviteStudy(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
-        Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
-        User member = checkUserById(studyMemberReq.getMemberId());
-        checkRoomMaker(user, study);
-        myStudyRepository.save(
-                MyStudy.builder()
-                        .isRoomMaker(false)
-                        .user(member)
-                        .study(study)
-                        .build()
-        );
-    }
-
     public String createInviteCode(String username, Long id) throws IllegalAccessException {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
@@ -355,29 +341,30 @@ public class StudyService {
         return newInviteCode;
     }
 
-    public Study getInviteInfo(String inviteCode) {
+    public InviteInfoRes getInviteInfo(String inviteCode) {
         StudyCode studyCode = studyCodeRedisRepository.findById(inviteCode).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
         );
+        Study study = checkStudyById(studyCode.getStudyId());
+        MyStudy myStudy = myStudyRepository.findTopByStudyAndIsRoomMaker(study, true);
 
-        return checkStudyById(studyCode.getStudyId());
+        return InviteInfoRes.builder()
+                .roomMaker(myStudy.getUser().getNickname())
+                .roomMakerProfileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                .title(study.getTitle())
+                .info(study.getInfo())
+                .build();
     }
 
-    public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq) {
-        Study study = checkStudyById(id);
+    public void inviteUserCode(String username, StudyInviteReq studyInviteReq) {
+        StudyCode studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode()).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
+        );
+        Study study = checkStudyById(studyCode.getStudyId());
         User user = checkUserByUsername(username);
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
-        }
-
-        Optional<StudyCode> studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode());
-
-        if (studyCode.isEmpty()) {
-            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
-        }
-        if (Boolean.TRUE.equals(!study.getId().equals(studyCode.get().getStudyId()))){
-            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
         }
 
         myStudyRepository.save(

@@ -2,10 +2,8 @@ package com.ssafy.alpaca.api.controller;
 
 
 import com.ssafy.alpaca.api.request.*;
-import com.ssafy.alpaca.api.response.ProblemListRes;
-import com.ssafy.alpaca.api.response.ScheduleListRes;
-import com.ssafy.alpaca.api.response.StudyListRes;
-import com.ssafy.alpaca.api.response.StudyRes;
+import com.ssafy.alpaca.api.response.*;
+import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
@@ -30,6 +28,7 @@ public class StudyController {
 
     private final UserService userService;
     private final StudyService studyService;
+    private final NotificationService notificationService;
 
     @ApiOperation(
             value = "스터디 개설",
@@ -197,8 +196,8 @@ public class StudyController {
             notes = "주어진 초대코드를 통해 스터디의 방장과 스터디 정보를 조회한다."
     )
     @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = Long.class )
-    @PostMapping("/inviteInfo")
-    public ResponseEntity<Study> inviteUserCode(@RequestParam String inviteCode) {
+    @GetMapping("/inviteInfo")
+    public ResponseEntity<InviteInfoRes> inviteUserCode(@RequestParam String inviteCode) {
         return ResponseEntity.ok(studyService.getInviteInfo(inviteCode));
     }
 
@@ -207,21 +206,21 @@ public class StudyController {
             notes = "스터디/초대코드 정보에 따라 스터디에 가입시킨다."
     )
     @ApiImplicitParam( name = "id", value = "가입할 스터디의 id", dataTypeClass = Long.class )
-    @PostMapping("/{id}/inviteCode")
-    public ResponseEntity<BaseResponseBody> inviteUserCode(@PathVariable Long id, @RequestBody StudyInviteReq studyInviteReq) {
+    @PostMapping("/inviteCode")
+    public ResponseEntity<BaseResponseBody> inviteUserCode(@RequestBody StudyInviteReq studyInviteReq) {
         String username = userService.getCurrentUsername();
-        studyService.inviteUserCode(username, id, studyInviteReq);
+        studyService.inviteUserCode(username, studyInviteReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
     @ApiOperation(
-            value = "스터디 초대 ",
+            value = "스터디 초대",
             notes = "방장이 스터디에 사용자를 초대한다."
     )
     @PostMapping("/{id}/invite")
     public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
-        studyService.inviteStudy(username, id, studyMemberReq);
+        notificationService.notifyAddStudyEvent(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
