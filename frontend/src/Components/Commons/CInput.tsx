@@ -4,9 +4,11 @@ import { BrowserView, MobileView } from 'react-device-detect';
 
 interface CInputProps {
   label: string;
+  multiline?: boolean;
   placeholder?: string;
   type?: string;
   helperText?: string;
+  value?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -25,7 +27,9 @@ const CustomInput = styled(Input)(({ theme }) => ({
 
 function CInput({
   label,
+  value,
   placeholder = '',
+  multiline = false,
   type = 'text',
   helperText = '',
   onChange,
@@ -47,6 +51,7 @@ function CInput({
                 id={`${label}-label`}
                 onChange={onChangeHandler}
                 type={type}
+                value={value}
                 placeholder={placeholder}
                 fullWidth
                 autoComplete={label}
@@ -67,8 +72,10 @@ function CInput({
                 id={`${label}-label`}
                 onChange={onChangeHandler}
                 type={type}
+                value={value}
                 placeholder={placeholder}
                 fullWidth
+                multiline={multiline}
                 autoComplete={label}
               />
               <FormHelperText>{helperText}</FormHelperText>
