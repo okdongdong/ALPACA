@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { Drawer, List, ListItemButton, ListItemIcon, Button } from '@mui/material';
 import Logo from '../../Assets/Img/Logo.png';
@@ -10,6 +10,7 @@ import { settingOn } from '../../Redux/roomReducer';
 import styles from './SideBar.module.css';
 
 import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
+import NotificationDialog from '../Dialogs/NotificationDialog';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function };
@@ -48,6 +49,7 @@ function SideBar() {
   const theme = useTheme();
 
   const userTheme = useSelector((state: any) => state.theme.themeType);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {
@@ -62,7 +64,10 @@ function SideBar() {
   const clickLogout = () => {
     dispatch(logout());
   };
-  const clickNotification = () => {};
+  const clickNotification = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event);
+    setAnchorEl(event.currentTarget);
+  };
 
   const icon: iconObjType = {
     Home: { icon: <Home />, onClick: clickHome },
@@ -94,8 +99,8 @@ function SideBar() {
         <span>
           {iconList.map((text, index) => (
             <ListItemButton
-              onClick={() => {
-                icon[text].onClick();
+              onClick={(event) => {
+                icon[text].onClick(event);
               }}
               key={text}
               sx={{
@@ -158,6 +163,7 @@ function SideBar() {
           </ListItemButton>
         )}
       </span>
+      <NotificationDialog anchorEl={anchorEl} setAnchorEl={setAnchorEl} />
     </CustomDrawer>
   );
 }
