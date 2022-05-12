@@ -10,10 +10,9 @@ import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
-import RoomMainComponentContainer from './RoomMainComponentContainer';
 
-interface RoomMainIntroductionMemberEditProps {
-  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+interface RoomMainIntroductionMemberSettingProps {
+  setInviteOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
@@ -23,7 +22,9 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
   height: 25,
 }));
 
-function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMemberEditProps) {
+function RoomMainIntroductionMemberSetting({
+  setInviteOpen,
+}: RoomMainIntroductionMemberSettingProps) {
   const { roomId } = useParams();
   const dispatch = useDispatch();
   const cAlert = useAlert();
@@ -88,7 +89,6 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
     if (result.isConfirmed) {
       const res = await empowerMember(memberId);
       if (res) {
-        setIsEdit(false);
         cAlert.fire({
           title: '양도 성공!',
           text: '방장 권한을 양도했습니다.',
@@ -129,39 +129,52 @@ function RoomMainIntroductionMemberEdit({ setIsEdit }: RoomMainIntroductionMembe
   };
 
   return (
-    <RoomMainComponentContainer>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h4>스터디원</h4>
-        <div>
-          <CBtn onClick={() => setIsEdit(false)}>완료</CBtn>
-        </div>
-      </div>
-      <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
-      <Stack spacing={1}>
-        {members.map((member: Member, idx: number) => (
-          <div
-            key={idx}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <CProfile nickname={member.nickname} profileImg={member.profileImg} />
-            {!member.roomMaker && (
-              <IconButton onClick={() => onClickHandler(member.userId)}>
-                <CCrown width={20} height={20} color="#cdcdcd" />
-              </IconButton>
-            )}
-            {userId !== member.userId && (
-              <CustomIconButton onClick={() => onDeleteHandler(member.userId)}>
-                <Remove />
-              </CustomIconButton>
-            )}
+    <div>
+      {members.some((member: Member) => member.userId === userId && member.roomMaker) && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>스터디 멤버 관리</h3>
+            <CBtn
+              width="20%"
+              height="100%"
+              onClick={() => {
+                setInviteOpen(true);
+              }}>
+              초대
+            </CBtn>
           </div>
-        ))}
-      </Stack>
-    </RoomMainComponentContainer>
+          <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+          <Stack spacing={1}>
+            {members.map((member: Member, idx: number) => (
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <CProfile nickname={member.nickname} profileImg={member.profileImg} />
+                <div>
+                  {!member.roomMaker && (
+                    <>
+                      <IconButton onClick={() => onClickHandler(member.userId)}>
+                        <CCrown width={20} height={20} color="#cdcdcd" />
+                      </IconButton>
+                      {userId !== member.userId && (
+                        <CustomIconButton onClick={() => onDeleteHandler(member.userId)}>
+                          <Remove />
+                        </CustomIconButton>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </Stack>
+        </>
+      )}
+    </div>
   );
 }
 
-export default RoomMainIntroductionMemberEdit;
+export default RoomMainIntroductionMemberSetting;

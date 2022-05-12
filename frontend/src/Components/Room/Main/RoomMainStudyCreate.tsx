@@ -43,16 +43,19 @@ function RoomMainStudyCreate() {
 
   const addStudy = async () => {
     try {
+      const tempStarted = new Date(selectedDay);
+      const tempFinished = new Date(selectedDay);
+      tempStarted.setHours(startedAt.getHours(), startedAt.getMinutes());
+      tempFinished.setHours(finishedAt.getHours(), finishedAt.getMinutes());
+
       const data: AddStudyData = {
-        startedAt: startedAt
-          ? new Date(selectedDay.toDateString() + ' ' + startedAt.toTimeString())
-          : selectedDay,
-        finishedAt: finishedAt
-          ? new Date(selectedDay.toDateString() + ' ' + finishedAt.toTimeString())
-          : selectedDay,
+        startedAt: tempStarted,
+        finishedAt: tempFinished,
         studyId: roomId || '',
         toSolveProblems: [],
       };
+
+      console.log(data);
 
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
@@ -88,17 +91,24 @@ function RoomMainStudyCreate() {
 
   const editStudy = async () => {
     try {
+      const tempStarted = new Date(selectedDay);
+      const tempFinished = new Date(selectedDay);
+
+      tempStarted.setHours(startedAt.getHours(), startedAt.getMinutes());
+      tempFinished.setHours(finishedAt.getHours(), finishedAt.getMinutes());
+
       const data: AddStudyData = {
-        startedAt: startedAt || selectedDay,
-        finishedAt: finishedAt || selectedDay,
+        startedAt: new Date(tempStarted),
+        finishedAt: new Date(tempFinished),
         studyId: roomId || '',
         toSolveProblems: [],
       };
+
+      console.log(data);
+
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
-
-      console.log(data);
 
       const res = await customAxios({
         method: 'put',

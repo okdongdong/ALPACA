@@ -69,7 +69,6 @@ function RoomMainChatBar({
         }}>
         <CustomInput
           value={value}
-          id="search-bar"
           onChange={onChangeHandler}
           placeholder={placeholder}
           fullWidth

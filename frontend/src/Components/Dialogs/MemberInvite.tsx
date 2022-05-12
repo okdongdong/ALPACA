@@ -204,7 +204,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
 
         <h3>초대링크</h3>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <CustomInput value={inviteCode} readOnly />
+          <CustomInput value={`${process.env.REACT_APP_CLIENT_URL}/${inviteCode}`} readOnly />
           <CBtn width="100px" onClick={copyInviteCode}>
             복사
           </CBtn>
