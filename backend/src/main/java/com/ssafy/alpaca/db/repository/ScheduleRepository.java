@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-//    @EntityGraph(attributePaths = "toSolveProblems")
+    @EntityGraph(attributePaths = "toSolveProblems")
     List<Schedule> findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(Study study, LocalDateTime a, LocalDateTime b);
 
     @EntityGraph(attributePaths = "toSolveProblems")

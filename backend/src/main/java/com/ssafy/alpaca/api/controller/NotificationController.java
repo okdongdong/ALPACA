@@ -22,7 +22,7 @@ public class NotificationController {
             value="서버 연결",
             notes="sse와 연결한다."
     )
-    @GetMapping(value = "/sub", consumes = MediaType.ALL_VALUE)
+    @GetMapping(value = "/sub/notice", consumes = MediaType.ALL_VALUE)
     public SseEmitter subscribe(@RequestParam String token){
         return notificationService.subscribe(token);
     }
