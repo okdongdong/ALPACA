@@ -1,8 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
-import com.ssafy.alpaca.api.response.InviteInfoRes;
-import com.ssafy.alpaca.api.response.NoticeRes;
+import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
@@ -10,17 +9,13 @@ import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.User;
-import com.ssafy.alpaca.db.repository.MyStudyRepository;
-import com.ssafy.alpaca.db.repository.ScheduleRepository;
-import com.ssafy.alpaca.db.repository.StudyRepository;
-import com.ssafy.alpaca.db.repository.UserRepository;
+import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.validation.constraints.Null;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -28,12 +23,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationService {
 
     private final ScheduleRepository scheduleRepository;
     private final MyStudyRepository myStudyRepository;
     private final UserRepository userRepository;
     private final StudyRepository studyRepository;
+    private final NotificationRepository notificationRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final ConvertUtil convertUtil;
     public static Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
@@ -50,6 +47,7 @@ public class NotificationService {
             e.printStackTrace();
         }
         sseEmitters.put(userId, sseEmitter);
+        notifyOld(userId);
         sseEmitter.onCompletion(() -> sseEmitters.remove(userId));
         sseEmitter.onTimeout(()-> sseEmitters.remove(userId));
         sseEmitter.onError((e) -> sseEmitters.remove(userId));
@@ -59,20 +57,20 @@ public class NotificationService {
     public void notifyAddScheduleEvent(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 ()-> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND));
-        List<MyStudy> myStudyList = myStudyRepository.findAllByStudy(schedule.getStudy());
-        MyStudy roomMaker = myStudyRepository.findTopByStudyAndIsRoomMaker(schedule.getStudy(), true);
-
+        Study study = schedule.getStudy();
+        List<MyStudy> myStudyList = myStudyRepository.findAllByStudy(study);
+        MyStudy roomMaker = myStudyRepository.findTopByStudyAndIsRoomMaker(study, true);
         for (MyStudy myStudy:myStudyList){
             Long userId = myStudy.getUser().getId();
             if (sseEmitters.containsKey(userId)){
                 SseEmitter sseEmitter = sseEmitters.get(userId);
                 try {
                     sseEmitter.send(SseEmitter.event().name("addSchedule").data(
-                            NoticeRes.builder()
+                            Notification.builder()
                                     .roomMaker(roomMaker.getUser().getNickname())
                                     .roomMakerProfileImg(convertUtil.convertByteArrayToString(roomMaker.getUser().getProfileImg()))
-                                    .studyId(schedule.getStudy().getId())
-                                    .studyTitle(schedule.getStudy().getTitle())
+                                    .studyId(study.getId())
+                                    .studyTitle(study.getTitle())
                                     .scheduleId(scheduleId)
                                     .scheduleStartedAt(schedule.getStartedAt())
                                     .build()
@@ -80,6 +78,19 @@ public class NotificationService {
                 } catch (Exception e) {
                     sseEmitters.remove(userId);
                 }
+            }
+            else {
+                notificationRepository.save(
+                        Notification.builder()
+                                .userId(userId)
+                                .roomMaker(roomMaker.getUser().getNickname())
+                                .roomMakerProfileImg(convertUtil.convertByteArrayToString(roomMaker.getUser().getProfileImg()))
+                                .studyId(study.getId())
+                                .studyTitle(study.getTitle())
+                                .scheduleId(scheduleId)
+                                .scheduleStartedAt(schedule.getStartedAt())
+                                .build()
+                );
             }
         }
     }
@@ -107,7 +118,7 @@ public class NotificationService {
             SseEmitter sseEmitter = sseEmitters.get(studyMemberReq.getMemberId());
             try {
                 sseEmitter.send(SseEmitter.event().name("inviteStudy").data(
-                        NoticeRes.builder()
+                        Notification.builder()
                                 .roomMaker(user.getNickname())
                                 .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                 .studyId(study.getId())
@@ -118,5 +129,29 @@ public class NotificationService {
                 sseEmitters.remove(studyMemberReq.getMemberId());
             }
         }
+        else {
+            notificationRepository.save(
+                    Notification.builder()
+                            .userId(member.getId())
+                            .roomMaker(user.getNickname())
+                            .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                            .studyId(study.getId())
+                            .studyTitle(study.getTitle())
+                            .build()
+            );
+        }
+    }
+
+    public void notifyOld(Long userId){
+        List<Notification> notifications = notificationRepository.findAllByUserId(userId);
+        SseEmitter sseEmitter = sseEmitters.get(userId);
+        for (Notification notification:notifications){
+            try {
+                sseEmitter.send(SseEmitter.event().name("initialNotification").data(notification));
+            } catch (Exception e) {
+                sseEmitters.remove(userId);
+            }
+        }
+        notificationRepository.deleteAll(notifications);
     }
 }
