@@ -67,6 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 map.put("message", e.getMessage());
                 String result = objectMapper.writeValueAsString(map);
                 response.getWriter().write(result);
+                return;
             }
         }
         if (requestURI.equals("/api/v1/auth/reissue")) {
