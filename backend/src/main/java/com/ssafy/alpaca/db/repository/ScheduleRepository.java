@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,13 +14,13 @@ import java.util.Optional;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @EntityGraph(attributePaths = "toSolveProblems")
-    List<Schedule> findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(Study study, LocalDateTime a, LocalDateTime b);
+    List<Schedule> findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(Study study, OffsetDateTime a, OffsetDateTime b);
 
     @EntityGraph(attributePaths = "toSolveProblems")
     List<Schedule> findAllByStudyId(Long studyId);
 
-    Optional<Schedule> findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
+    Optional<Schedule> findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, OffsetDateTime a, OffsetDateTime b);
 
-    Boolean existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, LocalDateTime a, LocalDateTime b);
+    Boolean existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, OffsetDateTime a, OffsetDateTime b);
 
 }

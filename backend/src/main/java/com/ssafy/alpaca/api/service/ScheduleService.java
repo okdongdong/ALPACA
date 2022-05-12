@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
@@ -94,20 +96,20 @@ public class ScheduleService {
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
-        LocalDateTime localDateTime = LocalDateTime.of(
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(LocalDateTime.of(
                 scheduleReq.getStartedAt().getYear(),
                 scheduleReq.getStartedAt().getMonth(),
-                scheduleReq.getStartedAt().getDayOfMonth(), 0, 0);
+                scheduleReq.getStartedAt().getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
         if (Boolean.TRUE.equals(scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, localDateTime, localDateTime.plusDays(1)))
+                study, offsetDateTime, offsetDateTime.plusDays(1)))
         ) {
             throw new NullPointerException(ExceptionUtil.STUDY_DATE_DUPLICATE);
         }
 
         Schedule schedule = Schedule.builder()
                         .study(study)
-                        .startedAt(startedAt)
-                        .finishedAt(finishedAt)
+                        .startedAt(OffsetDateTime.of(startedAt, ZoneOffset.of("Z")))
+                        .finishedAt(OffsetDateTime.of(finishedAt, ZoneOffset.of("Z")))
                         .build();
         List<ToSolveProblem> toSolveProblems = new ArrayList<>();
         for (Long number : scheduleReq.getToSolveProblems()) {
@@ -130,10 +132,10 @@ public class ScheduleService {
         checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime = LocalDateTime.now();
-        LocalDateTime today = LocalDateTime.of(
+        OffsetDateTime today = OffsetDateTime.of(LocalDateTime.of(
                 localDateTime.getYear(),
                 localDateTime.getMonth(),
-                localDateTime.getDayOfMonth(), 0, 0);
+                localDateTime.getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
         Optional<Schedule> todaySchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, today, today.plusDays(1));
 
@@ -152,20 +154,20 @@ public class ScheduleService {
     }
 
     public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
-        LocalDateTime finishedAt = LocalDateTime.of(
+        OffsetDateTime finishedAt = OffsetDateTime.of(LocalDateTime.of(
                 scheduleUpdateReq.getFinishedAt().getYear(),
                 scheduleUpdateReq.getFinishedAt().getMonth(),
                 scheduleUpdateReq.getFinishedAt().getDayOfMonth(),
                 scheduleUpdateReq.getFinishedAt().getHour(),
                 scheduleUpdateReq.getFinishedAt().getMinute()
-        );
-        LocalDateTime startedAt = LocalDateTime.of(
+        ), ZoneOffset.of("Z"));
+        OffsetDateTime startedAt = OffsetDateTime.of(LocalDateTime.of(
                 scheduleUpdateReq.getStartedAt().getYear(),
                 scheduleUpdateReq.getStartedAt().getMonth(),
                 scheduleUpdateReq.getStartedAt().getDayOfMonth(),
                 scheduleUpdateReq.getStartedAt().getHour(),
                 scheduleUpdateReq.getStartedAt().getMinute()
-        );
+        ), ZoneOffset.of("Z"));
         if (finishedAt.isBefore(startedAt)) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
@@ -173,10 +175,10 @@ public class ScheduleService {
         Schedule schedule = checkScheduleById(id);
         Study study = schedule.getStudy();
 
-        LocalDateTime localDateTime = LocalDateTime.of(
+        OffsetDateTime localDateTime = OffsetDateTime.of(LocalDateTime.of(
                 scheduleUpdateReq.getStartedAt().getYear(),
                 scheduleUpdateReq.getStartedAt().getMonth(),
-                scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0);
+                scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
         Optional<Schedule> checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, localDateTime, localDateTime.plusDays(1));
 
@@ -239,12 +241,14 @@ public class ScheduleService {
         if (day == null) {
             localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
             localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                    study, localDateTime, localDateTime.plusDays(42)));
+                    study, offsetDateTime, offsetDateTime.plusDays(42)));
         } else {
             localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                    study, localDateTime, localDateTime.plusDays(7)));
+                    study, offsetDateTime, offsetDateTime.plusDays(7)));
         }
     }
 

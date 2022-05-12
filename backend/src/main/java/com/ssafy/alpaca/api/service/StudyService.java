@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -136,15 +138,18 @@ public class StudyService {
         }
 
         LocalDateTime localDateTime = LocalDateTime.now();
+
         LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
+        OffsetDateTime offsetToday = OffsetDateTime.of(today, ZoneOffset.of("Z"));
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, today, today.plusDays(1));
+                study, offsetToday, offsetToday.plusDays(1));
 
         LocalDateTime thisMonth = LocalDateTime
                 .of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0)
                 .minusDays(localDateTime.getDayOfWeek().getValue());
+        OffsetDateTime offsetThisMonth = OffsetDateTime.of(thisMonth, ZoneOffset.of("Z"));
         List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, thisMonth, thisMonth.plusDays(42));
+                study, offsetThisMonth, offsetThisMonth.plusDays(42));
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
@@ -183,20 +188,23 @@ public class StudyService {
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day) {
         User user = checkUserByUsername(username);
         LocalDateTime localDateTime;
+        OffsetDateTime offsetDateTime;
         List<Object[]> objects;
         if (day == null) {
             localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
             localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
-            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(42));
+            offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusDays(42));
         } else {
             localDateTime = LocalDateTime.of(year, month, day, 0, 0);
-            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(7));
+            offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusDays(7));
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         return objects.stream().map(object -> ScheduleListRes.builder()
                 .id(Long.parseLong(object[0].toString()))
-                .startedAt(LocalDateTime.parse(object[1].toString(), dateTimeFormatter))
-                .finishedAt(LocalDateTime.parse(object[2].toString(), dateTimeFormatter))
+                .startedAt(OffsetDateTime.of(LocalDateTime.parse(object[1].toString(), dateTimeFormatter), ZoneOffset.of("Z")))
+                .finishedAt(OffsetDateTime.of(LocalDateTime.parse(object[2].toString(), dateTimeFormatter), ZoneOffset.of("Z")))
                 .build()).collect(Collectors.toList());
     }
 

@@ -4,8 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "my_study")
@@ -25,7 +23,7 @@ public class MyStudy {
 
     @Builder.Default
     @Column(name = "pinned_time")
-    private OffsetDateTime pinnedTime = OffsetDateTime.of(LocalDateTime.of(1, 1, 1, 6, 0), ZoneOffset.of("Z"));
+    private LocalDateTime pinnedTime = LocalDateTime.of(1, 1, 1, 6, 0);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
