@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Document(collection = "notification")
 @Getter
@@ -34,5 +34,7 @@ public class Notification {
     @Field(targetType = FieldType.INT64)
     private Long scheduleId;
 
-    private OffsetDateTime scheduleStartedAt;
+    @Field(targetType = FieldType.DATE_TIME)
+    private LocalDateTime scheduleStartedAt;
+
 }

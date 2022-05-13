@@ -195,7 +195,7 @@ public class StudyController {
             value = "초대코드로 스터디 정보 조회",
             notes = "주어진 초대코드를 통해 스터디의 방장과 스터디 정보를 조회한다."
     )
-    @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = Long.class )
+    @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = String.class )
     @GetMapping("/inviteInfo")
     public ResponseEntity<InviteInfoRes> inviteUserCode(@RequestParam String inviteCode) {
         return ResponseEntity.ok(studyService.getInviteInfo(inviteCode));
@@ -205,7 +205,6 @@ public class StudyController {
             value = "초대코드를 통해 스터디 가입",
             notes = "스터디/초대코드 정보에 따라 스터디에 가입시킨다."
     )
-    @ApiImplicitParam( name = "id", value = "가입할 스터디의 id", dataTypeClass = Long.class )
     @PostMapping("/inviteCode")
     public ResponseEntity<BaseResponseBody> inviteUserCode(@RequestBody StudyInviteReq studyInviteReq) {
         String username = userService.getCurrentUsername();

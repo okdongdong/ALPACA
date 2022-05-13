@@ -237,16 +237,17 @@ public class ScheduleService {
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
-        LocalDateTime localDateTime;
         if (day == null) {
-            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
-            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
-            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            if (offsetDateTime.getDayOfWeek().getValue() < 7) {
+                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().plus(1).getValue());
+            }
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                    study, offsetDateTime, offsetDateTime.plusDays(42)));
+                    study, offsetDateTime, offsetDateTime.plusWeeks(6)));
         } else {
-            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
-            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+//            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+//            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
                     study, offsetDateTime, offsetDateTime.plusDays(7)));
         }
