@@ -53,7 +53,12 @@ function EditPassword(props: EditPasswordProps) {
           password: presentPassword,
         },
       });
-      alert('비밀번호를 변경하였습니다.');
+      cAlert.fire({
+        title: '비밀번호 변경 완료!',
+        text: '비밀번호를 변경 하였습니다.',
+        icon: 'success',
+        showConfirmButton: true,
+      });
     } catch (e: any) {
       cAlert.fire({
         title: '비밀번호 변경 실패!',

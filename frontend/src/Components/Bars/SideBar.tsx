@@ -155,7 +155,7 @@ function SideBar() {
       <span>
         {pathname.indexOf('room') !== -1 &&
           pathname.indexOf('live') === -1 &&
-          pathname.indexOf('problem-manage') && (
+          pathname.indexOf('problem-manage') === -1 && (
             <ListItemButton
               onClick={() => {}}
               key="settings"

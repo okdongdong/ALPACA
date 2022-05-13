@@ -173,7 +173,7 @@ function RoomStudyLivePreview({ open, setOpen }: PreviewType) {
   }, [constraints]);
   return (
     <PreviewDialog maxWidth="md" open={open} onClose={handleClose}>
-      <DialogTitle>미리보기</DialogTitle>
+      <DialogTitle sx={{ color: theme.palette.txt }}>미리보기</DialogTitle>
       <div
         className="align_center"
         style={{ height: 480, width: 640, background: theme.palette.main }}>
