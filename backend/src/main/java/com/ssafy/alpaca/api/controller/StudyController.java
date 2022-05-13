@@ -19,6 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -56,11 +57,16 @@ public class StudyController {
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
+    @ApiImplicitParams({
+        @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "year", value = "오늘 기준 year", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "month", value = "오늘 기준 month", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "day", value = "오늘 기준 day", dataTypeClass = Long.class )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id) {
+    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam Integer day) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getStudy(username, id));
+        return ResponseEntity.ok(studyService.getStudy(username, id, year, month, day));
     }
 
     @ApiOperation(

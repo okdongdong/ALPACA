@@ -4,9 +4,12 @@ import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.stereotype.Repository;
 
+import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,5 +25,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     Optional<Schedule> findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, OffsetDateTime a, OffsetDateTime b);
 
     Boolean existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, OffsetDateTime a, OffsetDateTime b);
+
+    Optional<Schedule> findByStudyAndStartedAtBetween(Study study, OffsetDateTime a, OffsetDateTime b);
 
 }

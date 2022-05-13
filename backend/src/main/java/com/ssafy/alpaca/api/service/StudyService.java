@@ -20,6 +20,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -129,7 +130,7 @@ public class StudyService {
         myStudyRepository.save(myStudy);
     }
 
-    public StudyRes getStudy(String username, Long id){
+    public StudyRes getStudy(String username, Long id, Integer year, Integer month, Integer day){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
@@ -138,12 +139,11 @@ public class StudyService {
         }
 
         LocalDateTime localDateTime = LocalDateTime.now();
-        LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
         LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
 
-        OffsetDateTime offsetToday = OffsetDateTime.of(today, ZoneOffset.of("Z"));
-        Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, offsetToday, offsetToday.plusDays(1));
+        OffsetDateTime today = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
+        Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtBetween(
+                study, today, today.plusHours(24));
 
         OffsetDateTime offsetThisMonth = OffsetDateTime.of(thisMonth, ZoneOffset.of("Z"));
         if (offsetThisMonth.getDayOfWeek().getValue() < 7) {
