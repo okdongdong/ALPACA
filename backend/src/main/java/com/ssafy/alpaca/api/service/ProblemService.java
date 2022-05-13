@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,7 +86,7 @@ public class ProblemService {
             user.setLevel((Long) userData.get("tier"));
             userRepository.save(user);
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            throw new ServerErrorException(ExceptionUtil.SERVER_ERROR_WAIT,e);
         }
     }
 
@@ -111,7 +112,7 @@ public class ProblemService {
                 page++;
             }
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            throw new ServerErrorException(ExceptionUtil.SERVER_ERROR_WAIT,e);
         }
 
         List<SolvedProblem> solvedProblems = solvedProblemRepository.findAllByUser(user);

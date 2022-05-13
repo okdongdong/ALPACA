@@ -62,13 +62,13 @@ public class AuthController {
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )
     @PostMapping("/signup")
-    public ResponseEntity<BaseResponseBody> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> signup(@RequestBody SignupReq signupReq) {
         userService.signup(signupReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) throws IllegalAccessException {
+    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         TokenRes tokenRes = userService.login(loginReq);
         LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
         problemService.refreshSolvedAc(loginReq.getUsername());
@@ -83,7 +83,7 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<TokenRes> reissue(@RequestHeader("RefreshToken") String refreshToken) throws IllegalAccessException {
+    public ResponseEntity<TokenRes> reissue(@RequestHeader("RefreshToken") String refreshToken) {
         return ResponseEntity.ok(userService.reissue(refreshToken));
     }
 

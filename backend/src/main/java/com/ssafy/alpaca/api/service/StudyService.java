@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.*;
 import com.ssafy.alpaca.api.response.*;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
@@ -23,8 +24,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -71,11 +70,11 @@ public class StudyService {
         );
     }
 
-    private void checkRoomMaker(User user, Study study) throws IllegalAccessException {
+    private void checkRoomMaker(User user, Study study) {
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
             return;
         }
-        throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+        throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
     }
 
     public StudyListRes createStudy(String username, StudyReq studyReq) {
@@ -235,7 +234,7 @@ public class StudyService {
         return problemListRes;
     }
 
-    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) throws IllegalAccessException {
+    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
@@ -245,7 +244,7 @@ public class StudyService {
         studyRepository.save(study);
     }
 
-    public void deleteStudy(String username, Long id) throws IllegalAccessException {
+    public void deleteStudy(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
@@ -273,7 +272,7 @@ public class StudyService {
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
 
-    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
@@ -283,7 +282,7 @@ public class StudyService {
 
         MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
         if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
         MyStudy memberStudy = checkMyStudyByUserAndStudy(member, study);
 
@@ -293,7 +292,7 @@ public class StudyService {
         myStudyRepository.save(memberStudy);
     }
 
-    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
@@ -306,19 +305,19 @@ public class StudyService {
         myStudyRepository.delete(memberStudy);
     }
 
-    public void deleteMeFromStudy(String username, Long id) throws IllegalAccessException {
+    public void deleteMeFromStudy(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
 
         if (Boolean.TRUE.equals(myStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         myStudyRepository.delete(myStudy);
     }
 
-    public String createInviteCode(String username, Long id) throws IllegalAccessException {
+    public String createInviteCode(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);

@@ -5,6 +5,7 @@ import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.*;
@@ -47,9 +48,9 @@ public class ScheduleService {
         );
     }
 
-    private void checkIsStudyMember(User user, Study study) throws IllegalAccessException {
+    private void checkIsStudyMember(User user, Study study)  {
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudy(user, study))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
     }
 
@@ -71,7 +72,7 @@ public class ScheduleService {
         return problemListResList;
     }
 
-    public Long createSchedule(String username, ScheduleReq scheduleReq) throws IllegalAccessException {
+    public Long createSchedule(String username, ScheduleReq scheduleReq) {
         LocalDateTime finishedAt = LocalDateTime.of(
                 scheduleReq.getFinishedAt().getYear(),
                 scheduleReq.getFinishedAt().getMonth(),
@@ -124,7 +125,7 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public ScheduleRes getTodaySchedule(String username, Long studyId) throws IllegalAccessException {
+    public ScheduleRes getTodaySchedule(String username, Long studyId) {
         Study study = checkStudyById(studyId);
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
@@ -151,7 +152,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) {
         LocalDateTime finishedAt = LocalDateTime.of(
                 scheduleUpdateReq.getFinishedAt().getYear(),
                 scheduleUpdateReq.getFinishedAt().getMonth(),
@@ -230,7 +231,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleList(String username, Long id, Integer year, Integer month, Integer day) throws IllegalAccessException {
+    public List<ScheduleListRes> getScheduleList(String username, Long id, Integer year, Integer month, Integer day) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
@@ -248,13 +249,13 @@ public class ScheduleService {
         }
     }
 
-    public void deleteSchedule(String username, Long id) throws IllegalAccessException {
+    public void deleteSchedule(String username, Long id) {
         User user = checkUserByUsername(username);
         Schedule schedule = checkScheduleById(id);
         Study study = schedule.getStudy();
 
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         scheduleRepository.delete(schedule);

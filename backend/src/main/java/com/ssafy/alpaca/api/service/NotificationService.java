@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
@@ -13,6 +14,7 @@ import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class NotificationService {
         try {
             sseEmitter.send(SseEmitter.event().name("connect"));
         } catch (IOException e){
-            e.printStackTrace();
+            throw new ServerErrorException(ExceptionUtil.SERVER_ERROR_WAIT,e);
         }
         sseEmitters.put(userId, sseEmitter);
         notifyOld(userId);
@@ -95,7 +97,7 @@ public class NotificationService {
         }
     }
 
-    public void notifyAddStudyEvent(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void notifyAddStudyEvent(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -103,7 +105,7 @@ public class NotificationService {
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
