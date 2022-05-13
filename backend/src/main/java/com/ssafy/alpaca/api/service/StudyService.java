@@ -188,17 +188,18 @@ public class StudyService {
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day) {
         User user = checkUserByUsername(username);
-        LocalDateTime localDateTime;
-        OffsetDateTime offsetDateTime;
         List<Object[]> objects;
         if (day == null) {
-            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
-            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
-            offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
-            objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusDays(42));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            if (offsetDateTime.getDayOfWeek().getValue() < 7) {
+                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
+            }
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusWeeks(6));
         } else {
-            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
-            offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            if (offsetDateTime.getDayOfWeek().getValue() < 7) {
+                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
+            }
             objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusDays(7));
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
