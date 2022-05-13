@@ -172,8 +172,6 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         text: '프로필 이미지는 10MB를 초과할 수 없습니다.',
         icon: 'error',
         showConfirmButton: true,
-        backdrop: `
-        z-index: 2000`,
       });
       return;
     }
@@ -222,8 +220,6 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         text: '회원 탈퇴 되었습니다.',
         icon: 'success',
         showConfirmButton: true,
-        backdrop: `
-        z-index: 2000`,
       });
       dispatch(logout());
     } catch (e: any) {
@@ -234,8 +230,6 @@ function EditProfile({ onClose, open }: EditProfileProps) {
           '아직 방장인 스터디가 존재합니다. 스터디 탈퇴 후 다시 진행해주시기 바랍니다.',
         icon: 'error',
         showConfirmButton: true,
-        backdrop: `
-        z-index: 2000`,
       });
     }
   };
@@ -250,8 +244,6 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         showCancelButton: true,
         confirmButtonText: '탈퇴',
         cancelButtonText: '취소',
-        backdrop: `
-        z-index: 2000`,
         reverseButtons: false,
       })
       .then((result) => {
