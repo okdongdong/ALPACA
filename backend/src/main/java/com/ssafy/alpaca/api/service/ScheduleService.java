@@ -240,14 +240,15 @@ public class ScheduleService {
         if (day == null) {
             OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of("Z"));
             if (offsetDateTime.getDayOfWeek().getValue() < 7) {
-                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().plus(1).getValue());
+                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
             }
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
                     study, offsetDateTime, offsetDateTime.plusWeeks(6)));
         } else {
-//            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
-//            OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of("Z"));
             OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            if (offsetDateTime.getDayOfWeek().getValue() < 7) {
+                offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
+            }
             return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
                     study, offsetDateTime, offsetDateTime.plusDays(7)));
         }

@@ -138,18 +138,19 @@ public class StudyService {
         }
 
         LocalDateTime localDateTime = LocalDateTime.now();
-
         LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
+        LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
+
         OffsetDateTime offsetToday = OffsetDateTime.of(today, ZoneOffset.of("Z"));
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, offsetToday, offsetToday.plusDays(1));
 
-        LocalDateTime thisMonth = LocalDateTime
-                .of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0)
-                .minusDays(localDateTime.getDayOfWeek().getValue());
         OffsetDateTime offsetThisMonth = OffsetDateTime.of(thisMonth, ZoneOffset.of("Z"));
+        if (offsetThisMonth.getDayOfWeek().getValue() < 7) {
+            offsetThisMonth = offsetThisMonth.minusDays(offsetThisMonth.getDayOfWeek().getValue());
+        }
         List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, offsetThisMonth, offsetThisMonth.plusDays(42));
+                study, offsetThisMonth, offsetThisMonth.plusWeeks(6));
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
