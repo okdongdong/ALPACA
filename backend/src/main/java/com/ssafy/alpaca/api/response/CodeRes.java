@@ -1,10 +1,10 @@
 package com.ssafy.alpaca.api.response;
 
 import com.ssafy.alpaca.db.document.Code;
-import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +41,7 @@ public class CodeRes {
             return list.stream().map(
                     code -> CodeList.builder()
                             .language(code.getLanguage())
-                            .submittedAt(code.getSubmittedAt())
+                            .submittedAt(OffsetDateTime.of(code.getSubmittedAt(), ZoneOffset.of("Z")))
                             .submittedCode(code.getSubmittedCode())
                             .build()
             ).collect(Collectors.toList());
