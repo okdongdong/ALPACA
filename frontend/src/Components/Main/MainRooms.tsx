@@ -45,7 +45,7 @@ function MainRooms() {
     setStudyList(newStudyData);
   };
 
-  const test = (newPage: number, newStudyData: any) => {
+  const mData = (newPage: number, newStudyData: any) => {
     setStudyList(newStudyData);
   };
 
@@ -139,12 +139,13 @@ function MainRooms() {
             open={open}
             page={page}
             studyList={studyList}
-            callback={test}
+            callback={mData}
             onClose={() => {
               setOpen(false);
             }}
           />
           {studyList.map((study: any, i: number) => {
+            console.log(study);
             return (
               <Stack key={i}>
                 <MainRoomsDetail detail={study} page={page} callback={pinData} />

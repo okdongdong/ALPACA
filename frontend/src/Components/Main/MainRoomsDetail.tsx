@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
+import useAlert from '../../Hooks/useAlert';
 
 export interface StudyCreateProps {
   detail: any;
@@ -61,6 +62,7 @@ const MButton = styled(Button)(({ theme }) => ({
 
 function MainRoomsDetail(props: StudyCreateProps) {
   const theme = useTheme();
+  const cAlert = useAlert();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userInfo = useSelector((state: any) => state.account);
@@ -95,7 +97,23 @@ function MainRoomsDetail(props: StudyCreateProps) {
   };
 
   const goStudy = () => {
-    navigate(`/room/${props.detail.id}`);
+    cAlert
+      .fire({
+        title: '스터디 입장',
+        text: '스터디에 입장 하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '확인',
+        cancelButtonText: '취소',
+        backdrop: `
+        z-index: 2000`,
+        reverseButtons: false,
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          navigate(`/room/${props.detail.id}`);
+        }
+      });
   };
 
   return (

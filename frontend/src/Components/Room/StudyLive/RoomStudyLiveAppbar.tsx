@@ -124,6 +124,7 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
+                color: theme.palette.txt,
               }}>
               오늘의 문제가 없습니다.
             </div>
