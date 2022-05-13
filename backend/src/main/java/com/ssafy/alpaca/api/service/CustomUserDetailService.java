@@ -27,7 +27,7 @@ public class CustomUserDetailService implements UserDetailsService {
     // value::key의 형태로 Redis의 키에 저장됨, 값은 CustomerUserDetails 형태로 저장됨
     @Override
     @Cacheable(value = CacheKey.USER, key = "#username", unless = "#result == null")
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         return CustomUserDetails.of(user);

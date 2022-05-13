@@ -19,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 
 import java.util.List;
 import java.io.BufferedReader;
@@ -129,7 +130,8 @@ public class CodeService {
             );
             List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-            boolean flagA = false, flagB = false;
+            boolean flagA = false;
+            boolean flagB = false;
             for (MyStudy myStudy : myStudies) {
                 if (myStudy.getUser().getId().equals(userId)) {
                     flagA = true;
@@ -210,9 +212,8 @@ public class CodeService {
                     .runtime(jsonObject.get("cpuTime").toString())
                             .build();
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            throw new ServerErrorException(ExceptionUtil.SERVER_ERROR_WAIT,e);
         }
-        return null;
     }
 
 }

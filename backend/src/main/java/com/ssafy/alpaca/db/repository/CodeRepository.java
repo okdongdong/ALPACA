@@ -13,4 +13,6 @@ public interface CodeRepository extends MongoRepository<Code, String> {
 
     List<Code> findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(Long userId, Long problemNumber);
 
+    Boolean existsByProblemNumberAndUserId(Long problemNumber, Long userId);
+
 }

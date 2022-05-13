@@ -2,6 +2,7 @@ package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.*;
 import com.ssafy.alpaca.api.response.*;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ public class StudyService {
     private final MyStudyRepository myStudyRepository;
     private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final CodeRepository codeRepository;
     private final InviteCodeRedisRepository inviteCodeRedisRepository;
     private final StudyCodeRedisRepository studyCodeRedisRepository;
     private final ChatRepository chatRepository;
@@ -67,11 +70,11 @@ public class StudyService {
         );
     }
 
-    private void checkRoomMaker(User user, Study study) throws IllegalAccessException {
+    private void checkRoomMaker(User user, Study study) {
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
             return;
         }
-        throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+        throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
     }
 
     public StudyListRes createStudy(String username, StudyReq studyReq) {
@@ -136,9 +139,11 @@ public class StudyService {
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, today, today.plusDays(1));
 
-        LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
+        LocalDateTime thisMonth = LocalDateTime
+                .of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0)
+                .minusDays(localDateTime.getDayOfWeek().getValue());
         List<Schedule> schedules = scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, thisMonth.minusWeeks(1), thisMonth.plusMonths(1).plusWeeks(2));
+                study, thisMonth, thisMonth.plusDays(42));
 
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
@@ -174,7 +179,30 @@ public class StudyService {
                 .build());
     }
 
-    public List<ProblemListRes> getStudyProblem(Long id){
+    public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day) {
+        User user = checkUserByUsername(username);
+        LocalDateTime localDateTime;
+        List<Object[]> objects;
+        if (day == null) {
+            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(42));
+        } else {
+            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            objects = myStudyRepository.findScheduleListByUserId(user.getId(), localDateTime, localDateTime.plusDays(7));
+        }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        return objects.stream().map(object -> ScheduleListRes.builder()
+                .id(Long.parseLong(object[0].toString()))
+                .startedAt(LocalDateTime.parse(object[1].toString(), dateTimeFormatter))
+                .finishedAt(LocalDateTime.parse(object[2].toString(), dateTimeFormatter))
+                .build()).collect(Collectors.toList());
+    }
+
+    public List<ProblemListRes> getStudyProblem(String username, Long id){
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        List<MyStudy> myStudy = myStudyRepository.findAllByStudy(study);
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
         List<ToSolveProblem> problemList = new ArrayList<>();
         for(Schedule schedule:scheduleList){
@@ -187,27 +215,26 @@ public class StudyService {
             if (problem.isEmpty()) {
                 continue;
             }
+            List<User> users = new ArrayList<>();
+            for (MyStudy ms : myStudy) {
+                if (codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId())) {
+                    users.add(ms.getUser());
+                }
+            }
             problemListRes.add(ProblemListRes.builder()
                     .id(toSolveProblem.getId())
                     .problemNumber(problem.get().getProblemNumber())
                     .title(problem.get().getTitle())
                     .level(problem.get().getLevel())
+                    .isSolved(solvedProblemRepository.existsByUserAndProblemNumber(user, problem.get().getProblemNumber()))
                     .startedAt(toSolveProblem.getSchedule().getStartedAt())
-                    .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemNumber(toSolveProblem.getProblemNumber())))
+                    .solvedMemberList(users)
                     .build());
         }
         return problemListRes;
-//        return problemList.stream().map(toSolveProblem -> ProblemListRes.builder()
-//                .id(toSolveProblem.getProblemId())
-//                .number(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getNumber())
-//                .title(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getTitle())
-//                .level(problemRepository.findById(toSolveProblem.getProblemId()).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)).getLevel())
-//                .startedAt(toSolveProblem.getSchedule().getStartedAt())
-//                .solvedMemberList(ProblemListRes.of(solvedProblemRepository.findAllByProblemId(toSolveProblem.getProblemId())))
-//                .build()).collect(Collectors.toList());
     }
 
-    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) throws IllegalAccessException {
+    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
@@ -217,7 +244,7 @@ public class StudyService {
         studyRepository.save(study);
     }
 
-    public void deleteStudy(String username, Long id) throws IllegalAccessException {
+    public void deleteStudy(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
@@ -227,10 +254,10 @@ public class StudyService {
     public void checkMember(String username, Long userId, Long studyId) {
         Study study = checkStudyById(studyId);
         User user = checkUserByUsername(username);
-        User member = checkUserById(userId);
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-        boolean flagA = false, flagB = false;
+        boolean flagA = false;
+        boolean flagB = false;
         for (MyStudy myStudy : myStudies) {
             if (myStudy.getUser().getId().equals(userId)) {
                 flagA = true;
@@ -245,7 +272,7 @@ public class StudyService {
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
 
-    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
@@ -255,7 +282,7 @@ public class StudyService {
 
         MyStudy userStudy = checkMyStudyByUserAndStudy(user, study);
         if (Boolean.TRUE.equals(!userStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
         MyStudy memberStudy = checkMyStudyByUserAndStudy(member, study);
 
@@ -265,7 +292,7 @@ public class StudyService {
         myStudyRepository.save(memberStudy);
     }
 
-    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
@@ -278,33 +305,19 @@ public class StudyService {
         myStudyRepository.delete(memberStudy);
     }
 
-    public void deleteMeFromStudy(String username, Long id) throws IllegalAccessException {
+    public void deleteMeFromStudy(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
 
         if (Boolean.TRUE.equals(myStudy.getIsRoomMaker())) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         myStudyRepository.delete(myStudy);
     }
 
-    public void inviteStudy(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
-        Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
-        User member = checkUserById(studyMemberReq.getMemberId());
-        checkRoomMaker(user, study);
-        myStudyRepository.save(
-                MyStudy.builder()
-                        .isRoomMaker(false)
-                        .user(member)
-                        .study(study)
-                        .build()
-        );
-    }
-
-    public String createInviteCode(String username, Long id) throws IllegalAccessException {
+    public String createInviteCode(String username, Long id) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
@@ -327,21 +340,30 @@ public class StudyService {
         return newInviteCode;
     }
 
-    public void inviteUserCode(String username, Long id, StudyInviteReq studyInviteReq) {
-        Study study = checkStudyById(id);
+    public InviteInfoRes getInviteInfo(String inviteCode) {
+        StudyCode studyCode = studyCodeRedisRepository.findById(inviteCode).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
+        );
+        Study study = checkStudyById(studyCode.getStudyId());
+        MyStudy myStudy = myStudyRepository.findTopByStudyAndIsRoomMaker(study, true);
+
+        return InviteInfoRes.builder()
+                .roomMaker(myStudy.getUser().getNickname())
+                .roomMakerProfileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                .title(study.getTitle())
+                .info(study.getInfo())
+                .build();
+    }
+
+    public void inviteUserCode(String username, StudyInviteReq studyInviteReq) {
+        StudyCode studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode()).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
+        );
+        Study study = checkStudyById(studyCode.getStudyId());
         User user = checkUserByUsername(username);
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
-        }
-
-        Optional<StudyCode> studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode());
-
-        if (studyCode.isEmpty()) {
-            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS);
-        }
-        if (Boolean.TRUE.equals(!study.getId().equals(studyCode.get().getStudyId()))){
-            throw new IllegalArgumentException(ExceptionUtil.INVITE_CODE_INVALID);
         }
 
         myStudyRepository.save(

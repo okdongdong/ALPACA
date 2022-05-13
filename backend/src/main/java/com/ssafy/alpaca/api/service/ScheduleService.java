@@ -5,6 +5,7 @@ import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.*;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 
 @Service
@@ -28,6 +28,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final ProblemRepository problemRepository;
+    private final NotificationService notificationService;
 
     private User checkUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(
@@ -47,9 +48,9 @@ public class ScheduleService {
         );
     }
 
-    private void checkIsStudyMember(User user, Study study) throws IllegalAccessException {
+    private void checkIsStudyMember(User user, Study study)  {
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudy(user, study))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
     }
 
@@ -71,7 +72,7 @@ public class ScheduleService {
         return problemListResList;
     }
 
-    public Long createSchedule(String username, ScheduleReq scheduleReq) throws IllegalAccessException {
+    public Long createSchedule(String username, ScheduleReq scheduleReq) {
         LocalDateTime finishedAt = LocalDateTime.of(
                 scheduleReq.getFinishedAt().getYear(),
                 scheduleReq.getFinishedAt().getMonth(),
@@ -124,7 +125,7 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public ScheduleRes getTodaySchedule(String username, Long studyId) throws IllegalAccessException {
+    public ScheduleRes getTodaySchedule(String username, Long studyId) {
         Study study = checkStudyById(studyId);
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
@@ -151,7 +152,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) {
         LocalDateTime finishedAt = LocalDateTime.of(
                 scheduleUpdateReq.getFinishedAt().getYear(),
                 scheduleUpdateReq.getFinishedAt().getMonth(),
@@ -191,13 +192,31 @@ public class ScheduleService {
         schedule.setStartedAt(startedAt);
         schedule.setFinishedAt(finishedAt);
         scheduleRepository.save(schedule);
-        for (Long number : scheduleUpdateReq.getToSolveProblems()) {
-            toSolveProblemRepository.save(
-                    ToSolveProblem.builder()
-                            .schedule(schedule)
-                            .problemNumber(number)
-                            .build());
+        HashSet<Long> originProblems = toSolveProblemRepository.findProblemNumbersByScheduleId(schedule.getId());
+        HashSet<Long> newProblems = new HashSet<>(scheduleUpdateReq.getToSolveProblems());
+
+        List<ToSolveProblem> saveList = new ArrayList<>();
+        List<ToSolveProblem> deleteList = new ArrayList<>();
+
+        for (Long originProblem : originProblems) {
+            if (newProblems.contains(originProblem)) {
+                continue;
+            }
+            toSolveProblemRepository.findByScheduleAndProblemNumber(schedule, originProblem).ifPresent(deleteList::add);
         }
+
+        for (Long newProblem : newProblems) {
+            if (originProblems.contains(newProblem)) {
+                continue;
+            }
+            saveList.add(ToSolveProblem.builder()
+                    .schedule(schedule)
+                    .problemNumber(newProblem)
+                    .build());
+        }
+
+        toSolveProblemRepository.saveAll(saveList);
+        toSolveProblemRepository.deleteAll(deleteList);
     }
 
     public ScheduleRes getSchedule(Long id) {
@@ -212,23 +231,31 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleMonthList(String username, Long id, Integer year, Integer month) throws IllegalAccessException {
+    public List<ScheduleListRes> getScheduleList(String username, Long id, Integer year, Integer month, Integer day) {
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
-        LocalDateTime localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
-        return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
-                study, localDateTime.minusWeeks(1), localDateTime.plusMonths(1).plusWeeks(2)));
+        LocalDateTime localDateTime;
+        if (day == null) {
+            localDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+            localDateTime = localDateTime.minusDays(localDateTime.getDayOfWeek().getValue());
+            return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
+                    study, localDateTime, localDateTime.plusDays(42)));
+        } else {
+            localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            return ScheduleListRes.of(scheduleRepository.findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(
+                    study, localDateTime, localDateTime.plusDays(7)));
+        }
     }
 
-    public void deleteSchedule(String username, Long id) throws IllegalAccessException {
+    public void deleteSchedule(String username, Long id) {
         User user = checkUserByUsername(username);
         Schedule schedule = checkScheduleById(id);
         Study study = schedule.getStudy();
 
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         scheduleRepository.delete(schedule);

@@ -2,10 +2,12 @@ package com.ssafy.alpaca.common.etc;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BaseResponseBody {
 
     @ApiModelProperty(name="응답 메시지", example = "OK")
@@ -14,7 +16,6 @@ public class BaseResponseBody {
     @ApiModelProperty(name="응답 코드", example = "200")
     private Integer statusCode = null;
 
-    public BaseResponseBody() {}
 
     public static BaseResponseBody of(Integer statusCode, String message) {
         BaseResponseBody body = new BaseResponseBody();

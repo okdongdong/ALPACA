@@ -8,6 +8,8 @@ import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.response.UserListRes;
+import com.ssafy.alpaca.common.exception.FileConvertException;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
 import com.ssafy.alpaca.common.jwt.RefreshToken;
 import com.ssafy.alpaca.common.util.ConvertUtil;
@@ -70,9 +72,9 @@ public class UserService {
         }
     }
 
-    public void signup(SignupReq signupReq) throws IllegalAccessException {
+    public void signup(SignupReq signupReq) {
         if (!signupReq.getPassword().equals(signupReq.getPasswordCheck())) {
-            throw new IllegalAccessException(ExceptionUtil.USER_PW_INVALID);
+            throw new UnAuthorizedException(ExceptionUtil.USER_PW_INVALID);
         }
 
         if (Boolean.TRUE.equals(userRepository.existsByUsername(signupReq.getUsername()))) {
@@ -93,7 +95,7 @@ public class UserService {
                         .build());
     }
 
-    public TokenRes login(LoginReq loginReq) throws IllegalAccessException {
+    public TokenRes login(LoginReq loginReq) {
         User user = userRepository.findByUsername(loginReq.getUsername())
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         checkPassword(loginReq.getPassword(), user.getPassword());
@@ -144,9 +146,9 @@ public class UserService {
         return token.substring(7);
     }
 
-    private void checkPassword(String rawPassword, String findMemberPassword) throws IllegalAccessException {
+    private void checkPassword(String rawPassword, String findMemberPassword) {
         if (!passwordEncoder.matches(rawPassword, findMemberPassword)) {
-            throw new IllegalAccessException(ExceptionUtil.USER_PW_INVALID);
+            throw new UnAuthorizedException(ExceptionUtil.USER_PW_INVALID);
         }
     }
 
@@ -155,15 +157,15 @@ public class UserService {
                 jwtTokenUtil.generateRefreshToken(username), REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    public TokenRes reissue(String refreshToken) throws IllegalAccessException {
+    public TokenRes reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String username = jwtTokenUtil.getUsername(refreshToken);
         RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
-                .orElseThrow(()->new IllegalAccessException(ExceptionUtil.INVALID_REFRESH_TOKEN));
+                .orElseThrow(()->new UnAuthorizedException(ExceptionUtil.INVALID_REFRESH_TOKEN));
         if (refreshToken.equals(redisRefreshToken.getToken())) {
             return reissueRefreshToken(refreshToken, username);
         }
-        throw new IllegalAccessException(ExceptionUtil.MISMATCH_REFRESH_TOKEN);
+        throw new UnAuthorizedException(ExceptionUtil.MISMATCH_REFRESH_TOKEN);
     }
 
     private TokenRes reissueRefreshToken(String refreshToken, String username) {
@@ -182,11 +184,11 @@ public class UserService {
     }
 
     // 아래부터 UserController
-    public void updateUser(Long id, UserUpdateReq userUpdateReq) throws IllegalAccessException {
+    public void updateUser(Long id, UserUpdateReq userUpdateReq) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
-            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+            throw new UnAuthorizedException(ExceptionUtil.NOT_MYSELF);
         }
         user.setNickname(userUpdateReq.getNickname());
         user.setInfo(userUpdateReq.getInfo());
@@ -195,32 +197,37 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String updateProfileImg(Long id, MultipartFile file) throws IllegalAccessException, IOException {
+    public String updateProfileImg(Long id, MultipartFile file) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!username.equals(user.getUsername())) {
-            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+            throw new UnAuthorizedException(ExceptionUtil.NOT_MYSELF);
         }
-        Byte[] bytes = new Byte[file.getBytes().length];
+        try {
+            Byte[] bytes = new Byte[file.getBytes().length];
 
-        int i = 0;
+            int i = 0;
 
-        for (byte b : file.getBytes()) {
-            bytes[i++] = b;
+            for (byte b : file.getBytes()) {
+                bytes[i++] = b;
+            }
+            user.setProfileImg(bytes);
+            userRepository.save(user);
+
+            return convertUtil.convertByteArrayToString(user.getProfileImg());
+
+        } catch (IOException e) {
+            throw new FileConvertException(ExceptionUtil.FILE_NOT_CONVERT,e);
         }
-        user.setProfileImg(bytes);
-        userRepository.save(user);
-
-        return convertUtil.convertByteArrayToString(user.getProfileImg());
 
     }
 
-    public void deleteUser(Long id) throws IllegalAccessException {
+    public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
-            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+            throw new UnAuthorizedException(ExceptionUtil.NOT_MYSELF);
         }
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndIsRoomMaker(user, true))) {
@@ -248,14 +255,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void updatePassword(Long id, PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+    public void updatePassword(Long id, PasswordUpdateReq passwordUpdateReq) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         checkPassword(passwordUpdateReq.getPassword(), user.getPassword());
 
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
-            throw new IllegalAccessException(ExceptionUtil.NOT_MYSELF);
+            throw new UnAuthorizedException(ExceptionUtil.NOT_MYSELF);
         }
         if (!passwordUpdateReq.getChangedPassword().equals(passwordUpdateReq.getChangedPasswordCheck())){
             throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_VALUE);
