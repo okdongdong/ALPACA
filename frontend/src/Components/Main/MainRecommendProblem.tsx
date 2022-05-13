@@ -110,6 +110,9 @@ function MainRecommendProblem() {
           };
         }),
       );
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
