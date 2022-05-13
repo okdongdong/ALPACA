@@ -47,8 +47,8 @@ function CClassBadge({ level, width = 50, height = 50, labelOff = false }: CClas
           rx="6.5"
           transform="rotate(45 43.4265 -1.12132)"
           stroke="#DDDDDD"
-          stroke-opacity="0.5"
-          stroke-width="3"
+          strokeOpacity="0.5"
+          strokeWidth="3"
         />
         <rect
           x="42.8201"
