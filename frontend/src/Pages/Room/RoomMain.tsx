@@ -109,7 +109,6 @@ function RoomMain() {
         <Box sx={{ height: '100%', width: '100%' }}>
           <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
           <RoomSetting setInviteOpen={setOpen} />
-
           <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
             <Grid item xs={4}>
               <Stack spacing={3}>

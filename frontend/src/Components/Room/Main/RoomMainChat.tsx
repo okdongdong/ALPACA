@@ -189,7 +189,7 @@ function RoomMainChat() {
       <Stack
         spacing={1}
         className="scroll-box"
-        sx={{ height: isMobile ? '70vh' : '15vh', position: 'relative' }}
+        sx={{ height: isMobile ? '83vh' : '15vh', position: 'relative' }}
         ref={scrollRef}>
         {isError ? (
           <Divider variant="middle">

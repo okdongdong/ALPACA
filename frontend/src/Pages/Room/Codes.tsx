@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { customAxios } from '../../Lib/customAxios';
 import { useLocation, useParams } from 'react-router-dom';
+import { styled, useTheme } from '@mui/material/styles';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { useTheme } from '@mui/material/styles';
 import { Grid, Button, Drawer, List, Box } from '@mui/material';
 import RoomCodeRecordTime from '../../Components/Room/Codes/RoomCodeRecordTime';
 import RoomCompileTitle from '../../Components/Room/Compile/RoomCompileTitle';
@@ -24,6 +24,13 @@ type problemInfoType = {
 };
 
 type Anchor = 'left';
+
+const MDrawer = styled(Drawer)(({ theme }) => ({
+  '& .MuiPaper-root': {
+    backgroundColor: theme.palette.bg,
+    color: theme.palette.txt,
+  },
+}));
 
 function Codes() {
   const monaco = useMonaco();
@@ -185,18 +192,18 @@ function Codes() {
                 justifyContent: 'flex-start',
                 alignItems: 'center',
               }}>
-              <Grid item xs={4} sx={{ justifyContent: 'Left' }}>
+              <Grid item xs={3} sx={{ justifyContent: 'Left' }}>
                 <Button
                   onClick={toggleDrawer('left', true)}
                   startIcon={<AccessTimeIcon sx={{ color: theme.palette.txt }} />}
                   sx={{ color: theme.palette.txt }}>
-                  코드 조회하기
+                  코드 조회
                 </Button>
-                <Drawer open={state['left']} onClose={toggleDrawer('left', false)}>
+                <MDrawer open={state['left']} onClose={toggleDrawer('left', false)}>
                   {list('left')}
-                </Drawer>
+                </MDrawer>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={7}>
                 <RoomCompileTitle
                   tier={problemInfo.level}
                   problemTitle={problemInfo.title}
@@ -204,9 +211,7 @@ function Codes() {
                 />
               </Grid>
             </Grid>
-            <div style={{ position: 'absolute', top: '1vh', right: '2vw' }}>
-              <CProfile nickname={nickname} profileImg={profileImg} />
-            </div>
+            <div style={{ position: 'absolute', top: '2vh', right: '2vw' }}>{nickname}</div>
             <Grid item xs={20} md={17}>
               <Editor
                 height="82vh" // By default, it fully fits with its parent

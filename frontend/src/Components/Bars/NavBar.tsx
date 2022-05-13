@@ -56,8 +56,10 @@ const MBox = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
-  width: '200px',
+  width: '190px',
   marginTop: '2vh',
+  marginLeft: '5px',
+  marginRight: '5px',
 }));
 const MBtn = styled(Button)(({ theme }) => ({
   background: theme.palette.component,
@@ -90,6 +92,7 @@ function NavBar() {
     if (params.roomId !== undefined) {
       navigate(`room/${params.roomId}/problem-manage`);
     }
+    setRightOpen(false);
   };
 
   const clickLogout = () => {
