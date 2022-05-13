@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, ContactPageOutlined } from '@mui/icons-material';
 import CBtn from '../Commons/CBtn';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -126,62 +126,44 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   }, []);
 
   const addInitialNotification = (event: MessageEvent) => {
-    console.log('initialNoti', event);
+    console.log('addInitialNotification', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
+    const data = JSON.parse(event.data);
     setNotificationList((notifications) => {
-      if (event.data?.startedAt) {
+      if (data?.scheduleStartedAt) {
         return [
-          {
-            type: 'schedule',
-            studyId: event.data.studyId,
-            title: event.data.title,
-          },
+          { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
+          ...notifications,
         ];
       }
-      return [
-        {
-          type: 'invite',
-          studyId: event.data.studyId,
-          title: event.data.title,
-        },
-        ...notifications,
-      ];
+      return [{ type: 'invite', studyId: data.studyId, title: data.studyTitle }, ...notifications];
     });
   };
 
   const addSchedule = (event: MessageEvent) => {
-    console.log('addSchedule', event);
+    console.log('addSchedule', event.data);
+    console.log(!!!anchorEl, anchorEl);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
+    const data = JSON.parse(event.data);
     setNotificationList((notifications) => {
       return [
-        {
-          type: 'schedule',
-          studyId: event.data.studyId,
-          title: event.data.title,
-        },
-
+        { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
         ...notifications,
       ];
     });
   };
   const addInviteStudy = (event: MessageEvent) => {
-    console.log('addStudy', event);
+    console.log('addInviteStudy', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
+    const data = JSON.parse(event.data);
     setNotificationList((notifications) => {
-      return [
-        {
-          type: 'invite',
-          studyId: event.data.studyId,
-          title: event.data.title,
-        },
-        ...notifications,
-      ];
+      return [{ type: 'invite', studyId: data.studyId, title: data.studyTitle }, ...notifications];
     });
   };
 
@@ -192,7 +174,6 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   };
 
   const connectNotification = () => {
-    console.log('eventsource connect');
     const subscribeUrl = `${process.env.REACT_APP_BASE_URL}/api/v1/sub/notice`;
     const jwtToken = localStorage.getItem('accessToken')?.split(' ')[1];
     eventSource.current = new EventSource(`${subscribeUrl}?token=${jwtToken}`);
@@ -204,14 +185,13 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   };
 
   const disconnectNotification = () => {
-    console.log('eventsource disconnect');
-
-    if (eventSource.current) {
-      eventSource.current.removeEventListener('initialNotification', addInitialNotification);
-      eventSource.current.removeEventListener('addSchedule', addSchedule);
-      eventSource.current.removeEventListener('inviteStudy', addInviteStudy);
-      eventSource.current.removeEventListener('error', closeEventsource);
-    }
+    eventSource.current?.close();
+    // if (eventSource.current) {
+    //   eventSource.current.removeEventListener('initialNotification', addInitialNotification);
+    //   eventSource.current.removeEventListener('addSchedule', addSchedule);
+    //   eventSource.current.removeEventListener('inviteStudy', addInviteStudy);
+    //   eventSource.current.removeEventListener('error', closeEventsource);
+    // }
     eventSource.current = null;
   };
   const deleteNotification = (index: number) => {

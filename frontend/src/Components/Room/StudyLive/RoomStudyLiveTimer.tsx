@@ -270,7 +270,6 @@ function RoomStudyLiveTimer() {
               }}>
               {timerId.current ? <Pause /> : <PlayArrow />}
             </IconButton>
-            <>{timerId.current}</>
             <IconButton
               onClick={() => {
                 handleStop();
