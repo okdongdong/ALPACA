@@ -1,6 +1,7 @@
 package com.ssafy.alpaca.api.service;
 
 import com.ssafy.alpaca.api.request.StudyMemberReq;
+import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
@@ -95,7 +96,7 @@ public class NotificationService {
         }
     }
 
-    public void notifyAddStudyEvent(String username, Long id, StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public void notifyAddStudyEvent(String username, Long id, StudyMemberReq studyMemberReq) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -103,7 +104,7 @@ public class NotificationService {
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudyAndIsRoomMaker(user, study, true))) {
-            throw new IllegalAccessException(ExceptionUtil.UNAUTHORIZED_USER);
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
         User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(

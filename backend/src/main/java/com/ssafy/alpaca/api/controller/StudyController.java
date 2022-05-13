@@ -7,7 +7,6 @@ import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
-import com.ssafy.alpaca.db.entity.Study;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -85,7 +84,7 @@ public class StudyController {
     })
     @GetMapping("/span")
     public ResponseEntity<List<ScheduleListRes>> getScheduleList(
-            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) throws IllegalAccessException {
+            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day));
     }
@@ -107,7 +106,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "수정할 스터디의 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> updateStudy(@PathVariable Long id, @RequestBody StudyUpdateReq studyUpdateReq) {
         String username = userService.getCurrentUsername();
         studyService.updateStudy(username, id, studyUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
@@ -119,7 +118,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -148,7 +147,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "이임할 스터디의 id", dataTypeClass = Long.class )
     @PutMapping("/member/{id}")
-    public ResponseEntity<BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> updateRoomMaker(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.updateRoomMaker(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -160,7 +159,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "강퇴할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/member/{id}")
-    public ResponseEntity<BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteMember(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         studyService.deleteMember(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -172,7 +171,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "탈퇴할 스터디의 id", dataTypeClass = Long.class )
     @DeleteMapping("/exit/{id}")
-    public ResponseEntity<BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteMeFromStudy(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         studyService.deleteMeFromStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -186,7 +185,7 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "초대코드를 조회할 스터디의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}/inviteCode")
-    public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> createInviteCode(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(BaseResponseBody.of(200,studyService.createInviteCode(username, id)));
     }
@@ -218,7 +217,7 @@ public class StudyController {
             notes = "방장이 스터디에 사용자를 초대한다."
     )
     @PostMapping("/{id}/invite")
-    public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
         String username = userService.getCurrentUsername();
         notificationService.notifyAddStudyEvent(username, id, studyMemberReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));

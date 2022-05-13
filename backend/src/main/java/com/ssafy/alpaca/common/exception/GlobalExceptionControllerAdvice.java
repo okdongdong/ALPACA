@@ -19,8 +19,8 @@ public class GlobalExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(IllegalAccessException.class)
-    public ErrorResult illegalAccessExHandler(IllegalAccessException e) {
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ErrorResult illegalAccessExHandler(UnAuthorizedException e) {
         return new ErrorResult(e.getMessage());
     }
 

@@ -6,5 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class JwtFilterException extends RuntimeException{
-    private final String message;
+    public JwtFilterException(String message) {
+        super(message);
+    }
 }
