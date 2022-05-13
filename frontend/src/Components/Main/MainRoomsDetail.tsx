@@ -105,8 +105,6 @@ function MainRoomsDetail(props: StudyCreateProps) {
         showCancelButton: true,
         confirmButtonText: '확인',
         cancelButtonText: '취소',
-        backdrop: `
-        z-index: 2000`,
         reverseButtons: false,
       })
       .then((result) => {
