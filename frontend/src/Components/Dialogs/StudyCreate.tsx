@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView, isMobile, MobileView } from 'react-device-detect';
 
 export interface StudyCreateProps {
   open: boolean;
@@ -160,6 +160,10 @@ function StudyCreate(props: StudyCreateProps) {
       resUserInfo.studies = [...resUserInfo.studies, res.data];
       resUserInfo.studyCount += 1;
       dispatch(setUserInfo(resUserInfo));
+      if (isMobile) {
+        props.callback(props.page, resUserInfo.studies);
+        return;
+      }
       const page = Math.ceil(resUserInfo.studyCount / 3);
       searchData(page);
     } catch (e) {
