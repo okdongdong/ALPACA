@@ -130,7 +130,24 @@ public class StudyService {
         myStudyRepository.save(myStudy);
     }
 
-    public StudyRes getStudy(String username, Long id, Integer year, Integer month, Integer day){
+    private String getTime(Integer offset) {
+        if (offset == 0) {
+            return "Z";
+        } else {
+            StringBuilder ret = new StringBuilder(0 < offset ? "-" : "+");
+            int hour = Math.abs(offset/60);
+            int minute = Math.abs(offset%60);
+            String HOUR = String.format("%02d", hour);
+            String MINUTE = String.format("%02d", minute);
+
+            ret.append(HOUR);
+            ret.append(":");
+            ret.append(MINUTE);
+            return ret.toString();
+        }
+    }
+
+    public StudyRes getStudy(String username, Long id, Integer offset){
         Study study = checkStudyById(id);
         User user = checkUserByUsername(username);
 
@@ -139,13 +156,15 @@ public class StudyService {
         }
 
         LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
         LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
 
-        OffsetDateTime today = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
+        String offSet = getTime(offset);
+        OffsetDateTime offsetToday = OffsetDateTime.of(today, ZoneOffset.of(offSet));
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtBetween(
-                study, today, today.plusHours(24));
+                study, offsetToday, offsetToday.plusHours(24));
 
-        OffsetDateTime offsetThisMonth = OffsetDateTime.of(thisMonth, ZoneOffset.of("Z"));
+        OffsetDateTime offsetThisMonth = OffsetDateTime.of(thisMonth, ZoneOffset.of(offSet));
         if (offsetThisMonth.getDayOfWeek().getValue() < 7) {
             offsetThisMonth = offsetThisMonth.minusDays(offsetThisMonth.getDayOfWeek().getValue());
         }
@@ -186,17 +205,18 @@ public class StudyService {
                 .build());
     }
 
-    public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day) {
+    public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
         User user = checkUserByUsername(username);
+        String offSet = getTime(offset);
         List<Object[]> objects;
         if (day == null) {
-            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of(offSet));
             if (offsetDateTime.getDayOfWeek().getValue() < 7) {
                 offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
             }
             objects = myStudyRepository.findScheduleListByUserId(user.getId(), offsetDateTime, offsetDateTime.plusWeeks(6));
         } else {
-            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of("Z"));
+            OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.of(offSet));
             if (offsetDateTime.getDayOfWeek().getValue() < 7) {
                 offsetDateTime = offsetDateTime.minusDays(offsetDateTime.getDayOfWeek().getValue());
             }
@@ -205,8 +225,8 @@ public class StudyService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         return objects.stream().map(object -> ScheduleListRes.builder()
                 .id(Long.parseLong(object[0].toString()))
-                .startedAt(OffsetDateTime.of(LocalDateTime.parse(object[1].toString(), dateTimeFormatter), ZoneOffset.of("Z")))
-                .finishedAt(OffsetDateTime.of(LocalDateTime.parse(object[2].toString(), dateTimeFormatter), ZoneOffset.of("Z")))
+                .startedAt(OffsetDateTime.of(LocalDateTime.parse(object[1].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
+                .finishedAt(OffsetDateTime.of(LocalDateTime.parse(object[2].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
                 .build()).collect(Collectors.toList());
     }
 

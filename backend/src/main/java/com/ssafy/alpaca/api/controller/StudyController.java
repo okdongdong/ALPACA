@@ -59,14 +59,12 @@ public class StudyController {
     )
     @ApiImplicitParams({
         @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class ),
-        @ApiImplicitParam( name = "year", value = "오늘 기준 year", dataTypeClass = Long.class ),
-        @ApiImplicitParam( name = "month", value = "오늘 기준 month", dataTypeClass = Long.class ),
-        @ApiImplicitParam( name = "day", value = "오늘 기준 day", dataTypeClass = Long.class )
+        @ApiImplicitParam( name = "offset", value = "표준시간대로부터 offset", dataTypeClass = Integer.class )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam Integer day) {
+    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer offset) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getStudy(username, id, year, month, day));
+        return ResponseEntity.ok(studyService.getStudy(username, id, offset));
     }
 
     @ApiOperation(
@@ -88,12 +86,13 @@ public class StudyController {
             @ApiImplicitParam( name = "year", value = "시작하는 해", dataTypeClass = Long.class ),
             @ApiImplicitParam( name = "month", value = "시작하는 달", dataTypeClass = Long.class ),
             @ApiImplicitParam( name = "day", value = "시작하는 날짜", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "offset", value = "표준시간대로부터 offset", dataTypeClass = Integer.class )
     })
     @GetMapping("/span")
     public ResponseEntity<List<ScheduleListRes>> getScheduleList(
-            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) throws IllegalAccessException {
+            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day, @RequestParam Integer offset) throws IllegalAccessException {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day));
+        return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day, offset));
     }
 
     @ApiOperation(
