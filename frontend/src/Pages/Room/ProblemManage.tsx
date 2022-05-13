@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Avatar, AvatarGroup, Grid, Modal, Typography } from '@mui/material';
+import { Button, Box, Avatar, AvatarGroup, Grid, Modal, Chip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import { DataGrid, gridClasses, GridRowsProp } from '@mui/x-data-grid';
@@ -91,6 +91,23 @@ const MBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
+const MButton = styled(Button)(({ theme }) => ({
+  position: 'absolute',
+  top: 1,
+  right: 1,
+  backgroundColor: theme.palette.bg,
+  color: theme.palette.txt,
+  padding: 4,
+  zIndex: 1,
+}));
+
+const MChip = styled(Chip)(({ theme }) => ({
+  height: '1rem',
+  marginLeft: '10px',
+  backgroundColor: theme.palette.main,
+  color: theme.palette.txt,
+}));
+
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
   '& 	.MuiDataGrid-columnHeader': {
     color: theme.palette.txt,
@@ -137,6 +154,7 @@ function BasicMenu(props: any) {
     setAnchorEl(null);
     navigate(`/codes/${props.data.problemNumber}/${userId}`, { state: roomId });
   };
+
   return (
     <div>
       <Button
@@ -182,6 +200,7 @@ function BasicMenu(props: any) {
     </div>
   );
 }
+
 const columnsData = [
   {
     field: 'level',
@@ -192,7 +211,23 @@ const columnsData = [
     },
   },
   { field: 'problemNumber', type: 'number', headerName: '문제 번호', width: 110 },
-  { field: 'title', headerName: '문제 이름', width: 300 },
+  {
+    field: 'title',
+    headerName: '문제 이름',
+    width: 300,
+    renderCell: (params: any) => {
+      if (params.row.isSolved)
+        return (
+          <>
+            <div>
+              {params.value}
+              <MChip label="Solved" sx={{ height: '1rem', marginLeft: '10px' }} />
+            </div>
+          </>
+        );
+      return params.value;
+    },
+  },
   {
     field: 'startedAt',
     headerName: '스터디 날짜',
@@ -254,7 +289,21 @@ const McolumsData = [
     },
   },
   { field: 'problemNumber', type: 'number', headerName: '문제번호', flex: 2 },
-  { field: 'title', headerName: '문제 이름', flex: 4 },
+  {
+    field: 'title',
+    headerName: '문제 이름',
+    flex: 4,
+    renderCell: (params: any) => {
+      if (params.row.isSolved)
+        return (
+          <>
+            {params.value}
+            <MChip label="Solved" />
+          </>
+        );
+      return params.value;
+    },
+  },
   {
     field: 'startedAt',
     headerName: '스터디 날짜',
@@ -293,7 +342,6 @@ function ProblemManage() {
         method: 'get',
         url: `/study/${params.roomId}/problems`,
       });
-      console.log(res.data);
       const rowdata: GridRowsProp = res.data;
       setData(rowdata);
     } catch (e) {
@@ -310,7 +358,6 @@ function ProblemManage() {
   }, [data]);
 
   const handleOnClick = (nowrow: any) => {
-    console.log(nowrow);
     setRowData(nowrow);
     setOpen(true);
   };
@@ -319,10 +366,23 @@ function ProblemManage() {
     navigate(`/codes/${rowData?.problemNumber}/${userId}`, { state: roomId });
   };
 
+  const updateClick = async () => {
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/problem`,
+      });
+      problemsData();
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
+
   return (
     <>
       <BrowserView>
-        <Box sx={{ height: '75vh', width: 960 }}>
+        <Box sx={{ height: '75vh', width: 960, position: 'relative' }}>
+          <MButton onClick={updateClick}>Solved.ac 갱신하기</MButton>
           <StripedDataGrid
             disableColumnMenu
             hideFooter
@@ -378,36 +438,38 @@ function ProblemManage() {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description">
           <MBox>
-            <Typography id="server-modal-title" variant="h6" component="h2">
-              {rowData?.title}
-            </Typography>
-            <div style={{ paddingTop: '10px', display: 'flex' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
               <CBadge tier={rowData?.level}></CBadge>
-              <Typography id="server-modal-description">{rowData?.problemNumber}</Typography>
+              <span>
+                {rowData?.problemNumber} - {rowData?.title}
+              </span>
             </div>
-            <Typography id="server-modal-description">
-              {rowData?.startedAt.substring(0, 10)}
-            </Typography>
-
-            {rowData?.solvedMemberList.map((member: any, i: number) => {
-              return (
-                <MenuItem
-                  sx={{
-                    width: 200,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                  key={i}>
-                  <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
-                  <CBtn
-                    content="코드"
-                    onClick={() => {
-                      goCode(member.id);
-                    }}></CBtn>
-                </MenuItem>
-              );
-            })}
+            {rowData?.solvedMemberList.length !== 0 ? (
+              rowData?.solvedMemberList.map((member: any, i: number) => {
+                return (
+                  <MenuItem
+                    sx={{
+                      width: '50vw',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginTop: '5px',
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                    }}
+                    key={i}>
+                    <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
+                    <CBtn
+                      content="코드"
+                      onClick={() => {
+                        goCode(member.id);
+                      }}></CBtn>
+                  </MenuItem>
+                );
+              })
+            ) : (
+              <span style={{ marginTop: '10px' }}>아직 푼 스터디원이 없습니다. </span>
+            )}
           </MBox>
         </Modal>
       </MobileView>

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import CInput from '../Commons/CInput';
 import CBtn from '../Commons/CBtn';
 import ClearIcon from '@mui/icons-material/Clear';
+import useAlert from '../../Hooks/useAlert';
 
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 350,
@@ -27,6 +28,7 @@ export interface EditPasswordProps {
 
 function EditPassword(props: EditPasswordProps) {
   const theme = useTheme();
+  const cAlert = useAlert();
   const userInfo = useSelector((state: any) => state.account);
   const [presentPassword, setPresentPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
@@ -53,7 +55,12 @@ function EditPassword(props: EditPasswordProps) {
       });
       alert('비밀번호를 변경하였습니다.');
     } catch (e: any) {
-      alert(e.response.data.message);
+      cAlert.fire({
+        title: '비밀번호 변경 실패!',
+        text: e.response.data.message || '현재 비밀번호와 일치하지 않습니다.',
+        icon: 'error',
+        showConfirmButton: true,
+      });
     }
   };
 
@@ -120,7 +127,6 @@ function EditPassword(props: EditPasswordProps) {
             disabled={!!passwordMessage || !!passwordCheckMessage}
           />
         </Grid>
-
         <IconButton
           component="span"
           sx={{ position: 'absolute', top: 10, right: 10 }}

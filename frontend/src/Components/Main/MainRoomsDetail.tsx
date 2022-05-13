@@ -61,6 +61,7 @@ const MButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.main + '90',
   },
+  marginBottom: '3px',
 }));
 
 function MainRoomsDetail(props: StudyCreateProps) {

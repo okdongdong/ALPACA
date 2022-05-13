@@ -22,6 +22,7 @@ import { setLoading } from '../../Redux/commonReducer';
 import CInputWithBtn from '../../Components/Commons/CInputWithBtn';
 import FormHelperText from '@mui/material/FormHelperText';
 import { BrowserView, MobileView } from 'react-device-detect';
+import useAlert from '../../Hooks/useAlert';
 
 const WButton = styled(Button)(({ theme }) => ({
   borderRadius: '10px',
@@ -98,6 +99,7 @@ export interface EditProfileProps {
 function EditProfile({ onClose, open }: EditProfileProps) {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const cAlert = useAlert();
   const userTheme = useSelector((state: any) => state.theme.themeType);
   const userInfo = useSelector((state: any) => state.account);
   const [stacks, setStacks] = React.useState(userInfo.preferredLanguage);
@@ -154,10 +156,8 @@ function EditProfile({ onClose, open }: EditProfileProps) {
       const resUserInfo = { ...userInfo };
       resUserInfo.profileImg = profileData;
       dispatch(setUserInfo(resUserInfo));
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
       setImgData(userInfo.profileImg);
-      alert('프로필 이미지는 10MB를 초과할 수 없습니다.');
     }
   };
 
@@ -166,6 +166,15 @@ function EditProfile({ onClose, open }: EditProfileProps) {
   const reader = new FileReader();
   const imageChange = (event: any) => {
     const files = event.target.files[0];
+    if (files.size > 10240000) {
+      cAlert.fire({
+        title: '이미지 변경 실패!',
+        text: '프로필 이미지는 10MB를 초과할 수 없습니다.',
+        icon: 'error',
+        showConfirmButton: true,
+      });
+      return;
+    }
     frm.append('file', event.target.files[0]);
     reader.readAsDataURL(files);
     reader.onloadend = () => {
@@ -210,6 +219,23 @@ function EditProfile({ onClose, open }: EditProfileProps) {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const deleteClick = () => {
+    cAlert
+      .fire({
+        title: '회원 탈퇴',
+        text: '탈퇴 시 회원정보는 모두 삭제되며, 삭제된 데이터는 복구되지 않습니다.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '탈퇴',
+        cancelButtonText: '취소',
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          deleteUserData();
+        }
+      });
   };
 
   const nicknameDuplicateCheck = async () => {
@@ -330,12 +356,6 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                   }}>
                   {nicknameOkMessage}
                 </FormHelperText>
-                {/* <Grid item xs={4} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-              <Clabel>닉네임</Clabel>
-            </Grid>
-            <Grid item xs={8}>
-              <TInput onChange={inputNickname} sx={{ minWidth: '100%' }} value={nickname}></TInput>
-            </Grid> */}
               </Grid>
               <Grid item xs={6}>
                 <Grid container>
@@ -394,7 +414,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                   }}>
                   <img src={Basic} alt="" />
                   <br />
-                  <label htmlFor="">기본</label>
+                  <Clabel>기본</Clabel>
                 </ThemeButton>
                 <ThemeButton
                   onClick={() => setThemeSelect('dark')}
@@ -403,7 +423,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                   }}>
                   <img src={Dark} alt="" />
                   <br />
-                  <label htmlFor="">다크</label>
+                  <Clabel>다크</Clabel>
                 </ThemeButton>
                 <ThemeButton
                   onClick={() => setThemeSelect('olivegreen')}
@@ -413,7 +433,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                   }}>
                   <img src={Olivegreen} alt="" />
                   <br />
-                  <label htmlFor="">올리브그린</label>
+                  <Clabel>올리브그린</Clabel>
                 </ThemeButton>
                 <ThemeButton
                   onClick={() => setThemeSelect('peachpink')}
@@ -422,13 +442,13 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                   }}>
                   <img src={Peachpink} alt="" />
                   <br />
-                  <label htmlFor="">피치핑크</label>
+                  <Clabel>피치핑크</Clabel>
                 </ThemeButton>
               </Grid>
             </div>
             <Grid container>
               <Grid item xs={8}>
-                <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
+                <WButton onClick={deleteClick} sx={{ height: 35, width: 50 }}>
                   탈퇴
                 </WButton>
               </Grid>
@@ -472,7 +492,9 @@ function EditProfile({ onClose, open }: EditProfileProps) {
       <MobileView>
         <Dialog onClose={cancleClose} open={open} fullScreen>
           <MContent>
-            <DialogTitle sx={{ textAlign: 'center' }}>프로필 수정</DialogTitle>
+            <DialogTitle sx={{ textAlign: 'center', color: theme.palette.txt }}>
+              프로필 수정
+            </DialogTitle>
             <Grid
               sx={{
                 position: 'relative',
@@ -628,7 +650,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                 display: 'flex',
                 justifyContent: 'space-around',
               }}>
-              <WButton onClick={deleteUserData} sx={{ height: 35, width: 50 }}>
+              <WButton onClick={deleteClick} sx={{ height: 35, width: 50 }}>
                 탈퇴
               </WButton>
               <CButton onClick={dialogOpen} sx={{ height: 35, width: 110 }}>
