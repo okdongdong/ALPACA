@@ -10,7 +10,13 @@ import lombok.*;
 @Builder
 public class ProblemRecommendRes {
 
-    private Problem problem;
+    private Long problemNumber;
+
+    private String title;
+
+    private Long level;
+
+    private Long classLevel;
 
     private Boolean isSolved;
 

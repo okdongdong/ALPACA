@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.response.ProblemRecommendRes;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.document.TodayProblem;
@@ -136,46 +137,47 @@ public class ProblemService {
         solvedProblemRepository.saveAll(newSolvedProblem);
     }
 
-    public List<Problem> recommendProblem(String username) {
+    public List<ProblemRecommendRes> recommendProblem(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
         Optional<TodayProblem> todayProblem = todayProblemRepository.findByUserId(user.getId());
         if (todayProblem.isPresent() && todayProblem.get().getDate().isEqual(LocalDate.now())) {
-            return todayProblem.get().getProblems();
+            return todayProblem.get().getProblemRecommendRes();
         } else {
-            List<Problem> problems;
+            List<ProblemRecommendRes> problemRecommendRes;
             if (user.getClassDecoration().equals("gold")) {
                 if (user.getClassLevel() < 10) {
-                    problems = getClassProblem(user.getClassLevel()+1, user);
+                    problemRecommendRes = getClassProblem(user.getClassLevel()+1, user);
                 } else {
-                    problems = getRandomProblem(user);
+                    problemRecommendRes = getRandomProblem(user);
                 }
             } else {
-                problems = getClassProblem(user.getClassLevel(), user);
+                problemRecommendRes = getClassProblem(user.getClassLevel(), user);
             }
             if (todayProblem.isEmpty()) {
                 todayProblemRepository.save(TodayProblem.builder()
                         .userId(user.getId())
-                        .problems(problems)
+                        .problemRecommendRes(problemRecommendRes)
                         .date(LocalDate.now()).build());
-                return problems;
+                return problemRecommendRes;
             }
             todayProblem.get().setDate(LocalDate.now());
-            todayProblem.get().setProblems(problems);
+            todayProblem.get().setProblemRecommendRes(problemRecommendRes);
             todayProblemRepository.save(todayProblem.get());
-            return problems;
+            return problemRecommendRes;
         }
     }
 
-    private List<Problem> get3FromCandidate(List<Problem> candidateProblems, Long userId) {
-        List<Problem> selectProblems = new ArrayList<>();
+    private List<ProblemRecommendRes> get3FromCandidate(List<Problem> candidateProblems, Long userId) {
+        List<ProblemRecommendRes> selectProblems = new ArrayList<>();
         HashSet<Integer> selectIndex = new HashSet<>();
         HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(userId);
         Random random = new Random();
+        int newCandidate;
 
         while (selectProblems.size() < 3) {
-            Integer newCandidate = random.nextInt(candidateProblems.size());
+            newCandidate = random.nextInt(candidateProblems.size());
             if (selectIndex.contains(newCandidate)) {
                 continue;
             }
@@ -183,22 +185,38 @@ public class ProblemService {
             if (solvedProblems.contains((long) newCandidate)) {
                 continue;
             }
-            selectProblems.add(candidateProblems.get(newCandidate));
+            selectProblems.add(
+                    ProblemRecommendRes.builder()
+                            .problemNumber(candidateProblems.get(newCandidate).getProblemNumber())
+                            .title(candidateProblems.get(newCandidate).getTitle())
+                            .level(candidateProblems.get(newCandidate).getLevel())
+                            .classLevel(candidateProblems.get(newCandidate).getClassLevel())
+                            .isSolved(false)
+                            .build()
+            );
         }
         return selectProblems;
     }
 
-    private List<Problem> getClassProblem(Long classLevel, User user) {
+    private List<ProblemRecommendRes> getClassProblem(Long classLevel, User user) {
         List<Problem> candidateProblems = problemRepository.findAllByClassLevel(classLevel);
         return get3FromCandidate(candidateProblems, user.getId());
     }
 
-    private List<Problem> getRandomProblem(User user) {
+    private List<ProblemRecommendRes> getRandomProblem(User user) {
         List<Problem> candidateProblems = problemRepository.findAllByLevelGreaterThanEqual(user.getLevel());
         if (candidateProblems.isEmpty()) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         } else if (candidateProblems.size() <= 3) {
-            return candidateProblems;
+            return candidateProblems.stream().map(
+                    candidateProblem -> ProblemRecommendRes.builder()
+                            .problemNumber(candidateProblem.getProblemNumber())
+                            .title(candidateProblem.getTitle())
+                            .level(candidateProblem.getLevel())
+                            .classLevel(candidateProblem.getClassLevel())
+                            .isSolved(false)
+                            .build()
+            ).collect(Collectors.toList());
         } else {
             return get3FromCandidate(candidateProblems, user.getId());
         }
