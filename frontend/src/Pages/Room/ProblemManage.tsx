@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { customAxios } from '../../Lib/customAxios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
+import alpaca from '../../Assets/Img/alpaca.png';
 
 interface QuickSearchToolbarProps {
   clearSearch: () => void;
@@ -187,7 +188,9 @@ function BasicMenu(props: any) {
                 alignItems: 'center',
               }}
               key={i}>
-              <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
+              <CProfile
+                nickname={member.nickname}
+                profileImg={member.profileImg ? member.profileImg : alpaca}></CProfile>
               <CBtn
                 content="코드"
                 onClick={() => {
@@ -257,10 +260,11 @@ const columnsData = [
               '& .MuiAvatar-root': { width: 32, height: 32 },
             }}>
             {params.value.map((member: any, i: number) => {
+              console.log(member);
               return (
                 <Avatar
                   alt={member.nickname}
-                  src={member.profileImg}
+                  src={member.profileImg ? member.profileImg : alpaca}
                   key={i}
                   sx={{
                     '& .MuiAvatar-root-MuiAvatarGroup-avatar': {
@@ -342,6 +346,7 @@ function ProblemManage() {
         method: 'get',
         url: `/study/${params.roomId}/problems`,
       });
+      console.log(res.data);
       const rowdata: GridRowsProp = res.data;
       setData(rowdata);
     } catch (e) {
@@ -458,7 +463,9 @@ function ProblemManage() {
                       paddingRight: 0,
                     }}
                     key={i}>
-                    <CProfile nickname={member.nickname} profileImg={member.profileImg}></CProfile>
+                    <CProfile
+                      nickname={member.nickname}
+                      profileImg={member.profileImg ? member.profileImg : alpaca}></CProfile>
                     <CBtn
                       content="코드"
                       onClick={() => {
