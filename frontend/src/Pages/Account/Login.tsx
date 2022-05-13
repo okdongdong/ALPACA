@@ -31,7 +31,8 @@ function Login(props: any) {
 
     try {
       const res = await customAxios({ method: 'post', url: `/auth/login`, data: userInfo });
-
+      console.log('loginRes: ', res);
+      
       // 토큰 저장
       localStorage.setItem('accessToken', res.data.grantType + res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.grantType + res.data.refreshToken);
@@ -69,7 +70,7 @@ function Login(props: any) {
         text: e.response.data.message || '잠시 후 다시 시도해주세요.',
         icon: 'error',
         showConfirmButton: false,
-        // timer: 1500,
+        timer: 1500,
       });
 
       console.log('loginError:', e.response);

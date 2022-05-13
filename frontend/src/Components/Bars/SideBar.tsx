@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Drawer, List, ListItemButton, ListItemIcon, Button } from '@mui/material';
+import { Drawer, List, ListItemButton, ListItemIcon, Button, Badge } from '@mui/material';
 import Logo from '../../Assets/Img/Logo.png';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { logout } from '../../Redux/accountReducer';
 import { settingOn } from '../../Redux/roomReducer';
 import styles from './SideBar.module.css';
 
 import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
+import useLogout from '../../Hooks/useLogout';
+import NotificationDialog from '../Dialogs/NotificationDialog';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function };
 };
+
+const CustomBadge = styled(Badge)(({ theme }) => ({
+  color: theme.palette.icon,
+  '& .MuiBadge-badge': {
+    background: theme.palette.component_accent,
+  },
+}));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -46,8 +54,11 @@ function SideBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const logout = useLogout();
 
   const userTheme = useSelector((state: any) => state.theme.themeType);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [newNotiCount, setNewNotiCount] = useState<number>(0);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {
@@ -60,9 +71,12 @@ function SideBar() {
     }
   };
   const clickLogout = () => {
-    dispatch(logout());
+    logout();
   };
-  const clickNotification = () => {};
+  const clickNotification = (event: React.MouseEvent<HTMLElement>) => {
+    setNewNotiCount(0);
+    setAnchorEl(event.currentTarget);
+  };
 
   const icon: iconObjType = {
     Home: { icon: <Home />, onClick: clickHome },
@@ -94,8 +108,8 @@ function SideBar() {
         <span>
           {iconList.map((text, index) => (
             <ListItemButton
-              onClick={() => {
-                icon[text].onClick();
+              onClick={(event) => {
+                icon[text].onClick(event);
               }}
               key={text}
               sx={{
@@ -113,51 +127,71 @@ function SideBar() {
                   background: theme.palette.main + '90',
                 },
               }}>
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  justifyContent: 'center',
-                  color: theme.palette.icon,
-                }}>
-                {icon[text].icon}
-              </ListItemIcon>
+              {text === 'Noti' ? (
+                <CustomBadge badgeContent={newNotiCount} max={99}>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: theme.palette.icon,
+                    }}>
+                    {icon[text].icon}
+                  </ListItemIcon>
+                </CustomBadge>
+              ) : (
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    justifyContent: 'center',
+                    color: theme.palette.icon,
+                  }}>
+                  {icon[text].icon}
+                </ListItemIcon>
+              )}
             </ListItemButton>
           ))}
         </span>
       </List>
       <span>
-        {pathname.indexOf('room') !== -1 && (
-          <ListItemButton
-            onClick={() => {}}
-            key="settings"
-            sx={{
-              minHeight: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              mx: 'auto',
-              mt: 'auto',
-              mb: '30px',
-              px: 2.5,
-              borderRadius: '100px',
-              background: theme.palette.main,
-              height: '50px',
-              width: '50px',
-              '&:hover': {
-                background: theme.palette.main + '90',
-              },
-            }}>
-            <ListItemIcon
+        {pathname.indexOf('room') !== -1 &&
+          pathname.indexOf('live') === -1 &&
+          pathname.indexOf('problem-manage') && (
+            <ListItemButton
+              onClick={() => {}}
+              key="settings"
               sx={{
-                minWidth: 0,
+                minHeight: 48,
                 justifyContent: 'center',
-                color: theme.palette.icon,
-              }}
-              onClick={() => dispatch(settingOn())}>
-              <Settings />
-            </ListItemIcon>
-          </ListItemButton>
-        )}
+                alignItems: 'center',
+                mx: 'auto',
+                mt: 'auto',
+                mb: '30px',
+                px: 2.5,
+                borderRadius: '100px',
+                background: theme.palette.main,
+                height: '50px',
+                width: '50px',
+                '&:hover': {
+                  background: theme.palette.main + '90',
+                },
+              }}>
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.icon,
+                }}
+                onClick={() => dispatch(settingOn())}>
+                <Settings />
+              </ListItemIcon>
+            </ListItemButton>
+          )}
       </span>
+      <NotificationDialog
+        setNewNotiCount={setNewNotiCount}
+        anchorEl={anchorEl}
+        setAnchorEl={setAnchorEl}
+      />
     </CustomDrawer>
   );
 }

@@ -9,6 +9,7 @@ import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
 import CProfile from '../../Commons/CProfile';
 import { useParams } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 
 interface ReceiveMessage {
   userId: number;
@@ -55,6 +56,7 @@ function RoomMainChat() {
 
   const [page, setPage] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGetPrevChat, setIsGetPrevChat] = useState<boolean>(false);
 
@@ -129,6 +131,7 @@ function RoomMainChat() {
       console.log('page: ', page, ' / offsetId: ', offsetId);
       console.log(res);
     } catch (e: any) {
+      setIsError(true);
       console.log(e);
     }
     setIsLoading(false);
@@ -186,9 +189,13 @@ function RoomMainChat() {
       <Stack
         spacing={1}
         className="scroll-box"
-        sx={{ height: '15vh', position: 'relative' }}
+        sx={{ height: isMobile ? '83vh' : '15vh', position: 'relative' }}
         ref={scrollRef}>
-        {isFinished ? (
+        {isError ? (
+          <Divider variant="middle">
+            <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
+          </Divider>
+        ) : isFinished ? (
           <Divider variant="middle">
             <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
           </Divider>
@@ -210,7 +217,7 @@ function RoomMainChat() {
               />
               :{chat.content}
             </div>
-            -{calDateTime(new Date(chat.timeStamp))}
+            {calDateTime(new Date(chat.timeStamp))}
           </MessageBox>
         ))}
       </Stack>

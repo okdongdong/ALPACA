@@ -16,16 +16,11 @@ export interface StudyCreateProps {
   callback: Function;
 }
 
-const NameLabel = styled('label')(({ theme }) => ({
+const NameLabel = styled('div')(({ theme }) => ({
   color: theme.palette.txt,
   textAlign: 'center',
-  width: '200px',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  position: 'absolute',
-  bottom: 10,
-  left: '50%',
-  transform: 'translate(-50%,0)',
 }));
 
 const MNameLabel = styled('label')(({ theme }) => ({
@@ -45,8 +40,8 @@ const CButton = styled(Button)(({ theme }) => ({
   margin: '10px',
   borderRadius: '10px',
   background: theme.palette.main,
-  height: '200px',
-  width: '200px',
+  height: '165px',
+  width: '165px',
   position: 'relative',
   '&:hover': {
     background: theme.palette.main + '90',
@@ -61,6 +56,7 @@ const MButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.main + '90',
   },
+  marginBottom: '3px',
 }));
 
 function MainRoomsDetail(props: StudyCreateProps) {
@@ -109,7 +105,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
           <PushPinIcon
             sx={{
               position: 'absolute',
-              top: 12,
+              top: 6,
               left: 12,
               color:
                 props.detail.pinnedTime === '0001-01-01T06:00:00' ||
@@ -118,8 +114,8 @@ function MainRoomsDetail(props: StudyCreateProps) {
                   : theme.palette.component_accent,
               margin: 0,
               padding: 0,
-              height: '35px',
-              width: '35px',
+              height: '25px',
+              width: '25px',
               zIndex: 1,
             }}
             onClick={pinStudy}></PushPinIcon>
@@ -133,8 +129,8 @@ function MainRoomsDetail(props: StudyCreateProps) {
                 );
               })}
             </Grid>
-            <NameLabel sx={{ px: '8px' }}>{props.detail.title}</NameLabel>
           </CButton>
+          <NameLabel sx={{ px: '8px' }}>{props.detail.title}</NameLabel>
         </div>
       </BrowserView>
       <MobileView>

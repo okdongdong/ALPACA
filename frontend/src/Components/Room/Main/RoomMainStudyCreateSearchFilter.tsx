@@ -3,7 +3,6 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Grid,
   Radio,
   RadioGroup,
   Stack,
@@ -11,7 +10,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Member, memberQueryCheck } from '../../../Redux/roomReducer';
+import { Member, memberQueryCheck, memberQueryUncheck } from '../../../Redux/roomReducer';
 import CBadge from '../../Commons/CBadge';
 import CProfile from '../../Commons/CProfile';
 
@@ -33,6 +32,7 @@ function RoomMainStudyCreateSearchFilter({
   const dispatch = useDispatch();
 
   const members = useSelector((state: any) => state.room.members);
+  const [selectMemberCnt, setSelectMemberCnt] = useState<number>(0);
 
   const onTierChageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTierValue(parseInt(event.target.value));
@@ -42,8 +42,21 @@ function RoomMainStudyCreateSearchFilter({
     event: React.ChangeEvent<HTMLInputElement>,
     idx: number,
   ) => {
+    if (event.target.checked) setSelectMemberCnt((prev) => prev + 1);
+    else setSelectMemberCnt((prev) => prev + 1);
+
     dispatch(memberQueryCheck({ idx, isChecked: event.target.checked }));
   };
+
+  const onAllMemberCheckedChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.checked) return;
+    dispatch(memberQueryUncheck());
+    setSelectMemberCnt(0);
+  };
+
+  useEffect(() => {
+    dispatch(memberQueryUncheck());
+  }, []);
 
   return (
     <>
@@ -101,7 +114,13 @@ function RoomMainStudyCreateSearchFilter({
         <RadioGroup aria-labelledby="problem-member">
           <FormControlLabel
             value={0}
-            control={<Checkbox checked={true} onChange={() => {}} name="전체" />}
+            control={
+              <Checkbox
+                checked={selectMemberCnt === 0}
+                onChange={onAllMemberCheckedChangeHandler}
+                name="전체"
+              />
+            }
             label={'전체'}
           />
           <div>
@@ -111,7 +130,7 @@ function RoomMainStudyCreateSearchFilter({
                 value={1}
                 control={
                   <Checkbox
-                    checked={member.isQuery}
+                    checked={member.isQuery || false}
                     onChange={(event) => onMemberCheckedChangeHandler(event, idx)}
                     name={member.nickname}
                   />

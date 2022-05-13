@@ -59,9 +59,7 @@ function Compile() {
         url: `/problem/${problemId}`,
       });
       setProblemInfo(res.data);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
 
   const handleChange = (value: any, event: any) => {
@@ -93,9 +91,7 @@ function Compile() {
       });
       dispatch(setLoading(false));
       return res.data;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
     dispatch(setLoading(false));
   };
 
@@ -112,9 +108,7 @@ function Compile() {
         url: '/code',
         data,
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
     dispatch(setLoading(false));
   };
 

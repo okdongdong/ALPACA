@@ -10,7 +10,7 @@ const MainIntroductionDiv = styled('div')({
 
 const MMainIntroductionDiv = styled('div')({
   display: 'flex',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   alignItems: 'center',
 });
 
@@ -23,7 +23,6 @@ function MainIntroduction() {
           <MainIntroductionContent />
         </MainIntroductionDiv>
       </BrowserView>
-      {/* mobile */}
       <MobileView>
         <MMainIntroductionDiv>
           <MainIntroductionProfile />

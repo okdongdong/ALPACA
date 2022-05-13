@@ -11,10 +11,11 @@ import {
   ListItemIcon,
   ListItemText,
   Drawer,
+  Box,
 } from '@mui/material';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../Redux/accountReducer';
+import { settingOn } from '../../Redux/roomReducer';
 import {
   Menu,
   Home,
@@ -25,6 +26,9 @@ import {
   Person,
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import useLogout from '../../Hooks/useLogout';
+import RoomMainIntroduction from '../Room/Main/RoomMainIntroduction';
+import MemberInvite from '../Dialogs/MemberInvite';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function; text: string };
@@ -47,17 +51,37 @@ const CustomDrawer = styled(Drawer)(({ theme }) => ({
   },
 }));
 
+const MBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexDirection: 'column',
+  width: '190px',
+  marginTop: '2vh',
+  marginLeft: '5px',
+  marginRight: '5px',
+}));
+const MBtn = styled(Button)(({ theme }) => ({
+  background: theme.palette.component,
+  color: theme.palette.txt,
+  marginTop: '24px',
+}));
+
 function NavBar() {
   const theme = useTheme();
   const params = useParams();
+  const { roomId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const myTheme = useSelector((state: any) => state.theme.themeType);
+  const logout = useLogout();
 
   const [leftOpen, setLeftOpen] = useState<boolean>(false);
   const [rightOpen, setRightOpen] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<'left' | 'right'>('right');
+
+  const [open, setOpen] = useState<boolean>(false);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {
@@ -68,12 +92,17 @@ function NavBar() {
     if (params.roomId !== undefined) {
       navigate(`room/${params.roomId}/problem-manage`);
     }
+    setRightOpen(false);
   };
+
   const clickLogout = () => {
-    dispatch(logout());
+    logout();
   };
   const clickNotification = () => {};
-  const clickSettings = () => {};
+
+  const clickSettings = () => {
+    dispatch(settingOn());
+  };
 
   const handleLeftOpen = () => {
     setLeftOpen(true);
@@ -105,7 +134,18 @@ function NavBar() {
       ? ['Logout', 'Noti']
       : ['Home', 'Problem', 'Logout', 'Noti', 'Settings'];
   const drawer = {
-    left: <>left</>,
+    left: (
+      <MBox>
+        <RoomMainIntroduction />
+        <MBtn
+          onClick={() => {
+            setOpen(true);
+          }}>
+          초대
+        </MBtn>
+        <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
+      </MBox>
+    ),
     right: (
       <List>
         {iconList.map((text, index) => (
@@ -147,6 +187,9 @@ function NavBar() {
               left: '50%',
               top: '50%',
               transform: 'translate(-50%, -50%)',
+            }}
+            onClick={() => {
+              navigate('/');
             }}>
             <img style={{ height: 30 }} src={Logo_White} alt="" />
           </Button>

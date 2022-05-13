@@ -63,7 +63,7 @@ function RoomMainStudyCreateSearch({
     let query = '';
     query += searchQuery;
     members.forEach((member: Member) => {
-      if (member?.isQuery) query += ` !@${member.nickname}`;
+      if (member?.isQuery) query += ` !@${member.bojId}`;
     });
     if (tierValue > 0) query += ` *${tierValue}..${tierValue + 4}`;
 

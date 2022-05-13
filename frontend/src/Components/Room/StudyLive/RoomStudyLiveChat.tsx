@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Avatar, Fab, Paper, Popover, Button, styled, useTheme } from '@mui/material';
+import { Avatar, Fab, Paper, Popover, Button, styled, useTheme, Badge } from '@mui/material';
 import { Chat, ArrowDownward } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import RoomStudyLiveChatInput from './RoomStudyLiveChatInput';
@@ -52,6 +52,13 @@ const ChatNotiDiv = styled('div')(({ theme }) => ({
   whiteSpace: 'nowrap',
 }));
 
+const CustomBadge = styled(Badge)(({ theme }) => ({
+  color: theme.palette.icon,
+  '& .MuiBadge-badge': {
+    background: theme.palette.component_accent,
+  },
+}));
+
 type ChatType = {
   nickname: string;
   profileImg: string;
@@ -65,6 +72,7 @@ function RoomStudyLiveChat() {
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [isBottom, setIsBottom] = useState<Boolean>(true);
   const [isNewMessage, setIsNewMessage] = useState<Boolean>(false);
+  const [newMessageCount, setNewMessageCount] = useState<number>(0);
 
   const chatDivRef = useRef<HTMLDivElement>(null);
   const session = useSelector((state: any) => state.openvidu.sessionForCamera);
@@ -73,6 +81,10 @@ function RoomStudyLiveChat() {
 
   useEffect(() => {
     session.on('signal:chat', (event: any) => {
+      console.log(event);
+      if (!!!openChat) {
+        setNewMessageCount((prev) => prev + 1);
+      }
       setChatList((prev) => {
         const { clientData } = JSON.parse(event.from.data);
         const { profileImg, message } = JSON.parse(event.data);
@@ -117,14 +129,17 @@ function RoomStudyLiveChat() {
       setAnchorEl(undefined);
     } else {
       setAnchorEl(event.currentTarget);
+      setNewMessageCount(0);
     }
   };
 
   return (
     <>
-      <NavBtn onClick={toggleChat}>
-        <Chat />
-      </NavBtn>
+      <CustomBadge badgeContent={newMessageCount} max={99} overlap="circular">
+        <NavBtn onClick={toggleChat}>
+          <Chat />
+        </NavBtn>
+      </CustomBadge>
       <Popover
         open={openChat}
         anchorEl={anchorEl}
@@ -140,7 +155,7 @@ function RoomStudyLiveChat() {
         <ChatPaper>
           <ChatContentPaper onScroll={handleScroll} ref={chatDivRef}>
             {chatList.map((chat, index) => {
-              return chat.nickname !== nickname ? (
+              return chat.nickname === nickname ? (
                 <RoomStudyLiveChatSend key={`${chat.nickname}-${index}`} chat={chat} />
               ) : (
                 <RoomStudyLiveChatReception
