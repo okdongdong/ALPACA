@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Popover, styled, Paper, Divider, useTheme, Button } from '@mui/material';
+import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@mui/material';
+import { Close } from '@mui/icons-material';
 import CBtn from '../Commons/CBtn';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
   setAnchorEl: Function;
+  setNewNotiCount: Function;
 };
 
 type NotificationDataType = {
@@ -22,6 +24,7 @@ type NotificationItemType = {
   title: string;
   deleteNoti: Function;
 };
+
 const CustomPopover = styled(Popover)(({ theme }) => ({
   maxHeight: '50vh',
   '.MuiPopover-paper': {
@@ -58,7 +61,16 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
   const theme = useTheme();
   return (
     <NotiPaper>
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ marginBottom: '10px', padding: '0 10px 10px 10px', minWidth: '15vw' }}>
+        <div style={{ display: 'flex', justifyContent: 'end' }}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              deleteNoti(index);
+            }}>
+            <Close />
+          </IconButton>
+        </div>
         {type === 'invite' ? (
           <>
             <div
@@ -102,39 +114,77 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
   );
 }
 
-function NotificationDialog({ anchorEl, setAnchorEl }: NotificationDialogType) {
-  const isLogin = useSelector((state: any) => state.account.isLogin);
+function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: NotificationDialogType) {
   const [notificationList, setNotificationList] = useState<NotificationDataType[]>([
-    { type: 'invite', title: '양명균과 아이들', studyId: 2 },
-    { type: 'invite', title: '양명균과 아이들', studyId: 2 },
-    { type: 'schedule', title: '양명균과 아이들', studyId: 2 },
-    { type: 'invite', title: '양명균과 아이들', studyId: 2 },
-    { type: 'invite', title: '양명균과 아이들', studyId: 2 },
-    { type: 'schedule', title: '양명균과 아이들', studyId: 2 },
+    {
+      type: 'invite',
+      title: '양명균',
+      studyId: 2,
+    },
   ]);
-  const [newNotiCount, setNewNotiCount] = useState<number>(0);
   const eventSource = useRef<EventSource | null>(null);
 
   useEffect(() => {
-    if (isLogin) {
-      console.log('open');
-      connectNotification();
-    } else {
+    connectNotification();
+    return () => {
       disconnectNotification();
+    };
+  }, []);
+
+  const addInitialNotification = (event: MessageEvent) => {
+    if (!!!anchorEl) {
+      setNewNotiCount((prev: number) => prev + 1);
     }
-
-    return disconnectNotification();
-  }, [isLogin]);
-
-  useEffect(() => {});
-  const addSchedule = (event: MessageEvent) => {
     setNotificationList((notifications) => {
-      return [event.data, ...notifications];
+      if (event.data?.startedAt) {
+        return [
+          {
+            type: 'schedule',
+            studyId: event.data.studyId,
+            title: event.data.title,
+          },
+        ];
+      }
+      return [
+        {
+          type: 'invite',
+          studyId: event.data.studyId,
+          title: event.data.title,
+        },
+        ...notifications,
+      ];
+    });
+  };
+
+  const addSchedule = (event: MessageEvent) => {
+    if (!!!anchorEl) {
+      setNewNotiCount((prev: number) => prev + 1);
+    }
+    setNotificationList((notifications) => {
+      return [
+        {
+          type: 'schedule',
+          studyId: event.data.studyId,
+          title: event.data.title,
+        },
+
+        ...notifications,
+      ];
     });
   };
   const addInviteStudy = (event: MessageEvent) => {
+    if (!!!anchorEl) {
+      setNewNotiCount((prev: number) => prev + 1);
+    }
     setNotificationList((notifications) => {
-      return [event.data, ...notifications];
+      return [
+        {
+          type: 'invite',
+          studyId: event.data.studyId,
+          title: event.data.title,
+        },
+        ...notifications,
+      ];
     });
   };
 
@@ -145,17 +195,22 @@ function NotificationDialog({ anchorEl, setAnchorEl }: NotificationDialogType) {
   };
 
   const connectNotification = () => {
+    console.log('eventsource connect');
     const subscribeUrl = `${process.env.REACT_APP_BASE_URL}/api/v1/sub/notice`;
     const jwtToken = localStorage.getItem('accessToken')?.split(' ')[1];
     eventSource.current = new EventSource(`${subscribeUrl}?token=${jwtToken}`);
 
+    eventSource.current.addEventListener('initialNotification', addInitialNotification);
     eventSource.current.addEventListener('addSchedule', addSchedule);
     eventSource.current.addEventListener('inviteStudy', addInviteStudy);
     eventSource.current.addEventListener('error', closeEventsource);
   };
 
   const disconnectNotification = () => {
+    console.log('eventsource disconnect');
+
     if (eventSource.current) {
+      eventSource.current.removeEventListener('initialNotification', addInitialNotification);
       eventSource.current.removeEventListener('addSchedule', addSchedule);
       eventSource.current.removeEventListener('inviteStudy', addInviteStudy);
       eventSource.current.removeEventListener('error', closeEventsource);
@@ -187,18 +242,22 @@ function NotificationDialog({ anchorEl, setAnchorEl }: NotificationDialogType) {
       open={Boolean(anchorEl)}
       anchorEl={anchorEl}
       onClose={handleClose}>
-      {notificationList.map((noti, index) => {
-        return (
-          <NotificationItem
-            key={`noti-${index}`}
-            title={noti.title}
-            type={noti.type}
-            studyId={noti.studyId}
-            index={index}
-            deleteNoti={deleteNotification}
-          />
-        );
-      })}
+      {notificationList.length > 0 ? (
+        notificationList.map((noti, index) => {
+          return (
+            <NotificationItem
+              key={`noti-${index}`}
+              title={noti.title}
+              type={noti.type}
+              studyId={noti.studyId}
+              index={index}
+              deleteNoti={deleteNotification}
+            />
+          );
+        })
+      ) : (
+        <div>모든 알림을 확인했습니다.</div>
+      )}
     </CustomPopover>
   );
 }
