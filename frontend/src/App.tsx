@@ -34,12 +34,12 @@ function App() {
   const [theme, setTheme] = useState<Theme>(basic);
 
   useEffect(() => {
-    console.log(themeType);
     setTheme(() => themeSelector(themeType));
   }, [themeType]);
   return (
     <>
       <ThemeProvider theme={theme}>
+        <div id="background"></div>
         <NowLoading />
         <GlobalStyles />
         <Router isLogin={isLogin} />

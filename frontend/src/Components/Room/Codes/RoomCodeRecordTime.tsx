@@ -41,7 +41,8 @@ function RoomCodeRecordTime({ codeList, setCode, setLanguage }: timesProps) {
                 setCode(code.submittedCode);
                 setLanguage(code.language === 'python3' ? 'python' : code.language);
               }}>
-              {code.submittedAt}
+              {`${code.submittedAt.substring(0, 4)}. ${code.submittedAt.substring(5, 7)}. 
+              ${code.submittedAt.substring(8, 10)}. ${code.submittedAt.substring(11, 16)}`}
             </Button>
           );
         })}

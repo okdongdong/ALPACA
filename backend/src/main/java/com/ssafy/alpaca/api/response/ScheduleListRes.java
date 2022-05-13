@@ -3,6 +3,7 @@ package com.ssafy.alpaca.api.response;
 import com.ssafy.alpaca.db.entity.Schedule;
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

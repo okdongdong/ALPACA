@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -29,7 +28,7 @@ public class UserController {
     @ApiImplicitParam( name = "id", value = "수정할 사용자 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponseBody> updateUser(
-            @PathVariable Long id, @RequestBody UserUpdateReq userUpdateReq) throws IllegalAccessException {
+            @PathVariable Long id, @RequestBody UserUpdateReq userUpdateReq) {
         userService.updateUser(id, userUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -40,7 +39,7 @@ public class UserController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 사용자 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> deleteUser(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
@@ -52,7 +51,7 @@ public class UserController {
     @ApiImplicitParam( name = "id", value = "변경할 사용자 id", dataTypeClass = Long.class )
     @PostMapping("/{id}/profile")
     public ResponseEntity<BaseResponseBody> updateProfileImg(
-            @PathVariable Long id, @RequestParam MultipartFile file) throws IOException, IllegalAccessException {
+            @PathVariable Long id, @RequestParam MultipartFile file) {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
 
@@ -73,7 +72,7 @@ public class UserController {
     @ApiImplicitParam( name = "id", value = "변경할 사용자 id", dataTypeClass = Long.class )
     @PutMapping("/changePassword/{id}")
     public ResponseEntity<BaseResponseBody> updatePassword(
-            @PathVariable Long id,@RequestBody PasswordUpdateReq passwordUpdateReq) throws IllegalAccessException {
+            @PathVariable Long id,@RequestBody PasswordUpdateReq passwordUpdateReq) {
         userService.updatePassword(id, passwordUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }

@@ -4,16 +4,17 @@ import com.ssafy.alpaca.api.request.ScheduleUpdateReq;
 import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
+import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Month;
 import java.util.List;
 
 @RestController
@@ -23,15 +24,18 @@ public class ScheduleController {
 
     private final UserService userService;
     private final ScheduleService scheduleService;
+    private final NotificationService notificationService;
 
     @ApiOperation(
             value = "스터디 일정 추가",
             notes = "스터디룸에서 일정을 추가한다."
     )
     @PostMapping()
-    public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq)  {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleService.createSchedule(username, scheduleReq)));
+        Long scheduleId = scheduleService.createSchedule(username, scheduleReq);
+        notificationService.notifyAddScheduleEvent(scheduleId);
+        return ResponseEntity.ok(BaseResponseBody.of(200, scheduleId));
     }
 
     @ApiOperation(
@@ -39,7 +43,7 @@ public class ScheduleController {
             notes = "오늘 예정된 스터디의 문제들을 조회한다."
     )
     @GetMapping("/{id}/today")
-    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(scheduleService.getTodaySchedule(username, id));
     }
@@ -50,7 +54,7 @@ public class ScheduleController {
     )
     @ApiImplicitParam( name = "id", value = "수정할 일정의 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) {
         String username = userService.getCurrentUsername();
         scheduleService.updateSchedule(username, id, scheduleUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
@@ -68,14 +72,19 @@ public class ScheduleController {
 
     @ApiOperation(
             value = "스터디 일정 리스트 조회",
-            notes = "특정 기간 (year, month)의 스터디 일정을 조회한다."
+            notes = "특정 기간 (year, month, day)의 스터디 일정을 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
-    @GetMapping("/{id}/monthly")
-    public ResponseEntity<List<ScheduleListRes>> getScheduleMonthList(
-            @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month) throws IllegalAccessException {
+    @ApiImplicitParams({
+            @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "year", value = "시작하는 해", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "month", value = "시작하는 달", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "day", value = "시작하는 날짜", dataTypeClass = Long.class ),
+    })
+    @GetMapping("/{id}/span")
+    public ResponseEntity<List<ScheduleListRes>> getScheduleList(
+            @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(scheduleService.getScheduleMonthList(username, id, year, month));
+        return ResponseEntity.ok(scheduleService.getScheduleList(username, id, year, month, day));
     }
 
     @ApiOperation(
@@ -84,7 +93,7 @@ public class ScheduleController {
     )
     @ApiImplicitParam( name = "id", value = "삭제할 일정의 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id)  {
         String username = userService.getCurrentUsername();
         scheduleService.deleteSchedule(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));

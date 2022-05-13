@@ -1,32 +1,24 @@
-import { Collapse, Stack, styled, Switch, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import { Stack, useTheme } from '@mui/material';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
-import { setLoading } from '../../../Redux/commonReducer';
 import { deleteStudyUserInfo } from '../../../Redux/accountReducer';
+import { setLoading } from '../../../Redux/commonReducer';
+import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
-import RoomMainComponentContainer from './RoomMainComponentContainer';
-
-const CustomBox = styled(Stack)(({ theme }) => ({
-  backgroundColor: theme.palette.component,
-  color: theme.palette.txt,
-}));
 
 function RoomMainSetting() {
   const { roomId } = useParams();
   const theme = useTheme();
+  const cAlert = useAlert();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cAlert = useAlert();
-  const isSetting = useSelector((state: any) => state.room.isSetting);
 
-  const [alarmOn, setAlarmOn] = useState<boolean>(true);
-
-  const onAlarmClickHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAlarmOn(event.target.checked);
-  };
+  const userId = useSelector((state: any) => state.account.userId);
+  const members = useSelector((state: any) => state.room.members);
 
   const deleteStudy = async () => {
     dispatch(setLoading(true));
@@ -104,39 +96,29 @@ function RoomMainSetting() {
       else cAlert.fire('탈퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
-
   return (
-    <Collapse in={isSetting} sx={{ position: 'fixed', left: 150, bottom: 50 }}>
-      <div style={{ width: 200, height: 200 }}>
-        <RoomMainComponentContainer>
-          <CustomBox spacing={2} sx={{ padding: 1 }}>
-            <div>
-              <CBtn
-                onClick={() => {
-                  setAlarmOn((prev) => !prev);
-                }}>
-                알림설정
-              </CBtn>
-              <Switch checked={alarmOn} onChange={onAlarmClickHandler} />
-            </div>
-            <CBtn
-              backgroundColor={theme.palette.warn}
-              onClick={() => {
-                deleteHandler();
-              }}>
-              스터디 삭제
-            </CBtn>
-            <CBtn
-              backgroundColor={theme.palette.warn}
-              onClick={() => {
-                leaveHandler();
-              }}>
-              스터디 탈퇴
-            </CBtn>
-          </CustomBox>
-        </RoomMainComponentContainer>
-      </div>
-    </Collapse>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <h1>스터디 설정</h1>
+      {members.some((member: Member) => member.userId === userId && member.roomMaker) ? (
+        <CBtn
+          color="#fff"
+          backgroundColor={theme.palette.warn}
+          onClick={() => {
+            deleteHandler();
+          }}>
+          스터디 삭제
+        </CBtn>
+      ) : (
+        <CBtn
+          color="#fff"
+          backgroundColor={theme.palette.warn}
+          onClick={() => {
+            leaveHandler();
+          }}>
+          스터디 탈퇴
+        </CBtn>
+      )}
+    </div>
   );
 }
 

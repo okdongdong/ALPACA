@@ -2,10 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export interface Member {
   userId: number;
-  isRoomMaker: boolean;
+  roomMaker: boolean;
   nickname: string;
   profileImg: string;
-  isQuery?: boolean; // 문제검색시 사용
+  bojId: string;
+  isQuery?: boolean; // 문제검색 필터링시 사용
 }
 
 export interface MemberDict {
@@ -101,11 +102,9 @@ const roomSlice = createSlice({
       schedules: action.payload.scheduleListRes,
     }),
     resetRoomInfo: (state) => ({ ...initialState }),
-    setTitle: (state, action) => {
-      state.title = action.payload;
-    },
-    setInfo: (state, action) => {
-      state.info = action.payload;
+    setRoomIntroduction: (state, action) => {
+      state.title = action.payload.title;
+      state.info = action.payload.info;
     },
     setMembers: (state, action) => {
       state.members = action.payload;
@@ -121,6 +120,7 @@ const roomSlice = createSlice({
     },
     setSelectedDayIdx: (state, action) => {
       state.selectedDayIdx = action.payload;
+      state.selectedDay = state.dateRange[action.payload]?.day;
     },
     setIsStudyExist: (state, action) => {
       state.isStudyExist = action.payload;
@@ -155,6 +155,9 @@ const roomSlice = createSlice({
     memberQueryCheck: (state, action) => {
       state.members[action.payload.idx].isQuery = action.payload.isChecked;
     },
+    memberQueryUncheck: (state) => {
+      state.members.forEach((member) => (member.isQuery = false));
+    },
     resetProblemList: (state) => {
       state.problemListRes = [];
     },
@@ -164,14 +167,33 @@ const roomSlice = createSlice({
       state.isStudyExist = Boolean(state.dateRange[action.payload]?.schedule);
       state.scheduleId = state.dateRange[action.payload]?.schedule?.id;
     },
+    setDailySchedule: (state) => {
+      state.dateRange = calDailySchedule(state.dateRange, state.schedules);
+    },
   },
 });
+
+const calDailySchedule = (dateRange: DailySchedule[], schedules: Schedule[]) => {
+  let scheduleIdx = 0;
+  for (let i = 0; i < dateRange.length; i++) {
+    if (scheduleIdx < schedules.length) {
+      let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
+      if (
+        dateRange[i].day.getFullYear() === scheduleDay.getFullYear() &&
+        dateRange[i].day.getMonth() === scheduleDay.getMonth() &&
+        dateRange[i].day.getDate() === scheduleDay.getDate()
+      ) {
+        dateRange[i].schedule = schedules[scheduleIdx++];
+      }
+    }
+  }
+  return dateRange;
+};
 
 export const {
   setRoomInfo,
   resetRoomInfo,
-  setTitle,
-  setInfo,
+  setRoomIntroduction,
   setMembers,
   setMemberDict,
   setSchedules,
@@ -188,8 +210,10 @@ export const {
   addSchedule,
   settingOn,
   memberQueryCheck,
+  memberQueryUncheck,
   resetProblemList,
   changeSelectedDay,
+  setDailySchedule,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

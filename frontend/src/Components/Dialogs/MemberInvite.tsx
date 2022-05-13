@@ -1,4 +1,15 @@
-import { Avatar, Chip, Collapse, Dialog, Divider, Input, Stack, styled } from '@mui/material';
+import {
+  Avatar,
+  Chip,
+  Collapse,
+  Dialog,
+  DialogTitle,
+  Divider,
+  Input,
+  Stack,
+  styled,
+  useTheme,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
@@ -7,8 +18,8 @@ import CBtn from '../Commons/CBtn';
 import CProfile from '../Commons/CProfile';
 import CSearchBar from '../Commons/CSearchBar';
 import alpaca from '../../Assets/Img/alpaca.png';
-import CInput from '../Commons/CInput';
 import useAlert from '../../Hooks/useAlert';
+import { BrowserView, isMobile, MobileView } from 'react-device-detect';
 
 interface MemberInviteProps {
   roomId: string | undefined;
@@ -26,7 +37,7 @@ const CustomBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.bg,
   color: theme.palette.txt,
   padding: theme.spacing(3),
-  minWidth: 450,
+  minWidth: isMobile ? 300 : 450,
 }));
 
 const SearchResultBox = styled(Stack)(({ theme }) => ({
@@ -51,6 +62,7 @@ const CustomInput = styled(Input)(({ theme }) => ({
 function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   const dispatch = useDispatch();
   const cAlert = useAlert();
+  const theme = useTheme();
   const [nickname, setNickname] = useState<string>('');
   const [userList, setUserList] = useState<UserInfo[]>([]);
   const [inviteCode, setInviteCode] = useState('ㅁㄴㅇㄹㄴㄴㅇㄹ');
@@ -167,8 +179,16 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      <CustomBox spacing={2}>
+      <DialogTitle
+        sx={{
+          padding: 2,
+          fontSize: isMobile ? 12 : '',
+          backgroundColor: theme.palette.accent,
+          color: theme.palette.icon,
+        }}>
         <h1>스터디원 초대하기</h1>
+      </DialogTitle>
+      <CustomBox spacing={2}>
         <CSearchBar onChange={setNickname} />
         <Collapse in={!!userList}>
           <SearchResultBox>
@@ -202,13 +222,31 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
           </Divider>
         </div>
 
-        <h3>초대링크</h3>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <CustomInput value={inviteCode} readOnly />
-          <CBtn width="100px" onClick={copyInviteCode}>
-            복사
-          </CBtn>
-        </div>
+        <BrowserView>
+          <h3>초대링크</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <CustomInput value={`${process.env.REACT_APP_CLIENT_URL}/${inviteCode}`} readOnly />
+            <CBtn width="100px" onClick={copyInviteCode}>
+              복사
+            </CBtn>
+          </div>
+        </BrowserView>
+
+        <MobileView>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'end',
+              paddingBottom: 16,
+            }}>
+            <h3>초대링크</h3>
+            <CBtn width="100px" onClick={copyInviteCode}>
+              복사
+            </CBtn>
+          </div>
+          <CustomInput value={`${process.env.REACT_APP_CLIENT_URL}/${inviteCode}`} readOnly />
+        </MobileView>
       </CustomBox>
     </Dialog>
   );

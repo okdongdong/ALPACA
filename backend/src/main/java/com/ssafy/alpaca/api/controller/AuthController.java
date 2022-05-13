@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.LoginReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.TokenRes;
+import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.common.util.JwtTokenUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final ProblemService problemService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @ApiOperation(
@@ -60,15 +62,16 @@ public class AuthController {
             notes = "사용자 입력 정보에 따른 회원가입 요청"
     )
     @PostMapping("/signup")
-    public ResponseEntity<BaseResponseBody> signup(@RequestBody SignupReq signupReq) throws IllegalAccessException {
+    public ResponseEntity<BaseResponseBody> signup(@RequestBody SignupReq signupReq) {
         userService.signup(signupReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) throws IllegalAccessException {
+    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         TokenRes tokenRes = userService.login(loginReq);
         LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
+        problemService.refreshSolvedAc(loginReq.getUsername());
         return ResponseEntity.ok(LoginRes.of(tokenRes, loginRes));
     }
 
@@ -80,7 +83,7 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<TokenRes> reissue(@RequestHeader("RefreshToken") String refreshToken) throws IllegalAccessException {
+    public ResponseEntity<TokenRes> reissue(@RequestHeader("RefreshToken") String refreshToken) {
         return ResponseEntity.ok(userService.reissue(refreshToken));
     }
 

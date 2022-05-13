@@ -1,13 +1,9 @@
 package com.ssafy.alpaca.api.response;
 
-import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
-import com.ssafy.alpaca.db.entity.Study;
-import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -28,18 +24,19 @@ public class StudyRes {
 
     private String offsetId;
 
+    @Getter
     @Builder
     public static class Member {
 
-        public Long userId;
+        private Long userId;
 
-        public String nickname;
+        private String nickname;
 
-        public String bojId;
+        private String bojId;
 
-        public boolean isRoomMaker;
+        private boolean isRoomMaker;
 
-        public String profileImg;
+        private String profileImg;
 
     }
 

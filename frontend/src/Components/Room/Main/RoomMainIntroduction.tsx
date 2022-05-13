@@ -1,8 +1,6 @@
 import { Divider, Stack, styled } from '@mui/material';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
-import RoomMainIntroductionMemberEdit from './RoomMainIntroductionMemberEdit';
 import RoomMainIntroductionMemberList from './RoomMainIntroductionMemberList';
 
 const IntroductionContainer = styled(Stack)(({ theme }) => ({
@@ -13,7 +11,6 @@ function RoomMainIntroduction() {
   const info = useSelector((state: any) => state.room.info);
 
   // 스터디원 관리
-  const [isEdit, setIsEdit] = useState<boolean>(false);
 
   return (
     <IntroductionContainer spacing={3}>
@@ -22,12 +19,7 @@ function RoomMainIntroduction() {
         <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
         <p>{info}</p>
       </RoomMainComponentContainer>
-
-      {isEdit ? (
-        <RoomMainIntroductionMemberEdit setIsEdit={setIsEdit} />
-      ) : (
-        <RoomMainIntroductionMemberList setIsEdit={setIsEdit} />
-      )}
+      <RoomMainIntroductionMemberList />
     </IntroductionContainer>
   );
 }

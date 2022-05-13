@@ -22,14 +22,15 @@ function RoomStudyLiveMainItem({ user }: userPropsType) {
   const divRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number>();
   const [radioValue, setRadioValue] = useState<string>('camera');
-  useEffect(() => {
+
+  const setVideoElement = () => {
     if (user.getStreamManager()) {
       user.getStreamManager().addVideoElement(videoRef.current);
     }
     if (user.getScreenStreamManager()) {
       user.getScreenStreamManager().addVideoElement(screenRef.current);
     }
-  }, []);
+  };
 
   useEffect(() => {
     if (!divRef.current) return;
@@ -43,6 +44,10 @@ function RoomStudyLiveMainItem({ user }: userPropsType) {
       setRadioValue('camera');
     }
   }, [user.screenStreamManager]);
+
+  useEffect(() => {
+    setVideoElement();
+  }, [user]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRadioValue((event.target as HTMLInputElement).value);

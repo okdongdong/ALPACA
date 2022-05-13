@@ -1,12 +1,21 @@
 import { Session, OpenVidu } from 'openvidu-browser';
 import { createSlice } from '@reduxjs/toolkit';
 import UserModel from '../Components/Room/StudyLive/user-model';
+
+export interface Constraints {
+  audioSource: undefined | string;
+  videoSource: undefined | string;
+  publishAudio: boolean;
+  publishVideo: boolean;
+}
+
 interface OpenviduState {
   OVForCamera: OpenVidu | undefined;
   OVForScreen: OpenVidu | undefined;
   sessionForCamera: Session | undefined;
   sessionForScreen: Session | undefined;
   mainUser: UserModel | undefined;
+  constraints: Constraints;
 }
 
 const initialState: OpenviduState = {
@@ -15,6 +24,12 @@ const initialState: OpenviduState = {
   sessionForCamera: undefined,
   sessionForScreen: undefined,
   mainUser: undefined,
+  constraints: {
+    audioSource: undefined,
+    videoSource: undefined,
+    publishAudio: true,
+    publishVideo: true,
+  },
 };
 
 const openviduSlice = createSlice({
@@ -36,6 +51,9 @@ const openviduSlice = createSlice({
     setMainUser: (state, action) => {
       state.mainUser = action.payload;
     },
+    setConstraints: (state, action) => {
+      state.constraints = action.payload;
+    },
   },
 });
 
@@ -45,6 +63,7 @@ export const {
   setSessionForCamera,
   setSessionForScreen,
   setMainUser,
+  setConstraints,
 } = openviduSlice.actions;
 
 export default openviduSlice.reducer;

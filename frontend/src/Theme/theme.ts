@@ -3,17 +3,17 @@ import { createTheme } from '@mui/material';
 const palette = {
   /* backgruond*/
   basic_backgruond: '#FFFFFF',
-  dark_backgruond: '#000000',
+  dark_backgruond: '#2D2D2D',
   olivegreen_backgruond: '#FFFAED',
   peachpink_backgruond: '#FFF5F4',
   /* main*/
   basic_main: '#97B2E1',
-  dark_main: '#2D2D2D',
+  dark_main: '#3A4358',
   olivegreen_main: '#AAC1AA',
   peachpink_main: '#FFC2C0',
   /* txt*/
   basic_text: '#14181F',
-  dark_text: '#FFFFFF',
+  dark_text: '#E0E0E0',
   olivegreen_text: '#14181F',
   peachpink_text: '#000000',
   /* icon*/
@@ -23,7 +23,7 @@ const palette = {
   peachpink_icon: '#FFFFFF',
   /* accent*/
   basic_accent: '#3C5FAE',
-  dark_accent: '#5A6B96',
+  dark_accent: '#536A86',
   olivegreen_accent: '#1F7C39',
   peachpink_accent: '#CC9B99',
   /* component*/
@@ -43,6 +43,7 @@ const palette = {
 declare module '@mui/material/styles' {
   interface Palette {
     bg: string;
+    bg2: string;
     main: string;
     txt: string;
     icon: string;
@@ -54,6 +55,7 @@ declare module '@mui/material/styles' {
 
   interface PaletteOptions {
     bg: string;
+    bg2: string;
     main: string;
     txt: string;
     icon: string;
@@ -67,6 +69,7 @@ declare module '@mui/material/styles' {
 export const basic = createTheme({
   palette: {
     bg: palette.basic_backgruond,
+    bg2: '#F7F6CB',
     main: palette.basic_main,
     txt: palette.basic_text,
     icon: palette.basic_icon,
@@ -80,6 +83,7 @@ export const basic = createTheme({
 export const dark = createTheme({
   palette: {
     bg: palette.dark_backgruond,
+    bg2: '#759485',
     main: palette.dark_main,
     txt: palette.dark_text,
     icon: palette.dark_icon,
@@ -93,6 +97,7 @@ export const dark = createTheme({
 export const olivegreen = createTheme({
   palette: {
     bg: palette.olivegreen_backgruond,
+    bg2: '#F7F6CB',
     main: palette.olivegreen_main,
     txt: palette.olivegreen_text,
     icon: palette.olivegreen_icon,
@@ -106,6 +111,7 @@ export const olivegreen = createTheme({
 export const peachpink = createTheme({
   palette: {
     bg: palette.peachpink_backgruond,
+    bg2: '#F7F6CB',
     main: palette.peachpink_main,
     txt: palette.peachpink_text,
     icon: palette.peachpink_icon,

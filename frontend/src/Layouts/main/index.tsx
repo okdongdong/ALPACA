@@ -7,7 +7,7 @@ import { BrowserView, MobileView } from 'react-device-detect';
 
 const MainLayout = () => {
   const theme = useTheme();
-  const APP_BAR_DESKTOP = 30;
+  const APP_BAR_DESKTOP = 15;
   const APP_BAR_MOBILE = 56;
   const { pathname } = useLocation();
   const RootStyle = styled('div')({

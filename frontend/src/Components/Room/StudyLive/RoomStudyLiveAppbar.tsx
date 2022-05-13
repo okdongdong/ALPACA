@@ -17,7 +17,6 @@ type problemInfoType = {
 const PopoverPaper = styled('div')(({ theme }) => ({
   background: theme.palette.component,
   padding: '10px',
-  borderRadius: '10px',
 }));
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -48,31 +47,29 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
   };
 
   const getTodayProblem = async () => {
-    // try {
-    //   const res = await customAxios({
-    //     method: 'get',
-    //     url: `schedule/${roomId}/today`,
-    //   });
-    //   setProblemList(
-    //     res.data.problemListRes.map((problem: any) => {
-    //       return {
-    //         level: problem.level,
-    //         problemNumber: problem.problemNumber,
-    //         title: problem.title,
-    //       };
-    //     }),
-    //   );
-    // } catch (e) {
-    //   console.log(e);
-    // }
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `schedule/${roomId}/today`,
+      });
+      setProblemList(
+        res.data.problemListRes.map((problem: any) => {
+          return {
+            level: problem.level,
+            problemNumber: problem.problemNumber,
+            title: problem.title,
+          };
+        }),
+      );
+    } catch (e) {}
 
-    setProblemList([
-      { level: 10, problemNumber: 1000, title: 'A+B' },
-      { level: 10, problemNumber: 1000, title: 'A+B' },
-      { level: 10, problemNumber: 1000, title: 'A+B' },
-      { level: 10, problemNumber: 1000, title: 'A+B' },
-      { level: 10, problemNumber: 1000, title: 'A+B' },
-    ]);
+    // setProblemList([
+    //   { level: 10, problemNumber: 1000, title: 'A+B' },
+    //   { level: 10, problemNumber: 1000, title: 'A+B' },
+    //   { level: 10, problemNumber: 1000, title: 'A+B' },
+    //   { level: 10, problemNumber: 1000, title: 'A+B' },
+    //   { level: 10, problemNumber: 1000, title: 'A+B' },
+    // ]);
   };
 
   return (
@@ -120,7 +117,16 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
               );
             })
           ) : (
-            <div style={{ height: '10vh', width: '10vw' }}>오늘의 문제가 없습니다.</div>
+            <div
+              style={{
+                height: '10vh',
+                width: '10vw',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              오늘의 문제가 없습니다.
+            </div>
           )}
         </PopoverPaper>
       </Popover>
