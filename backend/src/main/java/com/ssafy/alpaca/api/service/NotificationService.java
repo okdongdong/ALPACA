@@ -14,6 +14,7 @@ import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class NotificationService {
         try {
             sseEmitter.send(SseEmitter.event().name("connect"));
         } catch (IOException e){
-            e.printStackTrace();
+            throw new ServerErrorException(ExceptionUtil.SERVER_ERROR_WAIT,e);
         }
         sseEmitters.put(userId, sseEmitter);
         notifyOld(userId);

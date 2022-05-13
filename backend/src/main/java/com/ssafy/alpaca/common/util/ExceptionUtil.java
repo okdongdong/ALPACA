@@ -37,5 +37,6 @@ public class ExceptionUtil {
 
     /* 500 */
     public static final String UTILITY_CLASS = "유틸리티 클래스입니다.";
+    public static final String SERVER_ERROR_WAIT = "잠시 후 다시 시도해주세요.";
 
 }
