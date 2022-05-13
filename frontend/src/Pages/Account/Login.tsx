@@ -9,7 +9,7 @@ import { setUserInfo } from '../../Redux/accountReducer';
 import { setLoading } from '../../Redux/commonReducer';
 import { setTheme } from '../../Redux/themeReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { isMobile } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
 
 function Login(props: any) {
@@ -32,7 +32,7 @@ function Login(props: any) {
     try {
       const res = await customAxios({ method: 'post', url: `/auth/login`, data: userInfo });
       console.log('loginRes: ', res);
-      
+
       // 토큰 저장
       localStorage.setItem('accessToken', res.data.grantType + res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.grantType + res.data.refreshToken);
@@ -46,7 +46,7 @@ function Login(props: any) {
         profileImg: !!res.data.profileImg ? res.data.profileImg : alpaca,
         bojId: res.data.bojId,
         preferredLanguage: res.data.preferredLanguage,
-        studies: res.data.studies,
+        studies: isMobile ? res.data.studies : res.data.studies.slice(0, 3),
         isLogin: true,
         studyCount: res.data.studyCount,
       };
@@ -87,45 +87,26 @@ function Login(props: any) {
   };
 
   return (
-    <>
-      <BrowserView>
-        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
-          <CInput onChange={setUsername} label="ID" />
-          <CInput type="password" onChange={setPassword} label="PASSWORD" />
-          <div style={{ width: '100%', justifyContent: 'space-around', display: 'flex' }}>
-            <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
-            <CBtn
-              width="30%"
-              content="로그인"
-              onClick={login}
-              disabled={username === '' || password === ''}
-            />
-          </div>
-        </CContainerWithLogo>
-      </BrowserView>
-      <MobileView>
-        <CContainerWithLogo onKeyPress={onkeyPressHandler}>
-          <CInput onChange={setUsername} label="ID" />
-          <div style={{ height: '6vh' }}></div>
-          <CInput type="password" onChange={setPassword} label="PASSWORD" />
-          <div
-            style={{
-              width: '100%',
-              justifyContent: 'space-between',
-              display: 'flex',
-              marginTop: '10vh',
-            }}>
-            <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
-            <CBtn
-              width="30%"
-              content="로그인"
-              onClick={login}
-              disabled={username === '' || password === ''}
-            />
-          </div>
-        </CContainerWithLogo>
-      </MobileView>
-    </>
+    <CContainerWithLogo onKeyPress={onkeyPressHandler}>
+      <CInput onChange={setUsername} label="ID" />
+      <div style={{ height: isMobile ? '6vh' : 0 }}></div>
+      <CInput type="password" onChange={setPassword} label="PASSWORD" />
+      <div
+        style={{
+          width: '100%',
+          justifyContent: isMobile ? 'space-between' : 'space-around',
+          display: 'flex',
+          marginTop: isMobile ? '10vh' : 0,
+        }}>
+        <CBtn width="30%" content="회원가입" onClick={() => navigate('/signup')} />
+        <CBtn
+          width="30%"
+          content="로그인"
+          onClick={login}
+          disabled={username === '' || password === ''}
+        />
+      </div>
+    </CContainerWithLogo>
   );
 }
 
