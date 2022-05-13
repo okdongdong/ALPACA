@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Drawer, List, ListItemButton, ListItemIcon, Button } from '@mui/material';
+import { Drawer, List, ListItemButton, ListItemIcon, Button, Badge } from '@mui/material';
 import Logo from '../../Assets/Img/Logo.png';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,10 +10,18 @@ import styles from './SideBar.module.css';
 
 import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
 import useLogout from '../../Hooks/useLogout';
+import NotificationDialog from '../Dialogs/NotificationDialog';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function };
 };
+
+const CustomBadge = styled(Badge)(({ theme }) => ({
+  color: theme.palette.icon,
+  '& .MuiBadge-badge': {
+    background: theme.palette.component_accent,
+  },
+}));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -49,6 +57,8 @@ function SideBar() {
   const logout = useLogout();
 
   const userTheme = useSelector((state: any) => state.theme.themeType);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [newNotiCount, setNewNotiCount] = useState<number>(0);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {
@@ -63,7 +73,10 @@ function SideBar() {
   const clickLogout = () => {
     logout();
   };
-  const clickNotification = () => {};
+  const clickNotification = (event: React.MouseEvent<HTMLElement>) => {
+    setNewNotiCount(0);
+    setAnchorEl(event.currentTarget);
+  };
 
   const icon: iconObjType = {
     Home: { icon: <Home />, onClick: clickHome },
@@ -95,8 +108,8 @@ function SideBar() {
         <span>
           {iconList.map((text, index) => (
             <ListItemButton
-              onClick={() => {
-                icon[text].onClick();
+              onClick={(event) => {
+                icon[text].onClick(event);
               }}
               key={text}
               sx={{
@@ -114,14 +127,27 @@ function SideBar() {
                   background: theme.palette.main + '90',
                 },
               }}>
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  justifyContent: 'center',
-                  color: theme.palette.icon,
-                }}>
-                {icon[text].icon}
-              </ListItemIcon>
+              {text === 'Noti' ? (
+                <CustomBadge badgeContent={newNotiCount} max={99}>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: theme.palette.icon,
+                    }}>
+                    {icon[text].icon}
+                  </ListItemIcon>
+                </CustomBadge>
+              ) : (
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    justifyContent: 'center',
+                    color: theme.palette.icon,
+                  }}>
+                  {icon[text].icon}
+                </ListItemIcon>
+              )}
             </ListItemButton>
           ))}
         </span>
@@ -159,6 +185,11 @@ function SideBar() {
           </ListItemButton>
         )}
       </span>
+      <NotificationDialog
+        setNewNotiCount={setNewNotiCount}
+        anchorEl={anchorEl}
+        setAnchorEl={setAnchorEl}
+      />
     </CustomDrawer>
   );
 }

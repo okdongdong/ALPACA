@@ -56,7 +56,14 @@ function RoomStudyLiveCamListItem({ user }: userPropsType) {
             ref={videoRef}
             // muted={this.props.mutedSound}
           />
-          <div style={{ position: 'absolute', bottom: 0, color: theme.palette.icon }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              background: theme.palette.main + '80',
+              color: theme.palette.icon,
+              borderRadius: '5px',
+            }}>
             <span>
               {user !== undefined && user.screenShareActive ? <ScreenShare /> : undefined}
             </span>

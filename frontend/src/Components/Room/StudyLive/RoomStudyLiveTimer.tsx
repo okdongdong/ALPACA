@@ -111,7 +111,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 99) {
       setHour(99);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setHour(0);
     } else {
       setHour(value);
@@ -121,7 +121,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 59) {
       setMinute(59);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setMinute(0);
     } else {
       setMinute(value);
@@ -131,7 +131,7 @@ function RoomStudyLiveTimer() {
     const value = parseInt(event.target.value);
     if (value > 59) {
       setSecond(59);
-    } else if (value < 0 || isNaN(value)) {
+    } else if (value <= 0 || isNaN(value)) {
       setSecond(0);
     } else {
       setSecond(value);
@@ -305,7 +305,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={hour} onChange={handleHour}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setHour((hour) => (hour < 0 ? 0 : hour - 1));
+                  setHour((hour) => (hour <= 0 ? 0 : hour - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>
@@ -321,7 +321,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={minute} onChange={handleMinute}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setMinute((minute) => (minute < 0 ? 0 : minute - 1));
+                  setMinute((minute) => (minute <= 0 ? 0 : minute - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>
@@ -337,7 +337,7 @@ function RoomStudyLiveTimer() {
               <TimeSpan value={second} onChange={handleSecond}></TimeSpan>
               <CustomIconButton
                 onClick={() => {
-                  setSecond((second) => (second < 0 ? 0 : second - 1));
+                  setSecond((second) => (second <= 0 ? 0 : second - 1));
                 }}>
                 <KeyboardArrowDown />
               </CustomIconButton>

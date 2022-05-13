@@ -37,8 +37,12 @@ function RoomStudyLiveCamMatrix({ users }: usersPropsType) {
   return (
     <>
       <div style={gridContainer}>
-        {users.map((user) => {
-          return user !== undefined && <RoomStudyLiveCamListItem user={user} />;
+        {users.map((user, index) => {
+          return (
+            user !== undefined && (
+              <RoomStudyLiveCamListItem key={`${user.getConnectionId}-${index}`} user={user} />
+            )
+          );
         })}
       </div>
     </>

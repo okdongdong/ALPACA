@@ -10,6 +10,7 @@ import RoomMainChat from '../../Components/Room/Main/RoomMainChat';
 import RoomMainIntroduction from '../../Components/Room/Main/RoomMainIntroduction';
 import RoomSetting from '../../Components/Dialogs/RoomSetting';
 import RoomMainStudyDetail from '../../Components/Room/Main/RoomMainStudyDetail';
+import RoomStudyLivePreview from '../../Components/Room/StudyLive/RoomStudyLivePreview';
 import { customAxios } from '../../Lib/customAxios';
 import {
   setRoomInfo,
@@ -59,6 +60,9 @@ function RoomMain() {
   const checkOut = () => {
     setOpenChat((prev) => !prev);
   };
+
+  // preview dialog open
+  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
 
   // 스터디룸 정보조회
   const getRoomInfo = async () => {
