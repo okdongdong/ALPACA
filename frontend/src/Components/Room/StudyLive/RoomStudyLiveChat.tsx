@@ -82,7 +82,7 @@ function RoomStudyLiveChat() {
   useEffect(() => {
     session.on('signal:chat', (event: any) => {
       console.log(event);
-      if (!openChat) {
+      if (!!!openChat) {
         setNewMessageCount((prev) => prev + 1);
       }
       setChatList((prev) => {

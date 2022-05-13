@@ -153,37 +153,39 @@ function SideBar() {
         </span>
       </List>
       <span>
-        {pathname.indexOf('room') !== -1 && (
-          <ListItemButton
-            onClick={() => {}}
-            key="settings"
-            sx={{
-              minHeight: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              mx: 'auto',
-              mt: 'auto',
-              mb: '30px',
-              px: 2.5,
-              borderRadius: '100px',
-              background: theme.palette.main,
-              height: '50px',
-              width: '50px',
-              '&:hover': {
-                background: theme.palette.main + '90',
-              },
-            }}>
-            <ListItemIcon
+        {pathname.indexOf('room') !== -1 &&
+          pathname.indexOf('live') === -1 &&
+          pathname.indexOf('problem-manage') && (
+            <ListItemButton
+              onClick={() => {}}
+              key="settings"
               sx={{
-                minWidth: 0,
+                minHeight: 48,
                 justifyContent: 'center',
-                color: theme.palette.icon,
-              }}
-              onClick={() => dispatch(settingOn())}>
-              <Settings />
-            </ListItemIcon>
-          </ListItemButton>
-        )}
+                alignItems: 'center',
+                mx: 'auto',
+                mt: 'auto',
+                mb: '30px',
+                px: 2.5,
+                borderRadius: '100px',
+                background: theme.palette.main,
+                height: '50px',
+                width: '50px',
+                '&:hover': {
+                  background: theme.palette.main + '90',
+                },
+              }}>
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: theme.palette.icon,
+                }}
+                onClick={() => dispatch(settingOn())}>
+                <Settings />
+              </ListItemIcon>
+            </ListItemButton>
+          )}
       </span>
       <NotificationDialog
         setNewNotiCount={setNewNotiCount}
