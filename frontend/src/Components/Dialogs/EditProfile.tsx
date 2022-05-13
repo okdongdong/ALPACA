@@ -172,6 +172,8 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         text: '프로필 이미지는 10MB를 초과할 수 없습니다.',
         icon: 'error',
         showConfirmButton: true,
+        backdrop: `
+        z-index: 2000`,
       });
       return;
     }
@@ -215,9 +217,26 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         method: 'delete',
         url: `/user/${userInfo.userId}`,
       });
+      cAlert.fire({
+        title: '회원 탈퇴 완료',
+        text: '회원 탈퇴 되었습니다.',
+        icon: 'success',
+        showConfirmButton: true,
+        backdrop: `
+        z-index: 2000`,
+      });
       dispatch(logout());
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      cAlert.fire({
+        title: '회원 탈퇴 실패!',
+        text:
+          e.response.data.message ||
+          '아직 방장인 스터디가 존재합니다. 스터디 탈퇴 후 다시 진행해주시기 바랍니다.',
+        icon: 'error',
+        showConfirmButton: true,
+        backdrop: `
+        z-index: 2000`,
+      });
     }
   };
 
@@ -227,9 +246,13 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         title: '회원 탈퇴',
         text: '탈퇴 시 회원정보는 모두 삭제되며, 삭제된 데이터는 복구되지 않습니다.',
         icon: 'warning',
+        showConfirmButton: true,
         showCancelButton: true,
         confirmButtonText: '탈퇴',
         cancelButtonText: '취소',
+        backdrop: `
+        z-index: 2000`,
+        reverseButtons: false,
       })
       .then((result) => {
         if (result.isConfirmed) {
