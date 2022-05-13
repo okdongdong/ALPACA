@@ -118,12 +118,12 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   const [notificationList, setNotificationList] = useState<NotificationDataType[]>([]);
   const eventSource = useRef<EventSource | null>(null);
 
-  useEffect(() => {
-    connectNotification();
-    return () => {
-      disconnectNotification();
-    };
-  }, []);
+  // useEffect(() => {
+  //   connectNotification();
+  //   return () => {
+  //     disconnectNotification();
+  //   };
+  // }, []);
 
   const addInitialNotification = (event: MessageEvent) => {
     console.log('addInitialNotification', event);
