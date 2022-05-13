@@ -115,13 +115,7 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
 }
 
 function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: NotificationDialogType) {
-  const [notificationList, setNotificationList] = useState<NotificationDataType[]>([
-    {
-      type: 'invite',
-      title: '양명균',
-      studyId: 2,
-    },
-  ]);
+  const [notificationList, setNotificationList] = useState<NotificationDataType[]>([]);
   const eventSource = useRef<EventSource | null>(null);
 
   useEffect(() => {
@@ -132,6 +126,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   }, []);
 
   const addInitialNotification = (event: MessageEvent) => {
+    console.log('initialNoti', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
@@ -157,6 +152,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   };
 
   const addSchedule = (event: MessageEvent) => {
+    console.log('addSchedule', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
@@ -173,6 +169,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
     });
   };
   const addInviteStudy = (event: MessageEvent) => {
+    console.log('addStudy', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }

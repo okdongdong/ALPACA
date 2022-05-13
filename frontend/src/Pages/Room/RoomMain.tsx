@@ -130,7 +130,7 @@ function RoomMain() {
                     width="100%"
                     height="100%"
                     onClick={() => {
-                      navigate(`/room/${roomId}/live`, { state: { roomToLive: roomId } });
+                      setPreviewOpen(true);
                     }}>
                     라이브 입장
                   </CBtn>
@@ -156,6 +156,7 @@ function RoomMain() {
             </Grid>
           </Grid>
         </Box>
+        <RoomStudyLivePreview open={previewOpen} setOpen={setPreviewOpen} />
       </BrowserView>
       <MobileView style={{ height: '100%', width: '100%' }}>
         <IconButton

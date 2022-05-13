@@ -26,7 +26,7 @@ const CustomBtn = styled(Button)(({ theme }) => ({
 
 const RecommendProblemDiv = styled(Paper)(({ theme }) => ({
   width: '100%',
-  height: '23vh',
+  height: '25vh',
   marginTop: '2vh',
   marginBottom: '3vh',
   borderRadius: '10px',
@@ -110,7 +110,6 @@ function MainRecommendProblem() {
           };
         }),
       );
-    } catch (e) {}
   };
 
   useEffect(() => {
@@ -121,7 +120,7 @@ function MainRecommendProblem() {
       <div style={{ textAlign: 'center', height: '3vh', fontWeight: '600', fontSize: '1.2rem' }}>
         오늘의 추천문제
       </div>
-      <div style={{ height: '18.5vh', display: 'flex', justifyContent: 'space-around' }}>
+      <div style={{ height: '19.5vh', display: 'flex', justifyContent: 'space-around' }}>
         {recommendProblems.map((problem) => {
           return (
             <div
