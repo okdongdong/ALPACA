@@ -13,8 +13,8 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResult illegalArgExHandler(IllegalArgumentException e) {
+    @ExceptionHandler({IllegalArgumentException.class, FileConvertException.class})
+    public ErrorResult illegalArgExHandler(Exception e) {
         return new ErrorResult(e.getMessage());
     }
 

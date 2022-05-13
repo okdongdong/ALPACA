@@ -8,6 +8,7 @@ import com.ssafy.alpaca.api.response.LoginRes;
 import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.response.UserListRes;
+import com.ssafy.alpaca.common.exception.FileConvertException;
 import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.common.jwt.LogoutAccessToken;
 import com.ssafy.alpaca.common.jwt.RefreshToken;
@@ -196,24 +197,29 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String updateProfileImg(Long id, MultipartFile file) throws IOException {
+    public String updateProfileImg(Long id, MultipartFile file) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!username.equals(user.getUsername())) {
             throw new UnAuthorizedException(ExceptionUtil.NOT_MYSELF);
         }
-        Byte[] bytes = new Byte[file.getBytes().length];
+        try {
+            Byte[] bytes = new Byte[file.getBytes().length];
 
-        int i = 0;
+            int i = 0;
 
-        for (byte b : file.getBytes()) {
-            bytes[i++] = b;
+            for (byte b : file.getBytes()) {
+                bytes[i++] = b;
+            }
+            user.setProfileImg(bytes);
+            userRepository.save(user);
+
+            return convertUtil.convertByteArrayToString(user.getProfileImg());
+
+        } catch (IOException e) {
+            throw new FileConvertException(ExceptionUtil.FILE_NOT_CONVERT,e);
         }
-        user.setProfileImg(bytes);
-        userRepository.save(user);
-
-        return convertUtil.convertByteArrayToString(user.getProfileImg());
 
     }
 

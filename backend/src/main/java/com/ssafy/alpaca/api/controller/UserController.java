@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -52,7 +51,7 @@ public class UserController {
     @ApiImplicitParam( name = "id", value = "변경할 사용자 id", dataTypeClass = Long.class )
     @PostMapping("/{id}/profile")
     public ResponseEntity<BaseResponseBody> updateProfileImg(
-            @PathVariable Long id, @RequestParam MultipartFile file) throws IOException {
+            @PathVariable Long id, @RequestParam MultipartFile file) {
         return ResponseEntity.ok(BaseResponseBody.of(200, userService.updateProfileImg(id, file)));
     }
 
