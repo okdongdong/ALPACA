@@ -157,7 +157,7 @@ public class UserService {
                 jwtTokenUtil.generateRefreshToken(username), REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
 
-    public TokenRes reissue(String refreshToken) throws UnAuthorizedException {
+    public TokenRes reissue(String refreshToken) {
         refreshToken = resolveToken(refreshToken);
         String username = jwtTokenUtil.getUsername(refreshToken);
         RefreshToken redisRefreshToken = refreshTokenRedisRepository.findById(username)
@@ -223,7 +223,7 @@ public class UserService {
 
     }
 
-    public void deleteUser(Long id) throws UnAuthorizedException {
+    public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
         String username = getCurrentUsername();
         if (!user.getUsername().equals(username)) {
