@@ -13,7 +13,7 @@ interface RoomSettingProps {
 }
 
 const CustomBox = styled(Stack)(({ theme }) => ({
-  backgroundColor: theme.palette.component,
+  backgroundColor: theme.palette.bg,
   color: theme.palette.txt,
   minWidth: isMobile ? 300 : 600,
   padding: theme.spacing(isMobile ? 2 : 3),

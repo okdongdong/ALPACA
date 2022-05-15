@@ -13,7 +13,10 @@ const CustomContainer = styled('div')(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-function RoomMainComponentContainer({ children, height = '' }: RoomMainComponentContainerProps) {
+function RoomMainComponentContainer({
+  children,
+  height = '100%',
+}: RoomMainComponentContainerProps) {
   return <CustomContainer style={{ height: height }}>{children}</CustomContainer>;
 }
 

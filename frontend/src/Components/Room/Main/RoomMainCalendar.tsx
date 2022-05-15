@@ -76,7 +76,7 @@ function RoomMainCalendar() {
     try {
       const res = await customAxios({
         method: 'get',
-        url: `/schedule/${roomId}/monthly`,
+        url: `/schedule/${roomId}/span`,
         params: { month: nowDay.getMonth() + 1, year: nowDay.getFullYear() },
       });
       console.log('change month: ', res);
@@ -107,15 +107,18 @@ function RoomMainCalendar() {
 
   useEffect(() => {
     getStartDate();
+    return () => {
+      dispatch(setSchedules([]));
+    };
   }, []);
 
   useEffect(() => {
     dispatch(setDailySchedule());
-  }, [schedules]);
+  }, [schedules, dispatch]);
 
   return (
     <>
-      <BrowserView style={{ width: '100%', height: '100%' }}>
+      <BrowserView style={{ width: '100%' }}>
         <Stack>
           <CalendarTitle>
             <IconButton

@@ -18,7 +18,7 @@ function RoomMainIntroductionMemberList() {
   const userId = useSelector((state: any) => state.account.userId);
 
   return (
-    <RoomMainComponentContainer>
+    <RoomMainComponentContainer height="fit-content">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h4>스터디원</h4>
       </div>

@@ -1,20 +1,19 @@
 const WEEK_DAY = ['일', '월', '화', '수', '목', '금', '토'];
 
-const dateToString = (date: Date | null | undefined) => {
+const dateToString = (date: Date | null | undefined, includeYear: boolean = true) => {
   if (!date) return '';
 
-  const tempDate = dateToStringDate(date);
+  const tempDate = dateToStringDate(date, includeYear);
   const tempTime = dateToStringTime(date);
 
   return tempDate + tempTime;
 };
 
-export const dateToStringDate = (date: Date | null | undefined) => {
+export const dateToStringDate = (date: Date | null | undefined, includeYear: boolean = true) => {
   if (!date) return '';
 
   const tempDate =
-    date.getFullYear() +
-    '.' +
+    (includeYear ? date.getFullYear() + '.' : '') +
     (date.getMonth() + 1) +
     '.' +
     date.getDate() +
