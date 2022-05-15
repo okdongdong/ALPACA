@@ -1,17 +1,19 @@
 import {
+  alpha,
   Avatar,
+  Box,
   Chip,
-  Collapse,
   Dialog,
   DialogTitle,
   Divider,
+  IconButton,
   Input,
   Stack,
   styled,
   useTheme,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/commonReducer';
 import CBtn from '../Commons/CBtn';
@@ -20,6 +22,7 @@ import CSearchBar from '../Commons/CSearchBar';
 import alpaca from '../../Assets/Img/alpaca.png';
 import useAlert from '../../Hooks/useAlert';
 import { BrowserView, isMobile, MobileView } from 'react-device-detect';
+import { Add } from '@mui/icons-material';
 
 interface MemberInviteProps {
   roomId: string | undefined;
@@ -59,17 +62,31 @@ const CustomInput = styled(Input)(({ theme }) => ({
   },
 }));
 
+const CustomIconButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.accent,
+  color: theme.palette.icon,
+  width: 30,
+  height: 30,
+  marginRight: theme.spacing(2),
+  '&:hover': { backgroundColor: theme.palette.main },
+}));
+
 function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   const dispatch = useDispatch();
   const cAlert = useAlert();
   const theme = useTheme();
+  const userId = useSelector((state: any) => state.account.userId);
+  const isRoomMaker = useSelector((state: any) => state.room.isRoomMaker);
+
   const [nickname, setNickname] = useState<string>('');
   const [userList, setUserList] = useState<UserInfo[]>([]);
-  const [inviteCode, setInviteCode] = useState('ㅁㄴㅇㄹㄴㄴㅇㄹ');
+  const [inviteCode, setInviteCode] = useState('');
   const [selectedUserList, setSelectedUserList] = useState<UserInfo[]>([]);
 
   // 초대코드 조회
   const getInviteCode = async () => {
+    if (!isRoomMaker) return;
+
     try {
       const res = await customAxios({
         method: 'get',
@@ -138,13 +155,14 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
       res.data.forEach((userInfo: UserInfo) => {
         if (
           selectedUserList.every(
-            (selectedUserInfo: UserInfo) => selectedUserInfo.id !== userInfo.id,
+            (selectedUserInfo: UserInfo) =>
+              selectedUserInfo.id !== userInfo.id && userInfo.id !== userId,
           )
         )
           tempList.push(userInfo);
       });
 
-      setUserList(res.data);
+      setUserList(tempList);
     } catch (e: any) {
       console.log(e);
     }
@@ -174,8 +192,8 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   }, [nickname]);
 
   useEffect(() => {
-    getInviteCode();
-  }, []);
+    if (open) getInviteCode();
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
@@ -190,15 +208,26 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
       </DialogTitle>
       <CustomBox spacing={2}>
         <CSearchBar onChange={setNickname} />
-        <Collapse in={!!userList}>
-          <SearchResultBox>
-            {userList.map((userInfo, idx) => (
-              <div key={idx} onClick={() => searchResultClickHandler(idx)}>
-                <CProfile nickname={userInfo.nickname} profileImg={userInfo.profileImg} />
-              </div>
-            ))}
-          </SearchResultBox>
-        </Collapse>
+        <SearchResultBox className="scroll-box" sx={{ position: 'relative', height: '30vh' }}>
+          {userList.map((userInfo, idx) => (
+            <Box
+              sx={{
+                py: 1,
+                backgroundColor:
+                  idx % 2 ? alpha(theme.palette.bg, 0.3) : alpha(theme.palette.main, 0.3),
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+              key={idx}>
+              <CProfile nickname={userInfo.nickname} profileImg={userInfo.profileImg} />
+
+              <CustomIconButton onClick={() => searchResultClickHandler(idx)}>
+                <Add />
+              </CustomIconButton>
+            </Box>
+          ))}
+        </SearchResultBox>
 
         <div>
           {selectedUserList.map((userInfo, idx) => (
