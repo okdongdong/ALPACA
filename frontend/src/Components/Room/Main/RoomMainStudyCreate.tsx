@@ -77,9 +77,16 @@ function RoomMainStudyCreate() {
 
       dispatch(addSchedule({ idx, schedule }));
       dispatch(setIsStudyExist(true));
+      cAlert.fire({
+        title: '추가 성공!',
+        text: '스터디 일정을 추가했습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (e: any) {
       cAlert.fire({
-        title: '스터디 추가 실패!',
+        title: '추가 실패!',
         text: e.response.data.message || '잠시 후 다시 시도해주세요.',
         icon: 'error',
         showConfirmButton: false,
@@ -117,9 +124,16 @@ function RoomMainStudyCreate() {
       });
       console.log('updated:', res);
       dispatch(setIsEdit(false));
+      cAlert.fire({
+        title: '변경 성공!',
+        text: '스터디 일정을 변경했습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (e: any) {
       cAlert.fire({
-        title: '스터디 변경 실패!',
+        title: '변경 실패!',
         text: e.response.data.message || '잠시 후 다시 시도해주세요.',
         icon: 'error',
         showConfirmButton: false,

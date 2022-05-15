@@ -49,6 +49,7 @@ function RoomMainChat() {
   const infiniteRef = useRef<HTMLDivElement>(null);
 
   const userId = useSelector((state: any) => state.account.userId);
+  const getRoomInfoFinished = useSelector((state: any) => state.account.userId);
 
   const [message, setMessage] = useState('');
   const [chatList, setChatList] = useState<ReceiveMessage[]>([]);
@@ -181,14 +182,15 @@ function RoomMainChat() {
   }, [chatList.length]);
 
   useEffect(() => {
-    initSequence();
+    wsDisconnect();
+    if (getRoomInfoFinished) initSequence();
 
     return () => {
       if (client.connected) {
         wsDisconnect();
       }
     };
-  }, []);
+  }, [getRoomInfoFinished]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(infiniteHandler, options);
@@ -224,6 +226,7 @@ function RoomMainChat() {
             </div>
           )}
           <Box sx={{ position: 'absolute', width: '100%' }}>
+            <MessageBox sx={{ height: 25 }}></MessageBox>
             {chatList.map((chat: ReceiveMessage, idx: number) => (
               <MessageBox key={idx}>
                 <div

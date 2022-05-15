@@ -30,6 +30,7 @@ function RoomMainIntroductionMemberSetting({
   const cAlert = useAlert();
   const userId = useSelector((state: any) => state.account.userId);
   const members = useSelector((state: any) => state.room.members);
+  const isRoomMaker = useSelector((state: any) => state.room.isRoomMaker);
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -130,49 +131,46 @@ function RoomMainIntroductionMemberSetting({
 
   return (
     <div>
-      {members.some((member: Member) => member.userId === userId && member.roomMaker) && (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3>스터디 멤버 관리</h3>
-            <CBtn
-              width="20%"
-              height="100%"
-              onClick={() => {
-                setInviteOpen(true);
-              }}>
-              초대
-            </CBtn>
-          </div>
-          <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
-          <Stack spacing={1}>
-            {members.map((member: Member, idx: number) => (
-              <div
-                key={idx}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <CProfile nickname={member.nickname} profileImg={member.profileImg} />
-                <div>
-                  {!member.roomMaker && (
-                    <>
-                      <IconButton onClick={() => onClickHandler(member.userId)}>
-                        <CCrown width={20} height={20} color="#cdcdcd" />
-                      </IconButton>
-                      {userId !== member.userId && (
-                        <CustomIconButton onClick={() => onDeleteHandler(member.userId)}>
-                          <Remove />
-                        </CustomIconButton>
-                      )}
-                    </>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h3>스터디 멤버 {isRoomMaker && ' 관리'}</h3>
+        <CBtn
+          width="20%"
+          height="100%"
+          disabled={!isRoomMaker}
+          onClick={() => {
+            setInviteOpen(true);
+          }}>
+          초대
+        </CBtn>
+      </div>
+      <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+      <Stack spacing={1}>
+        {members.map((member: Member, idx: number) => (
+          <div
+            key={idx}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <CProfile nickname={member.nickname} profileImg={member.profileImg} />
+            <div>
+              {isRoomMaker && !member.roomMaker && (
+                <>
+                  <IconButton onClick={() => onClickHandler(member.userId)}>
+                    <CCrown width={20} height={20} color="#cdcdcd" />
+                  </IconButton>
+                  {userId !== member.userId && (
+                    <CustomIconButton onClick={() => onDeleteHandler(member.userId)}>
+                      <Remove />
+                    </CustomIconButton>
                   )}
-                </div>
-              </div>
-            ))}
-          </Stack>
-        </>
-      )}
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </Stack>
     </div>
   );
 }

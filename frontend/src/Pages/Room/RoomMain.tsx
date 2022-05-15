@@ -20,6 +20,7 @@ import {
   Member,
   MemberDict,
   changeSelectedDay,
+  setIsRoomMaker,
 } from '../../Redux/roomReducer';
 import { BrowserView, MobileView } from 'react-device-detect';
 import DehazeIcon from '@mui/icons-material/Dehaze';
@@ -28,7 +29,6 @@ import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate'
 const RoomTitle = styled('h1')(({ theme }) => ({
   color: theme.palette.txt,
   textAlign: 'left',
-  paddingBottom: theme.spacing(3),
 }));
 
 const MRoomTitle = styled('h3')(({ theme }) => ({
@@ -40,10 +40,10 @@ const MRoomTitle = styled('h3')(({ theme }) => ({
 
 function RoomMain() {
   const { roomId } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
 
+  const userId = useSelector((state: any) => state.account.userId);
   const title = useSelector((state: any) => state.room.title);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const isStudyExist = useSelector((state: any) => state.room.isStudyExist);
@@ -77,6 +77,10 @@ function RoomMain() {
 
       console.log('roomInfo: ', res);
       dispatch(setRoomInfo(res.data));
+
+      if (res.data.members.some((member: Member) => member.userId === userId && member.roomMaker)) {
+        dispatch(setIsRoomMaker(true));
+      }
 
       // 문자열로 받아진 스케줄 Date로 변환
       const tempSchedules: Schedule[] = [];
@@ -118,20 +122,16 @@ function RoomMain() {
           <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
           <RoomSetting setInviteOpen={setOpen} />
           <Grid container spacing={4} sx={{ width: '100%', height: '100%', px: 5, margin: 0 }}>
-            <Grid item xs={3} sx={{ paddingBottom: 4 }}>
+            <Grid item xs={5} md={3} sx={{ paddingBottom: 4 }}>
               <Stack spacing={3} sx={{ height: '100%' }}>
-                <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
+                <Stack
+                  direction="row"
+                  spacing={5}
+                  sx={{ paddingTop: 3 }}
+                  justifyContent="space-between"
+                  alignItems="center">
                   <RoomTitle>{title}</RoomTitle>
                   <CBtn
-                    width="100%"
-                    height="100%"
-                    onClick={() => {
-                      setOpen(true);
-                    }}>
-                    초대
-                  </CBtn>
-                  <CBtn
-                    width="100%"
                     height="100%"
                     onClick={() => {
                       setPreviewOpen(true);
@@ -143,13 +143,17 @@ function RoomMain() {
                 <RoomMainChat />
               </Stack>
             </Grid>
-            <Grid item xs={5} sx={{ paddingBottom: 4 }}>
-              <RoomMainCalendar />
-            </Grid>
-            <Grid item xs={4} sx={{ paddingRight: 4, paddingBottom: 4 }}>
-              <Stack spacing={3} sx={{ height: '100%' }}>
-                {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
-              </Stack>
+            <Grid item xs={7} md={9} style={{ paddingLeft: 0, paddingRight: 4 }}>
+              <Grid container spacing={4} sx={{ width: '100%', height: '100%', margin: 0 }}>
+                <Grid item xs={12} md={7}>
+                  <RoomMainCalendar />
+                </Grid>
+                <Grid item xs={12} md={5} sx={{ paddingBottom: 4 }}>
+                  <Stack spacing={3} sx={{ height: '100%' }}>
+                    {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
+                  </Stack>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Box>
