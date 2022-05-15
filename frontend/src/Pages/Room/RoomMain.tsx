@@ -70,6 +70,9 @@ function RoomMain() {
       const res = await customAxios({
         method: 'get',
         url: `/study/${roomId}`,
+        params: {
+          offset: new Date().getTimezoneOffset(),
+        },
       });
 
       console.log('roomInfo: ', res);
@@ -93,6 +96,7 @@ function RoomMain() {
       console.log('userDict:', tempDict);
     } catch (e: any) {
       console.log(e.response);
+      console.log(e);
     }
   };
 
@@ -113,9 +117,9 @@ function RoomMain() {
         <Box sx={{ height: '100%', width: '100%' }}>
           <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
           <RoomSetting setInviteOpen={setOpen} />
-          <Grid container spacing={4} sx={{ width: '100%', height: '100%', padding: 5, margin: 0 }}>
-            <Grid item xs={4}>
-              <Stack spacing={3}>
+          <Grid container spacing={4} sx={{ width: '100%', height: '100%', px: 5, margin: 0 }}>
+            <Grid item xs={3} sx={{ paddingBottom: 4 }}>
+              <Stack spacing={3} sx={{ height: '100%' }}>
                 <Stack direction="row" spacing={5} sx={{ paddingTop: 3 }}>
                   <RoomTitle>{title}</RoomTitle>
                   <CBtn
@@ -135,24 +139,17 @@ function RoomMain() {
                     라이브 입장
                   </CBtn>
                 </Stack>
-                <RoomMainCalendar />
                 <RoomMainIntroduction />
                 <RoomMainChat />
               </Stack>
             </Grid>
-            <Grid item xs={4}>
-              <Stack spacing={3}>
+            <Grid item xs={5} sx={{ paddingBottom: 4 }}>
+              <RoomMainCalendar />
+            </Grid>
+            <Grid item xs={4} sx={{ paddingRight: 4, paddingBottom: 4 }}>
+              <Stack spacing={3} sx={{ height: '100%' }}>
                 {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
               </Stack>
-            </Grid>
-            <Grid item xs={4} sx={{ paddingRight: 4 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                }}></div>
             </Grid>
           </Grid>
         </Box>
