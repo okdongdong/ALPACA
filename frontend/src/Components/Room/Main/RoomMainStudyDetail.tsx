@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
 import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
 import {
+  deleteSchedule,
+  resetProblemList,
   setFinishedAt,
   setIsEdit,
   setIsStudyExist,
@@ -15,6 +17,8 @@ import CBtn from '../../Commons/CBtn';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyDetailProblemItem from './RoomMainStudyDetailProblemItem';
 import { BrowserView, MobileView } from 'react-device-detect';
+import useAlert from '../../../Hooks/useAlert';
+import { setLoading } from '../../../Redux/commonReducer';
 
 export interface ToSolveProblem {
   id: string;
@@ -52,6 +56,8 @@ function RoomMainStudyDetail() {
   const finishedAt = useSelector((state: any) => state.room.finishedAt);
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
 
+  const cAlert = useAlert();
+
   const getScheduleProblems = async () => {
     if (scheduleId === undefined) return;
 
@@ -70,13 +76,44 @@ function RoomMainStudyDetail() {
   };
 
   const deleteStudy = async () => {
+    dispatch(setLoading(true));
     try {
       const scheduleId = dateRange[selectedDayIdx].schedule?.id;
       await customAxios({ method: 'delete', url: `/schedule/${scheduleId}` });
-      dispatch(setIsStudyExist(false));
+      dispatch(deleteSchedule());
+      dispatch(setLoading(false));
+      cAlert.fire({
+        title: '삭제 성공!',
+        text: '스터디 일정을 삭제했습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (e: any) {
       console.log(e.response);
+      dispatch(setLoading(false));
+      cAlert.fire({
+        title: '삭제 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
+  };
+
+  const onDeleteHandler = async () => {
+    const result = await cAlert.fire({
+      title: '스터디 일정을 삭제하시겠습니까?',
+      text: '스터디 일정이 영구적으로 삭제됩니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: theme.palette.warn,
+      cancelButtonColor: theme.palette.component,
+      confirmButtonText: '삭제',
+    });
+
+    if (result.isConfirmed) deleteStudy();
   };
 
   useEffect(() => {
@@ -95,7 +132,7 @@ function RoomMainStudyDetail() {
                 <CBtn
                   height="100%"
                   content={<Delete sx={{ color: theme.palette.icon }} />}
-                  onClick={deleteStudy}
+                  onClick={onDeleteHandler}
                 />
                 <CBtn
                   height="100%"

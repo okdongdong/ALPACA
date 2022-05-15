@@ -71,6 +71,12 @@ export interface RoomInfo {
 
   // 세팅창 오픈
   isSetting: boolean;
+
+  // 방장인지 확인
+  isRoomMaker: boolean;
+
+  // 웹소켓 연결대기용
+  getRoomInfoFinished: boolean;
 }
 
 const initialState: RoomInfo = {
@@ -80,7 +86,7 @@ const initialState: RoomInfo = {
   memberDict: {},
   schedules: [],
   selectedDay: new Date(),
-  selectedDayIdx: 0,
+  selectedDayIdx: -1,
   isStudyExist: false,
   dateRange: [],
   isEdit: false,
@@ -90,6 +96,8 @@ const initialState: RoomInfo = {
   offsetId: '',
   scheduleId: undefined,
   isSetting: false,
+  isRoomMaker: false,
+  getRoomInfoFinished: false,
 };
 
 const roomSlice = createSlice({
@@ -102,6 +110,7 @@ const roomSlice = createSlice({
       isStudyExist: Boolean(action.payload.schedule),
       schedules: action.payload.scheduleListRes,
       scheduleId: action.payload.schedule?.id,
+      getRoomInfoFinished: true,
     }),
     resetRoomInfo: (state) => ({ ...initialState }),
     setRoomIntroduction: (state, action) => {
@@ -149,7 +158,9 @@ const roomSlice = createSlice({
       state.scheduleId = action.payload;
     },
     addSchedule: (state, action) => {
-      state.dateRange[action.payload.idx].schedule = action.payload.schedule;
+      state.dateRange[
+        action.payload.idx < 0 ? calTodayIdx(state.dateRange, state.schedules) : action.payload.idx
+      ].schedule = action.payload.schedule;
     },
     settingOn: (state) => {
       state.isSetting = !state.isSetting;
@@ -172,6 +183,14 @@ const roomSlice = createSlice({
     setDailySchedule: (state) => {
       state.dateRange = calDailySchedule(state.dateRange, state.schedules);
     },
+    deleteSchedule: (state) => {
+      state.problemListRes = [];
+      state.dateRange[state.selectedDayIdx] = { day: state.dateRange[state.selectedDayIdx].day };
+      state.isStudyExist = false;
+    },
+    setIsRoomMaker: (state, action) => {
+      state.isRoomMaker = action.payload;
+    },
   },
 });
 
@@ -180,16 +199,21 @@ const calDailySchedule = (dateRange: DailySchedule[], schedules: Schedule[]) => 
   for (let i = 0; i < dateRange.length; i++) {
     if (scheduleIdx < schedules.length) {
       let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
-      if (
-        dateRange[i].day.getFullYear() === scheduleDay.getFullYear() &&
-        dateRange[i].day.getMonth() === scheduleDay.getMonth() &&
-        dateRange[i].day.getDate() === scheduleDay.getDate()
-      ) {
+      if (dateRange[i].day.toDateString() === scheduleDay.toDateString()) {
         dateRange[i].schedule = schedules[scheduleIdx++];
       }
     }
   }
   return dateRange;
+};
+
+const calTodayIdx = (dateRange: DailySchedule[], schedules: Schedule[]) => {
+  const today = new Date();
+  for (let i = 0; i < dateRange.length; i++) {
+    if (dateRange[i].day.toDateString() === today.toDateString()) {
+      return i;
+    }
+  }
 };
 
 export const {
@@ -216,6 +240,8 @@ export const {
   resetProblemList,
   changeSelectedDay,
   setDailySchedule,
+  deleteSchedule,
+  setIsRoomMaker,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

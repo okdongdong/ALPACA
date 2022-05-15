@@ -37,8 +37,9 @@ export const dateToStringTimeSimple = (date: Date | null | undefined) => {
   if (!date) return '';
 
   const tempMinutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+  const tempHours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 
-  const tempTime = date.getHours() + ':' + tempMinutes;
+  const tempTime = tempHours + ':' + tempMinutes;
 
   return tempTime;
 };

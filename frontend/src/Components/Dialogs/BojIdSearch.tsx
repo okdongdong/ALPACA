@@ -1,4 +1,4 @@
-import { Dialog, Grid, Stack, styled } from '@mui/material';
+import { Dialog, Grid, Stack, styled, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { customAxios, solvedAcAxios } from '../../Lib/customAxios';
@@ -6,7 +6,7 @@ import { setLoading } from '../../Redux/commonReducer';
 import CBadge from '../Commons/CBadge';
 import CBtn from '../Commons/CBtn';
 import CSearchBar from '../Commons/CSearchBar';
-import ConfirmationWindow from './ConfirmationWindow';
+import useAlert from '../../Hooks/useAlert';
 
 interface BojIdSearchProps {
   open: boolean;
@@ -29,7 +29,8 @@ const CustomBox = styled(Stack)(({ theme }) => ({
 
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 450,
-  maxHeight: 600,
+  maxHeight: '60vh',
+  position: 'relative',
 }));
 
 const BojSearchResult = styled(Grid)(({ theme }) => ({
@@ -42,11 +43,11 @@ const BojSearchResult = styled(Grid)(({ theme }) => ({
 function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
   const dispatch = useDispatch();
 
-  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState<boolean>(false);
+  const cAlert = useAlert();
+  const theme = useTheme();
+
   const [idList, setIdList] = useState<BojUserInfo[]>([]);
   const [searchId, setSearchId] = useState<string>('');
-  const [selectedId, setSelectedId] = useState<string>('');
-  const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 
   const getBojIdList = async () => {
     dispatch(setLoading(true));
@@ -82,12 +83,11 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
   };
 
   const onClickHandler = (bojId: string) => {
-    setSelectedId(bojId);
-    bojDuplicateCheck();
+    bojDuplicateCheck(bojId);
   };
 
   // 백준연결
-  const bojDuplicateCheck = async () => {
+  const bojDuplicateCheck = async (bojId: string) => {
     dispatch(setLoading(true));
 
     // 중복 x
@@ -95,39 +95,58 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
       const res = await customAxios({
         method: 'get',
         url: '/auth/duplicated/bojId',
-        params: { bojId: selectedId },
+        params: { bojId },
       });
       console.log(res);
-      setBojId(selectedId);
-      setIsDuplicate(false);
+      dispatch(setLoading(false));
+
+      const result = await cAlert.fire({
+        title: 'BOJ 연동',
+        text: `${bojId}를 연결하시겠습니까?`,
+        icon: 'question',
+        showConfirmButton: true,
+        confirmButtonColor: theme.palette.main,
+        confirmButtonText: '연결',
+        showCancelButton: true,
+      });
+
+      if (result.isConfirmed) {
+        setBojId(bojId);
+        setOpen(false);
+      }
 
       // 중복 o
-    } catch (e) {
-      console.log(e);
-      setIsDuplicate(true);
+    } catch (e: any) {
+      console.log(e.response);
+      dispatch(setLoading(false));
+      if (e.response.status === 409) {
+        const result = await cAlert.fire({
+          title: 'BOJ 연동',
+          html: `${bojId}의 연결기록이 이미 존재합니다.<br/><br/>연결하시겠습니까?`,
+          icon: 'question',
+          showConfirmButton: true,
+          confirmButtonColor: theme.palette.main,
+          confirmButtonText: '연결',
+          showCancelButton: true,
+        });
+
+        if (result.isConfirmed) {
+          setBojId(bojId);
+          setOpen(false);
+        }
+      }
+      cAlert.fire({
+        title: '연동 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
-    setDuplicateDialogOpen(true);
-    dispatch(setLoading(false));
   };
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      <ConfirmationWindow
-        open={duplicateDialogOpen}
-        setOpen={setDuplicateDialogOpen}
-        confirm={() => {
-          setBojId(selectedId);
-          setOpen(false);
-        }}>
-        {isDuplicate ? (
-          <>
-            <div>{selectedId}의 연결기록이 이미 존재합니다.</div>
-            <div>연결하시겠습니까?</div>
-          </>
-        ) : (
-          <div>{selectedId}를 연결하시겠습니까?</div>
-        )}
-      </ConfirmationWindow>
       <CustomBox spacing={3}>
         <h1>BOJ 아이디 검색</h1>
         <CSearchBar onSearch={getBojIdList} onChange={setSearchId} />

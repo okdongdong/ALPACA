@@ -16,13 +16,14 @@ function useLogout() {
       });
       dispatch(logout());
     } catch (e: any) {
-      cAlert.fire({
-        title: '로그아웃 실패!',
-        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
-        icon: 'error',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      dispatch(logout());
+      // cAlert.fire({
+      //   title: '로그아웃 실패!',
+      //   text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+      //   icon: 'error',
+      //   showConfirmButton: false,
+      //   timer: 1500,
+      // });
     }
   };
 

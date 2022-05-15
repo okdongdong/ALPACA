@@ -15,6 +15,7 @@ function RoomMainIntroductionSetting() {
 
   const roomTitle = useSelector((state: any) => state.room.title);
   const roomInfo = useSelector((state: any) => state.room.info);
+  const isRoomMaker = useSelector((state: any) => state.room.isRoomMaker);
 
   const [title, setTitle] = useState<string>(roomTitle);
   const [info, setInfo] = useState<string>(roomInfo);
@@ -78,8 +79,8 @@ function RoomMainIntroductionSetting() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>스터디 정보 관리</h3>
-        <CBtn width="20%" height="100%" onClick={onEditHandler}>
+        <h3>스터디 정보 {isRoomMaker && ' 관리'}</h3>
+        <CBtn width="20%" height="100%" onClick={onEditHandler} disabled={!isRoomMaker}>
           수정
         </CBtn>
       </div>
@@ -92,6 +93,7 @@ function RoomMainIntroductionSetting() {
           value={title}
           placeholder="스터디 이름을 입력하세요."
           helperText={titleMessage}
+          readOnly={!isRoomMaker}
         />
         <CInput
           label="스터디 소개"
@@ -100,6 +102,7 @@ function RoomMainIntroductionSetting() {
           value={info}
           placeholder="스터디 소개를 입력하세요."
           helperText={infoMessage}
+          readOnly={!isRoomMaker}
         />
       </div>
     </div>

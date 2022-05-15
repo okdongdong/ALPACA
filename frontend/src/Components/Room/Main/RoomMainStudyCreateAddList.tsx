@@ -45,7 +45,7 @@ function RoomMainStudyCreateAddList({
       <h3>추가된 문제</h3>
       <Divider variant="middle" />
       <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
-        <Box sx={{ position: 'absolute' }}>
+        <Box sx={{ position: 'absolute', width: '100%' }}>
           {problemListRes.map((problem: ProblemRes, idx: number) => (
             <CProblem
               key={idx}

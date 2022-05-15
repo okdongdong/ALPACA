@@ -11,6 +11,7 @@ function useAlert() {
     color: theme.palette.txt,
     background: theme.palette.bg,
     confirmButtonText: '닫기',
+    cancelButtonText: '취소',
     customClass: {
       // cancelButton: classes.customCancelButton,
     },

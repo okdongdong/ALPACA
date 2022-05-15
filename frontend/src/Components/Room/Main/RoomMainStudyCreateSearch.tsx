@@ -81,9 +81,7 @@ function RoomMainStudyCreateSearch({
       res.data.items.forEach((item: any) => {
         // 이미 추가되지 않은 문제만 출력해줌
         if (
-          !problemListRes.some(
-            (problem: ProblemRes) => problem.problemNumber === item.problemNumber,
-          )
+          !problemListRes.some((problem: ProblemRes) => problem.problemNumber === item.problemId)
         ) {
           resProblems.push({
             problemNumber: item.problemId,
@@ -117,7 +115,7 @@ function RoomMainStudyCreateSearch({
       </FilterBox>
 
       <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
-        <Box sx={{ position: 'absolute' }}>
+        <Box sx={{ position: 'absolute', width: '100%' }}>
           {problemList.map((problem: ProblemRes, idx: number) => (
             <CProblem
               key={idx}
