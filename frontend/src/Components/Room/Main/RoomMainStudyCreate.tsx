@@ -148,7 +148,6 @@ function RoomMainStudyCreate() {
           problemList={searchProblemList}
           setProblemList={setSearchProblemList}
         />
-        <Divider variant="middle" />
         <RoomMainStudyCreateAddList
           problemList={searchProblemList}
           setProblemList={setSearchProblemList}

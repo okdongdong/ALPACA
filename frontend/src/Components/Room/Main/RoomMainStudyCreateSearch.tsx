@@ -1,5 +1,5 @@
 import { Add } from '@mui/icons-material';
-import { alpha, Collapse, IconButton, styled, useTheme } from '@mui/material';
+import { alpha, Box, Collapse, IconButton, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { solvedAcAxios } from '../../../Lib/customAxios';
@@ -30,7 +30,7 @@ const FilterBox = styled(Collapse)(({ theme }) => ({
 }));
 
 const ProblemBox = styled('div')(({ theme }) => ({
-  height: '20vh',
+  height: '15vh',
   borderRadius: 10,
   backgroundColor: theme.palette.bg,
 }));
@@ -103,7 +103,7 @@ function RoomMainStudyCreateSearch({
   };
 
   return (
-    <div style={{ height: '50%' }}>
+    <div style={{ height: '50%', position: 'relative', marginBottom: 24 }}>
       <CSearchBar
         onChange={setSearchQuery}
         onSearch={searchProblem}
@@ -116,21 +116,23 @@ function RoomMainStudyCreateSearch({
         <RoomMainStudyCreateSearchFilter tierValue={tierValue} setTierValue={setTierValue} />
       </FilterBox>
 
-      <ProblemBox className="scroll-box">
-        {problemList.map((problem: ProblemRes, idx: number) => (
-          <CProblem
-            key={idx}
-            number={problem.problemNumber}
-            backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
-            title={problem.title}
-            level={problem.level}
-            button={
-              <CustomIconButton>
-                <Add onClick={() => addProblem(idx)} />
-              </CustomIconButton>
-            }
-          />
-        ))}
+      <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
+        <Box sx={{ position: 'absolute' }}>
+          {problemList.map((problem: ProblemRes, idx: number) => (
+            <CProblem
+              key={idx}
+              number={problem.problemNumber}
+              backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
+              title={problem.title}
+              level={problem.level}
+              button={
+                <CustomIconButton>
+                  <Add onClick={() => addProblem(idx)} />
+                </CustomIconButton>
+              }
+            />
+          ))}
+        </Box>
       </ProblemBox>
     </div>
   );

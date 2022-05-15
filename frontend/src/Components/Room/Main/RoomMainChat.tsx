@@ -3,10 +3,10 @@ import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
-import { Divider, Stack, styled } from '@mui/material';
+import { Box, Divider, Stack, styled, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
-import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
+import dateToString, { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
 import CProfile from '../../Commons/CProfile';
 import { useParams } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
@@ -19,9 +19,7 @@ interface ReceiveMessage {
 }
 
 const MessageBox = styled('div')(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+  width: '100%',
 }));
 
 let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/api/v1/ws`);
@@ -41,6 +39,7 @@ const options = {
 
 function RoomMainChat() {
   const { roomId } = useParams();
+  const theme = useTheme();
 
   const memberDict = useSelector((state: any) => state.room.memberDict);
   const offsetId = useSelector((state: any) => state.room.offsetId);
@@ -77,7 +76,7 @@ function RoomMainChat() {
       header,
       (res) => {
         console.log('-----------연결성공!!-----------', res);
-
+        getInitChat();
         client.subscribe(
           `/sub/chat/study/${roomId}`,
           (msg) => {
@@ -144,9 +143,18 @@ function RoomMainChat() {
 
   const calDateTime = (nowTime: Date) => {
     if (nowTime.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]) {
-      return dateToStringTime(nowTime);
+      return (
+        <>
+          <div>{dateToStringTime(nowTime)}</div>
+        </>
+      );
     }
-    return dateToString(nowTime);
+    return (
+      <>
+        <div>{dateToStringDate(nowTime, nowTime.getFullYear() !== new Date().getFullYear())}</div>
+        <div>{dateToStringTime(nowTime)}</div>
+      </>
+    );
   };
 
   const infiniteHandler = async (entries: any) => {
@@ -158,6 +166,14 @@ function RoomMainChat() {
     }
   };
 
+  const initSequence = async () => {
+    await getInitChat();
+    if (!client.connected) {
+      wsConnect();
+    }
+    scrollRef?.current?.scrollTo(0, 987654321);
+  };
+
   useEffect(() => {
     if (!isGetPrevChat) {
       scrollRef?.current?.scrollTo(0, scrollRef.current.scrollHeight);
@@ -165,10 +181,8 @@ function RoomMainChat() {
   }, [chatList.length]);
 
   useEffect(() => {
-    getInitChat();
-    if (!client.connected) {
-      wsConnect();
-    }
+    initSequence();
+
     return () => {
       if (client.connected) {
         wsDisconnect();
@@ -186,42 +200,68 @@ function RoomMainChat() {
 
   return (
     <RoomMainComponentContainer>
-      <Stack
-        spacing={1}
-        className="scroll-box"
-        sx={{ height: isMobile ? '83vh' : '15vh', position: 'relative' }}
-        ref={scrollRef}>
-        {isError ? (
-          <Divider variant="middle">
-            <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
-          </Divider>
-        ) : isFinished ? (
-          <Divider variant="middle">
-            <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
-          </Divider>
-        ) : (
-          <div
-            style={{
-              position: 'absolute',
-            }}
-            ref={infiniteRef}>
-            <div style={{ height: 10, width: 200 }}></div>
-          </div>
-        )}
-        {chatList.map((chat: ReceiveMessage, idx: number) => (
-          <MessageBox key={idx}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <CProfile
-                nickname={memberDict[chat.userId]?.nickname}
-                profileImg={memberDict[chat.userId]?.profileImg}
-              />
-              :{chat.content}
+      <div style={{ height: 'calc(100% - 40px)' }}>
+        <Stack
+          spacing={1}
+          className="scroll-box"
+          sx={{ height: isMobile ? '83vh' : '100%', position: 'relative' }}
+          ref={scrollRef}>
+          {isError ? (
+            <Divider variant="middle">
+              <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
+            </Divider>
+          ) : isFinished ? (
+            <Divider variant="middle">
+              <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
+            </Divider>
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+              }}
+              ref={infiniteRef}>
+              <div style={{ height: 10, width: 10 }}></div>
             </div>
-            {calDateTime(new Date(chat.timeStamp))}
-          </MessageBox>
-        ))}
-      </Stack>
-      <RoomMainChatBar value={message} onChange={setMessage} onSendMessage={onSendMessageHandler} />
+          )}
+          <Box sx={{ position: 'absolute', width: '100%' }}>
+            {chatList.map((chat: ReceiveMessage, idx: number) => (
+              <MessageBox key={idx}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                  }}>
+                  <CProfile
+                    nickname={memberDict[chat.userId]?.nickname}
+                    profileImg={memberDict[chat.userId]?.profileImg}
+                  />
+                  <span style={{ fontSize: 12, color: '#888888', textAlign: 'right' }}>
+                    {calDateTime(new Date(chat.timeStamp))}
+                  </span>
+                </div>
+                <Box sx={{ margin: 1 }}>
+                  <span
+                    style={{
+                      backgroundColor: theme.palette.bg,
+                      padding: 4,
+                      marginLeft: 40,
+                      borderRadius: 10,
+                    }}>
+                    {chat.content}
+                  </span>
+                </Box>
+              </MessageBox>
+            ))}
+          </Box>
+        </Stack>
+        <RoomMainChatBar
+          value={message}
+          onChange={setMessage}
+          onSendMessage={onSendMessageHandler}
+        />
+      </div>
     </RoomMainComponentContainer>
   );
 }

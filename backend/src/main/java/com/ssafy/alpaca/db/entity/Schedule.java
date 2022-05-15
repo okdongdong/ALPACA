@@ -3,7 +3,7 @@ package com.ssafy.alpaca.db.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +21,10 @@ public class Schedule {
     private Long id;
 
     @Column(name = "started_at")
-    private LocalDateTime startedAt;
+    private OffsetDateTime startedAt;
 
     @Column(name = "finished_at")
-    private LocalDateTime finishedAt;
+    private OffsetDateTime finishedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id", nullable = false)

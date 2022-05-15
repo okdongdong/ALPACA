@@ -3,8 +3,7 @@ package com.ssafy.alpaca.api.response;
 import com.ssafy.alpaca.db.entity.Schedule;
 import lombok.*;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +16,9 @@ public class ScheduleListRes {
 
     private Long id;
 
-    private LocalDateTime startedAt;
+    private OffsetDateTime startedAt;
 
-    private LocalDateTime finishedAt;
+    private OffsetDateTime finishedAt;
 
     public static List<ScheduleListRes> of(List<Schedule> schedules) {
         return schedules.stream().map(
