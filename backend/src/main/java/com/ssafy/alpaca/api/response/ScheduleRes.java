@@ -2,7 +2,7 @@ package com.ssafy.alpaca.api.response;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Getter
@@ -12,9 +12,9 @@ import java.util.List;
 @Builder
 public class ScheduleRes {
 
-    private LocalDateTime startedAt;
+    private OffsetDateTime startedAt;
 
-    private LocalDateTime finishedAt;
+    private OffsetDateTime finishedAt;
 
     private List<ProblemListRes> problemListRes;
 

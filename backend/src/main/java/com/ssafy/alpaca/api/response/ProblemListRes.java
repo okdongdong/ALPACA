@@ -1,11 +1,10 @@
 package com.ssafy.alpaca.api.response;
 
-import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.SolvedProblem;
 import com.ssafy.alpaca.db.entity.User;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ public class ProblemListRes {
 
     private Boolean isSolved;
 
-    private LocalDateTime startedAt;
+    private OffsetDateTime startedAt;
 
     private List<User> solvedMemberList;
 
