@@ -5,7 +5,8 @@ const palette = {
   basic_backgruond: '#FFFFFF',
   dark_backgruond: '#2D2D2D',
   olivegreen_backgruond: '#FFFAED',
-  peachpink_backgruond: '#FFF5F4',
+  peachpink_backgruond: '#ffffff',
+  // peachpink_backgruond: '#FFF5F4',
   /* main*/
   basic_main: '#97B2E1',
   dark_main: '#3A4358',

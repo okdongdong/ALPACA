@@ -1,5 +1,5 @@
 import { Delete, Edit } from '@mui/icons-material';
-import { Divider, Stack, useTheme } from '@mui/material';
+import { Box, Divider, Stack, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
@@ -45,7 +45,7 @@ function RoomMainStudyDetail() {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const selectedDay = useSelector((state: any) => state.room.selectedDay);
+  const scheduleId = useSelector((state: any) => state.room.scheduleId);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const dateRange = useSelector((state: any) => state.room.dateRange);
   const startedAt = useSelector((state: any) => state.room.startedAt);
@@ -53,7 +53,6 @@ function RoomMainStudyDetail() {
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
 
   const getScheduleProblems = async () => {
-    const scheduleId = dateRange[selectedDayIdx].schedule?.id;
     if (scheduleId === undefined) return;
 
     try {
@@ -83,7 +82,7 @@ function RoomMainStudyDetail() {
   useEffect(() => {
     console.log('selectedDay: ', dateRange[selectedDayIdx]?.day);
     getScheduleProblems();
-  }, [selectedDayIdx]);
+  }, [scheduleId]);
 
   return (
     <>
@@ -113,17 +112,19 @@ function RoomMainStudyDetail() {
 
             <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
             <Divider variant="middle" />
-            <Stack className="scroll-box" spacing={1} sx={{ height: '55vh' }}>
-              {problemListRes.map((problem: ProblemRes, idx: number) => (
-                <RoomMainStudyDetailProblemItem
-                  key={idx}
-                  problemId={problem.problemNumber}
-                  number={problem.problemNumber}
-                  level={problem.level}
-                  title={problem.title}
-                  members={problem.solvedMemberList}
-                />
-              ))}
+            <Stack className="scroll-box" spacing={1} sx={{ height: '100%', position: 'relative' }}>
+              <Box sx={{ position: 'absolute' }}>
+                {problemListRes.map((problem: ProblemRes, idx: number) => (
+                  <RoomMainStudyDetailProblemItem
+                    key={idx}
+                    problemId={problem.problemNumber}
+                    number={problem.problemNumber}
+                    level={problem.level}
+                    title={problem.title}
+                    members={problem.solvedMemberList}
+                  />
+                ))}
+              </Box>
             </Stack>
           </Stack>
         </RoomMainComponentContainer>

@@ -40,9 +40,12 @@ function RoomMainCalendarDay({ dailySchedule, nowDay, onClick }: RoomMainCalenda
     }
     return (
       <div>
-        <span>{dateToStringTimeSimple(timeData?.schedule?.startedAt)}</span>
-        <span>~ {dateToStringTimeSimple(timeData?.schedule?.finishedAt)}</span>
+        <Brightness1Icon sx={{ color: theme.palette.component_accent }}></Brightness1Icon>
       </div>
+      // <div>
+      //   <span>{dateToStringTimeSimple(timeData?.schedule?.startedAt)}</span>
+      //   <span>~ {dateToStringTimeSimple(timeData?.schedule?.finishedAt)}</span>
+      // </div>
     );
   };
 
