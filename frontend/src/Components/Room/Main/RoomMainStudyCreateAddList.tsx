@@ -1,5 +1,5 @@
 import { Remove } from '@mui/icons-material';
-import { alpha, Divider, IconButton, styled, useTheme } from '@mui/material';
+import { alpha, Box, Divider, IconButton, Stack, styled, useTheme } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProblemListRes } from '../../../Redux/roomReducer';
@@ -20,7 +20,7 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const ProblemBox = styled('div')(({ theme }) => ({
-  height: '20vh',
+  height: '15vh',
   borderRadius: 10,
   backgroundColor: theme.palette.bg,
 }));
@@ -41,26 +41,28 @@ function RoomMainStudyCreateAddList({
     dispatch(setProblemListRes(tempAddedProblem));
   };
   return (
-    <div style={{ height: '50%' }}>
+    <Stack spacing={1} sx={{ height: '50%', my: 1 }}>
       <h3>추가된 문제</h3>
-      <Divider variant="middle" sx={{ margin: 0 }} />
-      <ProblemBox className="scroll-box">
-        {problemListRes.map((problem: ProblemRes, idx: number) => (
-          <CProblem
-            key={idx}
-            backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
-            number={problem.problemNumber}
-            title={problem.title}
-            level={problem.level}
-            button={
-              <CustomIconButton>
-                <Remove onClick={() => deleteProblem(idx)} />
-              </CustomIconButton>
-            }
-          />
-        ))}
+      <Divider variant="middle" />
+      <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
+        <Box sx={{ position: 'absolute' }}>
+          {problemListRes.map((problem: ProblemRes, idx: number) => (
+            <CProblem
+              key={idx}
+              backgroundColor={idx % 2 ? '' : alpha(theme.palette.main, 0.3)}
+              number={problem.problemNumber}
+              title={problem.title}
+              level={problem.level}
+              button={
+                <CustomIconButton>
+                  <Remove onClick={() => deleteProblem(idx)} />
+                </CustomIconButton>
+              }
+            />
+          ))}
+        </Box>
       </ProblemBox>
-    </div>
+    </Stack>
   );
 }
 

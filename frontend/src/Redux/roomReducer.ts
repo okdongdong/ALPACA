@@ -88,7 +88,7 @@ const initialState: RoomInfo = {
   finishedAt: new Date(),
   problemListRes: [],
   offsetId: '',
-  scheduleId: 0,
+  scheduleId: undefined,
   isSetting: false,
 };
 
@@ -99,7 +99,9 @@ const roomSlice = createSlice({
     setRoomInfo: (state, action) => ({
       ...state,
       ...action.payload,
+      isStudyExist: Boolean(action.payload.schedule),
       schedules: action.payload.scheduleListRes,
+      scheduleId: action.payload.schedule?.id,
     }),
     resetRoomInfo: (state) => ({ ...initialState }),
     setRoomIntroduction: (state, action) => {
