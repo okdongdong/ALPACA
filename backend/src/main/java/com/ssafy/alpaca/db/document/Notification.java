@@ -34,5 +34,7 @@ public class Notification {
     @Field(targetType = FieldType.INT64)
     private Long scheduleId;
 
+    @Field(targetType = FieldType.DATE_TIME)
     private LocalDateTime scheduleStartedAt;
+
 }

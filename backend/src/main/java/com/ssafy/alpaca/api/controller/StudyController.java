@@ -18,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -55,11 +56,14 @@ public class StudyController {
             value = "스터디 조회",
             notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
     )
-    @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class )
+    @ApiImplicitParams({
+        @ApiImplicitParam( name = "id", value = "조회할 스터디의 id", dataTypeClass = Long.class ),
+        @ApiImplicitParam( name = "offset", value = "표준시간대로부터 offset", dataTypeClass = Integer.class )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id) {
+    public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer offset) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getStudy(username, id));
+        return ResponseEntity.ok(studyService.getStudy(username, id, offset));
     }
 
     @ApiOperation(
@@ -81,12 +85,13 @@ public class StudyController {
             @ApiImplicitParam( name = "year", value = "시작하는 해", dataTypeClass = Long.class ),
             @ApiImplicitParam( name = "month", value = "시작하는 달", dataTypeClass = Long.class ),
             @ApiImplicitParam( name = "day", value = "시작하는 날짜", dataTypeClass = Long.class ),
+            @ApiImplicitParam( name = "offset", value = "표준시간대로부터 offset", dataTypeClass = Integer.class )
     })
     @GetMapping("/span")
     public ResponseEntity<List<ScheduleListRes>> getScheduleList(
-            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) {
+            @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day, @RequestParam Integer offset) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day));
+        return ResponseEntity.ok(studyService.getScheduleList(username, year, month, day, offset));
     }
 
     @ApiOperation(
@@ -194,7 +199,7 @@ public class StudyController {
             value = "초대코드로 스터디 정보 조회",
             notes = "주어진 초대코드를 통해 스터디의 방장과 스터디 정보를 조회한다."
     )
-    @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = Long.class )
+    @ApiImplicitParam( name = "inviteCode", value = "초대코드", dataTypeClass = String.class )
     @GetMapping("/inviteInfo")
     public ResponseEntity<InviteInfoRes> inviteUserCode(@RequestParam String inviteCode) {
         return ResponseEntity.ok(studyService.getInviteInfo(inviteCode));
@@ -204,7 +209,6 @@ public class StudyController {
             value = "초대코드를 통해 스터디 가입",
             notes = "스터디/초대코드 정보에 따라 스터디에 가입시킨다."
     )
-    @ApiImplicitParam( name = "id", value = "가입할 스터디의 id", dataTypeClass = Long.class )
     @PostMapping("/inviteCode")
     public ResponseEntity<BaseResponseBody> inviteUserCode(@RequestBody StudyInviteReq studyInviteReq) {
         String username = userService.getCurrentUsername();

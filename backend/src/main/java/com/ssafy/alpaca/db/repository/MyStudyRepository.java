@@ -12,8 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
             "AND sc.started_at BETWEEN :startedAt AND :finishedAt")
     List<Object[]> findScheduleListByUserId(
             @Param("userId")Long userId,
-            @Param("startedAt") LocalDateTime startedAt,
-            @Param("finishedAt")LocalDateTime finishedAt);
+            @Param("startedAt") OffsetDateTime startedAt,
+            @Param("finishedAt")OffsetDateTime finishedAt);
 
 }

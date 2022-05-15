@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -74,7 +75,7 @@ public class NotificationService {
                                     .studyId(study.getId())
                                     .studyTitle(study.getTitle())
                                     .scheduleId(scheduleId)
-                                    .scheduleStartedAt(schedule.getStartedAt())
+                                    .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
                                     .build()
                     ));
                 } catch (Exception e) {
@@ -90,7 +91,7 @@ public class NotificationService {
                                 .studyId(study.getId())
                                 .studyTitle(study.getTitle())
                                 .scheduleId(scheduleId)
-                                .scheduleStartedAt(schedule.getStartedAt())
+                                .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
                                 .build()
                 );
             }
