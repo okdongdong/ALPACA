@@ -22,14 +22,7 @@ const MessageBox = styled('div')(({ theme }) => ({
   width: '100%',
 }));
 
-let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/api/v1/ws`);
 
-var client = Stomp.over(socket);
-
-const token = localStorage.getItem('accessToken') || '';
-const header = {
-  Authorization: token,
-};
 
 const options = {
   root: null, // 기본 null, 관찰대상의 부모요소를 지정
@@ -37,7 +30,14 @@ const options = {
   threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
 };
 
+let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/api/v1/ws`);
+var client = Stomp.over(socket);
 function RoomMainChat() {
+  const token = localStorage.getItem('accessToken') || '';
+  const header = {
+    Authorization: token,
+  };
+
   const { roomId } = useParams();
   const theme = useTheme();
 
@@ -49,12 +49,12 @@ function RoomMainChat() {
   const infiniteRef = useRef<HTMLDivElement>(null);
 
   const userId = useSelector((state: any) => state.account.userId);
-  const getRoomInfoFinished = useSelector((state: any) => state.account.userId);
 
   const [message, setMessage] = useState('');
   const [chatList, setChatList] = useState<ReceiveMessage[]>([]);
 
   const [page, setPage] = useState<number>(0);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -72,11 +72,13 @@ function RoomMainChat() {
   };
 
   const wsConnect = () => {
+    setIsConnecting(true);
     console.log('-----------소켓연결시도-----------');
     client.connect(
       header,
       (res) => {
         console.log('-----------연결성공!!-----------', res);
+        setIsConnecting(false);
         getInitChat();
         client.subscribe(
           `/sub/chat/study/${roomId}`,
@@ -89,12 +91,14 @@ function RoomMainChat() {
       },
       (err) => {
         console.log('-----------연결실패!!-----------', err);
+        setIsConnecting(false);
       },
     );
   };
 
   const wsDisconnect = () => {
     client.disconnect();
+    setIsConnecting(false);
   };
 
   const onSendMessageHandler = () => {
@@ -167,13 +171,13 @@ function RoomMainChat() {
     }
   };
 
-  const initSequence = async () => {
-    await getInitChat();
-    if (!client.connected) {
-      wsConnect();
+  useEffect(() => {
+    const observer = new IntersectionObserver(infiniteHandler, options);
+    if (infiniteRef.current !== null) {
+      observer.observe(infiniteRef.current);
     }
-    scrollRef?.current?.scrollTo(0, 987654321);
-  };
+    return () => observer.disconnect();
+  }, [infiniteHandler]);
 
   useEffect(() => {
     if (!isGetPrevChat) {
@@ -182,23 +186,17 @@ function RoomMainChat() {
   }, [chatList.length]);
 
   useEffect(() => {
-    wsDisconnect();
-    if (getRoomInfoFinished) initSequence();
+    if (!client.connected && !isConnecting) {
+      wsConnect();
+    }
+    scrollRef?.current?.scrollTo(0, 987654321);
 
     return () => {
       if (client.connected) {
         wsDisconnect();
       }
     };
-  }, [getRoomInfoFinished]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(infiniteHandler, options);
-    if (infiniteRef.current !== null) {
-      observer.observe(infiniteRef.current);
-    }
-    return () => observer.disconnect();
-  }, [infiniteHandler]);
+  });
 
   return (
     <RoomMainComponentContainer>
