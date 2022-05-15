@@ -8,9 +8,10 @@ import { customAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/commonReducer';
 
 interface InviteInfo {
-  managerName: string;
-  managerProfile: string;
-  studyTitle: string;
+  roomMaker: string;
+  roomMakerProfileImg: string;
+  title: string;
+  info: string;
   studyId: number;
 }
 
@@ -23,21 +24,26 @@ function Invite() {
   const isLogin = useSelector((state: any) => state.account.isLogin);
 
   const [inviteInfo, setInviteInfo] = useState<InviteInfo>({
-    managerName: '',
-    managerProfile: '',
-    studyTitle: '',
+    roomMaker: '',
+    roomMakerProfileImg: '',
+    title: '',
     studyId: 0,
+    info: '',
   });
 
   const getInviteInfo = async () => {
     dispatch(setLoading(true));
 
     try {
-      const res = customAxios({ method: 'get', url: '', params: { inviteCode } });
-
+      const res = await customAxios({
+        method: 'get',
+        url: '/study/inviteInfo',
+        params: { inviteCode },
+      });
+      setInviteInfo(res.data);
       console.log(res);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response);
     }
 
     dispatch(setLoading(false));
@@ -47,11 +53,15 @@ function Invite() {
     dispatch(setLoading(true));
 
     try {
-      const res = customAxios({ method: 'post', url: '', data: { studyId: inviteInfo.studyId } });
+      const res = await customAxios({
+        method: 'post',
+        url: '/study/inviteCode',
+        data: { inviteCode },
+      });
 
       console.log(res);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response);
     }
 
     dispatch(setLoading(false));
@@ -66,10 +76,10 @@ function Invite() {
     <CContainerWithLogo>
       <Stack spacing={3}>
         <div>
-          <img src={inviteInfo.managerProfile} alt="profileImg" />
+          <img src={inviteInfo.roomMakerProfileImg} alt="profileImg" />
         </div>
         <div>
-          {inviteInfo.managerName}님이 당신을 {inviteInfo.studyTitle}로 초대했습니다.
+          {inviteInfo.roomMaker}님이 당신을 {inviteInfo.title}로 초대했습니다.
         </div>
         <div>수락하시겠습니까?</div>
         <div style={{ justifyContent: 'center', display: 'flex' }}>
@@ -82,7 +92,7 @@ function Invite() {
             </Stack>
           ) : (
             <Stack direction="row" spacing={5}>
-              <CBtn height="100%" onClick={() => {}}>
+              <CBtn height="100%" onClick={() => navigate('/')}>
                 거절
               </CBtn>
               <CBtn height="100%" onClick={acceptInvite}>

@@ -9,6 +9,7 @@ interface CInputProps {
   type?: string;
   helperText?: string;
   value?: string;
+  readOnly?: boolean;
   onChange: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -32,6 +33,7 @@ function CInput({
   multiline = false,
   type = 'text',
   helperText = '',
+  readOnly = false,
   onChange,
 }: CInputProps) {
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +56,7 @@ function CInput({
                 value={value}
                 placeholder={placeholder}
                 fullWidth
+                readOnly={readOnly}
                 autoComplete={label}
               />
               <FormHelperText>{helperText}</FormHelperText>
@@ -75,6 +78,7 @@ function CInput({
                 value={value}
                 placeholder={placeholder}
                 fullWidth
+                readOnly={readOnly}
                 multiline={multiline}
                 autoComplete={label}
               />

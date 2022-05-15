@@ -1,93 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import React, { useState } from 'react';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { Input, styled, TextField, useTheme } from '@mui/material';
+import { Grid, styled, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { dateToStringDate } from '../../../Lib/dateToString';
+import { dateToStringDate, dateToStringTimeSimple } from '../../../Lib/dateToString';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFinishedAt, setStartedAt } from '../../../Redux/roomReducer';
-import RoomMainStudyCreateTimeInput from './RoomMainStudyCreateTimeInput';
 
 const TimeContainer = styled('div')(({ theme }) => ({
-  display: 'flex',
   width: '100%',
-  justifyContent: 'space-between',
   textAlign: 'center',
 }));
-const DateBox = styled('div')(({ theme }) => ({ width: '50%' }));
-const TimeBox = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'end',
+
+const DateBox = styled('div')(({ theme }) => ({
+  width: '100%',
+  textAlign: 'left',
+  marginBottom: theme.spacing(2),
 }));
-const CTimeInput = styled(Input)(({ theme }) => ({
+
+const CustomInput = styled(TextField)(({ theme }) => ({
   color: theme.palette.txt,
+  backgroundColor: theme.palette.bg,
+  width: '100%',
   '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
   '&:after': {
     borderBottom: `2px solid ${theme.palette.accent}`,
   },
+  '& input': { padding: 10, color: theme.palette.txt },
 }));
 
 function RoomMainStudyCreateTime() {
-  const theme = useTheme();
-
   const dispatch = useDispatch();
 
   const selectedDay = useSelector((state: any) => state.room.selectedDay);
   const startedAt = useSelector((state: any) => state.room.startedAt);
   const finishedAt = useSelector((state: any) => state.room.finishedAt);
-  const [selectedTime, setSelectedTime] = useState<any>();
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
-    setSelectedTime(event.target.value);
+  const [startedTime, setStartedTime] = useState<string>(dateToStringTimeSimple(new Date()));
+  const [finishedTime, setFinishedTime] = useState<string>(dateToStringTimeSimple(new Date()));
+
+  const onChangeStartedAtHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const tempDate = new Date();
+    setStartedTime(event.target.value);
+    const [hours, minutes] = event.target.value.split(':');
+    tempDate.setHours(parseInt(hours), parseInt(minutes));
+    if (!!finishedAt && tempDate.getTime() > finishedAt.getTime()) {
+      // 시작시간을 종료시간보다 더 늦게 설정했을 때
+      dispatch(setFinishedAt(new Date(tempDate)));
+      setFinishedTime(event.target.value);
+    }
+    dispatch(setStartedAt(new Date(tempDate)));
   };
 
-  // 시작시간을 종료시간보다 더 늦게 설정했을 때
-  useEffect(() => {
-    if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
-      dispatch(setFinishedAt(new Date(startedAt)));
-    }
-  }, [startedAt]);
-
-  // 종료시간을 시작시간보다 더 빠르게 설정했을 때
-  useEffect(() => {
-    if (!!startedAt && !!finishedAt && startedAt.getTime() > finishedAt.getTime()) {
+  const onChangeFinishedAtHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const tempDate = new Date();
+    setFinishedTime(event.target.value);
+    const [hours, minutes] = event.target.value.split(':');
+    tempDate.setHours(parseInt(hours), parseInt(minutes));
+    if (!!startedAt && tempDate.getTime() < startedAt.getTime()) {
+      // 종료시간을 시작시간보다 더 빠르게 설정했을 때
       dispatch(setStartedAt(new Date(finishedAt)));
+      setStartedTime(event.target.value);
     }
-  }, [finishedAt]);
+    dispatch(setFinishedAt(new Date(tempDate)));
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <TimeContainer>
-        <TimeBox>
-          <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
-          <RoomMainStudyCreateTimeInput />
-          {/* <CTimeInput type="text" onChange={onChangeHandler} /> */}
-          {/* <TimePicker
-            value={startedAt}
-            onChange={(e) => dispatch(setStartedAt(e))}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                sx={{ width: '50%', backgroundColor: theme.palette.bg, marginRight: 1 }}
-              />
-            )}
-          />
-          ~
-          <TimePicker
-            value={finishedAt}
-            onChange={(e) => dispatch(setFinishedAt(e))}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                sx={{ width: '50%', backgroundColor: theme.palette.bg, marginLeft: 1 }}
-              />
-            )}
-          /> */}
-        </TimeBox>
+        <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
+        <Grid container alignItems="center">
+          <Grid item xs={10} xl={5}>
+            <CustomInput type="time" value={startedTime} onChange={onChangeStartedAtHandler} />
+          </Grid>
+          <Grid item xs={2} xl={0.5}></Grid>
+          <Grid item xs={1.5} xl={1}>
+            ~
+          </Grid>
+          <Grid item xs={0.5} xl={0.5}></Grid>
+          <Grid item xs={10} xl={5}>
+            <CustomInput type="time" value={finishedTime} onChange={onChangeFinishedAtHandler} />
+          </Grid>
+        </Grid>
       </TimeContainer>
     </LocalizationProvider>
   );

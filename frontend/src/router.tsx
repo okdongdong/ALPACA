@@ -50,18 +50,18 @@ function Router({ isLogin }: RouterProps) {
     },
     {
       path: '',
-      element: !isLogin ? <AccountLayout /> : <Navigate to="/" />,
+      element: <AccountLayout />,
       children: [
         {
           path: 'login',
-          element: <Login />,
+          element: !isLogin ? <Login /> : <Navigate to="/" />,
         },
         {
           path: 'signup',
-          element: <Signup />,
+          element: !isLogin ? <Signup /> : <Navigate to="/" />,
         },
         {
-          path: 'invite/:inviteCode',
+          path: '/invite/:inviteCode',
           element: <Invite />,
         },
       ],
