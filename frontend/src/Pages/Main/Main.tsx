@@ -2,7 +2,6 @@ import React from 'react';
 import MainRecommendProblem from '../../Components/Main/MainRecommendProblem';
 import MainIntroduction from '../../Components/Main/MainIntroduction';
 import MainRooms from '../../Components/Main/MainRooms';
-import MainCalendar from '../../Components/Main/MainCalender';
 import MainWeeklyCalendar from '../../Components/Main/MainWeeklyCalender';
 import { BrowserView, MobileView } from 'react-device-detect';
 
@@ -14,9 +13,9 @@ function Main() {
           <div>
             <MainIntroduction />
             <MainRecommendProblem />
+            <MainWeeklyCalendar />
             <MainRooms />
           </div>
-          <MainCalendar />
         </div>
       </BrowserView>
       <MobileView>
