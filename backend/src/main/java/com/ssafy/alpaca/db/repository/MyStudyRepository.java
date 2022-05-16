@@ -45,7 +45,8 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
     Page<MyStudy> findAllByUser(User user, Pageable pageable);
 
     @Query(name = "find_schedule_list_by_user_id", nativeQuery = true, value = "" +
-            "SELECT sc.id as id, sc.started_at as startedAt, sc.finished_at as finishedAt FROM my_study as ms " +
+            "SELECT sc.id as id, st.id as studyId, st.title as title, sc.started_at as startedAt, sc.finished_at as finishedAt " +
+            "FROM my_study as ms " +
             "INNER JOIN study as st ON ms.study_id = st.id " +
             "INNER JOIN schedule as sc ON sc.study_id = st.id " +
             "WHERE ms.user_id=:userId " +
