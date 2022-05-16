@@ -17,7 +17,9 @@ function RoomMainComponentContainer({
   children,
   height = '100%',
 }: RoomMainComponentContainerProps) {
-  return <CustomContainer style={{ height: height }}>{children}</CustomContainer>;
+  return (
+    <CustomContainer style={{ height: height, marginBottom: '20px' }}>{children}</CustomContainer>
+  );
 }
 
 export default RoomMainComponentContainer;
