@@ -117,7 +117,7 @@ public class StudyService {
                 .build();
     }
 
-    public List<StudyListRes> setPin(String username, Long id, Long limit) {
+    public List<StudyListRes> setPin(String username, Long id, StudyPinReq studyPinReq) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
@@ -128,7 +128,7 @@ public class StudyService {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
             myStudyRepository.save(myStudy);
 
-            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), limit)
+            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), studyPinReq.getLimit())
                     .stream().map(map -> StudyListRes.builder()
                             .id(map.getStudy().getId())
                             .title(map.getStudy().getTitle())

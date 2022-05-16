@@ -28,8 +28,7 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
             "SELECT * FROM my_study AS ms " +
             "WHERE ms.user_id=:userId " +
             "ORDER BY ms.pinned_time DESC " +
-            "LIMIT :limit;")
-    @EntityGraph(attributePaths = {"study"})
+            "LIMIT :limit")
     List<MyStudy> findByUserOrderByPinnedTimeDescLimitTo(
             @Param("userId")Long userId,
             @Param("limit")Long limit);
