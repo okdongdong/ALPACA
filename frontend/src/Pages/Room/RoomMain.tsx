@@ -122,7 +122,7 @@ function RoomMain() {
           <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
           <RoomSetting setInviteOpen={setOpen} />
           <Grid container spacing={4} sx={{ width: '100%', height: '100%', px: 5, margin: 0 }}>
-            <Grid item xs={5} md={3} sx={{ paddingBottom: 4 }}>
+            <Grid item xs={12} md={5} lg={3} sx={{ paddingBottom: 4 }}>
               <Stack spacing={3} sx={{ height: '100%' }}>
                 <Stack
                   direction="row"
@@ -143,12 +143,12 @@ function RoomMain() {
                 <RoomMainChat />
               </Stack>
             </Grid>
-            <Grid item xs={7} md={9} style={{ paddingLeft: 0, paddingRight: 4 }}>
+            <Grid item xs={12} md={7} lg={9} style={{ paddingLeft: 0, paddingRight: 4 }}>
               <Grid container spacing={4} sx={{ width: '100%', height: '100%', margin: 0 }}>
-                <Grid item xs={12} md={7}>
+                <Grid item xs={12} md={12} lg={7}>
                   <RoomMainCalendar />
                 </Grid>
-                <Grid item xs={12} md={5} sx={{ paddingBottom: 4 }}>
+                <Grid item xs={12} md={12} lg={5} sx={{ paddingBottom: 4 }}>
                   <Stack spacing={3} sx={{ height: '100%' }}>
                     {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
                   </Stack>
