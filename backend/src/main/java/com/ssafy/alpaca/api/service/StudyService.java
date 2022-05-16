@@ -117,16 +117,29 @@ public class StudyService {
                 .build();
     }
 
-    public void createPin(String username, Long id) {
+    public List<StudyListRes> setPin(String username, Long id, Long limit) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
         if (myStudy.getPinnedTime().getYear() == 1) {
             myStudy.setPinnedTime(LocalDateTime.now());
+            myStudyRepository.save(myStudy);
         } else {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
+            myStudyRepository.save(myStudy);
+
+            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), limit)
+                    .stream().map(map -> StudyListRes.builder()
+                            .id(map.getStudy().getId())
+                            .title(map.getStudy().getTitle())
+                            .pinnedTime(map.getPinnedTime())
+                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
+                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+                                    .collect(Collectors.toList()))
+                            .build()).collect(Collectors.toList());
+
         }
-        myStudyRepository.save(myStudy);
+        return null;
     }
 
     private String getTime(Integer offset) {

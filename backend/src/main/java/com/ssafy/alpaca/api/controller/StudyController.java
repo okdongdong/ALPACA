@@ -46,10 +46,9 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "고정할 스터디의 id", dataTypeClass = Long.class )
     @PostMapping("/{id}")
-    public ResponseEntity<BaseResponseBody> createPin(@PathVariable Long id) {
+    public ResponseEntity<List<StudyListRes>> setPin(@PathVariable Long id, @RequestParam Long limit) {
         String username = userService.getCurrentUsername();
-        studyService.createPin(username, id);
-        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+        return ResponseEntity.ok(studyService.setPin(username, id, limit));
     }
 
     @ApiOperation(
