@@ -28,7 +28,7 @@ const options = {
   threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
 };
 
-let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/ws`);
+let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/chat`);
 var client = Stomp.over(socket);
 const token = localStorage.getItem('accessToken') || '';
 const header = {
