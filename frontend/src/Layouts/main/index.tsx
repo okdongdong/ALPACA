@@ -5,42 +5,41 @@ import SideBar from '../../Components/Bars/SideBar';
 import NavBar from '../../Components/Bars/NavBar';
 import { BrowserView, MobileView } from 'react-device-detect';
 
+const RootStyle = styled('div')({
+  height: '100%',
+  display: 'flex',
+  minHeight: '100%',
+  alignItems: 'center',
+});
+
+const MainStyle = styled('div')(({ theme }) => ({
+  minHeight: '50%',
+  height: '100%',
+  width: '100%',
+  padding: 15,
+}));
+
+const MainDiv = styled('div')(({ theme }) => ({
+  height: '100%',
+  width: '100%',
+  background: theme.palette.bg,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  overflow: 'auto',
+}));
+
+const MMainDiv = styled('div')(({ theme }) => ({
+  height: '100%',
+  width: '100%',
+  background: theme.palette.bg,
+  overflow: 'auto',
+  paddingTop: 60,
+}));
+
 const MainLayout = () => {
   const theme = useTheme();
-  const APP_BAR_DESKTOP = 15;
-  const APP_BAR_MOBILE = 56;
   const { pathname } = useLocation();
-  const RootStyle = styled('div')({
-    height: '100%',
-    display: 'flex',
-    minHeight: '100%',
-    alignItems: 'center',
-  });
-
-  const MainStyle = styled('div')(({ theme }) => ({
-    minHeight: '50%',
-    height: '100%',
-    width: '100%',
-    padding: APP_BAR_DESKTOP,
-  }));
-
-  const MainDiv = styled('div')({
-    height: '100%',
-    width: '100%',
-    background: theme.palette.bg,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'auto',
-  });
-
-  const MMainDiv = styled('div')({
-    height: '100%',
-    width: '100%',
-    background: theme.palette.bg,
-    overflow: 'auto',
-    paddingTop: APP_BAR_MOBILE + 4,
-  });
   return (
     <>
       <BrowserView style={{ width: '100%', height: '100%' }}>

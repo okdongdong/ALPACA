@@ -151,6 +151,7 @@ function RoomStudyLivePreview({ open, setOpen }: PreviewType) {
       publishAudio: Boolean(constraints.audio),
       publishVideo: Boolean(constraints.video),
     };
+    console.log(audioDevices, videoDevices);
     dispatch(setReduxConstraints(state));
     navigate(`/room/${roomId}/live`, { state: roomId });
   };
