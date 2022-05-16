@@ -150,7 +150,7 @@ function RoomMainStudyDetail() {
             <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
             <Divider variant="middle" />
             <Stack className="scroll-box" spacing={1} sx={{ height: '100%', position: 'relative' }}>
-              <Box sx={{ position: 'absolute' }}>
+              <Box sx={{ position: 'absolute', width: '100%' }}>
                 {problemListRes.map((problem: ProblemRes, idx: number) => (
                   <RoomMainStudyDetailProblemItem
                     key={idx}

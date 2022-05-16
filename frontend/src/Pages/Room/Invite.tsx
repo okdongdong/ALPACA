@@ -6,6 +6,7 @@ import CBtn from '../../Components/Commons/CBtn';
 import CContainerWithLogo from '../../Components/Commons/CContainerWithLogo';
 import { customAxios } from '../../Lib/customAxios';
 import { setLoading } from '../../Redux/commonReducer';
+import alpaca from '../../Assets/Img/alpaca.png';
 
 interface InviteInfo {
   roomMaker: string;
@@ -76,7 +77,7 @@ function Invite() {
     <CContainerWithLogo>
       <Stack spacing={3}>
         <div>
-          <img src={inviteInfo.roomMakerProfileImg} alt="profileImg" />
+          <img src={inviteInfo.roomMakerProfileImg || alpaca} alt="profileImg" />
         </div>
         <div>
           {inviteInfo.roomMaker}님이 당신을 {inviteInfo.title}로 초대했습니다.

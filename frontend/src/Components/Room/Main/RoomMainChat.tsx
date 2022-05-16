@@ -22,22 +22,20 @@ const MessageBox = styled('div')(({ theme }) => ({
   width: '100%',
 }));
 
-
-
 const options = {
   root: null, // 기본 null, 관찰대상의 부모요소를 지정
   rootMargin: '0px', // 관찰하는 뷰포트의 마진 지정
   threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
 };
 
-let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/api/v1/ws`);
+let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/ws`);
 var client = Stomp.over(socket);
-function RoomMainChat() {
-  const token = localStorage.getItem('accessToken') || '';
-  const header = {
-    Authorization: token,
-  };
+const token = localStorage.getItem('accessToken') || '';
+const header = {
+  Authorization: token,
+};
 
+function RoomMainChat() {
   const { roomId } = useParams();
   const theme = useTheme();
 
@@ -196,7 +194,7 @@ function RoomMainChat() {
         wsDisconnect();
       }
     };
-  });
+  }, []);
 
   return (
     <RoomMainComponentContainer>
