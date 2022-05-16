@@ -12,16 +12,16 @@ function Main() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div>
             <MainIntroduction />
-            <MainRecommendProblem />
             <MainWeeklyCalendar />
+            <MainRecommendProblem />
             <MainRooms />
           </div>
         </div>
       </BrowserView>
       <MobileView>
         <MainIntroduction />
-        <MainRecommendProblem />
         <MainWeeklyCalendar />
+        <MainRecommendProblem />
         <MainRooms />
       </MobileView>
     </>

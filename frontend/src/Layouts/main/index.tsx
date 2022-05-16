@@ -62,6 +62,6 @@ function MainLayout() {
       </MobileView>
     </>
   );
-};
+}
 
 export default MainLayout;
