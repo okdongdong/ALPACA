@@ -24,6 +24,16 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
     @EntityGraph(attributePaths = {"study"})
     List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
 
+    @Query(nativeQuery = true, value = "" +
+            "SELECT * FROM my_study AS ms " +
+            "WHERE ms.user_id=:userId " +
+            "ORDER BY ms.pinned_time DESC " +
+            "LIMIT :limit;")
+    @EntityGraph(attributePaths = {"study"})
+    List<MyStudy> findByUserOrderByPinnedTimeDescLimitTo(
+            @Param("userId")Long userId,
+            @Param("limit")Long limit);
+
     Boolean existsByUserAndIsRoomMaker(User user, Boolean isRoomMaker);
 
     Boolean existsByUserAndStudy(User user, Study study);
