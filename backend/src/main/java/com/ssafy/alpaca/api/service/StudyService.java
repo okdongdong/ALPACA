@@ -224,8 +224,10 @@ public class StudyService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         return objects.stream().map(object -> ScheduleListRes.builder()
                 .id(Long.parseLong(object[0].toString()))
-                .startedAt(OffsetDateTime.of(LocalDateTime.parse(object[1].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
-                .finishedAt(OffsetDateTime.of(LocalDateTime.parse(object[2].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
+                .studyId(Long.parseLong(object[1].toString()))
+                .studyTitle(object[2].toString())
+                .startedAt(OffsetDateTime.of(LocalDateTime.parse(object[3].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
+                .finishedAt(OffsetDateTime.of(LocalDateTime.parse(object[4].toString(), dateTimeFormatter), ZoneOffset.of(offSet)))
                 .build()).collect(Collectors.toList());
     }
 
