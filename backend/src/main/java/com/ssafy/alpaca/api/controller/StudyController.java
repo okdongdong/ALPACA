@@ -45,8 +45,8 @@ public class StudyController {
             notes = "요청에 따라 지정한 스터디를 가장 앞으로 옮긴다."
     )
     @ApiImplicitParam( name = "id", value = "고정할 스터디의 id", dataTypeClass = Long.class )
-    @PostMapping("/{id}")
-    public ResponseEntity<List<StudyListRes>> setPin(@PathVariable Long id, @RequestParam Long limit) {
+    @PostMapping("/{id}/pin/{limit}/limit")
+    public ResponseEntity<List<StudyListRes>> setPin(@PathVariable Long id, @PathVariable Long limit) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.setPin(username, id, limit));
     }
