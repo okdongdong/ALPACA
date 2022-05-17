@@ -7,6 +7,7 @@ import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
 import com.ssafy.alpaca.db.document.Chat;
+import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
@@ -48,6 +49,7 @@ public class StudyService {
     private final InviteCodeRedisRepository inviteCodeRedisRepository;
     private final StudyCodeRedisRepository studyCodeRedisRepository;
     private final ChatRepository chatRepository;
+    private final NotificationRepository notificationRepository;
 
     private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
@@ -453,4 +455,28 @@ public class StudyService {
                 .build());
     }
 
+    public StudyListRes joinStudy(String username, Long id) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        Notification notification = notificationRepository.findTopByUserIdAndStudyId(user.getId(), study.getId()).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
+        );
+
+        MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
+                        .isRoomMaker(false)
+                        .user(user)
+                        .study(study)
+                        .build());
+        notificationRepository.delete(notification);
+
+        List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
+        return StudyListRes.builder()
+                .id(id)
+                .title(study.getTitle())
+                .pinnedTime(newMyStudy.getPinnedTime())
+                .profileImgList(myStudies.stream().map(
+                        myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                        .collect(Collectors.toList()))
+                .build();
+    }
 }

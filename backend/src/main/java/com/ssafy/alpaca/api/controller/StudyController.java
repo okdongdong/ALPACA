@@ -226,4 +226,15 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
+    @ApiOperation(
+            value = "스터디 초대",
+            notes = "방장이 스터디에 사용자를 초대한다."
+    )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
+    @PostMapping("/{id}/join")
+    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.joinStudy(username, id));
+    }
+
 }
