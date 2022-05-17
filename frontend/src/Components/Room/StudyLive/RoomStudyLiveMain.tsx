@@ -20,7 +20,7 @@ const CustomDragHandle = styled(DragHandle)(({ theme }) => ({
 
 function RoomStudyLiveMain({ mainStreamManager, openYjsDocs, setOpenYjsDocs }: mainPropsType) {
   const theme = useTheme();
-  const [width, setWidth] = useState<string>('20vw');
+  const [width, setWidth] = useState<string>('30vw');
   const handleDrag = (e: React.DragEvent) => {
     // 1920 기준 500
     const innerWidth = e.currentTarget.parentElement?.getBoundingClientRect().right;

@@ -5,6 +5,7 @@ import { Check, Link } from '@mui/icons-material';
 import CClassBadge from '../Commons/CClassBadge';
 import CBadge from '../Commons/CBadge';
 import { useNavigate } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 
 type RecommendProblemType = {
   classLevel: number;
@@ -26,7 +27,7 @@ const CustomBtn = styled(Button)(({ theme }) => ({
 
 const RecommendProblemDiv = styled(Paper)(({ theme }) => ({
   width: '100%',
-  height: '25vh',
+  height: isMobile ? '' : '20vh',
   marginTop: '2vh',
   marginBottom: '3vh',
   borderRadius: '10px',
@@ -49,27 +50,37 @@ function RecommendProblem(props: { problem: RecommendProblemType }) {
         width: '100%',
         background: theme.palette.main,
       }}>
-      <CClassBadge width={30} height={30} level={classLevel} />
+      <CClassBadge width={25} height={25} level={classLevel} />
       <div
         onClick={() => {
           window.open(`https://www.acmicpc.net/problem/${problemNumber}`, '_blank');
         }}
         className="align_center"
-        style={{ marginTop: '0.8vh', marginBottom: '1.6vh', cursor: 'pointer' }}>
-        <CBadge tier={level} />
-        <div style={{ marginLeft: '0.5vw' }}>{problemNumber}</div>
-        <IconButton>
+        style={{ cursor: 'pointer' }}>
+        <CBadge tier={level} width={20} height={20} />
+        <div style={{ marginLeft: '0.5vw', fontSize: '0.9rem' }}>{problemNumber}</div>
+        <IconButton size="small">
           <Link sx={{ color: theme.palette.txt }} />
         </IconButton>
       </div>
-      <div style={{ height: '5vh', overflowY: 'auto' }}>{title}</div>
-      <CustomBtn
-        size="small"
-        onClick={() => {
-          navigate(`/compile/${problemNumber}`);
+      <div
+        style={{
+          height: isMobile ? '' : '4vh',
+          overflowY: 'auto',
+          fontSize: '0.9rem',
+          textAlign: 'center',
         }}>
-        풀기
-      </CustomBtn>
+        {title}
+      </div>
+      {!isMobile && (
+        <CustomBtn
+          size="small"
+          onClick={() => {
+            navigate(`/compile/${problemNumber}`);
+          }}>
+          풀기
+        </CustomBtn>
+      )}
       {isSolved && (
         <div
           className="align_center"
@@ -110,8 +121,8 @@ function MainRecommendProblem() {
           };
         }),
       );
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 
@@ -123,7 +134,7 @@ function MainRecommendProblem() {
       <div style={{ textAlign: 'center', height: '3vh', fontWeight: '600', fontSize: '1.2rem' }}>
         오늘의 추천문제
       </div>
-      <div style={{ height: '19.5vh', display: 'flex', justifyContent: 'space-around' }}>
+      <div style={{ height: '15vh', display: 'flex', justifyContent: 'space-around' }}>
         {recommendProblems.map((problem) => {
           return (
             <div

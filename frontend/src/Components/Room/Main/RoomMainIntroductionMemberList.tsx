@@ -7,7 +7,6 @@ import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 
-
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.main,
   color: theme.palette.icon,

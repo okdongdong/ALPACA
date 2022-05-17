@@ -46,7 +46,7 @@ function MainLayout() {
     <>
       <BrowserView style={{ width: '100%', height: '100%' }}>
         <RootStyle>
-          {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <SideBar />}
+          {pathname === '/404' ? null : <SideBar />}
           <MainStyle>
             <MainDiv>
               <Outlet />
@@ -55,13 +55,13 @@ function MainLayout() {
         </RootStyle>
       </BrowserView>
       <MobileView style={{ width: '100%', height: '100%' }}>
-        {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <NavBar />}
+        {pathname === '/404' ? null : <NavBar />}
         <MMainDiv>
           <Outlet />
         </MMainDiv>
       </MobileView>
     </>
   );
-};
+}
 
 export default MainLayout;
