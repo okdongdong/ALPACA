@@ -10,6 +10,7 @@ import { Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLoading, setLoadingMessage } from '../../Redux/commonReducer';
+import useAlert from '../../Hooks/useAlert';
 
 type Monaco = typeof monaco;
 type problemInfoType = {
@@ -23,6 +24,7 @@ type problemInfoType = {
 function Compile() {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const cAlert = useAlert();
   const preferredLanguage = useSelector((state: any) => state.account.preferredLanguage);
   const themeType = useSelector((state: any) => state.theme.themeType);
   const { problemId } = useParams();
@@ -96,6 +98,16 @@ function Compile() {
   };
 
   const saveCode = async () => {
+    if (!!!code.trim()) {
+      cAlert.fire({
+        title: '저장 실패',
+        text: '코드 입력 후 저장해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
     dispatch(setLoading(true));
     try {
       const data = {
