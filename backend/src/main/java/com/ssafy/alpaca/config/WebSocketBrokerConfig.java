@@ -19,7 +19,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트에서 연결할 부분을 설정
-        registry.addEndpoint("/chat")
+        registry.addEndpoint("/ch")
                 // 허용 도메인
                 .setAllowedOriginPatterns("*")
                 // fallback

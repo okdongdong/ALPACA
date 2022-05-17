@@ -28,10 +28,6 @@ public class StudyReq {
         return Study.builder()
                 .title(studyReq.getTitle())
                 .info(studyReq.getInfo())
-//                .inviteCode(null)
-//                .sessionId(null)
                 .build();
-
-
     }
 }

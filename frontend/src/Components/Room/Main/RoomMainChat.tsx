@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import SockJS from 'sockjs-client';
-import Stomp from 'webstomp-client';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
 import { Box, Divider, Stack, styled, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
-import dateToString, { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
+import { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
 import CProfile from '../../Commons/CProfile';
 import { useParams } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
+import { Client } from '@stomp/stompjs';
 
 interface ReceiveMessage {
   userId: number;
@@ -27,13 +26,7 @@ const options = {
   rootMargin: '0px', // 관찰하는 뷰포트의 마진 지정
   threshold: 1, // 관찰요소와 얼만큼 겹쳤을 때 콜백을 수행하도록 지정하는 요소 };
 };
-
-let socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/chat`);
-var client = Stomp.over(socket);
-const token = localStorage.getItem('accessToken') || '';
-const header = {
-  Authorization: token,
-};
+var client: Client | null = null;
 
 function RoomMainChat() {
   const { roomId } = useParams();
@@ -52,56 +45,80 @@ function RoomMainChat() {
   const [chatList, setChatList] = useState<ReceiveMessage[]>([]);
 
   const [page, setPage] = useState<number>(0);
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGetPrevChat, setIsGetPrevChat] = useState<boolean>(false);
 
-  const wsSendMessage = () => {
-    if (!message) return;
-
-    if (client && client.connected) {
-      console.log('Send message:' + message);
-      const temp = { userId, studyId: roomId, content: message };
-      client.send(`/pub/chat/study`, JSON.stringify(temp), {});
-      setMessage('');
-    }
-  };
-
-  const wsConnect = () => {
-    setIsConnecting(true);
+  const connect = () => {
     console.log('-----------소켓연결시도-----------');
-    client.connect(
-      header,
-      (res) => {
-        console.log('-----------연결성공!!-----------', res);
-        setIsConnecting(false);
-        getInitChat();
-        client.subscribe(
-          `/sub/chat/study/${roomId}`,
-          (msg) => {
-            const newMessage = JSON.parse(msg.body);
-            setChatList((prev) => [...prev, newMessage]);
-          },
-          { id: 'user' },
-        );
+    const token = localStorage.getItem('accessToken') || '';
+    const header = {
+      Authorization: token,
+    };
+    // 연결시도
+    client = new Client({
+      brokerURL: `${process.env.REACT_APP_BASE_URL?.replace('http', 'ws')}/api/v1/ch/websocket`, // 웹소켓 서버로 직접 접속
+      connectHeaders: header,
+      debug: function (str: any) {
+        console.log(str);
       },
-      (err) => {
-        console.log('-----------연결실패!!-----------', err);
-        setIsConnecting(false);
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        console.log('-----------연결성공!!-----------');
+        subscribe();
+        scrollRef?.current?.scrollTo(0, 987654321);
       },
-    );
+      onStompError: (frame: any) => {
+        console.log('-----------연결실패!!-----------');
+        console.error(frame);
+      },
+      onWebSocketError: (evt: any) => {
+        console.log('-----------websocket error!!-----------');
+        console.log(evt);
+      },
+      onWebSocketClose: (evt: any) => {
+        console.log('-----------websocket close!!-----------');
+        console.log(evt);
+      },
+    });
+
+    client.activate();
+    console.log('client: ', client);
   };
 
-  const wsDisconnect = () => {
-    client.disconnect();
-    setIsConnecting(false);
+  const disconnect = () => {
+    console.log('--------------disconnect', client);
+    client?.deactivate();
+  };
+
+  const subscribe = () => {
+    console.log('--------------subscribe', client);
+    client?.subscribe(`/sub/chat/study/${roomId}`, (res: any) => {
+      const newMessage = JSON.parse(res.body);
+      setChatList((prev) => [...prev, newMessage]);
+    });
+  };
+
+  const sendMessage = () => {
+    if (!message) return;
+    if (!client?.connected) return;
+
+    console.log('Send message:' + message);
+    const temp = { userId, studyId: roomId, content: message };
+    client?.publish({
+      destination: '/pub/chat/study',
+      body: JSON.stringify(temp),
+    });
+
+    setMessage('');
   };
 
   const onSendMessageHandler = () => {
     setIsGetPrevChat(false);
-    wsSendMessage();
+    sendMessage();
     console.log('scrollRef: ', scrollRef);
   };
 
@@ -140,6 +157,7 @@ function RoomMainChat() {
   };
 
   const getInitChat = async () => {
+    console.log('======채팅조회');
     await getPrevChat();
     scrollRef?.current?.scrollTo(0, 987654321);
   };
@@ -169,6 +187,7 @@ function RoomMainChat() {
     }
   };
 
+  // 인피니티 스크롤
   useEffect(() => {
     const observer = new IntersectionObserver(infiniteHandler, options);
     if (infiniteRef.current !== null) {
@@ -177,23 +196,18 @@ function RoomMainChat() {
     return () => observer.disconnect();
   }, [infiniteHandler]);
 
+  // 이전 채팅 조회시 스크롤 보정
   useEffect(() => {
     if (!isGetPrevChat) {
       scrollRef?.current?.scrollTo(0, scrollRef.current.scrollHeight);
     }
   }, [chatList.length]);
 
+  // 웹소켓 연결
   useEffect(() => {
-    if (!client.connected && !isConnecting) {
-      wsConnect();
-    }
-    scrollRef?.current?.scrollTo(0, 987654321);
-
-    return () => {
-      if (client.connected) {
-        wsDisconnect();
-      }
-    };
+    getInitChat();
+    connect();
+    return () => disconnect();
   }, []);
 
   return (
@@ -202,7 +216,7 @@ function RoomMainChat() {
         <Stack
           spacing={1}
           className="scroll-box"
-          sx={{ height: isMobile ? '83vh' : '100%', position: 'relative' }}
+          sx={{ height: isMobile ? '83vh' : '100%', position: 'relative', minHeight: '20vh' }}
           ref={scrollRef}>
           {isError ? (
             <Divider variant="middle">

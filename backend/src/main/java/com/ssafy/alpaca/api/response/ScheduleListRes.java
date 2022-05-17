@@ -16,6 +16,10 @@ public class ScheduleListRes {
 
     private Long id;
 
+    private Long studyId;
+
+    private String studyTitle;
+
     private OffsetDateTime startedAt;
 
     private OffsetDateTime finishedAt;

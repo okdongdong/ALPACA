@@ -4,44 +4,18 @@ import { WebsocketProvider } from 'y-websocket';
 // @ts-ignore
 import { MonacoBinding } from 'y-monaco';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { useTheme, styled } from '@mui/material/styles';
-import { ArrowRight, ArrowLeft, DragHandle } from '@mui/icons-material';
-import { Icon, IconButton } from '@mui/material';
-
+import { ArrowForwardIos, ArrowBackIosNew, DragHandle } from '@mui/icons-material';
+import { Icon, IconButton, Tooltip, useTheme, styled } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import RoomCompileSelectLanguageBtn from '../Compile/RoomCompileSelectLanguageBtn';
 
 import './RoomStudyLiveCodeEditor.css';
 
-// // @ts-ignore
-// window.MonacoEnvironment = {
-//   // @ts-ignore
-//   getWorkerUrl: function (moduleId, label) {
-//     if (label === 'json') {
-//       return '/monaco/dist/json.worker.bundle.js';
-//     }
-//     if (label === 'css') {
-//       return '/monaco/dist/css.worker.bundle.js';
-//     }
-//     if (label === 'html') {
-//       return '/monaco/dist/html.worker.bundle.js';
-//     }
-//     if (label === 'typescript' || label === 'javascript') {
-//       return '/monaco/dist/ts.worker.bundle.js';
-//     }
-//     return '/monaco/dist/editor.worker.bundle.js';
-//   },
-// };
-
 const CustonIconBtn = styled(IconButton)(({ theme }) => ({
-  background: theme.palette.main,
   borderRadius: '20px',
   width: '25px',
   height: '25px',
-  color: theme.palette.icon,
-  '&:hover': {
-    background: theme.palette.main + '90',
-  },
+  color: theme.palette.txt,
 }));
 
 const CustomDragHandle = styled(DragHandle)(({ theme }) => ({
@@ -64,6 +38,7 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
   const theme = useTheme();
   const editorRef = useRef(null);
   const [language, setLanguage] = useState('python');
+  const [tooltipOpen, setTooltipOpen] = useState<boolean>(false);
   const monaco = useMonaco();
   monaco?.editor.defineTheme('myTheme', {
     base: 'vs',
@@ -107,14 +82,31 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
           transition: 'all .2s',
           overflow: 'hidden',
         }}>
-        <div style={{ padding: '10px', color: theme.palette.txt }}>
-          코드편집
+        <div
+          style={{ padding: '10px', color: theme.palette.txt }}
+          className={openYjsDocs ? 'align_center' : 'align_column_center'}>
+          <div style={{ textAlign: 'center' }}>코드 동시편집</div>
           <CustonIconBtn
+            onMouseEnter={() => {
+              setTooltipOpen(true);
+            }}
+            onMouseLeave={() => {
+              setTooltipOpen(false);
+            }}
             size="small"
             onClick={() => {
+              setTooltipOpen(false);
               setOpenYjsDocs((prev: Boolean) => !prev);
             }}>
-            {openYjsDocs ? <ArrowRight /> : <ArrowLeft />}
+            {openYjsDocs ? (
+              <Tooltip open={tooltipOpen} title="코드편집기 닫기">
+                <ArrowForwardIos />
+              </Tooltip>
+            ) : (
+              <Tooltip open={tooltipOpen} title="코드편집기 열기">
+                <ArrowBackIosNew />
+              </Tooltip>
+            )}
           </CustonIconBtn>
         </div>
         {openYjsDocs && (

@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView, MobileView, isMobile } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
 
 export interface StudyCreateProps {
@@ -66,14 +66,38 @@ function MainRoomsDetail(props: StudyCreateProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userInfo = useSelector((state: any) => state.account);
-  const temp = props.detail.profileImgList.slice(0, 4);
 
   const pinStudy = async () => {
     try {
-      await customAxios({
+      const res = await customAxios({
         method: 'post',
-        url: `/study/${props.detail.id}`,
+        url: `/study/${props.detail.id}/pin`,
+        data: { limit: props.page * 3 },
       });
+      console.log(res);
+      if (isMobile) {
+        if (res.data !== '') {
+          console.log('!=null');
+          const temp = { ...userInfo };
+          temp.studies = res.data;
+          dispatch(setUserInfo(temp));
+          props.callback(1, res.data);
+          return;
+        }
+        if (res.data === '') {
+          console.log('==null');
+          const temp = { ...userInfo };
+
+          const popItem = temp.studies.pop(
+            temp.studies.findIndex((v: any) => v.id === props.detail.id),
+          );
+          console.log(popItem);
+          temp.studies.unshift(popItem);
+          dispatch(setUserInfo(temp));
+          props.callback(1, temp.studies);
+          return;
+        }
+      }
       pinCheckOn();
     } catch (e) {
       console.log(e);
@@ -97,21 +121,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
   };
 
   const goStudy = () => {
-    cAlert
-      .fire({
-        title: '스터디 입장',
-        text: '스터디에 입장 하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '확인',
-        cancelButtonText: '취소',
-        reverseButtons: false,
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          navigate(`/room/${props.detail.id}`);
-        }
-      });
+    navigate(`/room/${props.detail.id}`);
   };
 
   return (
@@ -137,7 +147,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
             onClick={pinStudy}></PushPinIcon>
           <CButton onClick={goStudy}>
             <Grid container sx={{ padding: 2 }}>
-              {temp.map((item: string, i: number) => {
+              {props.detail.profileImgList.slice(0, 4).map((item: string, i: number) => {
                 return (
                   <Grid item xs={6} key={i} sx={{ padding: 0 }}>
                     <img src={!!item ? item : alpaca} className={styles.profileimg_mini} alt="" />
@@ -171,7 +181,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
           <MButton onClick={goStudy}>
             <MNameLabel>{props.detail.title}</MNameLabel>
             <Grid container sx={{ padding: 2 }}>
-              {temp.map((item: string, i: number) => {
+              {props.detail.profileImgList.slice(0, 4).map((item: string, i: number) => {
                 return (
                   <img
                     key={i}

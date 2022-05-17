@@ -17,11 +17,18 @@ export interface Schedule {
   id: number;
   finishedAt: Date;
   startedAt: Date;
+  studyId?: number;
+  studyTitle?: string;
 }
 
 export interface DailySchedule {
   day: Date;
   schedule?: Schedule;
+}
+
+export interface MainDailySchedule {
+  day: Date;
+  schedules: Schedule[];
 }
 
 export interface SolvedMemberList {
@@ -54,6 +61,7 @@ export interface RoomInfo {
 
   // 현재 달력의 날짜계산 및 스케줄저장을 위한 변수
   dateRange: DailySchedule[];
+  weeklyDateRange: MainDailySchedule[];
 
   // 일정 수정모드 체크
   isEdit: boolean;
@@ -89,6 +97,7 @@ const initialState: RoomInfo = {
   selectedDayIdx: -1,
   isStudyExist: false,
   dateRange: [],
+  weeklyDateRange: [],
   isEdit: false,
   startedAt: new Date(),
   finishedAt: new Date(),
@@ -139,6 +148,9 @@ const roomSlice = createSlice({
     setDateRange: (state, action) => {
       state.dateRange = action.payload;
     },
+    setWeeklyDateRange: (state, action) => {
+      state.weeklyDateRange = action.payload;
+    },
     setIsEdit: (state, action) => {
       state.isEdit = action.payload;
     },
@@ -183,6 +195,9 @@ const roomSlice = createSlice({
     setDailySchedule: (state) => {
       state.dateRange = calDailySchedule(state.dateRange, state.schedules);
     },
+    setWeeklySchedule: (state) => {
+      state.weeklyDateRange = calWeeklySchedule(state.weeklyDateRange, state.schedules);
+    },
     deleteSchedule: (state) => {
       state.problemListRes = [];
       state.dateRange[state.selectedDayIdx] = { day: state.dateRange[state.selectedDayIdx].day };
@@ -202,6 +217,24 @@ const calDailySchedule = (dateRange: DailySchedule[], schedules: Schedule[]) => 
       if (dateRange[i].day.toDateString() === scheduleDay.toDateString()) {
         dateRange[i].schedule = schedules[scheduleIdx++];
       }
+    }
+  }
+  return dateRange;
+};
+
+const calWeeklySchedule = (dateRange: MainDailySchedule[], schedules: Schedule[]) => {
+  let scheduleIdx = 0;
+  let dateIdx = 0;
+  while (dateIdx < dateRange.length) {
+    if (scheduleIdx < schedules.length) {
+      let scheduleDay = new Date(schedules[scheduleIdx].startedAt);
+      if (dateRange[dateIdx].day.toDateString() === scheduleDay.toDateString()) {
+        dateRange[dateIdx]?.schedules.push(schedules[scheduleIdx++]);
+      } else {
+        dateIdx++;
+      }
+    } else {
+      dateIdx++;
     }
   }
   return dateRange;
@@ -227,6 +260,7 @@ export const {
   setSelectedDayIdx,
   setIsStudyExist,
   setDateRange,
+  setWeeklyDateRange,
   setIsEdit,
   setStartedAt,
   setFinishedAt,
@@ -240,6 +274,7 @@ export const {
   resetProblemList,
   changeSelectedDay,
   setDailySchedule,
+  setWeeklySchedule,
   deleteSchedule,
   setIsRoomMaker,
 } = roomSlice.actions;
