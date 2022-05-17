@@ -121,21 +121,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
   };
 
   const goStudy = () => {
-    cAlert
-      .fire({
-        title: '스터디 입장',
-        text: '스터디에 입장 하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '확인',
-        cancelButtonText: '취소',
-        reverseButtons: false,
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          navigate(`/room/${props.detail.id}`);
-        }
-      });
+    navigate(`/room/${props.detail.id}`);
   };
 
   return (
