@@ -255,15 +255,20 @@ public class StudyService {
         }
 
         List<ProblemListRes> problemListRes = new ArrayList<>();
+        Optional<Problem> problem;
         for (ToSolveProblem toSolveProblem : problemList) {
-            Optional<Problem> problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber());
+            problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber());
             if (problem.isEmpty()) {
                 continue;
             }
-            List<User> users = new ArrayList<>();
+            List<UserListRes> userListRes = new ArrayList<>();
             for (MyStudy ms : myStudy) {
                 if (codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId())) {
-                    users.add(ms.getUser());
+                    userListRes.add(UserListRes.builder()
+                            .id(ms.getUser().getId())
+                            .nickname(ms.getUser().getNickname())
+                            .profileImg(convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
+                            .build());
                 }
             }
             problemListRes.add(ProblemListRes.builder()
@@ -273,7 +278,7 @@ public class StudyService {
                     .level(problem.get().getLevel())
                     .isSolved(solvedProblemRepository.existsByUserAndProblemNumber(user, problem.get().getProblemNumber()))
                     .startedAt(toSolveProblem.getSchedule().getStartedAt())
-                    .solvedMemberList(users)
+                    .solvedMemberList(userListRes)
                     .build());
         }
         return problemListRes;
