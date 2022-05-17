@@ -28,7 +28,4 @@ public class Study {
     @Size(max = 500)
     private String info;
 
-    @Column(name = "session_id")
-    private String sessionId;
-
 }
