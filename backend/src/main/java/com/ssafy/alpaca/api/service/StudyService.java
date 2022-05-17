@@ -117,16 +117,29 @@ public class StudyService {
                 .build();
     }
 
-    public void createPin(String username, Long id) {
+    public List<StudyListRes> setPin(String username, Long id, Long limit) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
         if (myStudy.getPinnedTime().getYear() == 1) {
             myStudy.setPinnedTime(LocalDateTime.now());
+            myStudyRepository.save(myStudy);
         } else {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
+            myStudyRepository.save(myStudy);
+
+            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), limit)
+                    .stream().map(map -> StudyListRes.builder()
+                            .id(map.getStudy().getId())
+                            .title(map.getStudy().getTitle())
+                            .pinnedTime(map.getPinnedTime())
+                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
+                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+                                    .collect(Collectors.toList()))
+                            .build()).collect(Collectors.toList());
+
         }
-        myStudyRepository.save(myStudy);
+        return null;
     }
 
     private String getTime(Integer offset) {
@@ -242,15 +255,20 @@ public class StudyService {
         }
 
         List<ProblemListRes> problemListRes = new ArrayList<>();
+        Optional<Problem> problem;
         for (ToSolveProblem toSolveProblem : problemList) {
-            Optional<Problem> problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber());
+            problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber());
             if (problem.isEmpty()) {
                 continue;
             }
-            List<User> users = new ArrayList<>();
+            List<UserListRes> userListRes = new ArrayList<>();
             for (MyStudy ms : myStudy) {
                 if (codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId())) {
-                    users.add(ms.getUser());
+                    userListRes.add(UserListRes.builder()
+                            .id(ms.getUser().getId())
+                            .nickname(ms.getUser().getNickname())
+                            .profileImg(convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
+                            .build());
                 }
             }
             problemListRes.add(ProblemListRes.builder()
@@ -260,7 +278,7 @@ public class StudyService {
                     .level(problem.get().getLevel())
                     .isSolved(solvedProblemRepository.existsByUserAndProblemNumber(user, problem.get().getProblemNumber()))
                     .startedAt(toSolveProblem.getSchedule().getStartedAt())
-                    .solvedMemberList(users)
+                    .solvedMemberList(userListRes)
                     .build());
         }
         return problemListRes;

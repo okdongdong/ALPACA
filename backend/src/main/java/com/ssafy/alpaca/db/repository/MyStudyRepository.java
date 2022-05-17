@@ -24,6 +24,16 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
     @EntityGraph(attributePaths = {"study"})
     List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
 
+    @Query(nativeQuery = true, value = "" +
+            "SELECT * FROM my_study AS ms " +
+            "WHERE ms.user_id=:userId " +
+            "ORDER BY ms.pinned_time DESC " +
+            "LIMIT :limit;")
+    @EntityGraph(attributePaths = {"study"})
+    List<MyStudy> findByUserOrderByPinnedTimeDescLimitTo(
+            @Param("userId")Long userId,
+            @Param("limit")Long limit);
+
     Boolean existsByUserAndIsRoomMaker(User user, Boolean isRoomMaker);
 
     Boolean existsByUserAndStudy(User user, Study study);
@@ -50,7 +60,8 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
             "INNER JOIN study as st ON ms.study_id = st.id " +
             "INNER JOIN schedule as sc ON sc.study_id = st.id " +
             "WHERE ms.user_id=:userId " +
-            "AND sc.started_at BETWEEN :startedAt AND :finishedAt")
+            "AND sc.started_at BETWEEN :startedAt AND :finishedAt " +
+            "ORDER BY sc.started_at")
     List<Object[]> findScheduleListByUserId(
             @Param("userId")Long userId,
             @Param("startedAt") OffsetDateTime startedAt,
