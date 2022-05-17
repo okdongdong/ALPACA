@@ -152,8 +152,10 @@ public class ProblemService {
                 } else {
                     problemRecommendRes = getRandomProblem(user);
                 }
-            } else {
+            } else if (0 < user.getClassLevel()) {
                 problemRecommendRes = getClassProblem(user.getClassLevel(), user);
+            } else {
+                problemRecommendRes = getClassProblem(1L, user);
             }
             if (todayProblem.isEmpty()) {
                 todayProblemRepository.save(TodayProblem.builder()
