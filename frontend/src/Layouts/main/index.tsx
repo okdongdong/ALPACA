@@ -54,7 +54,7 @@ function MainLayout() {
           </MainStyle>
         </RootStyle>
       </BrowserView>
-      <MobileView style={{ width: '100%', height: '100%' }}>
+      <MobileView style={{ width: '100%' }}>
         {pathname.indexOf('compile') !== -1 || pathname === '/404' ? null : <NavBar />}
         <MMainDiv>
           <Outlet />

@@ -2,7 +2,7 @@ import { alpha, Button, Collapse, Grid, Stack, styled, useTheme } from '@mui/mat
 import { useSelector } from 'react-redux';
 import { dateToStringTimeSimple } from '../../../Lib/dateToString';
 import { DailySchedule } from './RoomMainCalendar';
-import { MainDailySchedule } from '../../Main/MainWeeklyCalender';
+import { MainDailySchedule } from '../../Main/MainWeeklyCalendar';
 import { isMobile } from 'react-device-detect';
 import Brightness1Icon from '@mui/icons-material/Brightness1';
 

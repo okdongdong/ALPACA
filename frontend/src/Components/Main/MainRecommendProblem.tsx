@@ -121,8 +121,8 @@ function MainRecommendProblem() {
           };
         }),
       );
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response);
     }
   };
 

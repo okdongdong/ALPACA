@@ -7,7 +7,7 @@ import './Theme/GlobalStyles.css';
 import store from './Redux/store';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const persistor = persistStore(store);
 
@@ -23,4 +23,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   // </React.StrictMode>,
 );
 
-serviceWorkerRegistration.register();
+// serviceWorkerRegistration.register();
