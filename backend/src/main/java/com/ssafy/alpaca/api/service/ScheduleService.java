@@ -5,7 +5,9 @@ import com.ssafy.alpaca.api.request.ScheduleReq;
 import com.ssafy.alpaca.api.response.ProblemListRes;
 import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
+import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.exception.UnAuthorizedException;
+import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.*;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +32,10 @@ public class ScheduleService {
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
+    private final SolvedProblemRepository solvedProblemRepository;
     private final ProblemRepository problemRepository;
+    private final CodeRepository codeRepository;
+    private final ConvertUtil convertUtil;
     private final NotificationService notificationService;
 
     private User checkUserByUsername(String username) {
@@ -56,18 +62,34 @@ public class ScheduleService {
         }
     }
 
-    private List<ProblemListRes> getProblemListByToSolveProblems(List<ToSolveProblem> toSolveProblems) {
+    private List<ProblemListRes> getProblemListByToSolveProblems(User user, List<ToSolveProblem> toSolveProblems, List<MyStudy> myStudies) {
         List<ProblemListRes> problemListResList = new ArrayList<>();
+        HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
         for (ToSolveProblem toSolveProblem : toSolveProblems) {
             Problem problem = problemRepository.findByProblemNumber(toSolveProblem.getProblemNumber()).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
             );
+
+            List<UserListRes> userListRes = new ArrayList<>();
+            for (MyStudy myStudy : myStudies) {
+                if (codeRepository.existsByProblemNumberAndUserId(problem.getProblemNumber(), myStudy.getUser().getId())) {
+                    userListRes.add(
+                            UserListRes.builder()
+                                    .id(myStudy.getUser().getId())
+                                    .nickname(myStudy.getUser().getNickname())
+                                    .profileImg(convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                                    .build()
+                    );
+                }
+            }
 
             problemListResList.add(
                     ProblemListRes.builder()
                             .problemNumber(problem.getProblemNumber())
                             .title(problem.getTitle())
                             .level(problem.getLevel())
+                            .isSolved(solvedProblems.contains(problem.getProblemNumber()))
+                            .solvedMemberList(userListRes)
                             .build()
             );
         }
@@ -144,8 +166,9 @@ public class ScheduleService {
             throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(todaySchedule.get());
-        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(toSolveProblem);
+        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(user, toSolveProblem, myStudies);
 
         return ScheduleRes.builder()
                 .startedAt(todaySchedule.get().getStartedAt())
@@ -221,10 +244,12 @@ public class ScheduleService {
         toSolveProblemRepository.deleteAll(deleteList);
     }
 
-    public ScheduleRes getSchedule(Long id) {
+    public ScheduleRes getSchedule(String username, Long id) {
+        User user = checkUserByUsername(username);
         Schedule schedule = checkScheduleById(id);
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(schedule.getStudy());
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(schedule);
-        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(toSolveProblem);
+        List<ProblemListRes> problemListRes = getProblemListByToSolveProblems(user, toSolveProblem, myStudies);
 
         return ScheduleRes.builder()
                 .startedAt(schedule.getStartedAt())
