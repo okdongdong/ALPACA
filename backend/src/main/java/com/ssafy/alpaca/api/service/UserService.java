@@ -110,7 +110,7 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
-        List<StudyListRes> studyListRes = myStudyRepository.findTop3ByUserOrderByPinnedTimeDesc(user)
+        List<StudyListRes> studyListRes = myStudyRepository.findAllByUserOrderByPinnedTimeDesc(user)
                 .stream().map(myStudy -> StudyListRes.builder()
                         .id(myStudy.getStudy().getId())
                         .title(myStudy.getStudy().getTitle())

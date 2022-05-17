@@ -22,7 +22,7 @@ public interface MyStudyRepository extends JpaRepository<MyStudy, Long> {
     Long countAllByUser(User user);
 
     @EntityGraph(attributePaths = {"study"})
-    List<MyStudy> findTop3ByUserOrderByPinnedTimeDesc(User user);
+    List<MyStudy> findAllByUserOrderByPinnedTimeDesc(User user);
 
     @Query(nativeQuery = true, value = "" +
             "SELECT * FROM my_study AS ms " +

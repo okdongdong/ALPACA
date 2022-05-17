@@ -202,20 +202,20 @@ public class StudyService {
                 .build();
     }
 
-    public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
-        User user = checkUserByUsername(username);
-        Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);
-
-        return myStudyList.map(myStudy -> StudyListRes.builder()
-                .id(myStudy.getStudy().getId())
-                .title(myStudy.getStudy().getTitle())
-                .pinnedTime(myStudy.getPinnedTime())
-                .profileImgList(
-                        myStudyRepository.findAllByStudy(myStudy.getStudy())
-                                .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
-                                .collect(Collectors.toList()))
-                .build());
-    }
+//    public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
+//        User user = checkUserByUsername(username);
+//        Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);
+//
+//        return myStudyList.map(myStudy -> StudyListRes.builder()
+//                .id(myStudy.getStudy().getId())
+//                .title(myStudy.getStudy().getTitle())
+//                .pinnedTime(myStudy.getPinnedTime())
+//                .profileImgList(
+//                        myStudyRepository.findAllByStudy(myStudy.getStudy())
+//                                .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
+//                                .collect(Collectors.toList()))
+//                .build());
+//    }
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
         User user = checkUserByUsername(username);
