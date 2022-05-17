@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable() // rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다. 어쩌면 필요할수도?
                 .csrf().disable() // NOSONAR, rest api이므로 csrf 보안이 필요없으므로 disable처리.
                 .authorizeRequests()// 다음 리퀘스트에 대한 사용권한 체크
-                .antMatchers("/", "/auth/**", "/ws/**").permitAll() // 누구나 접근가능한 요청
+                .antMatchers("/", "/auth/**", "/chat/**").permitAll() // 누구나 접근가능한 요청
 //                .anyRequest().hasRole("USER")// 그외 나머지 요청은 모두 인증된 회원만 접근 가능
                 .and()
                 .exceptionHandling()
@@ -62,8 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(STATELESS) // jwt token으로 인증할것이므로 세션필요없으므로 생성안함.
 
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 전에 JwtAuthenticationFilter 삽입
-        ;
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // UsernamePasswordAuthenticationFilter 전에 JwtAuthenticationFilter 삽입
+
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Override
