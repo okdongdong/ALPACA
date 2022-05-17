@@ -122,7 +122,7 @@ public class StudyService {
                 .build();
     }
 
-    public List<StudyListRes> setPin(String username, Long id, StudyPinReq studyPinReq) {
+    public void setPin(String username, Long id) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
@@ -133,18 +133,16 @@ public class StudyService {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
             myStudyRepository.save(myStudy);
 
-            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), studyPinReq.getLimit())
-                    .stream().map(map -> StudyListRes.builder()
-                            .id(map.getStudy().getId())
-                            .title(map.getStudy().getTitle())
-                            .pinnedTime(map.getPinnedTime())
-                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
-                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
-                                    .collect(Collectors.toList()))
-                            .build()).collect(Collectors.toList());
-
+//            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), studyPinReq.getLimit())
+//                    .stream().map(map -> StudyListRes.builder()
+//                            .id(map.getStudy().getId())
+//                            .title(map.getStudy().getTitle())
+//                            .pinnedTime(map.getPinnedTime())
+//                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
+//                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+//                                    .collect(Collectors.toList()))
+//                            .build()).collect(Collectors.toList());
         }
-        return null;
     }
 
     private String getTime(Integer offset) {
