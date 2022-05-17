@@ -82,6 +82,11 @@ public class StudyService {
 
     public StudyListRes createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
+
+        if (99 < myStudyRepository.countAllByUser(user)) {
+            throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_STUDIES);
+        }
+
         if (12 < studyReq.getMemberIdList().size()) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_MEMBERS);
         }
