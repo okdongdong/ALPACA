@@ -12,6 +12,6 @@ public interface NotificationRepository extends MongoRepository<Notification,Str
 
     List<Notification> findAllByUserId(Long userId);
 
-    Optional<Notification> findTopByUserIdAndStudyId(Long userId, Long studyId);
+    Optional<Notification> findTopByUserIdAndStudyIdAndScheduleId(Long userId, Long studyId, Long scheduleId);
 
 }

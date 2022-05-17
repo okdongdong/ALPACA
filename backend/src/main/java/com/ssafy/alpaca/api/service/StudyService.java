@@ -458,9 +458,13 @@ public class StudyService {
     public StudyListRes joinStudy(String username, Long id) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
-        Notification notification = notificationRepository.findTopByUserIdAndStudyId(user.getId(), study.getId()).orElseThrow(
+        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
         );
+        if (myStudyRepository.existsByUserAndStudy(user, study)) {
+            notificationRepository.delete(notification);
+            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        }
 
         MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
                         .isRoomMaker(false)
@@ -479,4 +483,15 @@ public class StudyService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    public void rejectStudy(String username, Long id) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
+        );
+
+        notificationRepository.delete(notification);
+    }
+
 }
