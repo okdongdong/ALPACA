@@ -158,15 +158,19 @@ function BasicMenu(props: any) {
 
   return (
     <div>
-      <Button
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        sx={{ color: theme.palette.txt }}
-        onClick={handleClick}>
-        더보기
-      </Button>
+      {props.data?.solvedMemberList.length !== 0 ? (
+        <Button
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          sx={{ color: theme.palette.txt }}
+          onClick={handleClick}>
+          더보기
+        </Button>
+      ) : (
+        ''
+      )}
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -245,6 +249,7 @@ const columnsData = [
     headerName: '문제 푼 스터디원',
     width: 300,
     renderCell: (params: any) => {
+      console.log(params);
       return (
         <div
           style={{

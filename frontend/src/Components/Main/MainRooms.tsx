@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Box, Grid, Pagination, Stack, IconButton, Button } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Grid, Pagination, Stack, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
 import StudyCreate from '../Dialogs/StudyCreate';
 import { styled, useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../Lib/customAxios';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView, isMobile, MobileView } from 'react-device-detect';
 
 const CIconButton = styled(IconButton)(({ theme }) => ({
   margin: '10px',
@@ -45,7 +45,7 @@ function MainRooms() {
     setStudyList(newStudyData);
   };
 
-  const mData = (newPage: number, newStudyData: any) => {
+  const mNewData = (newPage: number, newStudyData: any) => {
     setStudyList(newStudyData);
   };
 
@@ -53,7 +53,11 @@ function MainRooms() {
     setPage(newPage);
     setStudyList(newStudyData);
   };
-
+  const mPinData = (newPage: number, newStudyData: any) => {
+    console.log(newStudyData);
+    console.log(studyList);
+    setStudyList(newStudyData);
+  };
   const searchData = async (now: number) => {
     try {
       const res = await customAxios({
@@ -61,18 +65,53 @@ function MainRooms() {
         url: `/study`,
         params: { page: now - 1 },
       });
-      console.log(res);
       setStudyList(res.data.content);
+      console.log(studyList);
     } catch (e) {
       console.log(e);
     }
   };
 
+  const MsearchData = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: `/study`,
+        params: { page: page },
+      });
+      console.log(res.data);
+      const newList = res.data.content;
+      const mergedList = studyList.concat(...newList);
+      setPage(page + 1);
+      setStudyList(mergedList);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleScroll = (): void => {
+    const { scrollHeight } = document.documentElement;
+    const { scrollTop } = document.documentElement;
+    const { clientHeight } = document.documentElement;
+    if (isMobile) {
+      if (scrollTop >= scrollHeight - clientHeight) {
+        MsearchData();
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, true);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [handleScroll]);
+
   return (
     <>
       <BrowserView>
         <Grid container>
-          {studyList.slice(0, 3).map((study: any, i: number) => {
+          {studyList?.slice(0, 3).map((study: any, i: number) => {
             return (
               <Stack key={i}>
                 <MainRoomsDetail detail={study} page={page} callback={pinData} />
@@ -139,16 +178,15 @@ function MainRooms() {
             open={open}
             page={page}
             studyList={studyList}
-            callback={mData}
+            callback={mNewData}
             onClose={() => {
               setOpen(false);
             }}
           />
-          {studyList.map((study: any, i: number) => {
-            console.log(study);
+          {studyList?.map((study: any, i: number) => {
             return (
               <Stack key={i}>
-                <MainRoomsDetail detail={study} page={page} callback={pinData} />
+                <MainRoomsDetail detail={study} page={page} callback={mPinData} />
               </Stack>
             );
           })}

@@ -7,7 +7,6 @@ import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 
-
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.main,
   color: theme.palette.icon,
@@ -24,7 +23,8 @@ function RoomMainIntroductionMemberList() {
       </div>
       <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
       <Stack spacing={1}>
-        {members.map((member: Member, idx: number) => (
+        {members.map((member: Member, idx: number) => {
+          console.log(member);
           <div
             key={idx}
             style={{
@@ -38,8 +38,8 @@ function RoomMainIntroductionMemberList() {
                 <CCrown width={25} height={25} color="#FFCD29" />
               </div>
             )}
-          </div>
-        ))}
+          </div>;
+        })}
       </Stack>
     </RoomMainComponentContainer>
   );
