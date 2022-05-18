@@ -67,22 +67,19 @@ type ChatType = {
 
 function RoomStudyLiveChat() {
   const theme = useTheme();
-
-  const [anchorEl, setAnchorEl] = useState<undefined | HTMLElement>();
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [isBottom, setIsBottom] = useState<Boolean>(true);
   const [isNewMessage, setIsNewMessage] = useState<Boolean>(false);
   const [newMessageCount, setNewMessageCount] = useState<number>(0);
-
+  const openRef = useRef<boolean>(false);
   const chatDivRef = useRef<HTMLDivElement>(null);
   const session = useSelector((state: any) => state.openvidu.sessionForCamera);
-  const openChat = Boolean(anchorEl);
   const { nickname } = useSelector((state: any) => state.account);
 
   useEffect(() => {
     session.on('signal:chat', (event: any) => {
-      console.log(event);
-      if (!!!openChat) {
+      if (!openRef.current) {
         setNewMessageCount((prev) => prev + 1);
       }
       setChatList((prev) => {
@@ -125,10 +122,12 @@ function RoomStudyLiveChat() {
   };
 
   const toggleChat = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (openChat) {
-      setAnchorEl(undefined);
+    if (!!anchorEl) {
+      setAnchorEl(null);
+      openRef.current = false;
     } else {
       setAnchorEl(event.currentTarget);
+      openRef.current = true;
       setNewMessageCount(0);
     }
   };
@@ -141,7 +140,7 @@ function RoomStudyLiveChat() {
         </NavBtn>
       </CustomBadge>
       <Popover
-        open={openChat}
+        open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={toggleChat}
         anchorOrigin={{

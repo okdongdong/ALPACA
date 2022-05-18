@@ -87,6 +87,7 @@ function NavBar() {
     if (params.roomId !== undefined) {
       navigate(`room/${params.roomId}`);
     }
+    setRightOpen(false);
   };
   const clickProblem = () => {
     if (params.roomId !== undefined) {
@@ -122,7 +123,7 @@ function NavBar() {
   };
 
   const icon: iconObjType = {
-    Home: { icon: <Home />, onClick: clickHome, text: '홈' },
+    Home: { icon: <Home />, onClick: clickHome, text: '스터디 홈' },
     Problem: { icon: <Assignment />, onClick: clickProblem, text: '문제조회' },
     Logout: { icon: <Logout />, onClick: clickLogout, text: '로그아웃' },
     Noti: { icon: <Notifications />, onClick: clickNotification, text: '알림' },

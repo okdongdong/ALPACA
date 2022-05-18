@@ -47,7 +47,6 @@ const CalendarBox = styled(Grid)(({ theme }) => ({
 }));
 
 function MainWeeklyCalendar() {
-  const { roomId } = useParams();
   const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -86,7 +85,6 @@ function MainWeeklyCalendar() {
   const getWeeklySchedule = async () => {
     const startDate = getStartDate();
     try {
-      console.log(startDate);
       const res = await customAxios({
         method: 'get',
         url: `/study/span`,
@@ -97,7 +95,6 @@ function MainWeeklyCalendar() {
           offset: 0,
         },
       });
-      console.log('change week: ', res);
       const tempSchedules: Schedule[] = [];
       res.data.forEach((schedule: Schedule) => {
         const startedAt = new Date(schedule.startedAt);
@@ -112,9 +109,7 @@ function MainWeeklyCalendar() {
         });
       });
       dispatch(setSchedules([...tempSchedules]));
-    } catch (e: any) {
-      console.log(e.response);
-    }
+    } catch (e: any) {}
   };
 
   const handleClose = () => {
@@ -132,6 +127,9 @@ function MainWeeklyCalendar() {
 
   useEffect(() => {
     getStartDate();
+    return () => {
+      dispatch(setSchedules([]));
+    };
   }, []);
 
   useEffect(() => {

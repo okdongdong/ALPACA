@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ALPACA",
+  "name": "ALPACA",
   "icons": [
     { "src": "./icons/apple-touch-icon-57x57.png", "sizes": "57x57", "type": "image/png" },
     { "src": "./icons/apple-touch-icon-60x60.png", "sizes": "60x60", "type": "image/png" },
@@ -23,7 +23,7 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "/login",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#031230",
   "background_color": "#031230"
