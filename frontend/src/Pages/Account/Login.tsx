@@ -67,7 +67,6 @@ function Login(props: any) {
         preferredLanguage: res.data.preferredLanguage,
         studies: res.data.studies,
         isLogin: true,
-        studyCount: res.data.studyCount,
       };
 
       console.log(resUserInfo);
@@ -114,6 +113,18 @@ function Login(props: any) {
   };
 
   useEffect(() => {
+    console.log(
+      '%c ALPACA ',
+      'font-size:50px; background-image:linear-gradient(30deg, #FFC2C0, #F7F6CB);color:white;',
+    );
+    console.log(
+      '%c\tALgorithm \n\tPowerup \n\tAlong with \n\tCoding study \n\tAssistance',
+      'font-size:24px;',
+    );
+    console.log(
+      '%c ',
+      'font-size:400px; background:url(https://k6e106.p.ssafy.io/static/media/alpaca.9da052aea15a52cf100a.png) no-repeat;',
+    );
     return () => {
       clearTimeout();
     };

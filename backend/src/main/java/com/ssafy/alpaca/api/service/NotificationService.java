@@ -1,7 +1,5 @@
 package com.ssafy.alpaca.api.service;
 
-import com.ssafy.alpaca.api.request.StudyMemberListReq;
-import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
@@ -19,10 +17,10 @@ import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -77,6 +75,7 @@ public class NotificationService {
                                     .studyTitle(study.getTitle())
                                     .scheduleId(scheduleId)
                                     .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
+                                    .isLive(true)
                                     .build()
                     ));
                 } catch (Exception e) {
@@ -93,13 +92,14 @@ public class NotificationService {
                                 .studyTitle(study.getTitle())
                                 .scheduleId(scheduleId)
                                 .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
+                                .isLive(false)
                                 .build()
                 );
             }
         }
     }
 
-    public void notifyAddStudyEvent(String username, Long id, StudyMemberListReq studyMemberListReq) {
+    public void notifyAddStudyEvent(String username, Long id, List<Long> studyMemberIdList) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -110,14 +110,15 @@ public class NotificationService {
             throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        for (Long memberId : studyMemberListReq.getMemberIdList()) {
+        for (Long memberId : studyMemberIdList) {
 
-            User member = userRepository.findById(memberId).orElseThrow(
-                    () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-            );
+            Optional<User> member = userRepository.findById(memberId);
+            if (member.isEmpty()) {
+                continue;
+            }
 
-            if (myStudyRepository.existsByUserAndStudy(member, study)) {
-                throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+            if (myStudyRepository.existsByUserAndStudy(member.get(), study)) {
+                continue;
             }
     
             if (sseEmitters.containsKey(memberId)){
@@ -129,6 +130,7 @@ public class NotificationService {
                                     .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                     .studyId(study.getId())
                                     .studyTitle(study.getTitle())
+                                    .isLive(true)
                                     .build()
                     ));
                 } catch (Exception e) {
@@ -138,11 +140,12 @@ public class NotificationService {
             else {
                 notificationRepository.save(
                         Notification.builder()
-                                .userId(member.getId())
+                                .userId(member.get().getId())
                                 .roomMaker(user.getNickname())
                                 .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                 .studyId(study.getId())
                                 .studyTitle(study.getTitle())
+                                .isLive(false)
                                 .build()
                 );
             }

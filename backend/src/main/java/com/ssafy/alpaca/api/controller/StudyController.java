@@ -32,7 +32,9 @@ public class StudyController {
     @PostMapping
     public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.createStudy(username, studyReq));
+        StudyListRes studyListRes = studyService.createStudy(username, studyReq);
+        notificationService.notifyAddStudyEvent(username, studyListRes.getId(), studyReq.getMemberIdList());
+        return ResponseEntity.ok(studyListRes);
     }
 
     @ApiOperation(
@@ -59,6 +61,16 @@ public class StudyController {
     public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer offset) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getStudy(username, id, offset));
+    }
+
+    @ApiOperation(
+            value = "스터디 조회",
+            notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
+    )
+    @GetMapping()
+    public ResponseEntity<List<StudyListRes>> getStudyList() {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getStudyList(username));
     }
 
     @ApiOperation(
@@ -207,7 +219,7 @@ public class StudyController {
     @PostMapping("/{id}/invite")
     public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberListReq studyMemberListReq) {
         String username = userService.getCurrentUsername();
-        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq);
+        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq.getMemberIdList());
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
@@ -217,9 +229,9 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
     @PostMapping("/{id}/join")
-    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id) {
+    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id, @RequestBody NotificationIsLiveReq notificationIsLiveReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.joinStudy(username, id));
+        return ResponseEntity.ok(studyService.joinStudy(username, id, notificationIsLiveReq));
     }
 
     @ApiOperation(

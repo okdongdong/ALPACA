@@ -110,16 +110,6 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
-        List<StudyListRes> studyListRes = myStudyRepository.findAllByUserOrderByPinnedTimeDesc(user)
-                .stream().map(myStudy -> StudyListRes.builder()
-                        .id(myStudy.getStudy().getId())
-                        .title(myStudy.getStudy().getTitle())
-                        .pinnedTime(myStudy.getPinnedTime())
-                        .profileImgList(myStudyRepository.findTop4ByStudy(myStudy.getStudy()).stream().map(
-                                anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
-                                .collect(Collectors.toList()))
-                        .build()).collect(Collectors.toList());
-
         return LoginRes.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -129,8 +119,6 @@ public class UserService {
                 .bojId(user.getBojId())
                 .theme(user.getTheme())
                 .preferredLanguage(user.getPreferredLanguage())
-                .studyCount(myStudyRepository.countAllByUser(user))
-                .studies(studyListRes)
                 .build();
     }
 

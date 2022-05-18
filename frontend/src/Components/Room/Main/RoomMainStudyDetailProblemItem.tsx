@@ -13,6 +13,7 @@ export interface RoomMainStudyDetailProblemItemProps {
   level: number;
   title: string;
   members?: SolvedMemeberList[];
+  isSolved?: boolean;
 }
 
 function RoomMainStudyDetailProblemItem({
@@ -21,6 +22,7 @@ function RoomMainStudyDetailProblemItem({
   title,
   level,
   members,
+  isSolved = false,
 }: RoomMainStudyDetailProblemItemProps) {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -38,6 +40,7 @@ function RoomMainStudyDetailProblemItem({
         number={number}
         level={level}
         title={title}
+        isSolved={isSolved}
         button={
           <>
             <CBtn onClick={() => navigate(`/compile/${problemId}`)}>코드 제출</CBtn>

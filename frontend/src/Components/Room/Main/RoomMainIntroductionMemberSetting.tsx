@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { setLoading } from '../../../Redux/commonReducer';
-import { Member } from '../../../Redux/roomReducer';
+import { Member, setIsRoomMaker } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
@@ -84,7 +84,6 @@ function RoomMainIntroductionMemberSetting({
       showCancelButton: true,
       confirmButtonText: '양도',
       cancelButtonText: '취소',
-      color: 'rgb(255,0,0)',
     });
 
     if (result.isConfirmed) {
@@ -96,6 +95,7 @@ function RoomMainIntroductionMemberSetting({
           icon: 'success',
           confirmButtonText: '닫기',
         });
+        dispatch(setIsRoomMaker(false));
       } else if (!!errorMessage)
         cAlert.fire('양도 실패!', errorMessage, 'error').then(() => {
           setErrorMessage('');

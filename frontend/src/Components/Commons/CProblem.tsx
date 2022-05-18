@@ -6,6 +6,7 @@ interface CProblemProps {
   number: number;
   level: number;
   title: string;
+  isSolved?: boolean;
   backgroundColor?: string;
   button?: ReactJSXElement;
   borderRadius?: number | string;
@@ -35,6 +36,7 @@ function CProblem({
   button,
   backgroundColor,
   borderRadius,
+  isSolved = false,
   onClick = () => {},
 }: CProblemProps) {
   // 새 창에서 문제페이지 띄워줌
@@ -50,7 +52,12 @@ function CProblem({
         paddingTop: '4px',
         paddingBottom: '4px',
       }}>
-      <ProblemBox sx={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+      <ProblemBox
+        sx={{
+          backgroundColor: 'rgba(0, 0, 0, 0)',
+          color: isSolved ? '#329B17' : '',
+          fontWeight: isSolved ? 'bold' : '',
+        }}>
         <div style={{ display: 'flex', alignItems: 'center' }} onClick={onClickHandler}>
           <CBadge tier={level} type="problem" />
           <div style={{ paddingLeft: 16 }}>{number}</div>
