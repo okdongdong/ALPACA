@@ -11,14 +11,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -65,17 +60,6 @@ public class StudyController {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getStudy(username, id, offset));
     }
-
-//    @ApiOperation(
-//            value = "스터디 추가 조회",
-//            notes = "pageable에 해당하는 스터디를 3개단위로 조회한다."
-//    )
-//    @GetMapping
-//    public ResponseEntity<Page<StudyListRes>> getMoreStudy(
-//            @PageableDefault(size = 3, sort = "pinnedTime", direction = Sort.Direction.DESC)Pageable pageable) {
-//        String username = userService.getCurrentUsername();
-//        return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
-//    }
 
     @ApiOperation(
             value = "스터디 일정 리스트 조회",

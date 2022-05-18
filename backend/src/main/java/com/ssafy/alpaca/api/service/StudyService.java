@@ -18,10 +18,8 @@ import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,16 +130,6 @@ public class StudyService {
         } else {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
             myStudyRepository.save(myStudy);
-
-//            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), studyPinReq.getLimit())
-//                    .stream().map(map -> StudyListRes.builder()
-//                            .id(map.getStudy().getId())
-//                            .title(map.getStudy().getTitle())
-//                            .pinnedTime(map.getPinnedTime())
-//                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
-//                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
-//                                    .collect(Collectors.toList()))
-//                            .build()).collect(Collectors.toList());
         }
     }
 
@@ -204,21 +192,6 @@ public class StudyService {
                 .offsetId(optChat.map(Chat::getId).orElse(null))
                 .build();
     }
-
-//    public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
-//        User user = checkUserByUsername(username);
-//        Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);
-//
-//        return myStudyList.map(myStudy -> StudyListRes.builder()
-//                .id(myStudy.getStudy().getId())
-//                .title(myStudy.getStudy().getTitle())
-//                .pinnedTime(myStudy.getPinnedTime())
-//                .profileImgList(
-//                        myStudyRepository.findAllByStudy(myStudy.getStudy())
-//                                .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
-//                                .collect(Collectors.toList()))
-//                .build());
-//    }
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
         User user = checkUserByUsername(username);
