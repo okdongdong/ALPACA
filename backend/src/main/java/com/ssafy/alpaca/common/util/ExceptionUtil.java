@@ -9,6 +9,7 @@ public class ExceptionUtil {
     public static final String ROOMMAKER_CANNOT_RESIGN = "스터디에서 방장을 맡고 있으면 탈퇴할 수 없습니다.";
     public static final String INVALID_DATE_VALUE = "종료시간이 더 빠를 수 없습니다.";
     public static final String TOO_MANY_MEMBERS = "스터디 멤버는 12명을 초과할 수 없습니다.";
+    public static final String TOO_MANY_STUDIES = "스터디는 100개를 초과할 수 없습니다.";
     public static final String INVITE_CODE_NOT_EXISTS = "초대코드가 존재하지 않습니다.";
     public static final String INVALID_INVITATION = "유효하지 않는 초대알림입니다.";
     public static final String FILE_NOT_CONVERT = "파일을 변환할 수 없습니다.";

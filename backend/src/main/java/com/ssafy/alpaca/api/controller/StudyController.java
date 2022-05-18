@@ -11,14 +11,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -45,10 +40,11 @@ public class StudyController {
             notes = "요청에 따라 지정한 스터디를 가장 앞으로 옮긴다."
     )
     @ApiImplicitParam( name = "id", value = "고정할 스터디의 id", dataTypeClass = Long.class )
-    @PostMapping("/{id}")
-    public ResponseEntity<List<StudyListRes>> setPin(@PathVariable Long id, @RequestParam Long limit) {
+    @PostMapping("/{id}/pin")
+    public ResponseEntity<BaseResponseBody> setPin(@PathVariable Long id) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.setPin(username, id, limit));
+        studyService.setPin(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
     @ApiOperation(
@@ -63,17 +59,6 @@ public class StudyController {
     public ResponseEntity<StudyRes> getStudy(@PathVariable Long id, @RequestParam Integer offset) {
         String username = userService.getCurrentUsername();
         return ResponseEntity.ok(studyService.getStudy(username, id, offset));
-    }
-
-    @ApiOperation(
-            value = "스터디 추가 조회",
-            notes = "pageable에 해당하는 스터디를 3개단위로 조회한다."
-    )
-    @GetMapping
-    public ResponseEntity<Page<StudyListRes>> getMoreStudy(
-            @PageableDefault(size = 3, sort = "pinnedTime", direction = Sort.Direction.DESC)Pageable pageable) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.getMoreStudy(username, pageable));
     }
 
     @ApiOperation(
