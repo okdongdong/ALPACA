@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import { OpenVidu, Session } from 'openvidu-browser';
@@ -59,7 +59,7 @@ function StudyLive() {
   const [publisher, setPublisher] = useState<UserModel | undefined>(undefined);
   const [subscribers, setSubscribers] = useState<UserModel[]>([]);
 
-  const [openYjsDocs, setOpenYjsDocs] = useState<Boolean>(false);
+  const [openYjsDocs, setOpenYjsDocs] = useState<Boolean>(true);
   const subseribersRef = useRef<UserModel[]>([]);
 
   useEffect(() => {
@@ -76,14 +76,16 @@ function StudyLive() {
       return;
     }
     joinSession();
+    window.addEventListener('beforeunload', leaveSession);
     return () => {
+      window.removeEventListener('beforeunload', leaveSession);
       leaveSession();
     };
   }, []);
 
   const joinSession = () => {
     OVForCamera = new OpenVidu();
-    OVForCamera.enableProdMode();
+    // OVForCamera.enableProdMode();
     OVForScreen = new OpenVidu();
     OVForScreen.enableProdMode();
 
@@ -111,7 +113,7 @@ function StudyLive() {
     connectToSession();
   };
 
-  const leaveSession = () => {
+  const leaveSession = useCallback(() => {
     if (sessionForCamera) {
       sessionForCamera.disconnect();
     }
@@ -126,7 +128,7 @@ function StudyLive() {
     dispatch(setMainUser(undefined));
     setPublisher(undefined);
     setSubscribers([]);
-  };
+  }, []);
   const exitStudyLive = () => {
     Swal.fire({
       title: '정말 나가시겠습니까?',
@@ -424,10 +426,10 @@ function StudyLive() {
             style={{
               height: 'calc(100% - 15vh)',
               position: 'absolute',
-              right: '1vw',
+              left: 0,
               width: '100%',
-              paddingLeft: '10vw',
-              paddingRight: '2vw',
+              paddingLeft: '2vw',
+              paddingRight: '10vw',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -444,7 +446,7 @@ function StudyLive() {
               <div
                 style={{
                   position: 'absolute',
-                  left: '1vw',
+                  right: '1vw',
                   top: '50%',
                   transform: 'translate(0, -50%)',
                 }}>
