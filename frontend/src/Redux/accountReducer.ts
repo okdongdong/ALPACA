@@ -36,6 +36,7 @@ const accountSlice = createSlice({
   initialState,
   reducers: {
     setUserInfo: (state, action) => ({
+      ...state,
       ...action.payload,
     }),
     logout: (state) => {
