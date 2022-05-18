@@ -24,12 +24,12 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
-import { BrowserView, isMobile, MobileView } from 'react-device-detect';
+import { isMobile } from 'react-device-detect';
 import CInput from '../Commons/CInput';
 import CProfile from '../Commons/CProfile';
 import { Close, Search } from '@mui/icons-material';
-import CSearchBar from '../Commons/CSearchBar';
 import CInputWithBtn from '../Commons/CInputWithBtn';
+import useAlert from '../../Hooks/useAlert';
 
 export interface StudyCreateProps {
   open: boolean;
@@ -119,6 +119,7 @@ function StudyCreate(props: StudyCreateProps) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
+  const cAlert = useAlert();
 
   const [studyname, setStudyName] = useState('');
   const [studyintro, setStudyIntro] = useState('');
@@ -161,7 +162,6 @@ function StudyCreate(props: StudyCreateProps) {
     setStudyName('');
     setStudyIntro('');
     setMemberList([]);
-    onClose();
   };
 
   const cancleClose = () => {
@@ -189,12 +189,26 @@ function StudyCreate(props: StudyCreateProps) {
       });
       const resUserInfo = { ...userInfo };
       resUserInfo.studies = [...resUserInfo.studies, res.data];
-      resUserInfo.studyCount += 1;
       dispatch(setUserInfo(resUserInfo));
-      const page = Math.ceil(resUserInfo.studyCount / 3);
+      const page = Math.ceil(resUserInfo.studies.length / 3);
       props.callback(page, resUserInfo.studies);
-    } catch (e) {
-      console.log(e);
+      cAlert.fire({
+        title: '생성 성공!!',
+        text: '스터디 생성에 성공했습니다!',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      onClose();
+    } catch (e: any) {
+      cAlert.fire({
+        title: '생성 실패!',
+        text: e.response.data.message || '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      console.log(e.response);
     }
   };
 
@@ -215,7 +229,7 @@ function StudyCreate(props: StudyCreateProps) {
   return (
     <Dialog onClose={cancleClose} open={open} fullScreen={isMobile}>
       <CDialogTitle>
-        <h1>스터디 개설</h1>
+        <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디 개설</div>
         <Close onClick={cancleClose} />
       </CDialogTitle>
       <CustomContent>

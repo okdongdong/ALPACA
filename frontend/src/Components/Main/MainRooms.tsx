@@ -4,8 +4,11 @@ import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
 import StudyCreate from '../Dialogs/StudyCreate';
 import { styled, useTheme } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserView, isMobile, MobileView } from 'react-device-detect';
+import { customAxios } from '../../Lib/customAxios';
+import useAlert from '../../Hooks/useAlert';
+import { setStudies } from '../../Redux/accountReducer';
 
 const CIconButton = styled(IconButton)(({ theme }) => ({
   margin: '10px',
@@ -22,16 +25,21 @@ const MIconButton = styled(IconButton)(({ theme }) => ({
   marginLeft: 'auto',
 }));
 
+const PER_PAGE = 4;
+
 function MainRooms() {
   const theme = useTheme();
+  const cAlert = useAlert();
+  const dispatch = useDispatch();
   const endRef = useRef<any>();
   const startRef = useRef<any>();
-  const userInfo = useSelector((state: any) => state.account);
+
+  const studies = useSelector((state: any) => state.account.studies);
+  const profileImg = useSelector((state: any) => state.account.profileImg);
+
   const [page, setPage] = useState(1);
-  const PER_PAGE = 3;
-  const count = Math.ceil(userInfo.studyCount / PER_PAGE);
-  const studyList = useSelector((state: any) => state.account.studies);
   const [open, setOpen] = useState(false);
+
   const handleChange = (e: any, p: number) => {
     setPage(p);
   };
@@ -55,30 +63,36 @@ function MainRooms() {
     startRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
   };
 
-  const handleScroll = (): void => {
-    const { scrollHeight } = document.documentElement;
-    const { scrollTop } = document.documentElement;
-    const { clientHeight } = document.documentElement;
-    if (isMobile) {
-      if (scrollTop >= scrollHeight - clientHeight) {
-        setPage(page + 1);
-        if (page >= count) setPage(count);
-      }
+  const getStudiesInfo = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: '/study',
+      });
+      dispatch(setStudies(res.data));
+
+      console.log('getStudiesInfo: ', res);
+    } catch (e: any) {
+      console.log(e.response);
+      cAlert.fire({
+        title: '스터디 조회 실패!',
+        text: e.response.data.message || '스터디 정보를 불러오는데 실패했습니다..',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, true);
-    return () => {
-      window.removeEventListener('scroll', handleScroll, true);
-    };
-  }, [handleScroll]);
+    getStudiesInfo();
+  }, [profileImg]);
 
   return (
     <>
       <BrowserView>
         <Grid container>
-          {studyList?.slice((page - 1) * 3, page * 3).map((study: any, i: number) => {
+          {studies?.slice((page - 1) * 4, page * 4).map((study: any, i: number) => {
             return (
               <Stack key={i}>
                 <MainRoomsDetail detail={study} page={page} callback={pinData} />
@@ -99,7 +113,7 @@ function MainRooms() {
           <StudyCreate
             open={open}
             page={page}
-            studyList={studyList}
+            studyList={studies}
             callback={newData}
             onClose={() => {
               setOpen(false);
@@ -107,7 +121,7 @@ function MainRooms() {
           />
         </Grid>
         <Pagination
-          count={count}
+          count={Math.ceil(studies.length / PER_PAGE)}
           size="large"
           page={page}
           onChange={handleChange}
@@ -144,13 +158,13 @@ function MainRooms() {
           <StudyCreate
             open={open}
             page={page}
-            studyList={studyList}
+            studyList={studies}
             callback={mNewData}
             onClose={() => {
               setOpen(false);
             }}
           />
-          {studyList?.slice(0, page * 3).map((study: any, i: number) => {
+          {studies?.slice(0, page * 3).map((study: any, i: number) => {
             return (
               <Stack key={i}>
                 <MainRoomsDetail detail={study} page={page} callback={mPinData} />

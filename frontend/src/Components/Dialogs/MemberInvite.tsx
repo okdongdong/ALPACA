@@ -219,7 +219,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <h1>스터디원 초대하기</h1>
+        <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디원 초대하기</div>
         <Close
           onClick={() => {
             setOpen(false);

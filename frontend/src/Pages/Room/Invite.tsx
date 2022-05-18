@@ -59,7 +59,7 @@ function Invite() {
         url: '/study/inviteCode',
         data: { inviteCode },
       });
-
+      navigate('/');
       console.log(res);
     } catch (e: any) {
       console.log(e.response);

@@ -23,6 +23,7 @@ function RoomMainSetting(props: RoomMainSettingProps) {
 
   const userId = useSelector((state: any) => state.account.userId);
   const members = useSelector((state: any) => state.room.members);
+  const isRoomMaker = useSelector((state: any) => state.room.isRoomMaker);
 
   const deleteStudy = async () => {
     dispatch(setLoading(true));
@@ -108,8 +109,8 @@ function RoomMainSetting(props: RoomMainSettingProps) {
   };
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h1>스터디 설정</h1>
-      {members.some((member: Member) => member.userId === userId && member.roomMaker) ? (
+      <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디 설정</div>
+      {isRoomMaker ? (
         <CBtn
           color="#fff"
           backgroundColor={theme.palette.warn}
