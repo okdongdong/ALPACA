@@ -150,13 +150,6 @@ function NavBar() {
     left: (
       <MBox>
         <RoomMainIntroduction />
-        <MBtn
-          onClick={() => {
-            setOpen(true);
-          }}>
-          초대
-        </MBtn>
-        <MemberInvite roomId={roomId} open={open} setOpen={setOpen} />
       </MBox>
     ),
     right: (

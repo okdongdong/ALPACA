@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Stack, Avatar } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -59,8 +59,8 @@ function Invite() {
         url: '/study/inviteCode',
         data: { inviteCode },
       });
-
       console.log(res);
+      navigate('/');
     } catch (e: any) {
       console.log(e.response);
     }
@@ -76,8 +76,12 @@ function Invite() {
   return (
     <CContainerWithLogo>
       <Stack spacing={3}>
-        <div>
-          <img src={inviteInfo.roomMakerProfileImg || alpaca} alt="profileImg" />
+        <div className="align_center">
+          <Avatar
+            alt="profileImg"
+            src={inviteInfo.roomMakerProfileImg || alpaca}
+            sx={{ mx: '10px', width: 150, height: 150 }}
+          />
         </div>
         <div>
           {inviteInfo.roomMaker}님이 당신을 {inviteInfo.title}로 초대했습니다.
