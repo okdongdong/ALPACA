@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
-import { Box, Divider, Stack, styled, useTheme } from '@mui/material';
+import { Box, Divider, Stack, styled, useTheme, alpha } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
 import { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
@@ -9,6 +9,8 @@ import CProfile from '../../Commons/CProfile';
 import { useParams } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { Client } from '@stomp/stompjs';
+import useReissue from '../../../Hooks/useReissue';
+import CBtn from '../../Commons/CBtn';
 
 interface ReceiveMessage {
   userId: number;
@@ -19,6 +21,18 @@ interface ReceiveMessage {
 
 const MessageBox = styled('div')(({ theme }) => ({
   width: '100%',
+}));
+const ChatScreen = styled('div')(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.txt, 0.8),
+  color: theme.palette.bg,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+  borderRadius: 10,
+  top: 0,
 }));
 
 const options = {
@@ -31,6 +45,7 @@ var client: Client | null = null;
 function RoomMainChat() {
   const { roomId } = useParams();
   const theme = useTheme();
+  const reissue = useReissue();
 
   const memberDict = useSelector((state: any) => state.room.memberDict);
   const offsetId = useSelector((state: any) => state.room.offsetId);
@@ -45,6 +60,11 @@ function RoomMainChat() {
   const [chatList, setChatList] = useState<ReceiveMessage[]>([]);
 
   const [page, setPage] = useState<number>(0);
+
+  const [connectAttemptCnt, setConnectAttemptCnt] = useState<number>(0);
+  const [chatHeight, setChatHeight] = useState<number>(0);
+
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -69,19 +89,35 @@ function RoomMainChat() {
       onConnect: () => {
         console.log('-----------연결성공!!-----------');
         subscribe();
+        setIsConnected(true);
+        setConnectAttemptCnt(0);
         scrollRef?.current?.scrollTo(0, 987654321);
       },
       onStompError: (frame: any) => {
         console.log('-----------연결실패!!-----------');
         console.error(frame);
+        reissue();
+        client?.deactivate();
+        console.log('retry count: ', connectAttemptCnt);
+        setIsConnected(false);
+        setConnectAttemptCnt((prev) => prev + 1);
+        if (connectAttemptCnt < 20) connect();
       },
-      onWebSocketError: (evt: any) => {
+      onWebSocketError: (event: any) => {
         console.log('-----------websocket error!!-----------');
-        console.log(evt);
+        console.log(event);
+        console.log('retry count: ', connectAttemptCnt);
+        setIsConnected(false);
+        setConnectAttemptCnt((prev) => prev + 1);
+        if (connectAttemptCnt > 20) client?.deactivate();
       },
-      onWebSocketClose: (evt: any) => {
+      onWebSocketClose: (event: any) => {
         console.log('-----------websocket close!!-----------');
-        console.log(evt);
+        console.log(event);
+        console.log('retry count: ', connectAttemptCnt);
+        setIsConnected(false);
+        setConnectAttemptCnt((prev) => prev + 1);
+        if (connectAttemptCnt > 20) client?.deactivate();
       },
     });
 
@@ -116,6 +152,12 @@ function RoomMainChat() {
     setMessage('');
   };
 
+  const reconnectHandler = () => {
+    if (client?.active) return;
+
+    connect();
+  };
+
   const onSendMessageHandler = () => {
     setIsGetPrevChat(false);
     sendMessage();
@@ -129,7 +171,6 @@ function RoomMainChat() {
     setIsLoading(true);
     setIsGetPrevChat(true);
     try {
-      const prevScrollHeight = scrollRef.current?.scrollHeight;
       const res = await customAxios({
         method: 'get',
         url: `/chat/study/${roomId}`,
@@ -142,11 +183,11 @@ function RoomMainChat() {
       }
       console.log('scrollRef: ', scrollRef);
       const nowScrollHeight = scrollRef.current?.scrollHeight;
-
-      console.log('scrollHeight: ', nowScrollHeight, prevScrollHeight);
-      if (!!prevScrollHeight && !!nowScrollHeight) {
-        scrollRef.current.scrollTo(0, res.data.numberOfElements * 43 + 10);
+      console.log('scrollHeight: ', nowScrollHeight, chatHeight);
+      if (!!nowScrollHeight) {
+        scrollRef.current.scrollTo(0, nowScrollHeight - chatHeight);
       }
+      setChatHeight(nowScrollHeight || 1000);
       console.log('page: ', page, ' / offsetId: ', offsetId);
       console.log(res);
     } catch (e: any) {
@@ -157,7 +198,7 @@ function RoomMainChat() {
   };
 
   const getInitChat = async () => {
-    console.log('======채팅조회');
+    console.log('=================채팅조회');
     await getPrevChat();
     scrollRef?.current?.scrollTo(0, 987654321);
   };
@@ -212,68 +253,87 @@ function RoomMainChat() {
 
   return (
     <RoomMainComponentContainer>
-      <div style={{ height: isMobile ? '85vh' : 'calc(100% - 40px)' }}>
-        <Stack
-          spacing={1}
-          className="scroll-box"
-          sx={{ height: isMobile ? '83vh' : '100%', position: 'relative', minHeight: '20vh' }}
-          ref={scrollRef}>
-          {isError ? (
-            <Divider variant="middle">
-              <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
-            </Divider>
-          ) : isFinished ? (
-            <Divider variant="middle">
-              <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
-            </Divider>
-          ) : (
-            <div
-              style={{
-                position: 'absolute',
-              }}
-              ref={infiniteRef}>
-              <div style={{ height: 10, width: 10 }}></div>
-            </div>
-          )}
-          <Box sx={{ position: 'absolute', width: '100%' }}>
-            <MessageBox sx={{ height: 25 }}></MessageBox>
-            {chatList.map((chat: ReceiveMessage, idx: number) => (
-              <MessageBox key={idx}>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <div style={{ height: 'calc(100% - 40px)' }}>
+          <Stack
+            spacing={1}
+            className="scroll-box"
+            sx={{ height: isMobile ? '83vh' : '100%', position: 'relative', minHeight: '20vh' }}
+            ref={scrollRef}>
+            {isConnected &&
+              (isError ? (
+                <Divider variant="middle">
+                  <span style={{ color: 'rgba(0,0,0,.5)' }}>에러 발생 </span>
+                </Divider>
+              ) : isFinished ? (
+                <Divider variant="middle">
+                  <span style={{ color: 'rgba(0,0,0,.5)' }}>채팅 시작</span>
+                </Divider>
+              ) : (
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                  }}>
-                  <CProfile
-                    nickname={memberDict[chat.userId]?.nickname}
-                    profileImg={memberDict[chat.userId]?.profileImg}
-                  />
-                  <span style={{ fontSize: 12, color: '#888888', textAlign: 'right' }}>
-                    {calDateTime(new Date(chat.timeStamp))}
-                  </span>
+                    position: 'absolute',
+                  }}
+                  ref={infiniteRef}>
+                  <div style={{ height: 10, width: 10 }}></div>
                 </div>
-                <Box sx={{ margin: 1 }}>
-                  <span
+              ))}
+            <Box sx={{ position: 'absolute', width: '100%' }}>
+              <MessageBox sx={{ height: 25 }}></MessageBox>
+              {chatList.map((chat: ReceiveMessage, idx: number) => (
+                <MessageBox key={idx}>
+                  <div
                     style={{
-                      backgroundColor: theme.palette.bg,
-                      padding: 4,
-                      marginLeft: 40,
-                      borderRadius: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
                     }}>
-                    {chat.content}
-                  </span>
-                </Box>
-              </MessageBox>
-            ))}
-          </Box>
-        </Stack>
-        <RoomMainChatBar
-          value={message}
-          onChange={setMessage}
-          onSendMessage={onSendMessageHandler}
-        />
+                    <CProfile
+                      nickname={memberDict[chat.userId]?.nickname}
+                      profileImg={memberDict[chat.userId]?.profileImg}
+                    />
+                    <span style={{ fontSize: 12, color: '#888888', textAlign: 'right' }}>
+                      {calDateTime(new Date(chat.timeStamp))}
+                    </span>
+                  </div>
+                  <Box sx={{ margin: 1 }}>
+                    <span
+                      style={{
+                        backgroundColor: theme.palette.bg,
+                        padding: 4,
+                        marginLeft: 40,
+                        borderRadius: 10,
+                      }}>
+                      {chat.content}
+                    </span>
+                  </Box>
+                </MessageBox>
+              ))}
+            </Box>
+          </Stack>
+          <RoomMainChatBar
+            value={message}
+            onChange={setMessage}
+            onSendMessage={onSendMessageHandler}
+          />
+        </div>
+        {isConnected || (
+          <ChatScreen>
+            <Stack
+              spacing={3}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ textAlign: 'center' }}>
+              <Box>
+                <div>서버와 연결이 원활하지 않습니다.</div>
+              </Box>
+              <CBtn onClick={reconnectHandler} height="100%">
+                다시연결
+              </CBtn>
+            </Stack>
+          </ChatScreen>
+        )}
       </div>
     </RoomMainComponentContainer>
   );

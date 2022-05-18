@@ -254,6 +254,7 @@ function Signup() {
           disabled={
             !!passwordMessage ||
             !!passwordCheckMessage ||
+            !bojId ||
             isUsernameChecked === false ||
             isNicknameChecked === false
           }
