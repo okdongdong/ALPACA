@@ -226,4 +226,27 @@ public class StudyController {
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
+    @ApiOperation(
+            value = "스터디 초대 수락",
+            notes = "초대받은 스터디를 수락하여 스터디에 가입한다."
+    )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
+    @PostMapping("/{id}/join")
+    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.joinStudy(username, id));
+    }
+
+    @ApiOperation(
+            value = "스터디 초대 거절",
+            notes = "초대받은 스터디를 거절한다."
+    )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<BaseResponseBody> rejectStudy(@PathVariable Long id) {
+        String username = userService.getCurrentUsername();
+        studyService.rejectStudy(username, id);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
+    }
+
 }

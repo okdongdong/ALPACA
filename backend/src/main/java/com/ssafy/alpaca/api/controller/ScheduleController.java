@@ -67,7 +67,8 @@ public class ScheduleController {
     @ApiImplicitParam( name = "id", value = "조회할 일정의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleRes> getSchedule(@PathVariable Long id) {
-        return ResponseEntity.ok(scheduleService.getSchedule(id));
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(scheduleService.getSchedule(username, id));
     }
 
     @ApiOperation(
