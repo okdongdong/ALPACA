@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Swal from 'sweetalert2';
 
 export const customAxios: AxiosInstance = axios.create({
   // baseURL이 작성되어있으므로 뒷부분만 작성해서 사용하면 됨
@@ -61,7 +62,6 @@ const unauthorizedError = async (error: any) => {
   const token = localStorage.getItem('accessToken') || '';
 
   // 토큰 refresh요청
-
   try {
     const res = await customAxios({
       method: 'post',
@@ -92,7 +92,17 @@ const unauthorizedError = async (error: any) => {
 
     //실패했던 요청 재요청
     return customAxios(originalRequest);
-  } catch (e) {}
+  } catch (e) {
+    await Swal.fire({
+      title: '토큰 만료!',
+      text: '토큰이 만료되어 로그아웃됩니다.',
+      icon: 'info',
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    localStorage.clear();
+    window.location.reload();
+  }
   return Promise.reject(error);
 };
 
