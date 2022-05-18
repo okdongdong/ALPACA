@@ -41,7 +41,6 @@ const MMainDiv = styled('div')(({ theme }) => ({
 
 function MainLayout() {
   const { pathname } = useLocation();
-
   return (
     <>
       <BrowserView style={{ width: '100%', height: '100%' }}>
