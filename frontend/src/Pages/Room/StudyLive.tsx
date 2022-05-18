@@ -85,7 +85,7 @@ function StudyLive() {
 
   const joinSession = () => {
     OVForCamera = new OpenVidu();
-    // OVForCamera.enableProdMode();
+    OVForCamera.enableProdMode();
     OVForScreen = new OpenVidu();
     OVForScreen.enableProdMode();
 
