@@ -104,7 +104,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
     if (navigator.clipboard) {
       // IE는 사용 못하고, 크롬은 66버전 이상일때 사용 가능
       navigator.clipboard
-        .writeText(`${process.env.REACT_APP_CLIENT_URL}/invite/${inviteCode}`)
+        .writeText(`${process.env.REACT_APP_BASE_URL}/invite/${inviteCode}`)
         .then(() => {
           console.log('초대코드를 복사하는데 성공했습니다.');
           cAlert.fire({
@@ -254,7 +254,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         <BrowserView>
           <h3>초대링크</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <CustomInput value={`${process.env.REACT_APP_CLIENT_URL}/${inviteCode}`} readOnly />
+            <CustomInput value={`${process.env.REACT_APP_BASE_URL}/${inviteCode}`} readOnly />
             <CBtn width="100px" onClick={copyInviteCode}>
               복사
             </CBtn>
@@ -274,7 +274,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
               복사
             </CBtn>
           </div>
-          <CustomInput value={`${process.env.REACT_APP_CLIENT_URL}/${inviteCode}`} readOnly />
+          <CustomInput value={`${process.env.REACT_APP_BASE_URL}/${inviteCode}`} readOnly />
         </MobileView>
       </CustomBox>
     </Dialog>

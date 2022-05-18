@@ -6,9 +6,9 @@ import { styled, useTheme } from '@mui/material/styles';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { setUserInfo } from '../../Redux/accountReducer';
+import { setStudies } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
-import { BrowserView, MobileView, isMobile } from 'react-device-detect';
+import { BrowserView, MobileView } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
 
 export interface StudyCreateProps {
@@ -27,7 +27,7 @@ const NameLabel = styled('div')(({ theme }) => ({
 const MNameLabel = styled('label')(({ theme }) => ({
   color: theme.palette.txt,
   textAlign: 'left',
-  width: '200px',
+  width: '400px',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
   marginLeft: '35px',
@@ -62,59 +62,44 @@ const MButton = styled(Button)(({ theme }) => ({
 
 function MainRoomsDetail(props: StudyCreateProps) {
   const theme = useTheme();
-  const cAlert = useAlert();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userInfo = useSelector((state: any) => state.account);
+  const userStudy = useSelector((state: any) => state.account.studies);
 
   const pinStudy = async () => {
+    var findStudy = userStudy.findIndex((v: any) => v.id === props.detail.id);
     try {
       const res = await customAxios({
         method: 'post',
         url: `/study/${props.detail.id}/pin`,
-        data: { limit: props.page * 3 },
       });
       console.log(res);
-      if (isMobile) {
-        if (res.data !== '') {
-          console.log('!=null');
-          const temp = { ...userInfo };
-          temp.studies = res.data;
-          dispatch(setUserInfo(temp));
-          props.callback(1, res.data);
-          return;
-        }
-        if (res.data === '') {
-          console.log('==null');
-          const temp = { ...userInfo };
-
-          const popItem = temp.studies.pop(
-            temp.studies.findIndex((v: any) => v.id === props.detail.id),
-          );
-          console.log(popItem);
-          temp.studies.unshift(popItem);
-          dispatch(setUserInfo(temp));
-          props.callback(1, temp.studies);
-          return;
+      const temp = [...userStudy];
+      let deleteTemp = temp.splice(findStudy, 1);
+      const tmp = { ...deleteTemp[0] };
+      if (tmp.pinnedTime === '0001-01-01T06:00:00') {
+        tmp.pinnedTime = new Date().toISOString();
+        temp.unshift(tmp);
+        props.callback(1);
+      } else {
+        tmp.pinnedTime = '0001-01-01T06:00:00';
+        var minId = 101;
+        temp.map((item: any, index: number) => {
+          if (item.pinnedTime === '0001-01-01T06:00:00') {
+            if (item.id > tmp.id) {
+              minId = Math.min(item.id, minId);
+              return minId;
+            }
+          }
+        });
+        if (minId === 101) {
+          temp.push(tmp);
+        } else {
+          var findIdx = userStudy.findIndex((v: any) => v.id === minId);
+          temp.splice(findIdx - 1, 0, tmp);
         }
       }
-      pinCheckOn();
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const pinCheckOn = async () => {
-    try {
-      const res = await customAxios({
-        method: 'get',
-        url: `/study`,
-        params: { page: 0 },
-      });
-      const resUserInfo = { ...userInfo };
-      resUserInfo.studies = res.data.content;
-      dispatch(setUserInfo(resUserInfo));
-      props.callback(1, res.data.content);
+      dispatch(setStudies(temp));
     } catch (e) {
       console.log(e);
     }

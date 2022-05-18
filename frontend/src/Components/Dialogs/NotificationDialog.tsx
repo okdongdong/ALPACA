@@ -4,6 +4,8 @@ import { Close, ContactPageOutlined } from '@mui/icons-material';
 import CBtn from '../Commons/CBtn';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { customAxios } from '../../Lib/customAxios';
+import useAlert from '../../Hooks/useAlert';
 
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
@@ -15,6 +17,7 @@ type NotificationDataType = {
   type: 'invite' | 'schedule';
   studyId: number;
   title: string;
+  scheduleStartedAt?: string;
 };
 
 type NotificationItemType = {
@@ -22,6 +25,7 @@ type NotificationItemType = {
   type: 'invite' | 'schedule';
   studyId: number;
   title: string;
+  scheduleStartedAt?: string;
   deleteNoti: Function;
 };
 
@@ -56,9 +60,84 @@ const CustomBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
-function NotificationItem({ type, studyId, title, deleteNoti, index }: NotificationItemType) {
+function NotificationItem({
+  type,
+  studyId,
+  title,
+  deleteNoti,
+  index,
+  scheduleStartedAt,
+}: NotificationItemType) {
+  const cAlert = useAlert();
   const navigate = useNavigate();
   const theme = useTheme();
+
+  const joinStudy = async () => {
+    deleteNoti(index);
+    try {
+      const res = await customAxios({
+        method: 'post',
+        url: `/study/${studyId}/join`,
+      });
+      cAlert
+        .fire({
+          title: '가입완료',
+          text: `${title}에 가입되었습니다.\n 스터디로 이동하시겠습니까?`,
+          icon: 'success',
+        })
+        .then((res) => {
+          if (res.isConfirmed) {
+            navigate(`/room/${studyId}`);
+          }
+        });
+    } catch (e: any) {
+      if (e.response.status === 400) {
+        cAlert.fire({
+          title: '가입 실패',
+          text: '잘못된 접근입니다.',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else if (e.response.status === 409) {
+        cAlert.fire({
+          title: '가입 실패',
+          text: '이미 가입되어있는 스터디입니다.',
+          icon: 'error',
+          showCancelButton: false,
+          timer: 1500,
+        });
+      }
+    }
+  };
+
+  const rejectStudy = async () => {
+    deleteNoti(index);
+    try {
+      const res = await customAxios({
+        method: 'post',
+        url: `/study/${studyId}/reject`,
+      });
+      cAlert.fire({
+        title: '거절 완료',
+        text: '스터디 초대 거절을 완료했습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (e: any) {
+      if (e.response.status === 400) {
+        cAlert.fire({
+          title: '거절 실패',
+          text: '잘못된 접근입니다.',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    }
+  };
+
   return (
     <NotiPaper>
       <div style={{ marginBottom: '10px', padding: '0 10px 10px 10px', minWidth: '15vw' }}>
@@ -81,13 +160,22 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
             <div style={{ textAlign: 'center' }}>수락하시겠습니까?</div>
           </>
         ) : (
-          `${title} 스터디에 일정이 추가되었습니다.`
+          <>
+            <div>{`${title} 스터디에 일정이 추가되었습니다.`}</div>
+            <div style={{ textAlign: 'center', marginTop: '2px' }}>
+              {scheduleStartedAt && '스터디 일정 : ' + scheduleStartedAt.split('T')[0]}
+            </div>
+          </>
         )}
       </div>
       <div className="align_center">
         {type === 'invite' ? (
           <>
-            <CustomBtn size="small" onClick={() => {}}>
+            <CustomBtn
+              size="small"
+              onClick={() => {
+                joinStudy();
+              }}>
               수락
             </CustomBtn>
             <Divider
@@ -95,7 +183,11 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
               orientation="vertical"
               variant="middle"
               flexItem></Divider>
-            <CustomBtn size="small" onClick={() => {}}>
+            <CustomBtn
+              size="small"
+              onClick={() => {
+                rejectStudy();
+              }}>
               거절
             </CustomBtn>
           </>
@@ -118,12 +210,12 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   const [notificationList, setNotificationList] = useState<NotificationDataType[]>([]);
   const eventSource = useRef<EventSource | null>(null);
 
-  // useEffect(() => {
-  //   connectNotification();
-  //   return () => {
-  //     disconnectNotification();
-  //   };
-  // }, []);
+  useEffect(() => {
+    connectNotification();
+    return () => {
+      disconnectNotification();
+    };
+  }, []);
 
   const addInitialNotification = (event: MessageEvent) => {
     console.log('addInitialNotification', event);
@@ -134,7 +226,12 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
     setNotificationList((notifications) => {
       if (data?.scheduleStartedAt) {
         return [
-          { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
+          {
+            type: 'schedule',
+            studyId: data.studyId,
+            title: data.studyTitle,
+            scheduleStartedAt: data.scheduleStartedAt,
+          },
           ...notifications,
         ];
       }
@@ -151,7 +248,12 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
     const data = JSON.parse(event.data);
     setNotificationList((notifications) => {
       return [
-        { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
+        {
+          type: 'schedule',
+          studyId: data.studyId,
+          title: data.studyTitle,
+          scheduleStartedAt: data.scheduleStartedAt,
+        },
         ...notifications,
       ];
     });
@@ -228,6 +330,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
               type={noti.type}
               studyId={noti.studyId}
               index={index}
+              scheduleStartedAt={noti.scheduleStartedAt}
               deleteNoti={deleteNotification}
             />
           );

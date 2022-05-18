@@ -64,6 +64,7 @@ function RoomStudyLiveMainItem({ user }: userPropsType) {
         maxHeight: '80vh',
       }}>
       <Button
+        sx={{ padding: 0 }}
         onClick={() => {
           dispatch(setMainUser(undefined));
         }}>
