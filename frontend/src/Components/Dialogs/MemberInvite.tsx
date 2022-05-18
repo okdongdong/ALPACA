@@ -22,7 +22,7 @@ import CSearchBar from '../Commons/CSearchBar';
 import alpaca from '../../Assets/Img/alpaca.png';
 import useAlert from '../../Hooks/useAlert';
 import { BrowserView, isMobile, MobileView } from 'react-device-detect';
-import { Add } from '@mui/icons-material';
+import { Add, Close } from '@mui/icons-material';
 
 interface MemberInviteProps {
   roomId: string | undefined;
@@ -45,6 +45,7 @@ const CustomBox = styled(Stack)(({ theme }) => ({
 
 const SearchResultBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.component,
+  position: 'relative',
   height: '30vh',
 }));
 
@@ -69,6 +70,17 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
   height: 30,
   marginRight: theme.spacing(2),
   '&:hover': { backgroundColor: theme.palette.main },
+}));
+
+const MemberArray = styled('div')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'left',
+  flexWrap: 'wrap',
+  listStyle: 'none',
+  padding: 0.5,
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  height: theme.spacing(5),
 }));
 
 function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
@@ -196,19 +208,27 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   }, [open]);
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)}>
+    <Dialog open={open} onClose={() => setOpen(false)} fullScreen={isMobile}>
       <DialogTitle
         sx={{
           padding: 2,
           fontSize: isMobile ? 12 : '',
           backgroundColor: theme.palette.accent,
           color: theme.palette.icon,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
         <h1>스터디원 초대하기</h1>
+        <Close
+          onClick={() => {
+            setOpen(false);
+          }}
+        />
       </DialogTitle>
       <CustomBox spacing={2}>
         <CSearchBar onChange={setNickname} />
-        <SearchResultBox className="scroll-box" sx={{ position: 'relative', height: '30vh' }}>
+        <SearchResultBox className="scroll-box">
           {userList.map((userInfo, idx) => (
             <Box
               sx={{
@@ -229,19 +249,20 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
           ))}
         </SearchResultBox>
 
-        <div>
+        <MemberArray>
           {selectedUserList.map((userInfo, idx) => (
-            <div key={idx}>
+            <Box key={idx} sx={{ px: 0.5 }}>
               <CChip
                 avatar={<Avatar src={!!userInfo.profileImg ? userInfo.profileImg : alpaca} />}
                 label={userInfo.nickname}
                 onDelete={() => deleteHandler(idx)}
               />
-            </div>
+            </Box>
           ))}
-        </div>
+        </MemberArray>
+
         <div style={{ alignSelf: 'end' }}>
-          <CBtn width="100px" onClick={() => {}}>
+          <CBtn width="100px" height="100%" onClick={() => {}}>
             초대
           </CBtn>
         </div>
