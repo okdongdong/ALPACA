@@ -12,6 +12,7 @@ import {
   ListItemText,
   Drawer,
   Box,
+  Badge,
 } from '@mui/material';
 import Logo_White from '../../Assets/Img/Logo_White.png';
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,6 +30,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import useLogout from '../../Hooks/useLogout';
 import RoomMainIntroduction from '../Room/Main/RoomMainIntroduction';
 import MemberInvite from '../Dialogs/MemberInvite';
+import NotificationDialog from '../Dialogs/NotificationDialog';
 
 type iconObjType = {
   [index: string]: { icon: React.ReactNode; onClick: Function; text: string };
@@ -37,6 +39,13 @@ type iconObjType = {
 const CustomToolbar = styled(Toolbar)(({ theme }) => ({
   background: theme.palette.main,
   position: 'relative',
+}));
+
+const CustomBadge = styled(Badge)(({ theme }) => ({
+  color: theme.palette.icon,
+  '& .MuiBadge-badge': {
+    background: theme.palette.component_accent,
+  },
 }));
 
 const CustomDrawer = styled(Drawer)(({ theme }) => ({
@@ -77,6 +86,8 @@ function NavBar() {
   const myTheme = useSelector((state: any) => state.theme.themeType);
   const logout = useLogout();
 
+  const [newNotiCount, setNewNotiCount] = useState<number>(0);
+  const [notiAnchorEl, setNotiAnchorEl] = useState<HTMLElement | null>(null);
   const [leftOpen, setLeftOpen] = useState<boolean>(false);
   const [rightOpen, setRightOpen] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<'left' | 'right'>('right');
@@ -97,9 +108,13 @@ function NavBar() {
   };
 
   const clickLogout = () => {
+    setRightOpen(false);
     logout();
   };
-  const clickNotification = () => {};
+  const clickNotification = (event: React.MouseEvent<HTMLElement>) => {
+    setNewNotiCount(0);
+    setNotiAnchorEl(event.currentTarget);
+  };
 
   const clickSettings = () => {
     dispatch(settingOn());
@@ -126,14 +141,11 @@ function NavBar() {
     Home: { icon: <Home />, onClick: clickHome, text: '스터디 홈' },
     Problem: { icon: <Assignment />, onClick: clickProblem, text: '문제조회' },
     Logout: { icon: <Logout />, onClick: clickLogout, text: '로그아웃' },
-    Noti: { icon: <Notifications />, onClick: clickNotification, text: '알림' },
     Settings: { icon: <Settings />, onClick: clickSettings, text: '설정' },
   };
 
   const iconList =
-    pathname.indexOf('room') === -1
-      ? ['Logout', 'Noti']
-      : ['Home', 'Problem', 'Logout', 'Noti', 'Settings'];
+    pathname.indexOf('room') === -1 ? ['Logout'] : ['Home', 'Problem', 'Logout', 'Settings'];
   const drawer = {
     left: (
       <MBox>
@@ -194,23 +206,38 @@ function NavBar() {
             }}>
             <img style={{ height: 30 }} src={Logo_White} alt="" />
           </Button>
-          <IconButton
+          <div
             style={{
               position: 'absolute',
               right: '1vw',
               top: '50%',
               transform: 'translate(0, -50%)',
-            }}
-            onClick={() => {
-              handleRightOpen();
             }}>
-            <Menu sx={{ color: theme.palette.icon }} />
-          </IconButton>
+            <IconButton
+              onClick={(event) => {
+                clickNotification(event);
+              }}>
+              <CustomBadge badgeContent={newNotiCount} max={99}>
+                <Notifications sx={{ color: theme.palette.icon }} />
+              </CustomBadge>
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                handleRightOpen();
+              }}>
+              <Menu sx={{ color: theme.palette.icon }} />
+            </IconButton>
+          </div>
         </CustomToolbar>
       </AppBar>
       <CustomDrawer anchor={anchor} open={rightOpen || leftOpen} onClose={handleClose}>
         {drawer[anchor]}
       </CustomDrawer>
+      <NotificationDialog
+        setNewNotiCount={setNewNotiCount}
+        anchorEl={notiAnchorEl}
+        setAnchorEl={setNotiAnchorEl}
+      />
     </>
   );
 }

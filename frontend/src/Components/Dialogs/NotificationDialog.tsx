@@ -3,6 +3,7 @@ import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@
 import { Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { customAxios } from '../../Lib/customAxios';
+import { isMobile } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
 import Sound from '../../Assets/Audio/Sound.mp3';
 
@@ -37,7 +38,7 @@ const CustomPopover = styled(Popover)(({ theme }) => ({
   },
 }));
 const NotiPaper = styled(Paper)(({ theme }) => ({
-  maxWidth: '20vw',
+  maxWidth: isMobile ? '80vw' : '20vw',
   background: theme.palette.main,
   color: theme.palette.txt,
   margin: '10px',
@@ -151,7 +152,7 @@ function NotificationItem({
           </>
         ) : (
           <>
-            <div>{`${title} 스터디에 일정이 추가되었습니다.`}</div>
+            <div style={{ textAlign: 'center' }}>{`${title} 스터디에 일정이 추가되었습니다.`}</div>
             <div style={{ textAlign: 'center', marginTop: '2px' }}>
               {scheduleStartedAt && '스터디 일정 : ' + scheduleStartedAt.split('T')[0]}
             </div>
