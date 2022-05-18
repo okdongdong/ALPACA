@@ -388,9 +388,9 @@ function EditProfile({ onClose, open }: EditProfileProps) {
                         value={stacks}
                         onChange={handleChange}>
                         <MenuItem value="python3">python3</MenuItem>
-                        <MenuItem value="Java">Java</MenuItem>
-                        <MenuItem value="C">C</MenuItem>
-                        <MenuItem value="C++">C++</MenuItem>
+                        <MenuItem value="java">Java</MenuItem>
+                        <MenuItem value="c">C</MenuItem>
+                        <MenuItem value="cpp">C++</MenuItem>
                       </CSelect>
                     </FormControl>
                   </Grid>
