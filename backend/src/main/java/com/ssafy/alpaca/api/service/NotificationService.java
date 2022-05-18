@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.service;
 
+import com.ssafy.alpaca.api.request.StudyMemberListReq;
 import com.ssafy.alpaca.api.request.StudyMemberReq;
 import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
@@ -98,7 +99,7 @@ public class NotificationService {
         }
     }
 
-    public void notifyAddStudyEvent(String username, Long id, StudyMemberReq studyMemberReq) {
+    public void notifyAddStudyEvent(String username, Long id, StudyMemberListReq studyMemberListReq) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -109,39 +110,42 @@ public class NotificationService {
             throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
         }
 
-        User member = userRepository.findById(studyMemberReq.getMemberId()).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+        for (Long memberId : studyMemberListReq.getMemberIdList()) {
 
-        if (myStudyRepository.existsByUserAndStudy(member, study)) {
-            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
-        }
+            User member = userRepository.findById(memberId).orElseThrow(
+                    () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+            );
 
-        if (sseEmitters.containsKey(studyMemberReq.getMemberId())){
-            SseEmitter sseEmitter = sseEmitters.get(studyMemberReq.getMemberId());
-            try {
-                sseEmitter.send(SseEmitter.event().name("inviteStudy").data(
+            if (myStudyRepository.existsByUserAndStudy(member, study)) {
+                throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+            }
+    
+            if (sseEmitters.containsKey(memberId)){
+                SseEmitter sseEmitter = sseEmitters.get(memberId);
+                try {
+                    sseEmitter.send(SseEmitter.event().name("inviteStudy").data(
+                            Notification.builder()
+                                    .roomMaker(user.getNickname())
+                                    .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
+                                    .studyId(study.getId())
+                                    .studyTitle(study.getTitle())
+                                    .build()
+                    ));
+                } catch (Exception e) {
+                    sseEmitters.remove(memberId);
+                }
+            }
+            else {
+                notificationRepository.save(
                         Notification.builder()
+                                .userId(member.getId())
                                 .roomMaker(user.getNickname())
                                 .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                 .studyId(study.getId())
                                 .studyTitle(study.getTitle())
                                 .build()
-                ));
-            } catch (Exception e) {
-                sseEmitters.remove(studyMemberReq.getMemberId());
+                );
             }
-        }
-        else {
-            notificationRepository.save(
-                    Notification.builder()
-                            .userId(member.getId())
-                            .roomMaker(user.getNickname())
-                            .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
-                            .studyId(study.getId())
-                            .studyTitle(study.getTitle())
-                            .build()
-            );
         }
     }
 
