@@ -18,11 +18,9 @@ function Login(props: any) {
   const cAlert = useAlert();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   // 로그인요청
   const login = async () => {
-    setLoading(true);
     cAlert.fire({
       title: '로그인 시도',
       html: `<span>로그인 시도중입니다..</span>`,
@@ -40,15 +38,15 @@ function Login(props: any) {
       password,
     };
 
-    const span = cAlert?.getHtmlContainer()?.querySelector('span');
+    const span = cAlert.getHtmlContainer()?.querySelector('span');
     setTimeout(() => {
-      if (span && loading) span.textContent = '데이터를 가져오는 중입니다..';
+      if (span) span.textContent = '데이터를 가져오는 중입니다..';
     }, 1500);
     setTimeout(() => {
-      if (span && loading) span.textContent = '풀이한 문제가 많을경우 시간이 오래걸릴 수 있습니다.';
+      if (span) span.textContent = '풀이한 문제가 많을경우 시간이 오래걸릴 수 있습니다.';
     }, 5000);
     setTimeout(() => {
-      if (span && loading) span.textContent = '잠시만 기다려주세요..';
+      if (span) span.textContent = '잠시만 기다려주세요..';
     }, 8500);
     try {
       const res = await customAxios({ method: 'post', url: `/auth/login`, data: userInfo });
@@ -72,7 +70,6 @@ function Login(props: any) {
         studyCount: res.data.studyCount,
       };
 
-      setLoading(false);
       console.log(resUserInfo);
 
       await cAlert.fire({
@@ -95,7 +92,6 @@ function Login(props: any) {
       // 알림창 닫기
     } catch (e: any) {
       clearTimeout();
-      setLoading(false);
       setTimeout(() => {
         cAlert.fire({
           title: '로그인 실패!',
