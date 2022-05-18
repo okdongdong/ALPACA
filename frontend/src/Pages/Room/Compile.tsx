@@ -69,7 +69,12 @@ function Compile() {
   };
 
   const submitCode = async (tab: number, input?: string) => {
-    const returnCode = code.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+    const returnCode = code
+      // .replaceAll('#', '\\#')
+      .replaceAll('\n', '\\n')
+      .replaceAll('\r', '\\r')
+      // .replaceAll("'", "\\'")
+      .replaceAll('"', '\\"');
     const url = tab === 0 ? '/code/bojCompile' : '/code/compile';
     const data =
       tab === 0
