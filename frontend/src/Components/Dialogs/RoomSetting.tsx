@@ -42,7 +42,7 @@ function RoomSetting({ setInviteOpen }: RoomSettingProps) {
           backgroundColor: theme.palette.accent,
           color: theme.palette.icon,
         }}>
-        <RoomMainSetting />
+        <RoomMainSetting data={onCloseHandler} />
       </DialogTitle>
       <CustomBox spacing={2}>
         <RoomMainIntroductionSetting />
