@@ -205,9 +205,9 @@ public class StudyController {
             notes = "방장이 스터디에 사용자를 초대한다."
     )
     @PostMapping("/{id}/invite")
-    public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberReq studyMemberReq) {
+    public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberListReq studyMemberListReq) {
         String username = userService.getCurrentUsername();
-        notificationService.notifyAddStudyEvent(username, id, studyMemberReq);
+        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq);
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
