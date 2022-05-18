@@ -87,38 +87,32 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_STUDIES);
         }
 
-        if (12 < studyReq.getMemberIdList().size()) {
+        if (11 < studyReq.getMemberIdList().size()) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_MEMBERS);
         }
-        Study study = StudyReq.of(studyReq);
-
-        HashSet<Long> hashSet = new HashSet<>();
-        List<MyStudy> myStudyList = new ArrayList<>();
-        List<String> profileImgList = new ArrayList<>();
-        for (Long userId : studyReq.getMemberIdList()) {
-            if (hashSet.contains(userId)) {
-                continue;
-            }
-            User addUser = checkUserById(userId);
-
-            hashSet.add(userId);
-
-            myStudyList.add(MyStudy.builder()
-                    .isRoomMaker(user.getId().equals(userId))
-                    .user(checkUserById(userId))
-                    .study(study)
-                    .build());
-
-            profileImgList.add(convertUtil.convertByteArrayToString(addUser.getProfileImg()));
-        }
+        Study study = studyRepository.save(
+                Study.builder()
+                        .title(studyReq.getTitle())
+                        .info(studyReq.getInfo())
+                        .build()
+        );
 
         studyRepository.save(study);
-        myStudyRepository.saveAll(myStudyList);
+        MyStudy myStudy = myStudyRepository.save(
+                MyStudy.builder()
+                        .isRoomMaker(true)
+                        .user(user)
+                        .study(study)
+                        .build()
+        );
+        myStudyRepository.save(myStudy);
+        List<String> profileImg = new ArrayList<>();
+        profileImg.add(convertUtil.convertByteArrayToString(user.getProfileImg()));
         return StudyListRes.builder()
                 .id(study.getId())
                 .title(study.getTitle())
-                .pinnedTime(myStudyList.get(0).getPinnedTime())
-                .profileImgList(profileImgList)
+                .pinnedTime(myStudy.getPinnedTime())
+                .profileImgList(profileImg)
                 .build();
     }
 
@@ -193,6 +187,20 @@ public class StudyService {
                 .scheduleListRes(ScheduleListRes.of(schedules))
                 .offsetId(optChat.map(Chat::getId).orElse(null))
                 .build();
+    }
+
+    public List<StudyListRes> getStudyList(String username) {
+        User user = checkUserByUsername(username);
+
+        return myStudyRepository.findAllByUserOrderByPinnedTimeDesc(user)
+                .stream().map(myStudy -> StudyListRes.builder()
+                        .id(myStudy.getStudy().getId())
+                        .title(myStudy.getStudy().getTitle())
+                        .pinnedTime(myStudy.getPinnedTime())
+                        .profileImgList(myStudyRepository.findTop4ByStudy(myStudy.getStudy()).stream().map(
+                                        anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+                                .collect(Collectors.toList()))
+                        .build()).collect(Collectors.toList());
     }
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
@@ -431,33 +439,37 @@ public class StudyService {
                 .build());
     }
 
-    public StudyListRes joinStudy(String username, Long id) {
+    public StudyListRes joinStudy(String username, Long id, NotificationIsLiveReq notificationIsLiveReq) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
-        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
-                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
-        );
-        if (myStudyRepository.existsByUserAndStudy(user, study)) {
-            notificationRepository.delete(notification);
-            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        Optional<Notification> notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null);
+
+        if (!notificationIsLiveReq.getIsLive()) {
+            if (notification.isEmpty()) {
+                throw new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
+            } else {
+                notificationRepository.delete(notification.get());
+            }
         }
 
-        MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
-                        .isRoomMaker(false)
-                        .user(user)
-                        .study(study)
-                        .build());
-        notificationRepository.delete(notification);
-
-        List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
-        return StudyListRes.builder()
-                .id(id)
-                .title(study.getTitle())
-                .pinnedTime(newMyStudy.getPinnedTime())
-                .profileImgList(myStudies.stream().map(
-                        myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
-                        .collect(Collectors.toList()))
-                .build();
+        if (myStudyRepository.existsByUserAndStudy(user, study)) {
+            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        } else {
+            MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
+                    .isRoomMaker(false)
+                    .user(user)
+                    .study(study)
+                    .build());
+            List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
+            return StudyListRes.builder()
+                    .id(id)
+                    .title(study.getTitle())
+                    .pinnedTime(newMyStudy.getPinnedTime())
+                    .profileImgList(myStudies.stream().map(
+                                    myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                            .collect(Collectors.toList()))
+                    .build();
+        }
     }
 
     public void rejectStudy(String username, Long id) {
