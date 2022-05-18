@@ -62,14 +62,6 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
         }),
       );
     } catch (e) {}
-
-    // setProblemList([
-    //   { level: 10, problemNumber: 1000, title: 'A+B' },
-    //   { level: 10, problemNumber: 1000, title: 'A+B' },
-    //   { level: 10, problemNumber: 1000, title: 'A+B' },
-    //   { level: 10, problemNumber: 1000, title: 'A+B' },
-    //   { level: 10, problemNumber: 1000, title: 'A+B' },
-    // ]);
   };
 
   return (
@@ -78,7 +70,7 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
         <CustomButton onClick={handleOpen}>오늘의 스터디 문제</CustomButton>
       </span>
       <span>
-        <CBtn onClick={() => exitStudyLive()} backgroundColor={theme.palette.warn}>
+        <CBtn width="4vw" onClick={() => exitStudyLive()} backgroundColor={theme.palette.warn}>
           퇴장
         </CBtn>
       </span>

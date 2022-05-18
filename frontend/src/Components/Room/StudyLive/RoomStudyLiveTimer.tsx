@@ -13,6 +13,7 @@ import CBtn from '../../Commons/CBtn';
 import Swal from 'sweetalert2';
 const Timer = styled('div')(({ theme }) => ({
   background: theme.palette.component_accent,
+  color: '#000000',
   minHeight: '5.5vh',
   width: '10vw',
   borderRadius: '10px',
@@ -44,7 +45,7 @@ const TimerPaper = styled('div')(({ theme }) => ({
 
 const CustomIconButton = styled(IconButton)(({ theme }) => ({
   color:
-    theme.palette.main === '#2D2D2D'
+    theme.palette.main === '#3A4358'
       ? '#FFFFFF'
       : theme.palette.main === '#FFC2C0'
       ? theme.palette.component_accent

@@ -15,21 +15,33 @@ type mainPropsType = {
 const CustomDragHandle = styled(DragHandle)(({ theme }) => ({
   cursor: 'col-resize',
   transform: 'rotate(90deg)',
-  color: theme.palette.main,
+  color: theme.palette.component_accent,
 }));
 
 function RoomStudyLiveMain({ mainStreamManager, openYjsDocs, setOpenYjsDocs }: mainPropsType) {
   const theme = useTheme();
-  const [width, setWidth] = useState<string>('30vw');
+  const [width, setWidth] = useState<string>('60vw');
   const handleDrag = (e: React.DragEvent) => {
     // 1920 기준 500
-    const innerWidth = e.currentTarget.parentElement?.getBoundingClientRect().right;
+    const innerWidth = e.currentTarget.parentElement?.getBoundingClientRect().left;
     if (innerWidth && window.innerWidth * 0.95 > e.clientX && e.clientX > 500) {
-      setWidth(`${innerWidth - e.clientX}px`);
+      setWidth(`${e.clientX - innerWidth}px`);
     }
   };
   return (
     <>
+      <div style={{ height: '100%', width: openYjsDocs ? width : '2vw' }} className="align_center">
+        <RoomStudyLiveCodeEditer
+          width={width}
+          openYjsDocs={openYjsDocs}
+          setOpenYjsDocs={setOpenYjsDocs}
+        />
+        {openYjsDocs && (
+          <IconButton draggable size="small" onDrag={handleDrag}>
+            <CustomDragHandle />
+          </IconButton>
+        )}
+      </div>
       <div
         style={{
           background: theme.palette.component,
@@ -38,19 +50,6 @@ function RoomStudyLiveMain({ mainStreamManager, openYjsDocs, setOpenYjsDocs }: m
           borderRadius: '20px',
         }}>
         {mainStreamManager && <RoomStudyLiveMainItem user={mainStreamManager} />}
-      </div>
-
-      <div style={{ height: '100%', width: openYjsDocs ? width : '2vw' }} className="align_center">
-        {openYjsDocs && (
-          <IconButton draggable size="small" onDrag={handleDrag}>
-            <CustomDragHandle />
-          </IconButton>
-        )}
-        <RoomStudyLiveCodeEditer
-          width={width}
-          openYjsDocs={openYjsDocs}
-          setOpenYjsDocs={setOpenYjsDocs}
-        />
       </div>
     </>
   );

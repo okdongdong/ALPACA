@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RoomStudyLiveCamListItem from './RoomStudyLiveCamListItem';
 import UserModel from './user-model';
-import { Stack, IconButton } from '@mui/material';
+import { Stack, IconButton, useTheme } from '@mui/material';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 
 type usersPropsType = {
@@ -9,6 +9,7 @@ type usersPropsType = {
 };
 
 function RoomStudyLiveCamList({ users }: usersPropsType) {
+  const theme = useTheme();
   const [page, setPage] = useState<number>(0);
   const minPage = 0;
   const maxPage = parseInt(`${(users.length - 1) / 6}`);
@@ -21,7 +22,7 @@ function RoomStudyLiveCamList({ users }: usersPropsType) {
   return (
     <div className="align_column_center">
       {page > minPage && (
-        <IconButton onClick={pageDown}>
+        <IconButton onClick={pageDown} sx={{ color: theme.palette.txt }}>
           <ArrowDropUp />
         </IconButton>
       )}
@@ -35,7 +36,7 @@ function RoomStudyLiveCamList({ users }: usersPropsType) {
         })}
       </Stack>
       {page < maxPage && (
-        <IconButton onClick={pageUp}>
+        <IconButton onClick={pageUp} sx={{ color: theme.palette.txt }}>
           <ArrowDropDown />
         </IconButton>
       )}

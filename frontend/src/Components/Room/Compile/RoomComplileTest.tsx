@@ -106,7 +106,10 @@ function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTest
   };
 
   const handleSubmitCode = async () => {
-    const res = await submitCode(tab, tab === 1 && userInput);
+    const res = await submitCode(
+      tab,
+      tab === 1 && userInput.replaceAll('\n', '\\n').replaceAll('\r', '\\r'),
+    );
     if (!res) return;
     if (tab === 0) {
       setUserResult(

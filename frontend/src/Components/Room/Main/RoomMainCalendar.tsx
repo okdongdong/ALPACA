@@ -123,6 +123,7 @@ function RoomMainCalendar() {
           <CalendarTitle>
             <IconButton
               size="large"
+              sx={{ color: theme.palette.txt }}
               onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() - 1)))}>
               <ArrowBackIosNew />
             </IconButton>
@@ -132,6 +133,7 @@ function RoomMainCalendar() {
             </div>
             <IconButton
               size="large"
+              sx={{ color: theme.palette.txt }}
               onClick={() => setNowDay((prev) => new Date(prev.setMonth(prev.getMonth() + 1)))}>
               <ArrowForwardIos />
             </IconButton>
