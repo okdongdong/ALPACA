@@ -219,9 +219,9 @@ public class StudyController {
     )
     @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
     @PostMapping("/{id}/join")
-    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id) {
+    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id, @RequestBody NotificationIsLiveReq notificationIsLiveReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.joinStudy(username, id));
+        return ResponseEntity.ok(studyService.joinStudy(username, id, notificationIsLiveReq));
     }
 
     @ApiOperation(

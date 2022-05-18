@@ -425,33 +425,37 @@ public class StudyService {
                 .build());
     }
 
-    public StudyListRes joinStudy(String username, Long id) {
+    public StudyListRes joinStudy(String username, Long id, NotificationIsLiveReq notificationIsLiveReq) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
-        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
-                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
-        );
-        if (myStudyRepository.existsByUserAndStudy(user, study)) {
-            notificationRepository.delete(notification);
-            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        Optional<Notification> notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null);
+
+        if (!notificationIsLiveReq.getIsLive()) {
+            if (notification.isEmpty()) {
+                throw new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
+            } else {
+                notificationRepository.delete(notification.get());
+            }
         }
 
-        MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
-                        .isRoomMaker(false)
-                        .user(user)
-                        .study(study)
-                        .build());
-        notificationRepository.delete(notification);
-
-        List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
-        return StudyListRes.builder()
-                .id(id)
-                .title(study.getTitle())
-                .pinnedTime(newMyStudy.getPinnedTime())
-                .profileImgList(myStudies.stream().map(
-                        myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
-                        .collect(Collectors.toList()))
-                .build();
+        if (myStudyRepository.existsByUserAndStudy(user, study)) {
+            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        } else {
+            MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
+                    .isRoomMaker(false)
+                    .user(user)
+                    .study(study)
+                    .build());
+            List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
+            return StudyListRes.builder()
+                    .id(id)
+                    .title(study.getTitle())
+                    .pinnedTime(newMyStudy.getPinnedTime())
+                    .profileImgList(myStudies.stream().map(
+                                    myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                            .collect(Collectors.toList()))
+                    .build();
+        }
     }
 
     public void rejectStudy(String username, Long id) {

@@ -37,4 +37,7 @@ public class Notification {
     @Field(targetType = FieldType.DATE_TIME)
     private LocalDateTime scheduleStartedAt;
 
+    @Field(targetType = FieldType.BOOLEAN)
+    private Boolean isLive;
+
 }

@@ -75,6 +75,7 @@ public class NotificationService {
                                     .studyTitle(study.getTitle())
                                     .scheduleId(scheduleId)
                                     .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
+                                    .isLive(true)
                                     .build()
                     ));
                 } catch (Exception e) {
@@ -91,6 +92,7 @@ public class NotificationService {
                                 .studyTitle(study.getTitle())
                                 .scheduleId(scheduleId)
                                 .scheduleStartedAt(schedule.getStartedAt().toLocalDateTime())
+                                .isLive(false)
                                 .build()
                 );
             }
@@ -128,6 +130,7 @@ public class NotificationService {
                                     .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                     .studyId(study.getId())
                                     .studyTitle(study.getTitle())
+                                    .isLive(true)
                                     .build()
                     ));
                 } catch (Exception e) {
@@ -142,6 +145,7 @@ public class NotificationService {
                                 .roomMakerProfileImg(convertUtil.convertByteArrayToString(user.getProfileImg()))
                                 .studyId(study.getId())
                                 .studyTitle(study.getTitle())
+                                .isLive(false)
                                 .build()
                 );
             }
