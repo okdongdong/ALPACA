@@ -175,7 +175,7 @@ public class StudyService {
         Optional<Chat> optChat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
         return StudyRes.builder()
                 .title(study.getTitle())
-                .info(study.getTitle())
+                .info(study.getInfo())
                 .schedule(schedule.orElse(null))
                 .members(myStudies.stream().map(myStudy -> StudyRes.Member.builder()
                                 .userId(myStudy.getUser().getId())
@@ -187,6 +187,20 @@ public class StudyService {
                 .scheduleListRes(ScheduleListRes.of(schedules))
                 .offsetId(optChat.map(Chat::getId).orElse(null))
                 .build();
+    }
+
+    public List<StudyListRes> getStudyList(String username) {
+        User user = checkUserByUsername(username);
+
+        return myStudyRepository.findAllByUserOrderByPinnedTimeDesc(user)
+                .stream().map(myStudy -> StudyListRes.builder()
+                        .id(myStudy.getStudy().getId())
+                        .title(myStudy.getStudy().getTitle())
+                        .pinnedTime(myStudy.getPinnedTime())
+                        .profileImgList(myStudyRepository.findTop4ByStudy(myStudy.getStudy()).stream().map(
+                                        anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
+                                .collect(Collectors.toList()))
+                        .build()).collect(Collectors.toList());
     }
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {

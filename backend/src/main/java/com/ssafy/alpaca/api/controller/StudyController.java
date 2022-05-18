@@ -64,6 +64,16 @@ public class StudyController {
     }
 
     @ApiOperation(
+            value = "스터디 조회",
+            notes = "요청한 스터디 id에 따라 스터디룸의 정보를 조회한다."
+    )
+    @GetMapping()
+    public ResponseEntity<List<StudyListRes>> getStudyList() {
+        String username = userService.getCurrentUsername();
+        return ResponseEntity.ok(studyService.getStudyList(username));
+    }
+
+    @ApiOperation(
             value = "스터디 일정 리스트 조회",
             notes = "특정 기간 (year, month, day)의 스터디 일정을 조회한다."
     )
