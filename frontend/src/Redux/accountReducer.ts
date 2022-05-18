@@ -17,7 +17,6 @@ interface UserInfo {
   preferredLanguage: string;
   studies: Study[];
   isLogin: boolean;
-  studyCount: number;
 }
 
 const initialState: UserInfo = {
@@ -30,7 +29,6 @@ const initialState: UserInfo = {
   preferredLanguage: '',
   studies: [],
   isLogin: false,
-  studyCount: 0,
 };
 
 const accountSlice = createSlice({
@@ -48,7 +46,6 @@ const accountSlice = createSlice({
     },
     deleteStudyUserInfo: (state, action) => {
       state.studies = state.studies.filter((study) => study.id !== parseInt(action.payload));
-      state.studyCount -= 1;
     },
     setStudies: (state, action) => {
       state.studies = action.payload;

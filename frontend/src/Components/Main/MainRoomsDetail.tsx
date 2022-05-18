@@ -1,15 +1,13 @@
-import { Button, Grid } from '@mui/material';
-import styles from './MainRoomsDetail.module.css';
+import { Button, Grid, styled, useTheme } from '@mui/material';
 import PushPinIcon from '@mui/icons-material/PushPin';
+import styles from './MainRoomsDetail.module.css';
 import alpaca from '../../Assets/Img/alpaca.png';
-import { styled, useTheme } from '@mui/material/styles';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setStudies } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
-import useAlert from '../../Hooks/useAlert';
 
 export interface StudyCreateProps {
   detail: any;
@@ -69,11 +67,10 @@ function MainRoomsDetail(props: StudyCreateProps) {
   const pinStudy = async () => {
     var findStudy = userStudy.findIndex((v: any) => v.id === props.detail.id);
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'post',
         url: `/study/${props.detail.id}/pin`,
       });
-      console.log(res);
       const temp = [...userStudy];
       let deleteTemp = temp.splice(findStudy, 1);
       const tmp = { ...deleteTemp[0] };
@@ -128,6 +125,9 @@ function MainRoomsDetail(props: StudyCreateProps) {
               height: '25px',
               width: '25px',
               zIndex: 1,
+              '&:hover': {
+                color: theme.palette.accent,
+              },
             }}
             onClick={pinStudy}></PushPinIcon>
           <CButton onClick={goStudy}>

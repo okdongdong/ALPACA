@@ -42,6 +42,7 @@ export interface ProblemRes {
   level: number;
   problemNumber: number;
   title: string;
+  isSolved?: boolean;
   solvedMemberList?: SolvedMemeberList[];
 }
 
@@ -55,6 +56,7 @@ function RoomMainStudyDetail() {
   const startedAt = useSelector((state: any) => state.room.startedAt);
   const finishedAt = useSelector((state: any) => state.room.finishedAt);
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
+  const isEdit = useSelector((state: any) => state.room.isEdit);
 
   const cAlert = useAlert();
 
@@ -123,7 +125,7 @@ function RoomMainStudyDetail() {
 
   useEffect(() => {
     return () => {
-      dispatch(setIsEdit(false));
+      if (isEdit) dispatch(setIsEdit(false));
     };
   }, []);
 
@@ -189,6 +191,7 @@ function RoomMainStudyDetail() {
                     level={problem.level}
                     title={problem.title}
                     members={problem.solvedMemberList}
+                    isSolved={problem.isSolved}
                   />
                 ))}
               </Box>

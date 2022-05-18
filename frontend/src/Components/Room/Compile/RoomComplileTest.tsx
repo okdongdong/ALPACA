@@ -111,6 +111,7 @@ function RoomComplileTest({ submitCode, saveCode, inputs, outputs }: CompileTest
       tab === 1 && userInput.replaceAll('\n', '\\n').replaceAll('\r', '\\r'),
     );
     if (!res) return;
+    setUserResult([]);
     if (tab === 0) {
       setUserResult(
         res.map((result: any) => {

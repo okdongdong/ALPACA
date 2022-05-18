@@ -95,6 +95,31 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
   const [inviteCode, setInviteCode] = useState('');
   const [selectedUserList, setSelectedUserList] = useState<UserInfo[]>([]);
 
+  // 멤버 리스트로 초대
+  const inviteMemberList = async () => {
+    if (!isRoomMaker) return;
+
+    try {
+      const memberIdList = selectedUserList.map((user: UserInfo) => user.id);
+      await customAxios({
+        method: 'post',
+        url: `/study/${roomId}/invite`,
+        data: {
+          memberIdList,
+        },
+      });
+      cAlert.fire({
+        title: '초대 완료',
+        text: '초대 알림이 전송되었습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   // 초대코드 조회
   const getInviteCode = async () => {
     if (!isRoomMaker) return;
@@ -219,7 +244,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <h1>스터디원 초대하기</h1>
+        <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디원 초대하기</div>
         <Close
           onClick={() => {
             setOpen(false);
@@ -262,7 +287,12 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         </MemberArray>
 
         <div style={{ alignSelf: 'end' }}>
-          <CBtn width="100px" height="100%" onClick={() => {}}>
+          <CBtn
+            width="100px"
+            height="100%"
+            onClick={() => {
+              inviteMemberList();
+            }}>
             초대
           </CBtn>
         </div>

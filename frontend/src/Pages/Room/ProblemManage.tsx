@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Box, Avatar, AvatarGroup, Grid, Modal, Chip } from '@mui/material';
+import { DataGrid, gridClasses, GridRowsProp } from '@mui/x-data-grid';
+import { BrowserView, MobileView } from 'react-device-detect';
+import { useNavigate, useParams } from 'react-router-dom';
+import { customAxios } from '../../Lib/customAxios';
+import { styled, useTheme } from '@mui/material/styles';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import { DataGrid, gridClasses, GridRowsProp } from '@mui/x-data-grid';
-import ClearIcon from '@mui/icons-material/Clear';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled, useTheme } from '@mui/material/styles';
-import CBadge from '../../Components/Commons/CBadge';
-import CProfile from '../../Components/Commons/CProfile';
-import CBtn from '../../Components/Commons/CBtn';
-import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { customAxios } from '../../Lib/customAxios';
-import { useNavigate, useParams } from 'react-router-dom';
-import { BrowserView, MobileView } from 'react-device-detect';
+import Menu from '@mui/material/Menu';
+import CProfile from '../../Components/Commons/CProfile';
+import CBadge from '../../Components/Commons/CBadge';
+import CBtn from '../../Components/Commons/CBtn';
 import alpaca from '../../Assets/Img/alpaca.png';
 
 interface QuickSearchToolbarProps {
@@ -249,7 +249,6 @@ const columnsData = [
     headerName: '문제 푼 스터디원',
     width: 300,
     renderCell: (params: any) => {
-      console.log(params);
       return (
         <div
           style={{
@@ -265,7 +264,6 @@ const columnsData = [
               '& .MuiAvatar-root': { width: 32, height: 32 },
             }}>
             {params.value.map((member: any, i: number) => {
-              console.log(member);
               return (
                 <Avatar
                   alt={member.nickname}
@@ -325,12 +323,13 @@ const McolumsData = [
 
 function ProblemManage() {
   const navigate = useNavigate();
-  const { roomId } = useParams();
   const params = useParams();
-  const [searchText, setSearchText] = useState('');
-  const [rowData, setRowData] = useState<any>();
+  const { roomId } = useParams();
+  const [open, setOpen] = useState(false);
   const [data, setData] = useState<any>([]);
   const [rows, setRows] = useState<any[]>(data);
+  const [rowData, setRowData] = useState<any>();
+  const [searchText, setSearchText] = useState('');
   const requestSearch = (searchValue: string) => {
     setSearchText(searchValue);
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
@@ -342,7 +341,6 @@ function ProblemManage() {
     setRows(filteredRows);
   };
 
-  const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
 
   const problemsData = async () => {
@@ -351,7 +349,6 @@ function ProblemManage() {
         method: 'get',
         url: `/study/${params.roomId}/problems`,
       });
-      console.log(res.data);
       const rowdata: GridRowsProp = res.data;
       setData(rowdata);
     } catch (e) {
@@ -383,7 +380,7 @@ function ProblemManage() {
         url: `/problem`,
       });
       problemsData();
-    } catch (e: any) {
+    } catch (e) {
       console.log(e);
     }
   };

@@ -21,6 +21,7 @@ import {
   MemberDict,
   changeSelectedDay,
   setIsRoomMaker,
+  resetRoomInfo,
 } from '../../Redux/roomReducer';
 import { BrowserView, MobileView } from 'react-device-detect';
 import DehazeIcon from '@mui/icons-material/Dehaze';
@@ -130,6 +131,9 @@ function RoomMain() {
   // 페이지 랜더링시 스터디 기본정보를 가져옴
   useEffect(() => {
     initSequence();
+    return () => {
+      dispatch(resetRoomInfo());
+    };
   }, []);
 
   useEffect(() => {

@@ -46,6 +46,7 @@ export interface ProblemRes {
   level: number;
   problemNumber: number;
   title: string;
+  isSolved: boolean;
   solvedMemberList?: SolvedMemberList[];
 }
 
