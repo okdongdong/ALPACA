@@ -143,6 +143,7 @@ function MainWeeklyCalendar() {
       <CalendarTitle>
         <IconButton
           size="large"
+          sx={{ color: theme.palette.txt }}
           onClick={() => setNowDay((prev) => new Date(prev.setDate(prev.getDate() - 7)))}>
           <ArrowBackIosNew />
         </IconButton>
@@ -155,6 +156,7 @@ function MainWeeklyCalendar() {
         </div>
         <IconButton
           size="large"
+          sx={{ color: theme.palette.txt }}
           onClick={() => setNowDay((prev) => new Date(prev.setDate(prev.getDate() + 7)))}>
           <ArrowForwardIos />
         </IconButton>

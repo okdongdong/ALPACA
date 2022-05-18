@@ -16,7 +16,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { settingOn } from '../../Redux/roomReducer';
 import styles from './SideBar.module.css';
 
-import { Home, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
+import { Home, HomeWork, Logout, Assignment, Notifications, Settings } from '@mui/icons-material';
 import useLogout from '../../Hooks/useLogout';
 import useAlert from '../../Hooks/useAlert';
 import NotificationDialog from '../Dialogs/NotificationDialog';
@@ -91,6 +91,9 @@ function SideBar() {
   const [newNotiCount, setNewNotiCount] = useState<number>(0);
 
   const clickHome = () => {
+    navigate(`/`);
+  };
+  const clickStudyHome = () => {
     if (params.roomId !== undefined) {
       navigate(`room/${params.roomId}`);
     }
@@ -120,14 +123,19 @@ function SideBar() {
   };
 
   const icon: iconObjType = {
-    Home: { icon: <Home />, onClick: clickHome, tooltip: '스터디 홈' },
+    Home: { icon: <Home />, onClick: clickHome, tooltip: '메인으로 이동' },
+    StudyHome: { icon: <HomeWork />, onClick: clickStudyHome, tooltip: '스터디 홈' },
     Problem: { icon: <Assignment />, onClick: clickProblem, tooltip: '문제관리' },
     Logout: { icon: <Logout />, onClick: clickLogout, tooltip: '로그아웃' },
     Noti: { icon: <Notifications />, onClick: clickNotification, tooltip: '알림확인' },
   };
 
   const iconList =
-    pathname.indexOf('room') === -1 ? ['Noti', 'Logout'] : ['Home', 'Problem', 'Noti', 'Logout'];
+    pathname.indexOf('room') === -1
+      ? ['Home', 'Noti', 'Logout']
+      : pathname.indexOf('live') !== -1
+      ? ['Home', 'StudyHome', 'Problem', 'Noti']
+      : ['Home', 'StudyHome', 'Problem', 'Noti', 'Logout'];
   return (
     <CustomDrawer variant="permanent">
       <DrawerHeader>

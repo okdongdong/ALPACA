@@ -10,6 +10,7 @@ type userPropsType = {
 };
 
 const VideoButton = styled(Button)(({ theme }) => ({
+  padding: 0,
   '&:hover': {
     backgroundColor: theme.palette.main + '30',
     boxShadow: 'none',

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { customAxios } from '../../Lib/customAxios';
-import { Paper, useTheme, styled, Button, IconButton } from '@mui/material';
-import { Check, Link } from '@mui/icons-material';
+import { Paper, useTheme, styled, Button, IconButton, Tooltip } from '@mui/material';
+import { Check, Link, InfoOutlined } from '@mui/icons-material';
 import CClassBadge from '../Commons/CClassBadge';
 import CBadge from '../Commons/CBadge';
 import { useNavigate } from 'react-router-dom';
@@ -131,8 +131,20 @@ function MainRecommendProblem() {
   }, []);
   return (
     <RecommendProblemDiv>
-      <div style={{ textAlign: 'center', height: '3vh', fontWeight: '600', fontSize: '1.2rem' }}>
-        오늘의 추천문제
+      <div
+        style={{
+          textAlign: 'center',
+          height: '3vh',
+          fontWeight: '600',
+          fontSize: '1.2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <span>오늘의 추천문제</span>
+        <Tooltip title="본인이 속한 클래스를 기준으로 문제가 추천됩니다." arrow>
+          <InfoOutlined fontSize="small" />
+        </Tooltip>
       </div>
       <div style={{ height: '15vh', display: 'flex', justifyContent: 'space-around' }}>
         {recommendProblems.map((problem) => {

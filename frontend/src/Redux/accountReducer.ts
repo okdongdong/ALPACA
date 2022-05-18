@@ -50,9 +50,12 @@ const accountSlice = createSlice({
       state.studies = state.studies.filter((study) => study.id !== parseInt(action.payload));
       state.studyCount -= 1;
     },
+    setStudies: (state, action) => {
+      state.studies = action.payload;
+    },
   },
 });
 
-export const { setUserInfo, logout, deleteStudyUserInfo } = accountSlice.actions;
+export const { setUserInfo, logout, deleteStudyUserInfo, setStudies } = accountSlice.actions;
 
 export default accountSlice.reducer;

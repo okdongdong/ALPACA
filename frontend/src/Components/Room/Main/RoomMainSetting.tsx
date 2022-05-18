@@ -9,7 +9,11 @@ import { setLoading } from '../../../Redux/commonReducer';
 import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 
-function RoomMainSetting() {
+interface RoomMainSettingProps {
+  data: Function;
+}
+
+function RoomMainSetting(props: RoomMainSettingProps) {
   const { roomId } = useParams();
   const theme = useTheme();
   const cAlert = useAlert();
@@ -68,7 +72,10 @@ function RoomMainSetting() {
     if (result.isConfirmed) {
       const res = await deleteStudy();
       if (res)
-        cAlert.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success').then(() => navigate('/'));
+        cAlert.fire('삭제 성공!', '스터디를 삭제했습니다.', 'success').then(() => {
+          props.data();
+          navigate('/');
+        });
       else cAlert.fire('삭제 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
@@ -92,7 +99,10 @@ function RoomMainSetting() {
     if (result.isConfirmed) {
       const res = await leaveStudy();
       if (res)
-        cAlert.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success').then(() => navigate('/'));
+        cAlert.fire('탈퇴 성공!', '스터디에서 탈퇴했습니다.', 'success').then(() => {
+          props.data();
+          navigate('/');
+        });
       else cAlert.fire('탈퇴 실패!', '잠시 후 다시 시도해주세요.', 'error');
     }
   };
