@@ -212,7 +212,7 @@ function RoomMainChat() {
 
   return (
     <RoomMainComponentContainer>
-      <div style={{ height: 'calc(100% - 40px)' }}>
+      <div style={{ height: isMobile ? '85vh' : 'calc(100% - 40px)' }}>
         <Stack
           spacing={1}
           className="scroll-box"

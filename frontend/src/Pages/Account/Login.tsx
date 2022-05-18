@@ -46,7 +46,7 @@ function Login(props: any) {
         profileImg: !!res.data.profileImg ? res.data.profileImg : alpaca,
         bojId: res.data.bojId,
         preferredLanguage: res.data.preferredLanguage,
-        studies: isMobile ? res.data.studies : res.data.studies.slice(0, 3),
+        studies: res.data.studies,
         isLogin: true,
         studyCount: res.data.studyCount,
       };
