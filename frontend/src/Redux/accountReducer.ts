@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-interface Study {
+export interface Study {
   id: number;
   title: string;
   pinnedTime: string;

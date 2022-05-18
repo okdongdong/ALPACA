@@ -26,16 +26,21 @@ function RoomMainStudyDetailProblemItem({
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
 
+  const onClickHandler = () => {
+    window.open(`https://www.acmicpc.net/problem/${number}`, '_blank');
+  };
+
   return (
     <div style={{ marginTop: '8px' }}>
       <CProblem
+        onClick={() => setOpen((prev) => !prev)}
         borderRadius="10px"
         number={number}
         level={level}
         title={title}
         button={
           <>
-            <CBtn onClick={() => navigate(`/compile/${problemId}`)}>문제풀기</CBtn>
+            <CBtn onClick={() => navigate(`/compile/${problemId}`)}>코드 제출</CBtn>
             <IconButton onClick={() => setOpen((prev) => !prev)} sx={{ width: 'fit-content' }}>
               {open ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
@@ -44,6 +49,29 @@ function RoomMainStudyDetailProblemItem({
       />
 
       <Collapse in={open}>
+        {!members && (
+          <Stack
+            padding={2}
+            spacing={1}
+            alignItems="center"
+            sx={{
+              backgroundColor: theme.palette.bg,
+              color: alpha(theme.palette.txt, 0.5),
+              width: '100%',
+              borderRadius: '10px',
+              marginTop: '8px',
+              display: 'flex',
+            }}>
+            <div> 저장된 코드가 없습니다.</div>
+
+            <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
+              {`문제 보러 가기 >`}
+            </CBtn>
+            <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
+              {`코드 제출하러 가기 >`}
+            </CBtn>
+          </Stack>
+        )}
         <Stack
           className="scroll-box"
           sx={{ marginTop: 1, borderRadius: '10px', backgroundColor: theme.palette.bg }}>
