@@ -181,7 +181,7 @@ public class StudyService {
         Optional<Chat> optChat = chatRepository.findDistinctFirstByStudyIdOrderByIdDesc(id);
         return StudyRes.builder()
                 .title(study.getTitle())
-                .info(study.getTitle())
+                .info(study.getInfo())
                 .schedule(schedule.orElse(null))
                 .members(myStudies.stream().map(myStudy -> StudyRes.Member.builder()
                                 .userId(myStudy.getUser().getId())
