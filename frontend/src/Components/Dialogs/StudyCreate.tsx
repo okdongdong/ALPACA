@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, Input, DialogTitle, FormHelperText, FormControl } from '@mui/material';
+import {
+  Dialog,
+  Input,
+  DialogTitle,
+  FormHelperText,
+  FormControl,
+  Stack,
+  alpha,
+  Box,
+} from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -15,7 +24,12 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../Redux/accountReducer';
 import alpaca from '../../Assets/Img/alpaca.png';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView, isMobile, MobileView } from 'react-device-detect';
+import CInput from '../Commons/CInput';
+import CProfile from '../Commons/CProfile';
+import { Close, Search } from '@mui/icons-material';
+import CSearchBar from '../Commons/CSearchBar';
+import CInputWithBtn from '../Commons/CInputWithBtn';
 
 export interface StudyCreateProps {
   open: boolean;
@@ -23,6 +37,12 @@ export interface StudyCreateProps {
   page: number;
   studyList: any;
   callback: Function;
+}
+
+interface Member {
+  id: number;
+  nickname: string;
+  profileImg?: string;
 }
 
 interface userData {
@@ -41,17 +61,27 @@ const TInput = styled(Input)(({ theme }) => ({
   },
 }));
 
-const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  color: theme.palette.txt,
+const SearchResultBox = styled(Stack)(({ theme }) => ({
+  backgroundColor: theme.palette.component,
+  position: 'relative',
+  height: '20vh',
 }));
 
-const CustomContent = styled('div')(({ theme }) => ({
-  minWidth: 960,
-  minHeight: 720,
-  display: 'Grid',
-  justifyContent: 'center',
+const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  padding: theme.spacing(2),
+  fontSize: isMobile ? 12 : '',
+  backgroundColor: theme.palette.accent,
+  color: theme.palette.icon,
+  display: 'flex',
+  justifyContent: 'space-between',
   alignItems: 'center',
+}));
+
+const CustomContent = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.bg,
+  color: theme.palette.txt,
+  padding: theme.spacing(3),
+  minWidth: isMobile ? 300 : 450,
 }));
 
 const MContent = styled('div')(({ theme }) => ({
@@ -65,7 +95,9 @@ const MemberArray = styled('div')(({ theme }) => ({
   flexWrap: 'wrap',
   listStyle: 'none',
   padding: 0.5,
-  marginTop: 20,
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  height: theme.spacing(5),
 }));
 
 const ListChip = styled('li')(({ theme }) => ({
@@ -82,21 +114,22 @@ const Demo = styled('div')(({ theme }) => ({
 }));
 
 function StudyCreate(props: StudyCreateProps) {
+  const { onClose, open } = props;
+
   const dispatch = useDispatch();
   const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
-  const myData = [
-    { id: userInfo.userId, nickname: userInfo.nickname, profileImg: userInfo.profileImg },
-  ];
+
   const [studyname, setStudyName] = useState('');
   const [studyintro, setStudyIntro] = useState('');
-  const [memberList, setMemberList] = useState<any[]>(myData);
-  const { onClose, open } = props;
-  const [getUser, setgetUser] = useState<any>([]);
+  const [memberList, setMemberList] = useState<Member[]>([]);
+  const [getUser, setgetUser] = useState<Member[]>([]);
   const [nameMessage, setNameMessage] = useState<string>('');
   const [introMessage, setIntroMessage] = useState<string>('');
-  const nameRegex = /^.{1,50}$/;
-  const introRegex = /^.{1,500}$/;
+  const [searchNickname, setSearchNickname] = useState<string>('');
+
+  const nameRegex = /^.{0,50}$/;
+  const introRegex = /^.{0,500}$/;
 
   useEffect(() => {
     if (nameRegex.test(studyname)) {
@@ -114,34 +147,32 @@ function StudyCreate(props: StudyCreateProps) {
     }
   }, [studyintro]);
 
+  useEffect(() => {
+    setMemberList([]);
+    setgetUser([]);
+  }, [open]);
+
+  useEffect(() => {
+    userSearch();
+  }, [searchNickname]);
+
   const handleClose = () => {
     createData();
     setStudyName('');
     setStudyIntro('');
-    setMemberList(myData);
+    setMemberList([]);
     onClose();
   };
 
   const cancleClose = () => {
     setStudyName('');
     setStudyIntro('');
-    setMemberList(myData);
+    setMemberList([]);
     onClose();
   };
-  const handleDelete = (chipToDelete: userData) => () => {
+  const handleDelete = (chipToDelete: Member) => () => {
     if (userInfo.userId !== chipToDelete.id)
       setMemberList((chips) => chips.filter((chip) => chip.id !== chipToDelete.id));
-  };
-
-  const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setStudyName(event.target.value);
-  };
-  const onChangeIntro = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setStudyIntro(event.target.value);
-  };
-
-  const userSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    userList(event.target.value);
   };
 
   const createData = async () => {
@@ -167,220 +198,98 @@ function StudyCreate(props: StudyCreateProps) {
     }
   };
 
-  const userList = async (inputValue: string) => {
+  const userSearch = async () => {
     try {
       const res = await customAxios({
         method: 'get',
         url: `/user/search`,
-        params: { nickname: inputValue },
+        params: { nickname: searchNickname },
       });
       setgetUser(res.data);
+      console.log('getUserList: ', res);
     } catch (e: any) {
       console.log(e.response);
     }
   };
 
   return (
-    <>
-      <BrowserView style={{ width: '100%', height: '100%' }}>
-        <Dialog onClose={cancleClose} open={open} maxWidth="lg">
-          <CustomContent>
-            <CDialogTitle sx={{ textAlign: 'center' }}>스터디 개설</CDialogTitle>
-            <Grid container sx={{ minWidth: 900, display: 'flex', justifyContent: 'center' }}>
-              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-                <Clabel>스터디 이름</Clabel>
-              </Grid>
-              <Grid item xs={10}>
-                <FormControl variant="standard" error={!!nameMessage} fullWidth>
-                  <TInput
-                    multiline={true}
-                    sx={{ minWidth: '100%' }}
-                    onChange={onChangeName}></TInput>
-                  <FormHelperText>{nameMessage}</FormHelperText>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-                <Clabel>스터디 소개</Clabel>
-              </Grid>
-              <Grid item xs={10}>
-                <FormControl variant="standard" error={!!introMessage} fullWidth>
-                  <TInput
-                    multiline={true}
-                    sx={{ minWidth: '100%' }}
-                    onChange={onChangeIntro}></TInput>
-                  <FormHelperText>{introMessage}</FormHelperText>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs={2} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'center' }}>
-                <Clabel>스터디원</Clabel>
-              </Grid>
-              <Grid item xs={10}>
-                <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
-                <Demo>
-                  <List
-                    sx={{
-                      position: 'relative',
-                      overflow: 'auto',
-                      maxHeight: 200,
-                    }}>
-                    {getUser.map((item: any) => {
-                      return (
-                        <ListItem key={item.id}>
-                          <ListItemButton
-                            onClick={() => {
-                              setMemberList((memberList) => {
-                                if (
-                                  !memberList.some((samedata) => {
-                                    return samedata.id === item.id;
-                                  })
-                                )
-                                  return [...memberList, item];
-                                else return [...memberList];
-                              });
-                            }}>
-                            <ListItemAvatar>
-                              <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={item.nickname}
-                              sx={{ color: theme.palette.txt }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </Demo>
-                <MemberArray>
-                  {memberList.map((data: any) => {
-                    return (
-                      <ListChip key={data.id}>
-                        <CChip
-                          avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
-                          label={data.nickname}
-                          onDelete={handleDelete(data)}
-                        />
-                      </ListChip>
-                    );
-                  })}
-                </MemberArray>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-              <CBtn content="닫기" onClick={cancleClose}></CBtn>
-              <CBtn
-                content="확인"
-                onClick={handleClose}
-                disabled={!!nameMessage || !!introMessage}></CBtn>
-            </Grid>
-          </CustomContent>
-        </Dialog>
-      </BrowserView>
-      <MobileView>
-        <Dialog onClose={cancleClose} open={open} fullScreen>
-          <MContent>
-            <CDialogTitle sx={{ textAlign: 'center', marginBottom: '10vh' }}>
-              스터디 개설
-            </CDialogTitle>
-            <Grid
-              container
-              sx={{ display: 'flex', justifyContent: 'center', width: '100%', padding: 1 }}>
-              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
-                <Clabel>스터디 이름</Clabel>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="standard" error={!!nameMessage} fullWidth>
-                  <TInput multiline={true} sx={{ Width: '100%' }} onChange={onChangeName}></TInput>
-                  <FormHelperText>{nameMessage}</FormHelperText>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <Grid container sx={{ padding: 1 }}>
-              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
-                <Clabel>스터디 소개</Clabel>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="standard" error={!!introMessage} fullWidth>
-                  <TInput multiline={true} onChange={onChangeIntro}></TInput>
-                  <FormHelperText>{introMessage}</FormHelperText>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <Grid container sx={{ padding: 1 }}>
-              <Grid item xs={12} sx={{ paddingTop: 1, display: 'flex', justifyContent: 'left' }}>
-                <Clabel>스터디원</Clabel>
-              </Grid>
-              <Grid item xs={12}>
-                <TInput onChange={userSearch} sx={{ minWidth: '100%' }}></TInput>
-                <Demo>
-                  <List
-                    sx={{
-                      position: 'relative',
-                      overflow: 'auto',
-                      maxHeight: 200,
-                    }}>
-                    {getUser.map((item: any) => {
-                      return (
-                        <ListItem key={item.id}>
-                          <ListItemButton
-                            onClick={() => {
-                              setMemberList((memberList) => {
-                                if (
-                                  !memberList.some((samedata) => {
-                                    return samedata.id === item.id;
-                                  })
-                                )
-                                  return [...memberList, item];
-                                else return [...memberList];
-                              });
-                            }}>
-                            <ListItemAvatar>
-                              <Avatar src={!!item.profileImg ? item.profileImg : alpaca} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={item.nickname}
-                              sx={{ color: theme.palette.txt }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </Demo>
-                <MemberArray>
-                  {memberList.map((data: any) => {
-                    return (
-                      <ListChip key={data.id}>
-                        <CChip
-                          avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
-                          label={data.nickname}
-                          onDelete={handleDelete(data)}
-                        />
-                      </ListChip>
-                    );
-                  })}
-                </MemberArray>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-              <CBtn content="닫기" onClick={cancleClose}></CBtn>
-              <CBtn
-                content="확인"
-                onClick={handleClose}
-                disabled={!!nameMessage || !!introMessage}></CBtn>
-            </Grid>
-          </MContent>
-        </Dialog>
-      </MobileView>
-    </>
+    <Dialog onClose={cancleClose} open={open} fullScreen={isMobile}>
+      <CDialogTitle>
+        <h1>스터디 개설</h1>
+        <Close onClick={cancleClose} />
+      </CDialogTitle>
+      <CustomContent>
+        <CInput label="스터디 이름" onChange={setStudyName} helperText={nameMessage} multiline />
+        <CInput label="스터디 소개" onChange={setStudyIntro} helperText={introMessage} multiline />
+        <CInputWithBtn
+          label="스터디원 검색"
+          onChange={setSearchNickname}
+          buttonBackgroundColor="rgba(0,0,0,0)"
+          buttonContent={<Search />}
+          onButtonClick={() => {}}
+        />
+
+        <SearchResultBox className="scroll-box">
+          {getUser.map((item: Member, idx: number) => {
+            return (
+              <Box
+                sx={{
+                  py: 1,
+                  backgroundColor:
+                    idx % 2 ? alpha(theme.palette.bg, 0.3) : alpha(theme.palette.main, 0.3),
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  height: 'fit-content',
+                }}
+                key={`search-result-${idx}`}
+                onClick={() => {
+                  setMemberList((prev) => {
+                    if (
+                      !prev.some((samedata) => {
+                        return samedata.id === item.id;
+                      })
+                    )
+                      return [...prev, item];
+                    else return [...prev];
+                  });
+                }}>
+                <CProfile nickname={item.nickname} profileImg={item.profileImg} />
+              </Box>
+            );
+          })}
+        </SearchResultBox>
+        <MemberArray>
+          <ListChip>
+            <CChip
+              avatar={<Avatar src={userInfo.profileImg ? userInfo.profileImg : alpaca} />}
+              label={userInfo.nickname}
+            />
+          </ListChip>
+
+          {memberList.map((data: Member, idx: number) => {
+            return (
+              <ListChip key={`added-member-${idx}`}>
+                <CChip
+                  avatar={<Avatar src={!!data.profileImg ? data.profileImg : alpaca} />}
+                  label={data.nickname}
+                  onDelete={handleDelete(data)}
+                />
+              </ListChip>
+            );
+          })}
+        </MemberArray>
+        <Grid item sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+          <CBtn content="닫기" onClick={cancleClose} width="30%" height="100%"></CBtn>
+          <CBtn
+            content="확인"
+            onClick={handleClose}
+            width="30%"
+            height="100%"
+            disabled={!!nameMessage || !!introMessage}></CBtn>
+        </Grid>
+      </CustomContent>
+    </Dialog>
   );
 }
 
