@@ -87,38 +87,32 @@ public class StudyService {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_STUDIES);
         }
 
-        if (12 < studyReq.getMemberIdList().size()) {
+        if (11 < studyReq.getMemberIdList().size()) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_MEMBERS);
         }
-        Study study = StudyReq.of(studyReq);
-
-        HashSet<Long> hashSet = new HashSet<>();
-        List<MyStudy> myStudyList = new ArrayList<>();
-        List<String> profileImgList = new ArrayList<>();
-        for (Long userId : studyReq.getMemberIdList()) {
-            if (hashSet.contains(userId)) {
-                continue;
-            }
-            User addUser = checkUserById(userId);
-
-            hashSet.add(userId);
-
-            myStudyList.add(MyStudy.builder()
-                    .isRoomMaker(user.getId().equals(userId))
-                    .user(checkUserById(userId))
-                    .study(study)
-                    .build());
-
-            profileImgList.add(convertUtil.convertByteArrayToString(addUser.getProfileImg()));
-        }
+        Study study = studyRepository.save(
+                Study.builder()
+                        .title(studyReq.getTitle())
+                        .info(studyReq.getInfo())
+                        .build()
+        );
 
         studyRepository.save(study);
-        myStudyRepository.saveAll(myStudyList);
+        MyStudy myStudy = myStudyRepository.save(
+                MyStudy.builder()
+                        .isRoomMaker(true)
+                        .user(user)
+                        .study(study)
+                        .build()
+        );
+        myStudyRepository.save(myStudy);
+        List<String> profileImg = new ArrayList<>();
+        profileImg.add(convertUtil.convertByteArrayToString(user.getProfileImg()));
         return StudyListRes.builder()
                 .id(study.getId())
                 .title(study.getTitle())
-                .pinnedTime(myStudyList.get(0).getPinnedTime())
-                .profileImgList(profileImgList)
+                .pinnedTime(myStudy.getPinnedTime())
+                .profileImgList(profileImg)
                 .build();
     }
 

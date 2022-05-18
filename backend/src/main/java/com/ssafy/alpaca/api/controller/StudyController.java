@@ -32,7 +32,9 @@ public class StudyController {
     @PostMapping
     public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.createStudy(username, studyReq));
+        StudyListRes studyListRes = studyService.createStudy(username, studyReq);
+        notificationService.notifyAddStudyEvent(username, studyListRes.getId(), studyReq.getMemberIdList());
+        return ResponseEntity.ok(studyListRes);
     }
 
     @ApiOperation(
@@ -207,7 +209,7 @@ public class StudyController {
     @PostMapping("/{id}/invite")
     public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberListReq studyMemberListReq) {
         String username = userService.getCurrentUsername();
-        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq);
+        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq.getMemberIdList());
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
