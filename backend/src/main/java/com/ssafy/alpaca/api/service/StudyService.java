@@ -7,6 +7,7 @@ import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
 import com.ssafy.alpaca.common.util.RandomCodeUtil;
 import com.ssafy.alpaca.db.document.Chat;
+import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
@@ -18,10 +19,8 @@ import com.ssafy.alpaca.db.redis.StudyCode;
 import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +47,7 @@ public class StudyService {
     private final InviteCodeRedisRepository inviteCodeRedisRepository;
     private final StudyCodeRedisRepository studyCodeRedisRepository;
     private final ChatRepository chatRepository;
+    private final NotificationRepository notificationRepository;
 
     private Study checkStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
@@ -82,6 +82,11 @@ public class StudyService {
 
     public StudyListRes createStudy(String username, StudyReq studyReq) {
         User user = checkUserByUsername(username);
+
+        if (99 < myStudyRepository.countAllByUser(user)) {
+            throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_STUDIES);
+        }
+
         if (12 < studyReq.getMemberIdList().size()) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_MEMBERS);
         }
@@ -117,7 +122,7 @@ public class StudyService {
                 .build();
     }
 
-    public List<StudyListRes> setPin(String username, Long id, Long limit) {
+    public void setPin(String username, Long id) {
         User user = checkUserByUsername(username);
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
@@ -127,19 +132,7 @@ public class StudyService {
         } else {
             myStudy.setPinnedTime(LocalDateTime.of(1, 1, 1, 6, 0));
             myStudyRepository.save(myStudy);
-
-            return myStudyRepository.findByUserOrderByPinnedTimeDescLimitTo(user.getId(), limit)
-                    .stream().map(map -> StudyListRes.builder()
-                            .id(map.getStudy().getId())
-                            .title(map.getStudy().getTitle())
-                            .pinnedTime(map.getPinnedTime())
-                            .profileImgList(myStudyRepository.findTop4ByStudy(map.getStudy()).stream().map(
-                                            anotherMyStudy -> convertUtil.convertByteArrayToString(anotherMyStudy.getUser().getProfileImg()))
-                                    .collect(Collectors.toList()))
-                            .build()).collect(Collectors.toList());
-
         }
-        return null;
     }
 
     private String getTime(Integer offset) {
@@ -200,21 +193,6 @@ public class StudyService {
                 .scheduleListRes(ScheduleListRes.of(schedules))
                 .offsetId(optChat.map(Chat::getId).orElse(null))
                 .build();
-    }
-
-    public Page<StudyListRes> getMoreStudy(String username, Pageable pageable) {
-        User user = checkUserByUsername(username);
-        Page<MyStudy> myStudyList = myStudyRepository.findAllByUser(user, pageable);
-
-        return myStudyList.map(myStudy -> StudyListRes.builder()
-                .id(myStudy.getStudy().getId())
-                .title(myStudy.getStudy().getTitle())
-                .pinnedTime(myStudy.getPinnedTime())
-                .profileImgList(
-                        myStudyRepository.findAllByStudy(myStudy.getStudy())
-                                .stream().map(ms -> convertUtil.convertByteArrayToString(ms.getUser().getProfileImg()))
-                                .collect(Collectors.toList()))
-                .build());
     }
 
     public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
@@ -451,6 +429,45 @@ public class StudyService {
                 .content(chat.getContent())
                 .timeStamp(chat.getTimeStamp())
                 .build());
+    }
+
+    public StudyListRes joinStudy(String username, Long id) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
+        );
+        if (myStudyRepository.existsByUserAndStudy(user, study)) {
+            notificationRepository.delete(notification);
+            throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
+        }
+
+        MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
+                        .isRoomMaker(false)
+                        .user(user)
+                        .study(study)
+                        .build());
+        notificationRepository.delete(notification);
+
+        List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
+        return StudyListRes.builder()
+                .id(id)
+                .title(study.getTitle())
+                .pinnedTime(newMyStudy.getPinnedTime())
+                .profileImgList(myStudies.stream().map(
+                        myStudy -> convertUtil.convertByteArrayToString(myStudy.getUser().getProfileImg()))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public void rejectStudy(String username, Long id) {
+        User user = checkUserByUsername(username);
+        Study study = checkStudyById(id);
+        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
+                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
+        );
+
+        notificationRepository.delete(notification);
     }
 
 }
