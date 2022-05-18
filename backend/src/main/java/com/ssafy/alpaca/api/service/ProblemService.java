@@ -76,6 +76,7 @@ public class ProblemService {
             URL url = new URL("https://solved.ac/api/v3/search/user?query=" + user.getBojId());
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             JSONObject jsonObject = getJsonDataFromURL(httpURLConnection);
+            httpURLConnection.disconnect();
             List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
             JSONObject userData = jsonObjects.get(0);
             if (Boolean.TRUE.equals(!userData.get("handle").toString().equals(user.getBojId()))) {
@@ -100,6 +101,7 @@ public class ProblemService {
                 URL url = new URL("https://solved.ac/api/v3/search/problem?query=solved_by:" + user.getBojId() + "&page=" + page);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 JSONObject jsonObject = getJsonDataFromURL(httpURLConnection);
+                httpURLConnection.disconnect();
                 long totalCount = (long) jsonObject.get("count");
                 List<JSONObject> jsonObjects = (List<JSONObject>) jsonObject.get("items");
                 for (JSONObject j : jsonObjects) {
@@ -152,8 +154,10 @@ public class ProblemService {
                 } else {
                     problemRecommendRes = getRandomProblem(user);
                 }
-            } else {
+            } else if (0 < user.getClassLevel()) {
                 problemRecommendRes = getClassProblem(user.getClassLevel(), user);
+            } else {
+                problemRecommendRes = getClassProblem(1L, user);
             }
             if (todayProblem.isEmpty()) {
                 todayProblemRepository.save(TodayProblem.builder()
