@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@mui/material';
-import { Close, ContactPageOutlined } from '@mui/icons-material';
-import CBtn from '../Commons/CBtn';
-import { useSelector } from 'react-redux';
+import { Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { customAxios } from '../../Lib/customAxios';
 import useAlert from '../../Hooks/useAlert';
+import Sound from '../../Assets/Audio/Sound.mp3';
 
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
@@ -17,6 +16,7 @@ type NotificationDataType = {
   type: 'invite' | 'schedule';
   studyId: number;
   title: string;
+  isLive?: boolean;
   scheduleStartedAt?: string;
 };
 
@@ -24,6 +24,7 @@ type NotificationItemType = {
   index: number;
   type: 'invite' | 'schedule';
   studyId: number;
+  isLive?: boolean;
   title: string;
   scheduleStartedAt?: string;
   deleteNoti: Function;
@@ -64,6 +65,7 @@ function NotificationItem({
   type,
   studyId,
   title,
+  isLive,
   deleteNoti,
   index,
   scheduleStartedAt,
@@ -75,15 +77,19 @@ function NotificationItem({
   const joinStudy = async () => {
     deleteNoti(index);
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'post',
         url: `/study/${studyId}/join`,
+        data: {
+          isLive: isLive ? true : false,
+        },
       });
       cAlert
         .fire({
           title: '가입완료',
           text: `${title}에 가입되었습니다.\n 스터디로 이동하시겠습니까?`,
           icon: 'success',
+          confirmButtonText: '이동',
         })
         .then((res) => {
           if (res.isConfirmed) {
@@ -111,31 +117,15 @@ function NotificationItem({
     }
   };
 
-  const rejectStudy = async () => {
+  const rejectStudy = () => {
     deleteNoti(index);
-    try {
-      const res = await customAxios({
-        method: 'post',
-        url: `/study/${studyId}/reject`,
-      });
-      cAlert.fire({
-        title: '거절 완료',
-        text: '스터디 초대 거절을 완료했습니다.',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } catch (e: any) {
-      if (e.response.status === 400) {
-        cAlert.fire({
-          title: '거절 실패',
-          text: '잘못된 접근입니다.',
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    }
+    cAlert.fire({
+      title: '거절 완료',
+      text: '스터디 초대 거절을 완료했습니다.',
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 1500,
+    });
   };
 
   return (
@@ -209,7 +199,7 @@ function NotificationItem({
 function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: NotificationDialogType) {
   const [notificationList, setNotificationList] = useState<NotificationDataType[]>([]);
   const eventSource = useRef<EventSource | null>(null);
-
+  const sound = useRef(new Audio(Sound));
   useEffect(() => {
     connectNotification();
     return () => {
@@ -218,7 +208,6 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   }, []);
 
   const addInitialNotification = (event: MessageEvent) => {
-    console.log('addInitialNotification', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
@@ -230,6 +219,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
             type: 'schedule',
             studyId: data.studyId,
             title: data.studyTitle,
+
             scheduleStartedAt: data.scheduleStartedAt,
           },
           ...notifications,
@@ -240,8 +230,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   };
 
   const addSchedule = (event: MessageEvent) => {
-    console.log('addSchedule', event.data);
-    console.log(!!!anchorEl, anchorEl);
+    sound.current.play();
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
@@ -252,6 +241,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
           type: 'schedule',
           studyId: data.studyId,
           title: data.studyTitle,
+          isLive: data.isLive,
           scheduleStartedAt: data.scheduleStartedAt,
         },
         ...notifications,
@@ -259,13 +249,16 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
     });
   };
   const addInviteStudy = (event: MessageEvent) => {
-    console.log('addInviteStudy', event);
     if (!!!anchorEl) {
       setNewNotiCount((prev: number) => prev + 1);
     }
+    sound.current.play();
     const data = JSON.parse(event.data);
     setNotificationList((notifications) => {
-      return [{ type: 'invite', studyId: data.studyId, title: data.studyTitle }, ...notifications];
+      return [
+        { type: 'invite', studyId: data.studyId, title: data.studyTitle, isLive: data.isLive },
+        ...notifications,
+      ];
     });
   };
 
@@ -299,7 +292,6 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
   const deleteNotification = (index: number) => {
     setNotificationList((notifications) => {
       return notifications.filter((notification, idx) => {
-        console.log(index, idx);
         return idx !== index;
       });
     });
@@ -330,6 +322,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
               type={noti.type}
               studyId={noti.studyId}
               index={index}
+              isLive={noti.isLive}
               scheduleStartedAt={noti.scheduleStartedAt}
               deleteNoti={deleteNotification}
             />
