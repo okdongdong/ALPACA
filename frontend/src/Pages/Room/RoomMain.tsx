@@ -25,6 +25,8 @@ import {
 import { BrowserView, MobileView } from 'react-device-detect';
 import DehazeIcon from '@mui/icons-material/Dehaze';
 import RoomMainStudyCreate from '../../Components/Room/Main/RoomMainStudyCreate';
+import { Study } from '../../Redux/accountReducer';
+import useAlert from '../../Hooks/useAlert';
 
 const RoomTitle = styled('h1')(({ theme }) => ({
   color: theme.palette.txt,
@@ -41,14 +43,16 @@ const MRoomTitle = styled('h3')(({ theme }) => ({
 function RoomMain() {
   const { roomId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const cAlert = useAlert();
   const theme = useTheme();
 
   const userId = useSelector((state: any) => state.account.userId);
+  const studies = useSelector((state: any) => state.account.studies);
   const title = useSelector((state: any) => state.room.title);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const isStudyExist = useSelector((state: any) => state.room.isStudyExist);
   const isEdit = useSelector((state: any) => state.room.isEdit);
-
   // 초대 dialog open
   const [open, setOpen] = useState<boolean>(false);
   // chat open
@@ -63,6 +67,22 @@ function RoomMain() {
 
   // preview dialog open
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+
+  // 정보 조회전 내가 속한 스터디가 맞는지 체크
+  const studyCheck = async () => {
+    if (studies.every((study: Study) => `${study.id}` !== roomId)) {
+      await cAlert.fire({
+        title: '잘못된 접근입니다!',
+        text: '메인페이지로 돌아갑니다',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      navigate('/');
+      return false;
+    }
+    return true;
+  };
 
   // 스터디룸 정보조회
   const getRoomInfo = async () => {
@@ -104,9 +124,12 @@ function RoomMain() {
     }
   };
 
+  const initSequence = async () => {
+    if (await studyCheck()) getRoomInfo();
+  };
   // 페이지 랜더링시 스터디 기본정보를 가져옴
   useEffect(() => {
-    getRoomInfo();
+    initSequence();
   }, []);
 
   useEffect(() => {

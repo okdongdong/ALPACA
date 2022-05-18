@@ -4,6 +4,7 @@ import React from 'react';
 interface RoomMainComponentContainerProps {
   children?: React.ReactNode;
   height?: string | number;
+  marginBottom?: string | number;
 }
 
 const CustomContainer = styled('div')(({ theme }) => ({
@@ -16,9 +17,12 @@ const CustomContainer = styled('div')(({ theme }) => ({
 function RoomMainComponentContainer({
   children,
   height = '100%',
+  marginBottom = '20px',
 }: RoomMainComponentContainerProps) {
   return (
-    <CustomContainer style={{ height: height, marginBottom: '20px' }}>{children}</CustomContainer>
+    <CustomContainer style={{ height: height, marginBottom: marginBottom }}>
+      {children}
+    </CustomContainer>
   );
 }
 

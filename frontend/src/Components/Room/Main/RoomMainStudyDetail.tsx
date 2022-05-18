@@ -1,5 +1,5 @@
 import { Delete, Edit } from '@mui/icons-material';
-import { Box, Divider, Stack, useTheme } from '@mui/material';
+import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
@@ -121,6 +121,12 @@ function RoomMainStudyDetail() {
     getScheduleProblems();
   }, [scheduleId]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setIsEdit(false));
+    };
+  }, []);
+
   return (
     <>
       <BrowserView style={{ width: '100%', height: '100%' }}>
@@ -151,6 +157,30 @@ function RoomMainStudyDetail() {
             <Divider variant="middle" />
             <Stack className="scroll-box" spacing={1} sx={{ height: '100%', position: 'relative' }}>
               <Box sx={{ position: 'absolute', width: '100%' }}>
+                {problemListRes.length === 0 && (
+                  <Stack
+                    padding={5}
+                    spacing={5}
+                    alignItems="center"
+                    sx={{
+                      backgroundColor: theme.palette.bg,
+                      color: alpha(theme.palette.txt, 0.5),
+                      width: '100%',
+                      borderRadius: '10px',
+                      marginTop: '8px',
+                      display: 'flex',
+                    }}>
+                    <div>등록된 문제가 없습니다.</div>
+
+                    <CBtn
+                      height="100%"
+                      onClick={() => {
+                        dispatch(setIsEdit(true));
+                      }}>
+                      문제 추가 하기
+                    </CBtn>
+                  </Stack>
+                )}
                 {problemListRes.map((problem: ProblemRes, idx: number) => (
                   <RoomMainStudyDetailProblemItem
                     key={idx}

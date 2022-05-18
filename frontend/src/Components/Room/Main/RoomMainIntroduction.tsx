@@ -1,4 +1,4 @@
-import { Divider, Stack, styled } from '@mui/material';
+import { Divider } from '@mui/material';
 import { useSelector } from 'react-redux';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainIntroductionMemberList from './RoomMainIntroductionMemberList';
