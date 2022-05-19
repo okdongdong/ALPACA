@@ -4,25 +4,34 @@ import MainIntroduction from '../../Components/Main/MainIntroduction';
 import MainRooms from '../../Components/Main/MainRooms';
 import MainWeeklyCalendar from '../../Components/Main/MainWeeklyCalendar';
 import { BrowserView, MobileView } from 'react-device-detect';
-import { Grid, Stack } from '@mui/material';
+import { Grid, Stack, styled } from '@mui/material';
+
+const CBox = styled('div')(({ theme }) => ({
+  [theme.breakpoints.down('lg')]: {
+    paddingLeft: '10vw',
+    paddingRight: '10vw',
+  },
+}));
 
 function Main() {
   return (
     <>
       <BrowserView style={{ height: '100%', width: '100%', paddingTop: 40 }}>
-        <Grid container sx={{ width: '100%' }}>
-          <Grid xs={1.5}></Grid>
-          <Grid xs={2} sx={{ width: '100%', pt: 5 }}>
-            <MainIntroduction />
+        <CBox>
+          <Grid container sx={{ width: '100%' }}>
+            <Grid xs={12} lg={1.5}></Grid>
+            <Grid xs={12} lg={2} sx={{ width: '100%', pt: 5 }}>
+              <MainIntroduction />
+            </Grid>
+            <Grid xs={12} lg={6} sx={{ height: '100%', width: '100%', minWidth: 700 }}>
+              <Stack spacing={3} justifyContent="center">
+                <MainWeeklyCalendar />
+                <MainRecommendProblem />
+                <MainRooms />
+              </Stack>
+            </Grid>
           </Grid>
-          <Grid xs={6} sx={{ height: '100%', width: '100%', minWidth: 700 }}>
-            <Stack spacing={3} justifyContent="center">
-              <MainWeeklyCalendar />
-              <MainRecommendProblem />
-              <MainRooms />
-            </Stack>
-          </Grid>
-        </Grid>
+        </CBox>
       </BrowserView>
       <MobileView>
         <Stack spacing={3} justifyContent="center">

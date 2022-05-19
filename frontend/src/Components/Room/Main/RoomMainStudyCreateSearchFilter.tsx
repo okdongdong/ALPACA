@@ -1,4 +1,5 @@
 import {
+  alpha,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -7,6 +8,7 @@ import {
   RadioGroup,
   Stack,
   styled,
+  useTheme,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,11 +27,19 @@ const TierBox = styled('div')(({ theme }) => ({
   justifyContent: 'space-between',
 }));
 
+const CRadio = styled(Radio)(({ theme }) => ({
+  color: alpha(theme.palette.txt, 0.5),
+}));
+const CCheckbox = styled(Radio)(({ theme }) => ({
+  color: alpha(theme.palette.txt, 0.5),
+}));
+
 function RoomMainStudyCreateSearchFilter({
   tierValue,
   setTierValue,
 }: RoomMainStudyCreateSearchFilterProps) {
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const members = useSelector((state: any) => state.room.members);
   const [selectMemberCnt, setSelectMemberCnt] = useState<number>(0);
@@ -61,7 +71,9 @@ function RoomMainStudyCreateSearchFilter({
   return (
     <>
       <FormControl sx={{ width: '100%' }}>
-        <FormLabel id="problem-tier">문제 난이도</FormLabel>
+        <FormLabel sx={{ color: alpha(theme.palette.txt, 0.5) }} id="problem-tier">
+          문제 난이도
+        </FormLabel>
         <RadioGroup
           row
           aria-labelledby="problem-tier"
@@ -75,34 +87,34 @@ function RoomMainStudyCreateSearchFilter({
             <TierBox>
               <FormControlLabel
                 value={1}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={1} labelOff />}
               />
               <FormControlLabel
                 value={6}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={6} labelOff />}
               />
               <FormControlLabel
                 value={11}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={11} labelOff />}
               />
             </TierBox>
             <TierBox>
               <FormControlLabel
                 value={16}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={16} labelOff />}
               />
               <FormControlLabel
                 value={21}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={21} labelOff />}
               />
               <FormControlLabel
                 value={26}
-                control={<Radio />}
+                control={<CRadio />}
                 label={<CBadge tier={26} labelOff />}
               />
             </TierBox>
@@ -110,12 +122,14 @@ function RoomMainStudyCreateSearchFilter({
         </RadioGroup>
       </FormControl>
       <FormControl>
-        <FormLabel id="problem-member">멤버가 풀지 않은 문제만</FormLabel>
+        <FormLabel sx={{ color: alpha(theme.palette.txt, 0.5) }} id="problem-member">
+          멤버가 풀지 않은 문제만
+        </FormLabel>
         <RadioGroup aria-labelledby="problem-member">
           <FormControlLabel
             value={0}
             control={
-              <Checkbox
+              <CCheckbox
                 checked={selectMemberCnt === 0}
                 onChange={onAllMemberCheckedChangeHandler}
                 name="전체"
@@ -129,7 +143,7 @@ function RoomMainStudyCreateSearchFilter({
                 key={idx}
                 value={1}
                 control={
-                  <Checkbox
+                  <CCheckbox
                     checked={member.isQuery || false}
                     onChange={(event) => onMemberCheckedChangeHandler(event, idx)}
                     name={member.nickname}
