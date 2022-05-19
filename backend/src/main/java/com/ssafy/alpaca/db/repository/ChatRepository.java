@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChatRepository extends MongoRepository<Chat, String> {
-    @Query("{'_id': {$lt : ?0}, 'studyId': ?1 }")
+    @Query("{'_id': {$lte : ?0}, 'studyId': ?1 }")
     Slice<Chat> findPartByStudyId(ObjectId id, Long studyId, Pageable pageable);
 
     Optional<Chat> findDistinctFirstByStudyIdOrderByIdDesc(Long studyId);

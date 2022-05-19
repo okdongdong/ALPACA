@@ -28,7 +28,7 @@ public class Chat {
 
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)
-    private LocalDateTime timeStamp = LocalDateTime.now();
+    private LocalDateTime timeStamp = LocalDateTime.now().plusHours(9);
 
     @NotBlank
     private String content;
