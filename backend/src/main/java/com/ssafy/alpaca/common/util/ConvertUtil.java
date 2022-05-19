@@ -17,4 +17,24 @@ public class ConvertUtil {
         }
         return "data:image/png;base64," + StringUtils.newStringUtf8(Base64.encodeBase64(primitiveBytes, false));
     }
+
+    private String convertTimeToString(int number) {
+        return String.format("%02d", number);
+    }
+
+    public String getTime(Integer offset) {
+        if (offset == 0) {
+            return "Z";
+        } else {
+            StringBuilder ret = new StringBuilder(0 < offset ? "-" : "+");
+            int hour = Math.abs(offset/60);
+            int minute = Math.abs(offset%60);
+
+            ret.append(convertTimeToString(hour));
+            ret.append(":");
+            ret.append(convertTimeToString(minute));
+            return ret.toString();
+        }
+    }
+
 }

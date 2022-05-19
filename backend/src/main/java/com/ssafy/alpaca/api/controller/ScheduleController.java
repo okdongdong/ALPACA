@@ -6,8 +6,10 @@ import com.ssafy.alpaca.api.response.ScheduleRes;
 import com.ssafy.alpaca.api.response.ScheduleListRes;
 import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.ScheduleService;
+import com.ssafy.alpaca.api.service.StudyService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
+import com.ssafy.alpaca.db.entity.Study;
 import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -24,6 +26,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final UserService userService;
+    private final StudyService studyService;
     private final ScheduleService scheduleService;
     private final NotificationService notificationService;
 
@@ -34,7 +37,8 @@ public class ScheduleController {
     @PostMapping()
     public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq)  {
         User user = userService.getCurrentUser();
-        Long scheduleId = scheduleService.createSchedule(user, scheduleReq);
+        Study study = studyService.getStudyById(scheduleReq.getStudyId());
+        Long scheduleId = scheduleService.createSchedule(user, study, scheduleReq);
         notificationService.createScheduleNotification(scheduleId);
         return ResponseEntity.ok(BaseResponseBody.of(200, scheduleId));
     }
@@ -44,9 +48,10 @@ public class ScheduleController {
             notes = "오늘 예정된 스터디의 문제들을 조회한다."
     )
     @GetMapping("/{id}/today")
-    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) {
+    public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id, @RequestParam Integer offset) {
         User user = userService.getCurrentUser();
-        return ResponseEntity.ok(scheduleService.getTodaySchedule(user, id));
+        Study study = studyService.getStudyById(id);
+        return ResponseEntity.ok(scheduleService.getTodaySchedule(user, study, offset));
     }
 
     @ApiOperation(
@@ -86,7 +91,8 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleListRes>> getScheduleList(
             @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) {
         User user = userService.getCurrentUser();
-        return ResponseEntity.ok(scheduleService.getScheduleList(user, id, year, month, day));
+        Study study = studyService.getStudyById(id);
+        return ResponseEntity.ok(scheduleService.getScheduleList(user, study, year, month, day));
     }
 
     @ApiOperation(
