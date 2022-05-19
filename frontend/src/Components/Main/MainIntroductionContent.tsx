@@ -12,8 +12,7 @@ const CustomContainer = styled('div')(({ theme }) => ({
   color: theme.palette.txt,
   borderRadius: 10,
   padding: theme.spacing(1),
-  marginTop: '3px',
-  marginBottom: '3px',
+  marginTop: '16px',
 }));
 
 const TInput = styled(Input)(({ theme }) => ({
