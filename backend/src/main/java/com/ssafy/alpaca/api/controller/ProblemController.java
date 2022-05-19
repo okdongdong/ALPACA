@@ -1,10 +1,12 @@
 package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.response.ProblemRecommendRes;
+import com.ssafy.alpaca.api.response.ProblemRes;
 import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.db.document.Problem;
+import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +29,9 @@ public class ProblemController {
     )
     @ApiImplicitParam( name = "problemNumber", value = "검색할 문제 번호", dataTypeClass = Long.class )
     @GetMapping()
-    public ResponseEntity<List<Problem>> searchProblems(@RequestParam Long problemNumber) {
-        return ResponseEntity.ok(problemService.searchProblems(problemNumber));
+    public ResponseEntity<List<ProblemRes>> searchProblems(@RequestParam Long problemNumber) {
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(problemService.searchProblems(user, problemNumber));
     }
 
     @ApiOperation(
@@ -37,8 +40,9 @@ public class ProblemController {
     )
     @ApiImplicitParam( name = "problemNumber", value = "조회할 문제 번호", dataTypeClass = Long.class)
     @GetMapping("/{problemNumber}")
-    public ResponseEntity<Problem> getProblem(@PathVariable Long problemNumber) {
-        return ResponseEntity.ok(problemService.getProblem(problemNumber));
+    public ResponseEntity<ProblemRes> getProblem(@PathVariable Long problemNumber) {
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(problemService.getProblem(user, problemNumber));
     }
 
     @ApiOperation(
@@ -58,7 +62,7 @@ public class ProblemController {
     )
     @GetMapping("/recommend")
     public ResponseEntity<List<ProblemRecommendRes>> recommendProblem(){
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(problemService.recommendProblem(username));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(problemService.recommendProblem(user));
     }
 }

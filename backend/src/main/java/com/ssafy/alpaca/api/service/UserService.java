@@ -54,6 +54,12 @@ public class UserService {
         return principal.getUsername();
     }
 
+    public User getCurrentUser() {
+        return userRepository.findByUsername(getCurrentUsername()).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+    }
+
     public void checkUsername(String username) {
         if (Boolean.TRUE.equals(userRepository.existsByUsername(username))) {
             throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
