@@ -38,6 +38,6 @@ public class Notification {
     private LocalDateTime scheduleStartedAt;
 
     @Field(targetType = FieldType.BOOLEAN)
-    private Boolean isLive;
+    private Boolean isInvitation;
 
 }
