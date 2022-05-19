@@ -1,22 +1,19 @@
 import { Delete, Edit } from '@mui/icons-material';
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
-import dateToString, { dateToStringTime } from '../../../Lib/dateToString';
+import { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
 import {
   deleteSchedule,
-  resetProblemList,
   setFinishedAt,
   setIsEdit,
-  setIsStudyExist,
   setProblemListRes,
   setStartedAt,
 } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyDetailProblemItem from './RoomMainStudyDetailProblemItem';
-import { BrowserView, MobileView } from 'react-device-detect';
 import useAlert from '../../../Hooks/useAlert';
 import { setLoading } from '../../../Redux/commonReducer';
 
@@ -51,6 +48,7 @@ function RoomMainStudyDetail() {
   const dispatch = useDispatch();
 
   const scheduleId = useSelector((state: any) => state.room.scheduleId);
+  const selectedDay = useSelector((state: any) => state.room.selectedDay);
   const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
   const dateRange = useSelector((state: any) => state.room.dateRange);
   const startedAt = useSelector((state: any) => state.room.startedAt);
@@ -130,118 +128,77 @@ function RoomMainStudyDetail() {
   }, []);
 
   return (
-    <>
-      <BrowserView style={{ width: '100%', height: '100%' }}>
-        <RoomMainComponentContainer height="100%">
-          <Stack spacing={1} sx={{ padding: 2, height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ textAlign: 'center' }}>스터디 상세정보</h2>
-              <Stack direction="row" spacing={1}>
+    <RoomMainComponentContainer height="100%">
+      <Stack spacing={1} sx={{ padding: 2, height: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ textAlign: 'center' }}>스터디 상세정보</h2>
+          <Stack direction="row" spacing={1}>
+            <CBtn
+              height="100%"
+              content={<Delete sx={{ color: theme.palette.icon }} />}
+              onClick={onDeleteHandler}
+            />
+            <CBtn
+              height="100%"
+              content={<Edit sx={{ color: theme.palette.icon }} />}
+              onClick={() => {
+                dispatch(setIsEdit(true));
+              }}
+            />
+          </Stack>
+        </div>
+        <Divider variant="middle" />
+
+        <div>
+          일시 :{' '}
+          {`${dateToStringDate(selectedDay)} ${dateToStringTime(startedAt)} ~ ${dateToStringTime(
+            finishedAt,
+          )}`}
+        </div>
+
+        <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
+        <Divider variant="middle" />
+        <Stack className="scroll-box" spacing={1} sx={{ height: '100%', position: 'relative' }}>
+          <Box sx={{ position: 'absolute', width: '100%' }}>
+            {problemListRes.length === 0 && (
+              <Stack
+                padding={5}
+                spacing={5}
+                alignItems="center"
+                sx={{
+                  backgroundColor: theme.palette.bg,
+                  color: alpha(theme.palette.txt, 0.5),
+                  width: '100%',
+                  borderRadius: '10px',
+                  marginTop: '8px',
+                  display: 'flex',
+                }}>
+                <div>등록된 문제가 없습니다.</div>
+
                 <CBtn
                   height="100%"
-                  content={<Delete sx={{ color: theme.palette.icon }} />}
-                  onClick={onDeleteHandler}
-                />
-                <CBtn
-                  height="100%"
-                  content={<Edit sx={{ color: theme.palette.icon }} />}
                   onClick={() => {
                     dispatch(setIsEdit(true));
-                  }}
-                />
+                  }}>
+                  문제 추가 하기
+                </CBtn>
               </Stack>
-            </div>
-            <Divider variant="middle" />
-
-            <div>일시 : {`${dateToString(startedAt)} ~ ${dateToStringTime(finishedAt)}`}</div>
-
-            <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
-            <Divider variant="middle" />
-            <Stack className="scroll-box" spacing={1} sx={{ height: '100%', position: 'relative' }}>
-              <Box sx={{ position: 'absolute', width: '100%' }}>
-                {problemListRes.length === 0 && (
-                  <Stack
-                    padding={5}
-                    spacing={5}
-                    alignItems="center"
-                    sx={{
-                      backgroundColor: theme.palette.bg,
-                      color: alpha(theme.palette.txt, 0.5),
-                      width: '100%',
-                      borderRadius: '10px',
-                      marginTop: '8px',
-                      display: 'flex',
-                    }}>
-                    <div>등록된 문제가 없습니다.</div>
-
-                    <CBtn
-                      height="100%"
-                      onClick={() => {
-                        dispatch(setIsEdit(true));
-                      }}>
-                      문제 추가 하기
-                    </CBtn>
-                  </Stack>
-                )}
-                {problemListRes.map((problem: ProblemRes, idx: number) => (
-                  <RoomMainStudyDetailProblemItem
-                    key={idx}
-                    problemId={problem.problemNumber}
-                    number={problem.problemNumber}
-                    level={problem.level}
-                    title={problem.title}
-                    members={problem.solvedMemberList}
-                    isSolved={problem.isSolved}
-                  />
-                ))}
-              </Box>
-            </Stack>
-          </Stack>
-        </RoomMainComponentContainer>
-      </BrowserView>
-
-      <MobileView>
-        <RoomMainComponentContainer height="100%">
-          <Stack spacing={1} sx={{ padding: 2, height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ textAlign: 'center' }}>스터디 상세정보</h2>
-              <Stack direction="row" spacing={1}>
-                <CBtn
-                  height="100%"
-                  content={<Delete sx={{ color: theme.palette.icon }} />}
-                  onClick={deleteStudy}
-                />
-                <CBtn
-                  height="100%"
-                  content={<Edit sx={{ color: theme.palette.icon }} />}
-                  onClick={() => {
-                    dispatch(setIsEdit(true));
-                  }}
-                />
-              </Stack>
-            </div>
-            <Divider variant="middle" />
-
-            <div>일시 : {`${dateToString(startedAt)} ~ ${dateToStringTime(finishedAt)}`}</div>
-
-            <h3 style={{ marginTop: '24px' }}>스터디 문제</h3>
-            <Divider variant="middle" />
-            <Stack className="scroll-box" spacing={1} sx={{ height: '55vh' }}>
-              {problemListRes.map((problem: ProblemRes, idx: number) => (
-                <RoomMainStudyDetailProblemItem
-                  key={idx}
-                  problemId={problem.problemNumber}
-                  number={problem.problemNumber}
-                  level={problem.level}
-                  title={problem.title}
-                  members={problem.solvedMemberList}
-                />
-              ))}
-            </Stack>
-          </Stack>
-        </RoomMainComponentContainer>
-      </MobileView>
-    </>
+            )}
+            {problemListRes.map((problem: ProblemRes, idx: number) => (
+              <RoomMainStudyDetailProblemItem
+                key={idx}
+                problemId={problem.problemNumber}
+                number={problem.problemNumber}
+                level={problem.level}
+                title={problem.title}
+                members={problem.solvedMemberList}
+                isSolved={problem.isSolved}
+              />
+            ))}
+          </Box>
+        </Stack>
+      </Stack>
+    </RoomMainComponentContainer>
   );
 }
 

@@ -2,10 +2,9 @@ import MainIntroductionContent from './MainIntroductionContent';
 import MainIntroductionProfile from './MainIntroductionProfile';
 import { styled } from '@mui/material/styles';
 import { BrowserView, MobileView } from 'react-device-detect';
-const MainIntroductionDiv = styled('div')({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'flex-end',
+import { Stack } from '@mui/material';
+const MainIntroductionDiv = styled(Stack)({
+  paddingRight: 24,
 });
 
 const MMainIntroductionDiv = styled('div')({
@@ -17,12 +16,13 @@ const MMainIntroductionDiv = styled('div')({
 function MainIntroduction() {
   return (
     <>
-      <BrowserView>
-        <MainIntroductionDiv>
+      <BrowserView style={{ width: '100%' }}>
+        <MainIntroductionDiv spacing={3} justifyContent="center" alignItems="center">
           <MainIntroductionProfile />
           <MainIntroductionContent />
         </MainIntroductionDiv>
       </BrowserView>
+
       <MobileView>
         <MMainIntroductionDiv>
           <MainIntroductionProfile />

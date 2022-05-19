@@ -6,6 +6,7 @@ import styles from './MainIntroductionProfile.module.css';
 import EditProfile from '../Dialogs/EditProfile';
 import { useSelector } from 'react-redux';
 import { BrowserView, MobileView } from 'react-device-detect';
+import { Avatar } from '@mui/material';
 
 const ProfileDiv = styled('div')({
   position: 'relative',
@@ -46,7 +47,12 @@ function MainIntroductionProfile() {
     <>
       <BrowserView>
         <ProfileDiv>
-          <img src={userInfo.profileImg} className={styles.profileimg} alt="" />
+          <Avatar
+            src={userInfo.profileImg}
+            className={styles.profileimg}
+            alt=""
+            sx={{ backgroundColor: 'rgba(123,123,123,0.5)', width: 100, height: 100 }}
+          />
           <CIconButton aria-label="EditIcon" onClick={handleClickOpen}>
             <EditIcon
               sx={{
@@ -61,11 +67,16 @@ function MainIntroductionProfile() {
       </BrowserView>
       <MobileView>
         <ProfileDiv>
-          <img
+          <Avatar
             src={userInfo.profileImg}
             className={styles.profileimg}
             alt=""
-            style={{ height: '12vh', width: '12vh', marginLeft: '35px' }}
+            style={{
+              height: '12vh',
+              width: '12vh',
+              marginLeft: '35px',
+              backgroundColor: 'rgba(123,123,123,0.5)',
+            }}
           />
           <CIconButton
             aria-label="EditIcon"

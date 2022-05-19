@@ -9,17 +9,27 @@ import { BrowserView, isMobile, MobileView } from 'react-device-detect';
 import { customAxios } from '../../Lib/customAxios';
 import useAlert from '../../Hooks/useAlert';
 import { setStudies } from '../../Redux/accountReducer';
+import CBtn from '../Commons/CBtn';
 
 const CIconButton = styled(IconButton)(({ theme }) => ({
   margin: '10px',
   padding: 2.5,
-  borderRadius: '10px',
+  borderRadius: '100px',
   background: theme.palette.main,
-  height: '165px',
-  width: '165px',
+  height: 32,
+  width: 32,
 }));
 
-const MIconButton = styled(IconButton)(({ theme }) => ({
+const StudiesBox = styled('div')(({ theme }) => ({
+  margin: theme.spacing(1, 0),
+  borderRadius: '10px',
+  background: theme.palette.component,
+  color: theme.palette.txt,
+  height: 'fit-content',
+  width: '100%',
+}));
+
+const MIconButton = styled('div')(({ theme }) => ({
   display: 'inline-block',
   background: 'none',
   marginLeft: 'auto',
@@ -90,36 +100,63 @@ function MainRooms() {
 
   return (
     <>
+      {/* 스터디 추가 dialog */}
+      <StudyCreate
+        open={open}
+        page={page}
+        studyList={studies}
+        callback={newData}
+        onClose={() => {
+          setOpen(false);
+        }}
+      />
+
       <BrowserView>
-        <Grid container>
-          {studies?.slice((page - 1) * 4, page * 4).map((study: any, i: number) => {
-            return (
-              <Stack key={i}>
-                <MainRoomsDetail detail={study} page={page} callback={pinData} />
+        <Stack justifyContent="center" alignItems="center">
+          <div
+            style={{
+              height: 40,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              position: 'relative',
+              textAlign: 'center',
+              fontWeight: '600',
+              fontSize: '1.2rem',
+              alignItems: 'center',
+            }}>
+            <span style={{ alignSelf: 'center' }}>스터디 목록</span>
+            <div style={{ position: 'absolute', right: 0 }}>
+              <CBtn onClick={handleClickOpen}>
+                <>
+                  <span>스터디 추가</span>
+                  <AddIcon
+                    sx={{
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                    }}
+                  />
+                </>
+              </CBtn>
+            </div>
+          </div>
+          <StudiesBox style={{ width: '100%' }}>
+            {studies.length === 0 && (
+              <Stack spacing={3} sx={{ pt: 3 }} justifyContent="center" alignItems="center">
+                <div>아직 등록된 스터디가 없어요.</div>
+                <CBtn onClick={handleClickOpen}>{`스터디 만들기 >`}</CBtn>
               </Stack>
-            );
-          })}
-          <CIconButton onClick={handleClickOpen}>
-            <AddIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                height: '100px',
-                width: '100px',
-              }}
-            />
-          </CIconButton>
-          <StudyCreate
-            open={open}
-            page={page}
-            studyList={studies}
-            callback={newData}
-            onClose={() => {
-              setOpen(false);
-            }}
-          />
-        </Grid>
+            )}
+            <Grid container sx={{ p: 1, width: '100%' }}>
+              {studies?.slice((page - 1) * 4, page * 4).map((study: any, i: number) => (
+                <Grid item xs={3}>
+                  <MainRoomsDetail detail={study} page={page} callback={pinData} />
+                </Grid>
+              ))}
+            </Grid>
+          </StudiesBox>
+        </Stack>
         <Pagination
           count={Math.ceil(studies.length / PER_PAGE)}
           size="large"
@@ -142,18 +179,38 @@ function MainRooms() {
           }}
         />
       </BrowserView>
+
       <MobileView style={{ width: '100%' }}>
         <Box p="5" sx={{ width: '100%' }}>
-          <div ref={startRef} style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
-            <MIconButton onClick={handleClickOpen}>
-              <AddIcon
-                sx={{
-                  minWidth: 0,
-                  justifyContent: 'center',
-                  color: theme.palette.txt,
-                }}
-              />
-            </MIconButton>
+          <div
+            ref={startRef}
+            style={{
+              height: 40,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              position: 'relative',
+              textAlign: 'center',
+              fontWeight: '600',
+              fontSize: '1.2rem',
+              alignItems: 'center',
+              paddingBottom: 10,
+            }}>
+            <span style={{ alignSelf: 'center' }}>스터디 목록</span>
+            <div style={{ position: 'absolute', right: 0 }}>
+              <CBtn onClick={handleClickOpen}>
+                <>
+                  <span>스터디 추가</span>
+                  <AddIcon
+                    sx={{
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                    }}
+                  />
+                </>
+              </CBtn>
+            </div>
           </div>
           <StudyCreate
             open={open}
@@ -164,6 +221,16 @@ function MainRooms() {
               setOpen(false);
             }}
           />
+          {studies.length === 0 && (
+            <Stack
+              spacing={3}
+              sx={{ p: 3, backgroundColor: theme.palette.component, borderRadius: '10px' }}
+              justifyContent="center"
+              alignItems="center">
+              <div>아직 등록된 스터디가 없어요.</div>
+              <CBtn onClick={handleClickOpen}>{`스터디 만들기 >`}</CBtn>
+            </Stack>
+          )}
           {studies?.slice(0, page * 3).map((study: any, i: number) => {
             return (
               <Stack key={i}>

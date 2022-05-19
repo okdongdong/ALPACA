@@ -28,14 +28,12 @@ const MainDiv = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  overflow: 'auto',
 }));
 
 const MMainDiv = styled('div')(({ theme }) => ({
   height: '100%',
   width: '100%',
   background: theme.palette.bg,
-  overflow: 'auto',
   paddingTop: APP_BAR_MOBILE + 4,
 }));
 
@@ -47,7 +45,7 @@ function MainLayout() {
         <RootStyle>
           {pathname === '/404' ? null : <SideBar />}
           <MainStyle>
-            <MainDiv>
+            <MainDiv className="scroll-box">
               <Outlet />
             </MainDiv>
           </MainStyle>
@@ -55,7 +53,7 @@ function MainLayout() {
       </BrowserView>
       <MobileView style={{ width: '100%', height: '100%' }}>
         {pathname === '/404' ? null : <NavBar />}
-        <MMainDiv>
+        <MMainDiv className="scroll-box">
           <Outlet />
         </MMainDiv>
       </MobileView>

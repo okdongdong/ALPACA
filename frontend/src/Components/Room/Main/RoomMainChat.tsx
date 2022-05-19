@@ -61,10 +61,12 @@ function RoomMainChat() {
 
   const [page, setPage] = useState<number>(0);
 
+  // 채팅 웹소켓 연결 관련
   const [connectAttemptCnt, setConnectAttemptCnt] = useState<number>(0);
-  const [chatHeight, setChatHeight] = useState<number>(0);
-
   const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  // 채팅 인피니티 스크롤 관련
+  const [chatHeight, setChatHeight] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -243,6 +245,11 @@ function RoomMainChat() {
       scrollRef?.current?.scrollTo(0, scrollRef.current.scrollHeight);
     }
   }, [chatList.length]);
+
+  // 20번까지 재연결 시도에도 연결실패시 멈춤
+  useEffect(() => {
+    if (connectAttemptCnt > 20) client?.deactivate();
+  }, [connectAttemptCnt]);
 
   // 웹소켓 연결
   useEffect(() => {
