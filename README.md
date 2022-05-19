@@ -76,8 +76,30 @@
 
 - MongoDB 5.0.7
 
-  ```mongo
-  
+  -  config setting
+
+  ```ini
+  # C:\Program Files\MongoDB\Server\5.0\bin\mongod.conf 
+  ```
+
+  - auth
+
+  ```sh
+  mongo
+  use admin
+  db.createUser({
+      user: '****',
+      pwd: '****',
+      roles: ['userAdminAnyDatabase']
+  })
+  use admin
+  db.auth('****','****')
+  use alpaca
+  db.createUser({user: "alpaca",
+  pwd: "didaudrbs1", 
+  roles:["readWrite"],
+  mechanisms:["SCRAM-SHA-1"]})
+  })
   ```
 
 - [Redis](https://github.com/microsoftarchive/redis/releases) 3.0.504 설치

@@ -16,9 +16,15 @@
 
 > MongoDB
 >
+> Authentication Method : Username/Password
+>
 > username : alpaca
 >
 > password : didaudrbs1
+>
+> Authentication Database : alpaca
+>
+> Authentication Mechanism : SCRAM-SHA-1
 
 ### Docker
 
@@ -111,6 +117,65 @@ FLUSH PRIVILEGES
 ### MongoDB
 
 ##### version : 5.0.7
+
+**Authentication**
+
+```sh
+mongo --host k6E106.p.ssafy.io --port 7107 // 몽고 쉘 연결
+
+use admin
+db.createUser({
+    user: '****',
+    pwd: '****',
+    roles: ['userAdminAnyDatabase']
+}) // 관리자 계정 생성
+
+use admin
+db.auth('****','****') // roles:userAdminAnyDatabase 관리자 계정 인증
+use alpaca
+db.createUser({user: "alpaca",
+pwd: "didaudrbs1", 
+roles:["readWrite"],
+mechanisms:["SCRAM-SHA-1"]})
+}) // alpaca db에 읽기/쓰기가능한 유저 생성
+```
+
+**docker - config / auth**
+
+```sh
+sudo docker run --name mongodb -v /home/ubuntu/docker-volume/mongodb:/data/db -d -p 7107:27017 -v /home/ubuntu/docker-volume/mongodb/mongod.conf:/etc/mongod.conf mongo:5.0.7 -config /etc/mongod.conf --auth
+```
+
+**mongod.conf**
+
+```ini
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# Where and how to store data.
+storage:
+  dbPath: C:\Program Files\MongoDB\Server\5.0\data
+  journal:
+    enabled: true
+#  engine:
+#  wiredTiger:
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path:  C:\Program Files\MongoDB\Server\5.0\log\mongod.log
+
+# network interfaces
+net:
+  port: 7017
+  bindIp: k6E106.p.ssafy.io
+
+security:
+  authorization: enabled
+```
 
 
 
