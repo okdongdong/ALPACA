@@ -33,7 +33,7 @@ const MNameLabel = styled('label')(({ theme }) => ({
 }));
 
 const CButton = styled(Button)(({ theme }) => ({
-  margin: '10px',
+  margin: 'auto',
   borderRadius: '10px',
   display: 'flex',
   alignItems: 'start',
@@ -114,7 +114,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
             sx={{
               position: 'absolute',
               top: 6,
-              left: 12,
+              left: 'calc(50% - 70px)',
               color:
                 props.detail.pinnedTime.split('-')[0] === '0001' || props.detail.pinnedTime === null
                   ? theme.palette.bg
@@ -129,10 +129,10 @@ function MainRoomsDetail(props: StudyCreateProps) {
               },
             }}
             onClick={pinStudy}>
-            <PushPinIcon></PushPinIcon>
+            <PushPinIcon />
           </IconButton>
 
-          <CButton onClick={goStudy}>
+          <CButton onClick={goStudy} sx={{ my: 1 }}>
             <Grid container alignItems="start" spacing={1} sx={{ paddingBottom: 1 }}>
               {props.detail.profileImgList.slice(0, 4).map((profileImg: string, i: number) => (
                 <Grid item xs={6} key={i}>
