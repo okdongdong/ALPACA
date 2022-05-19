@@ -186,7 +186,7 @@ function BasicMenu(props: any) {
           return (
             <MenuItem
               sx={{
-                width: 200,
+                width: 290,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
