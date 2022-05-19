@@ -1,24 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Dialog, Grid, IconButton, DialogTitle } from '@mui/material';
+import { Dialog, Grid, DialogTitle } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { customAxios } from '../../Lib/customAxios';
 import { useSelector } from 'react-redux';
 import CInput from '../Commons/CInput';
 import CBtn from '../Commons/CBtn';
-import ClearIcon from '@mui/icons-material/Clear';
 import useAlert from '../../Hooks/useAlert';
+import { Close } from '@mui/icons-material';
+import { isMobile } from 'react-device-detect';
 
 const CustomContent = styled('div')(({ theme }) => ({
   minWidth: 350,
   minHeight: 300,
+  paddingTop: theme.spacing(5),
   display: 'Grid',
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: theme.palette.bg,
-}));
-
-const CDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  color: theme.palette.txt,
 }));
 
 export interface EditPasswordProps {
@@ -38,10 +36,6 @@ function EditPassword(props: EditPasswordProps) {
   const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,30}$/;
   const { onClose, open } = props;
 
-  const cancleClose = () => {
-    onClose();
-  };
-
   const editPasswordData = async () => {
     try {
       await customAxios({
@@ -53,6 +47,9 @@ function EditPassword(props: EditPasswordProps) {
           password: presentPassword,
         },
       });
+
+      onClose();
+
       cAlert.fire({
         title: '비밀번호 변경 완료!',
         text: '비밀번호를 변경 하였습니다.',
@@ -67,11 +64,6 @@ function EditPassword(props: EditPasswordProps) {
         showConfirmButton: true,
       });
     }
-  };
-
-  const editPasswordClose = () => {
-    editPasswordData();
-    onClose();
   };
 
   useEffect(() => {
@@ -91,9 +83,22 @@ function EditPassword(props: EditPasswordProps) {
   }, [newPassword, newPasswordCheck]);
 
   return (
-    <Dialog onClose={editPasswordClose} open={open} maxWidth="xs">
+    <Dialog onClose={onClose} open={open} maxWidth="xs">
+      <DialogTitle
+        sx={{
+          padding: 2,
+          fontSize: isMobile ? 12 : '',
+          backgroundColor: theme.palette.accent,
+          color: theme.palette.icon,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <div style={{ fontSize: 24, fontWeight: 'bold' }}>비밀번호 변경</div>
+        <Close onClick={onClose} />
+      </DialogTitle>
+
       <CustomContent>
-        <CDialogTitle sx={{ textAlign: 'center' }}>비밀번호 변경</CDialogTitle>
         <Grid
           container
           sx={{
@@ -128,22 +133,10 @@ function EditPassword(props: EditPasswordProps) {
           <CBtn
             width="30%"
             content="변경하기"
-            onClick={editPasswordClose}
+            onClick={editPasswordData}
             disabled={!!passwordMessage || !!passwordCheckMessage}
           />
         </Grid>
-        <IconButton
-          component="span"
-          sx={{ position: 'absolute', top: 10, right: 10 }}
-          onClick={cancleClose}>
-          <ClearIcon
-            sx={{
-              minWidth: 0,
-              justifyContent: 'center',
-              color: theme.palette.txt,
-            }}
-          />
-        </IconButton>
       </CustomContent>
     </Dialog>
   );

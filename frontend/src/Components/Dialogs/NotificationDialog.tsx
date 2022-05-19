@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { customAxios } from '../../Lib/customAxios';
 import { isMobile } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
+import { useDispatch } from 'react-redux';
+import { joinAndAddStudy } from '../../Redux/accountReducer';
 
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
@@ -63,6 +65,7 @@ const CustomBtn = styled(Button)(({ theme }) => ({
 function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
   const cAlert = useAlert();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
   const { id, isInvitation, studyId, studyTitle, scheduleStartedAt } = notification;
   const joinStudy = async () => {
@@ -72,6 +75,10 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
         method: 'post',
         url: `/study/${id}/join`,
       });
+
+      console.log('joinStudy: ', res);
+      dispatch(joinAndAddStudy(res.data));
+
       cAlert
         .fire({
           title: '가입완료',

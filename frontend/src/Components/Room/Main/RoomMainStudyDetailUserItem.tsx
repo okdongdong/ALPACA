@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import CBtn from '../../Commons/CBtn';
 import CProfile from '../../Commons/CProfile';
 
@@ -17,10 +17,11 @@ function RoomMainStudyDetailUserItem({
   profileImg,
   backgroundColor,
 }: RoomMainStudyDetailUserItemProps) {
+  const { roomId } = useParams();
   const navigate = useNavigate();
 
   const onClickHandler = () => {
-    navigate(`/codes/${problemId}/${userId}`);
+    navigate(`/codes/${problemId}/${userId}`, { state: roomId });
   };
 
   return (

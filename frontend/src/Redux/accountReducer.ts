@@ -51,9 +51,18 @@ const accountSlice = createSlice({
     setStudies: (state, action) => {
       state.studies = action.payload;
     },
+    joinAndAddStudy: (state, action) => {
+      state.studies = addStudyAndSortStudiesById(state.studies, action.payload);
+    },
   },
 });
 
-export const { setUserInfo, logout, deleteStudyUserInfo, setStudies } = accountSlice.actions;
+const addStudyAndSortStudiesById = (prevStudies: Study[], newStudy: Study) => {
+  const newStudies = [...prevStudies, newStudy];
+  return newStudies.sort((a, b) => a.id - b.id);
+};
+
+export const { setUserInfo, logout, deleteStudyUserInfo, setStudies, joinAndAddStudy } =
+  accountSlice.actions;
 
 export default accountSlice.reducer;

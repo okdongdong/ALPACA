@@ -16,7 +16,7 @@ const ProfileDiv = styled('div')({
 const CIconButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   bottom: 0,
-  right: 0,
+  right: -16,
   minHeight: 48,
   justifyContent: 'center',
   alignItems: 'center',
@@ -45,25 +45,27 @@ function MainIntroductionProfile() {
 
   return (
     <>
-      <BrowserView>
-        <ProfileDiv>
-          <Avatar
-            src={userInfo.profileImg}
-            className={styles.profileimg}
-            alt=""
-            sx={{ backgroundColor: 'rgba(123,123,123,0.5)', width: 100, height: 100 }}
-          />
-          <CIconButton aria-label="EditIcon" onClick={handleClickOpen}>
-            <EditIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: 'center',
-                color: '#FFFFFF',
-              }}
+      <BrowserView style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center' }}>
+          <ProfileDiv>
+            <Avatar
+              src={userInfo.profileImg}
+              className={styles.profileimg}
+              alt=""
+              sx={{ backgroundColor: 'rgba(123,123,123,0.5)', width: '10vw', height: '10vw' }}
             />
-          </CIconButton>
-          <EditProfile open={open} onClose={handleClose} />
-        </ProfileDiv>
+            <CIconButton aria-label="EditIcon" onClick={handleClickOpen}>
+              <EditIcon
+                sx={{
+                  minWidth: 0,
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              />
+            </CIconButton>
+            <EditProfile open={open} onClose={handleClose} />
+          </ProfileDiv>
+        </div>
       </BrowserView>
       <MobileView>
         <ProfileDiv>
