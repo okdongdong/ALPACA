@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -159,37 +160,25 @@ public class ProblemService {
     public List<ProblemRecommendRes> recommendProblem(User user) {
         Optional<TodayProblem> todayProblem = todayProblemRepository.findByUserId(user.getId());
         if (todayProblem.isPresent() && todayProblem.get().getDate().isEqual(LocalDate.now())) {
-            return todayProblem.get().getProblemRecommendRes();
+            return todayProblem.get().getProblemRecommendRes().stream().map(
+                    problemRecommendRes -> ProblemRecommendRes.builder()
+                            .problemNumber(problemRecommendRes.getProblemNumber())
+                            .title(problemRecommendRes.getTitle())
+                            .level(problemRecommendRes.getLevel())
+                            .classLevel(problemRecommendRes.getClassLevel())
+                            .isSolved(solvedProblemRepository.existsByUserAndProblemNumber(user, problemRecommendRes.getProblemNumber()))
+                            .build())
+                    .collect(Collectors.toList());
         } else {
-            Long nowClassLevel;
+            Long nowClassLevel = getRecommendLevel(user);
             List<ProblemRecommendRes> problemRecommendRes = new ArrayList<>();
-            if (user.getClassDecoration().equals("gold")) {
-                if (user.getClassLevel() < 10) {
-                    nowClassLevel = user.getClassLevel()+1;
-                } else {
-                    nowClassLevel = 11L;
-                }
-            } else if (0 < user.getClassLevel()) {
-                if (user.getClassLevel() < user.getLevel()/3) {
-                    nowClassLevel = user.getLevel()/3;
-                } else {
-                    nowClassLevel = user.getClassLevel();
-                }
-            } else {
-                if (1L < user.getLevel()/3) {
-                    nowClassLevel = user.getLevel()/3;
-                } else {
-                    nowClassLevel = 1L;
-                }
-            }
             HashSet<Long> solvedProblems = solvedProblemRepository.findProblemNumbersByUserId(user.getId());
             while (problemRecommendRes.size() < 3) {
                 if (10 < nowClassLevel) {
                     break;
-                } else {
-                    problemRecommendRes.addAll(getClassProblem(nowClassLevel, user, solvedProblems, 3- problemRecommendRes.size()));
-                    nowClassLevel ++;
                 }
+                problemRecommendRes.addAll(getClassProblem(nowClassLevel, solvedProblems, 3- problemRecommendRes.size()));
+                nowClassLevel ++;
             }
             if (problemRecommendRes.size() < 3) {
                 problemRecommendRes.addAll((getRandomProblem(user.getLevel()*2/3, solvedProblems, 3- problemRecommendRes.size())));
@@ -208,10 +197,25 @@ public class ProblemService {
         }
     }
 
+    private Long getRecommendLevel(User user) {
+        if (user.getClassDecoration().equals("gold")) {
+            return user.getClassLevel()+1;
+        } else if (0 < user.getClassLevel()) {
+            if (user.getLevel()/3 < user.getClassLevel()) {
+                return user.getClassLevel();
+            } else {
+                return user.getLevel()/3;
+            }
+        } else if (6L <= user.getLevel()) {
+            return user.getLevel()/3;
+        }
+        return 1L;
+    }
+
     private List<ProblemRecommendRes> getNFromCandidate(List<Problem> candidateProblems, HashSet<Long> solvedProblems,int needProblemCnt) {
         List<ProblemRecommendRes> selectProblems = new ArrayList<>();
         HashSet<Integer> selectIndex = new HashSet<>();
-        Random random = new Random();
+        Random random = new SecureRandom();
         int newCandidate;
 
         if (candidateProblems.size() <= needProblemCnt) {
@@ -245,7 +249,7 @@ public class ProblemService {
         return selectProblems;
     }
 
-    private List<ProblemRecommendRes> getClassProblem(Long classLevel, User user, HashSet<Long> solvedProblems, int needProblemCnt) {
+    private List<ProblemRecommendRes> getClassProblem(Long classLevel, HashSet<Long> solvedProblems, int needProblemCnt) {
         List<Problem> candidateProblems = problemRepository.findAllByClassLevelAndProblemNumberNotIn(classLevel, solvedProblems);
         return getNFromCandidate(candidateProblems, solvedProblems, needProblemCnt);
     }

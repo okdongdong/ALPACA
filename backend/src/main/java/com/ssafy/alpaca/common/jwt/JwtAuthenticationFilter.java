@@ -8,7 +8,6 @@ import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.repository.LogoutAccessTokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰에서 사용자 정보(이름)을 가져옴
             try {
                 String username = jwtTokenUtil.getUsername(accessToken);
-                log.info("username {}",username);
                 if (username != null) {
                     UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
                     // 토큰이 가지고 있는 정보에 기록된 사용자가 인증받은 사용자인지 확인

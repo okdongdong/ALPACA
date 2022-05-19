@@ -98,39 +98,35 @@ public class CodeService {
                         .build());
     }
 
+    private boolean returnFlag(User user, User member, Long studyId) {
+        if (studyId == null) {
+            return Boolean.TRUE.equals(user.getId().equals(member.getId()));
+        }
+        Study study = studyRepository.findById(studyId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+
+        boolean flagA = false;
+        boolean flagB = false;
+        for (MyStudy myStudy : myStudies) {
+            if (myStudy.getUser().getId().equals(member.getId())) {
+                flagA = true;
+            }
+            if (myStudy.getUser().getId().equals(user.getId())) {
+                flagB = true;
+            }
+        }
+
+        return flagA && flagB;
+    }
+
     public CodeRes getCode(User user, Long studyId, Long userId, Long problemNumber) {
         User member = userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );
-        boolean returnFlag = false;
 
-        if (studyId == null) {
-            if (Boolean.TRUE.equals(user.getId().equals(member.getId()))) {
-                returnFlag =  true;
-            }
-        } else {
-            Study study = studyRepository.findById(studyId).orElseThrow(
-                    () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-            );
-            List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
-
-            boolean flagA = false;
-            boolean flagB = false;
-            for (MyStudy myStudy : myStudies) {
-                if (myStudy.getUser().getId().equals(userId)) {
-                    flagA = true;
-                }
-                if (myStudy.getUser().getId().equals(user.getId())) {
-                    flagB = true;
-                }
-            }
-
-            if (flagA && flagB) {
-                returnFlag = true;
-            }
-        }
-
-        if (returnFlag) {
+        if (returnFlag(user, member, studyId)) {
             List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
             Problem problem = problemRepository.findByProblemNumber(problemNumber).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
@@ -171,7 +167,7 @@ public class CodeService {
             outputStream.flush();
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
+                throw new IllegalArgumentException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
             }
 
             BufferedReader bufferedReader;

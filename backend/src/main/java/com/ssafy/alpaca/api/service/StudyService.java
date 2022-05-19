@@ -120,6 +120,10 @@ public class StudyService {
         }
     }
 
+    private String convertTimeToString(int number) {
+        return String.format("%02d", number);
+    }
+
     private String getTime(Integer offset) {
         if (offset == 0) {
             return "Z";
@@ -127,12 +131,10 @@ public class StudyService {
             StringBuilder ret = new StringBuilder(0 < offset ? "-" : "+");
             int hour = Math.abs(offset/60);
             int minute = Math.abs(offset%60);
-            String HOUR = String.format("%02d", hour);
-            String MINUTE = String.format("%02d", minute);
 
-            ret.append(HOUR);
+            ret.append(convertTimeToString(hour));
             ret.append(":");
-            ret.append(MINUTE);
+            ret.append(convertTimeToString(minute));
             return ret.toString();
         }
     }
