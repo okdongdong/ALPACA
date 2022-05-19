@@ -5,7 +5,6 @@ import com.ssafy.alpaca.api.request.PasswordUpdateReq;
 import com.ssafy.alpaca.api.request.SignupReq;
 import com.ssafy.alpaca.api.request.UserUpdateReq;
 import com.ssafy.alpaca.api.response.LoginRes;
-import com.ssafy.alpaca.api.response.StudyListRes;
 import com.ssafy.alpaca.api.response.TokenRes;
 import com.ssafy.alpaca.api.response.UserListRes;
 import com.ssafy.alpaca.common.exception.FileConvertException;

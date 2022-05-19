@@ -20,14 +20,12 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ScheduleService {
 
-    private final UserRepository userRepository;
     private final MyStudyRepository myStudyRepository;
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
@@ -65,7 +63,7 @@ public class ScheduleService {
 
             List<UserListRes> userListRes = new ArrayList<>();
             for (MyStudy myStudy : myStudies) {
-                if (codeRepository.existsByProblemNumberAndUserId(problem.getProblemNumber(), myStudy.getUser().getId())) {
+                if (Boolean.TRUE.equals(codeRepository.existsByProblemNumberAndUserId(problem.getProblemNumber(), myStudy.getUser().getId()))) {
                     userListRes.add(
                             UserListRes.builder()
                                     .id(myStudy.getUser().getId())

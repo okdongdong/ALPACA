@@ -235,7 +235,7 @@ public class StudyService {
             }
             List<UserListRes> userListRes = new ArrayList<>();
             for (MyStudy ms : myStudy) {
-                if (codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId())) {
+                if (Boolean.TRUE.equals(codeRepository.existsByProblemNumberAndUserId(problem.get().getProblemNumber(), ms.getUser().getId()))) {
                     userListRes.add(UserListRes.builder()
                             .id(ms.getUser().getId())
                             .nickname(ms.getUser().getNickname())
@@ -424,7 +424,7 @@ public class StudyService {
         }
         Study study = checkStudyById(notification.get().getStudyId());
 
-        if (myStudyRepository.existsByUserAndStudy(user, study)) {
+        if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             notificationRepository.delete(notification.get());
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
         } else {

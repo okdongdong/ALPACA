@@ -5,7 +5,6 @@ import com.ssafy.alpaca.api.response.ProblemRes;
 import com.ssafy.alpaca.api.service.ProblemService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
-import com.ssafy.alpaca.db.document.Problem;
 import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

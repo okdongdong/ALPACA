@@ -6,7 +6,6 @@ import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
-import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
@@ -15,13 +14,9 @@ import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ServerErrorException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
