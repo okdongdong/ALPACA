@@ -20,7 +20,7 @@ import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIR
 public class JwtTokenUtil {
 
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private String SECRET_KEY;  // NOSONAR
 
     public Claims extractAllClaims(String token) {
         try {
