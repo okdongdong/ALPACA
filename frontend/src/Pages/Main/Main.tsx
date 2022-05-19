@@ -11,7 +11,7 @@ function Main() {
     <>
       <BrowserView style={{ height: '100%', width: '100%', paddingTop: 40 }}>
         <Grid container sx={{ width: '100%' }}>
-          <Grid xs={1}></Grid>
+          <Grid xs={1.5}></Grid>
           <Grid xs={2} sx={{ width: '100%', pt: 5 }}>
             <MainIntroduction />
           </Grid>
