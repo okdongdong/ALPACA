@@ -118,7 +118,6 @@ function SideBar() {
     }
   };
   const clickNotification = (event: React.MouseEvent<HTMLElement>) => {
-    setNewNotiCount(0);
     setAnchorEl(event.currentTarget);
   };
 

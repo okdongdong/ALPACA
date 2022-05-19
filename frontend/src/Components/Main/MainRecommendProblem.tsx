@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { customAxios } from '../../Lib/customAxios';
-import { Paper, useTheme, styled, Button, IconButton, Tooltip } from '@mui/material';
+import { useTheme, styled, Button, IconButton, Tooltip, Stack } from '@mui/material';
 import { Check, Link, InfoOutlined } from '@mui/icons-material';
 import CClassBadge from '../Commons/CClassBadge';
 import CBadge from '../Commons/CBadge';
@@ -25,13 +25,12 @@ const CustomBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
-const RecommendProblemDiv = styled(Paper)(({ theme }) => ({
+const RecommendProblemDiv = styled('div')(({ theme }) => ({
   width: '100%',
-  height: isMobile ? '' : '20vh',
-  marginTop: '2vh',
-  marginBottom: '3vh',
+  height: isMobile ? '' : 'fit-content',
+  marginTop: '10px',
   borderRadius: '10px',
-  padding: '10px',
+  padding: theme.spacing(2, 1),
   color: theme.palette.txt,
   background: theme.palette.component,
 }));
@@ -43,14 +42,18 @@ function RecommendProblem(props: { problem: RecommendProblemType }) {
     <div
       className="align_column_center"
       style={{
+        paddingTop: isMobile ? 20 : 25,
+        paddingBottom: 10,
         maxWidth: '100%',
         position: 'relative',
         borderRadius: '10px',
-        height: '100%',
+        height: 'fit-content',
         width: '100%',
         background: theme.palette.main,
       }}>
-      <CClassBadge width={25} height={25} level={classLevel} />
+      <div style={{ position: 'absolute', top: -25 }}>
+        <CClassBadge width={50} height={50} level={classLevel} />
+      </div>
       <div
         onClick={() => {
           window.open(`https://www.acmicpc.net/problem/${problemNumber}`, '_blank');
@@ -100,7 +103,6 @@ function RecommendProblem(props: { problem: RecommendProblemType }) {
 }
 
 function MainRecommendProblem() {
-  const theme = useTheme();
   const [recommendProblems, setRecommendProblems] = useState<RecommendProblemType[]>([]);
 
   const getRecommendProblem = async () => {
@@ -130,39 +132,41 @@ function MainRecommendProblem() {
     getRecommendProblem();
   }, []);
   return (
-    <RecommendProblemDiv>
+    <Stack>
       <div
         style={{
           textAlign: 'center',
-          height: '3vh',
+          height: '40px',
           fontWeight: '600',
           fontSize: '1.2rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <span>오늘의 추천문제</span>
+        <span style={{ paddingRight: 6 }}>오늘의 추천문제</span>
         <Tooltip title="본인이 속한 클래스를 기준으로 문제가 추천됩니다." arrow>
           <InfoOutlined fontSize="small" />
         </Tooltip>
       </div>
-      <div style={{ height: '15vh', display: 'flex', justifyContent: 'space-around' }}>
-        {recommendProblems.map((problem) => {
-          return (
-            <div
-              key={problem.problemNumber}
-              style={{
-                width: `calc(90% / ${
-                  recommendProblems.length === 0 ? 1 : recommendProblems.length
-                })`,
-                height: '100%',
-              }}>
-              <RecommendProblem problem={problem} />
-            </div>
-          );
-        })}
-      </div>
-    </RecommendProblemDiv>
+      <RecommendProblemDiv>
+        <div style={{ height: 'fit-content', display: 'flex', justifyContent: 'space-around' }}>
+          {recommendProblems.map((problem) => {
+            return (
+              <div
+                key={problem.problemNumber}
+                style={{
+                  width: `calc(90% / ${
+                    recommendProblems.length === 0 ? 1 : recommendProblems.length
+                  })`,
+                  height: '100%',
+                }}>
+                <RecommendProblem problem={problem} />
+              </div>
+            );
+          })}
+        </div>
+      </RecommendProblemDiv>
+    </Stack>
   );
 }
 

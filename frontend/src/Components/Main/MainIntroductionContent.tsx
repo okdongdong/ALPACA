@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { Input } from '@mui/material';
+import { Divider, Input, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { BrowserView, MobileView } from 'react-device-detect';
 
@@ -18,17 +18,13 @@ const CustomContainer = styled('div')(({ theme }) => ({
 
 const TInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
-  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:before': { borderBottom: `0px solid ${theme.palette.txt}` },
   '&:after': {
     borderBottom: `2px solid ${theme.palette.accent}`,
   },
 }));
 
-const IntroductionDiv = styled('div')({
-  display: 'Grid',
-  justifyContent: 'center',
-  alignItems: 'flex-end',
-});
+const IntroductionDiv = styled(Stack)({ width: '100%', paddingRight: '16px' });
 
 function MainIntroductionContent() {
   const theme = useTheme();
@@ -36,23 +32,21 @@ function MainIntroductionContent() {
   return (
     <>
       <BrowserView>
-        <IntroductionDiv>
-          <div>
-            <Clabel htmlFor="">닉네임</Clabel>
-          </div>
+        <Stack spacing={2}>
           <CustomContainer>
-            <TInput sx={{ width: 500, marginBottom: '5px' }} value={userInfo.nickname}></TInput>
+            <h4>닉네임</h4>
+            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+            <p>{userInfo.nickname}</p>
           </CustomContainer>
-          <div>
-            <Clabel htmlFor="">자기소개</Clabel>
-          </div>
           <CustomContainer>
-            <TInput sx={{ width: 500 }} value={userInfo.info} multiline maxRows={4}></TInput>
+            <h4>자기소개</h4>
+            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+            <p>{userInfo.info}</p>
           </CustomContainer>
-        </IntroductionDiv>
+        </Stack>
       </BrowserView>
-      <MobileView>
-        <IntroductionDiv sx={{ marginRight: '10px' }}>
+      <MobileView style={{ width: '100%' }}>
+        <IntroductionDiv>
           <div style={{ marginTop: '1vh' }}>
             <Clabel htmlFor="">닉네임</Clabel>
           </div>
