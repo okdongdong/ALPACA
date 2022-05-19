@@ -37,11 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    public void configure(WebSecurity web) { // 4
-//        web.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
-//    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http

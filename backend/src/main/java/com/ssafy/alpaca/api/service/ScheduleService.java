@@ -20,14 +20,12 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ScheduleService {
 
-    private final UserRepository userRepository;
     private final MyStudyRepository myStudyRepository;
     private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
@@ -36,13 +34,6 @@ public class ScheduleService {
     private final ProblemRepository problemRepository;
     private final CodeRepository codeRepository;
     private final ConvertUtil convertUtil;
-    private final NotificationService notificationService;
-
-    private User checkUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-    }
 
     private Schedule checkScheduleById(Long id) {
         return scheduleRepository.findById(id).orElseThrow(
@@ -72,7 +63,7 @@ public class ScheduleService {
 
             List<UserListRes> userListRes = new ArrayList<>();
             for (MyStudy myStudy : myStudies) {
-                if (codeRepository.existsByProblemNumberAndUserId(problem.getProblemNumber(), myStudy.getUser().getId())) {
+                if (Boolean.TRUE.equals(codeRepository.existsByProblemNumberAndUserId(problem.getProblemNumber(), myStudy.getUser().getId()))) {
                     userListRes.add(
                             UserListRes.builder()
                                     .id(myStudy.getUser().getId())
@@ -96,7 +87,7 @@ public class ScheduleService {
         return problemListResList;
     }
 
-    public Long createSchedule(String username, ScheduleReq scheduleReq) {
+    public Long createSchedule(User user, ScheduleReq scheduleReq) {
         LocalDateTime finishedAt = LocalDateTime.of(
                 scheduleReq.getFinishedAt().getYear(),
                 scheduleReq.getFinishedAt().getMonth(),
@@ -116,7 +107,6 @@ public class ScheduleService {
         }
 
         Study study = checkStudyById(scheduleReq.getStudyId());
-        User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
         OffsetDateTime offsetDateTime = OffsetDateTime.of(LocalDateTime.of(
@@ -149,9 +139,8 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public ScheduleRes getTodaySchedule(String username, Long studyId) {
+    public ScheduleRes getTodaySchedule(User user, Long studyId) {
         Study study = checkStudyById(studyId);
-        User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -177,7 +166,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public void updateSchedule(String username, Long id, ScheduleUpdateReq scheduleUpdateReq) {
+    public void updateSchedule(User user, Long id, ScheduleUpdateReq scheduleUpdateReq) {
         OffsetDateTime finishedAt = OffsetDateTime.of(LocalDateTime.of(
                 scheduleUpdateReq.getFinishedAt().getYear(),
                 scheduleUpdateReq.getFinishedAt().getMonth(),
@@ -211,7 +200,6 @@ public class ScheduleService {
         }
 
 //      스터디원만 수정 가능
-        User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
         schedule.setStartedAt(startedAt);
@@ -244,8 +232,7 @@ public class ScheduleService {
         toSolveProblemRepository.deleteAll(deleteList);
     }
 
-    public ScheduleRes getSchedule(String username, Long id) {
-        User user = checkUserByUsername(username);
+    public ScheduleRes getSchedule(User user, Long id) {
         Schedule schedule = checkScheduleById(id);
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(schedule.getStudy());
         List<ToSolveProblem> toSolveProblem = toSolveProblemRepository.findAllBySchedule(schedule);
@@ -258,9 +245,8 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleList(String username, Long id, Integer year, Integer month, Integer day) {
+    public List<ScheduleListRes> getScheduleList(User user, Long id, Integer year, Integer month, Integer day) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         checkIsStudyMember(user, study);
 
         if (day == null) {
@@ -280,8 +266,7 @@ public class ScheduleService {
         }
     }
 
-    public void deleteSchedule(String username, Long id) {
-        User user = checkUserByUsername(username);
+    public void deleteSchedule(User user, Long id) {
         Schedule schedule = checkScheduleById(id);
         Study study = schedule.getStudy();
 

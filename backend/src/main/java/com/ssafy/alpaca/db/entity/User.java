@@ -5,7 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -22,7 +21,6 @@ public class User {
     private Long id;
 
     @NotBlank
-//    @Pattern(regexp = "")
     @Size(min = 6, max = 20)
     @Column(unique = true)
     private String username;

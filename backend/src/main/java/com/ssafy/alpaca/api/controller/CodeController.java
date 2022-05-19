@@ -8,6 +8,7 @@ import com.ssafy.alpaca.api.service.CodeService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
 import com.ssafy.alpaca.api.response.CodeCompileRes;
+import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -32,8 +33,7 @@ public class CodeController {
     @PostMapping("/compile")
     public ResponseEntity<CodeCompileRes> compileCode(
             @RequestBody CodeCompileWithInputReq codeCompileWithInputReq) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.compileCode(username, codeCompileWithInputReq));
+        return ResponseEntity.ok(codeService.compileCode(codeCompileWithInputReq));
     }
 
     @ApiOperation(
@@ -43,8 +43,7 @@ public class CodeController {
     @PostMapping("/bojCompile")
     public ResponseEntity<List<CodeCompileRes>> compileBojCode(
             @RequestBody CodeCompileReq codeCompileReq) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.compileBojCode(username, codeCompileReq));
+        return ResponseEntity.ok(codeService.compileBojCode(codeCompileReq));
     }
 
     @ApiOperation(
@@ -53,8 +52,8 @@ public class CodeController {
     )
     @PostMapping()
     public ResponseEntity<BaseResponseBody> createCode(@RequestBody CodeReq codeReq) {
-        String username = userService.getCurrentUsername();
-        codeService.createCode(username, codeReq);
+        User user = userService.getCurrentUser();
+        codeService.createCode(user, codeReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
@@ -70,8 +69,8 @@ public class CodeController {
     @GetMapping("/{id}")
     public ResponseEntity<CodeRes> getCode(
             @PathVariable Long id, @RequestParam Long problemNumber, @RequestParam(required = false) Long studyId) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(codeService.getCode(username, studyId, id, problemNumber));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(codeService.getCode(user, studyId, id, problemNumber));
     }
 
 }

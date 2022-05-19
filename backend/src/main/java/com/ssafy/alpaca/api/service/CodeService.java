@@ -54,20 +54,12 @@ public class CodeService {
         }
     }
 
-    public CodeCompileRes compileCode(String username, CodeCompileWithInputReq codeCompileWithInputReq) {
-        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
-
+    public CodeCompileRes compileCode(CodeCompileWithInputReq codeCompileWithInputReq) {
         return doodleCompile(codeCompileWithInputReq.getCode(), codeCompileWithInputReq.getLanguage(),
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-    public List<CodeCompileRes> compileBojCode(String username, CodeCompileReq codeCompileReq) {
-        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
-
+    public List<CodeCompileRes> compileBojCode(CodeCompileReq codeCompileReq) {
         Problem problem = problemRepository.findByProblemNumber(codeCompileReq.getProblemNumber()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
 
@@ -88,11 +80,7 @@ public class CodeService {
         return codeCompileResList;
     }
 
-    public void createCode(String username, CodeReq codeReq) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public void createCode(User user, CodeReq codeReq) {
         if (Boolean.TRUE.equals(!problemRepository.existsByProblemNumber(codeReq.getProblemNumber()))) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         }
@@ -110,43 +98,35 @@ public class CodeService {
                         .build());
     }
 
-    public CodeRes getCode(String username, Long studyId, Long userId, Long problemNumber) {
-        // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-        User member = userRepository.findById(userId).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-        boolean returnFlag = false;
-
+    private boolean returnFlag(User user, User member, Long studyId) {
         if (studyId == null) {
-            if (Boolean.TRUE.equals(user.getId().equals(member.getId()))) {
-                returnFlag =  true;
-            }
-        } else {
-            Study study = studyRepository.findById(studyId).orElseThrow(
-                    () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
-            );
-            List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
+            return Boolean.TRUE.equals(user.getId().equals(member.getId()));
+        }
+        Study study = studyRepository.findById(studyId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
+        );
+        List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
-            boolean flagA = false;
-            boolean flagB = false;
-            for (MyStudy myStudy : myStudies) {
-                if (myStudy.getUser().getId().equals(userId)) {
-                    flagA = true;
-                }
-                if (myStudy.getUser().getId().equals(user.getId())) {
-                    flagB = true;
-                }
+        boolean flagA = false;
+        boolean flagB = false;
+        for (MyStudy myStudy : myStudies) {
+            if (myStudy.getUser().getId().equals(member.getId())) {
+                flagA = true;
             }
-
-            if (flagA && flagB) {
-                returnFlag = true;
+            if (myStudy.getUser().getId().equals(user.getId())) {
+                flagB = true;
             }
         }
 
-        if (returnFlag) {
+        return flagA && flagB;
+    }
+
+    public CodeRes getCode(User user, Long studyId, Long userId, Long problemNumber) {
+        User member = userRepository.findById(userId).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        if (returnFlag(user, member, studyId)) {
             List<Code> codes = codeRepository.findAllByUserIdAndProblemNumberOrderBySubmittedAtDesc(userId, problemNumber);
             Problem problem = problemRepository.findByProblemNumber(problemNumber).orElseThrow(
                     () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND)
@@ -187,7 +167,7 @@ public class CodeService {
             outputStream.flush();
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
+                throw new IllegalArgumentException("Please check your inputs : HTTP error code : "+ connection.getResponseCode());
             }
 
             BufferedReader bufferedReader;

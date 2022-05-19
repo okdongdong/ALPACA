@@ -6,6 +6,8 @@ public class ExceptionUtil {
     }
     /* 400 BAD_REQUEST : 잘못된 요청 */
     public static final String NOT_VALID_VALUE = "존재하지 않거나, 유효하지 않는 요청 값이 있습니다."; // NoSOANR
+    public static final String NOT_VALID_USERNAME = "ID는 영문자+숫자 조합으로 6자리 이상 20자리 이하로 입력해주세요";
+    public static final String NOT_VALID_SIGNUP = "비밀번호는 영문자+숫자+특수문자(!@#$%^*+=-) 조합으로 8자리이상 입력하세요.";
     public static final String ROOMMAKER_CANNOT_RESIGN = "스터디에서 방장을 맡고 있으면 탈퇴할 수 없습니다.";
     public static final String INVALID_DATE_VALUE = "종료시간이 더 빠를 수 없습니다.";
     public static final String TOO_MANY_MEMBERS = "스터디 멤버는 12명을 초과할 수 없습니다.";

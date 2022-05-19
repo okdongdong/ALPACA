@@ -8,6 +8,7 @@ import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.ScheduleService;
 import com.ssafy.alpaca.api.service.UserService;
 import com.ssafy.alpaca.common.etc.BaseResponseBody;
+import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -32,8 +33,8 @@ public class ScheduleController {
     )
     @PostMapping()
     public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq)  {
-        String username = userService.getCurrentUsername();
-        Long scheduleId = scheduleService.createSchedule(username, scheduleReq);
+        User user = userService.getCurrentUser();
+        Long scheduleId = scheduleService.createSchedule(user, scheduleReq);
         notificationService.createScheduleNotification(scheduleId);
         return ResponseEntity.ok(BaseResponseBody.of(200, scheduleId));
     }
@@ -44,8 +45,8 @@ public class ScheduleController {
     )
     @GetMapping("/{id}/today")
     public ResponseEntity<ScheduleRes> getTodaySchedule(@PathVariable Long id) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(scheduleService.getTodaySchedule(username, id));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(scheduleService.getTodaySchedule(user, id));
     }
 
     @ApiOperation(
@@ -55,8 +56,8 @@ public class ScheduleController {
     @ApiImplicitParam( name = "id", value = "수정할 일정의 id", dataTypeClass = Long.class )
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponseBody> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateReq scheduleUpdateReq) {
-        String username = userService.getCurrentUsername();
-        scheduleService.updateSchedule(username, id, scheduleUpdateReq);
+        User user = userService.getCurrentUser();
+        scheduleService.updateSchedule(user, id, scheduleUpdateReq);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
@@ -67,8 +68,8 @@ public class ScheduleController {
     @ApiImplicitParam( name = "id", value = "조회할 일정의 id", dataTypeClass = Long.class )
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleRes> getSchedule(@PathVariable Long id) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(scheduleService.getSchedule(username, id));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(scheduleService.getSchedule(user, id));
     }
 
     @ApiOperation(
@@ -84,8 +85,8 @@ public class ScheduleController {
     @GetMapping("/{id}/span")
     public ResponseEntity<List<ScheduleListRes>> getScheduleList(
             @PathVariable Long id, @RequestParam Integer year, @RequestParam Integer month, @RequestParam(required = false) Integer day) {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(scheduleService.getScheduleList(username, id, year, month, day));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(scheduleService.getScheduleList(user, id, year, month, day));
     }
 
     @ApiOperation(
@@ -95,8 +96,8 @@ public class ScheduleController {
     @ApiImplicitParam( name = "id", value = "삭제할 일정의 id", dataTypeClass = Long.class )
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponseBody> deleteSchedule(@PathVariable Long id)  {
-        String username = userService.getCurrentUsername();
-        scheduleService.deleteSchedule(username, id);
+        User user = userService.getCurrentUser();
+        scheduleService.deleteSchedule(user, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));
     }
 
