@@ -439,20 +439,16 @@ public class StudyService {
                 .build());
     }
 
-    public StudyListRes joinStudy(String username, Long id, NotificationIsLiveReq notificationIsLiveReq) {
+    public StudyListRes joinStudy(String username, String id) {
         User user = checkUserByUsername(username);
-        Study study = checkStudyById(id);
-        Optional<Notification> notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null);
-
-        if (!notificationIsLiveReq.getIsLive()) {
-            if (notification.isEmpty()) {
-                throw new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
-            } else {
-                notificationRepository.delete(notification.get());
-            }
+        Optional<Notification> notification = notificationRepository.findById(id);
+        if (notification.isEmpty()) {
+            throw  new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
         }
+        Study study = checkStudyById(notification.get().getStudyId());
 
         if (myStudyRepository.existsByUserAndStudy(user, study)) {
+            notificationRepository.delete(notification.get());
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
         } else {
             MyStudy newMyStudy = myStudyRepository.save(MyStudy.builder()
@@ -462,7 +458,7 @@ public class StudyService {
                     .build());
             List<MyStudy> myStudies = myStudyRepository.findTop4ByStudy(study);
             return StudyListRes.builder()
-                    .id(id)
+                    .id(study.getId())
                     .title(study.getTitle())
                     .pinnedTime(newMyStudy.getPinnedTime())
                     .profileImgList(myStudies.stream().map(
@@ -472,14 +468,16 @@ public class StudyService {
         }
     }
 
-    public void rejectStudy(String username, Long id) {
+    public void rejectStudy(String username, String id) {
         User user = checkUserByUsername(username);
-        Study study = checkStudyById(id);
-        Notification notification = notificationRepository.findTopByUserIdAndStudyIdAndScheduleId(user.getId(), study.getId(), null).orElseThrow(
-                () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
-        );
-
-        notificationRepository.delete(notification);
+        Optional<Notification> notification = notificationRepository.findById(id);
+        if (notification.isEmpty()) {
+            throw new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
+        }
+        if (!user.getId().equals(notification.get().getUserId())) {
+            throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
+        }
+        notificationRepository.delete(notification.get());
     }
 
 }
