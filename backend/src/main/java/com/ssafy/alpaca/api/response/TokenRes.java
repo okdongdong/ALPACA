@@ -1,17 +1,13 @@
 package com.ssafy.alpaca.api.response;
 
 import com.ssafy.alpaca.common.jwt.JwtHeaderEnums;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 public class TokenRes {
 
     private String grantType;

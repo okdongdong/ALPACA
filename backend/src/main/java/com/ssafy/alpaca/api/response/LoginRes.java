@@ -1,20 +1,15 @@
 package com.ssafy.alpaca.api.response;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public class LoginRes extends TokenRes{
+@Builder
+public class LoginRes {
 
     private Long userId;
 
@@ -32,19 +27,10 @@ public class LoginRes extends TokenRes{
 
     private String preferredLanguage;
 
-    public static LoginRes of(TokenRes tokenRes, LoginRes loginRes) {
-        return LoginRes.builder()
-                .grantType(tokenRes.getGrantType())
-                .accessToken(tokenRes.getAccessToken())
-                .refreshToken(tokenRes.getRefreshToken())
-                .userId(loginRes.getUserId())
-                .username(loginRes.getUsername())
-                .nickname(loginRes.getNickname())
-                .info(loginRes.getInfo())
-                .profileImg(loginRes.getProfileImg())
-                .bojId(loginRes.getBojId())
-                .theme(loginRes.getTheme())
-                .preferredLanguage(loginRes.getPreferredLanguage())
-                .build();
-    }
+    private String grantType;
+
+    private String accessToken;
+
+    private String refreshToken;
+
 }

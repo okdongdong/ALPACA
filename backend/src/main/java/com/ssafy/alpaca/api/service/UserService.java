@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.ssafy.alpaca.common.jwt.JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME;
@@ -82,6 +83,14 @@ public class UserService {
             throw new UnAuthorizedException(ExceptionUtil.USER_PW_INVALID);
         }
 
+        if (!Pattern.matches("^[a-zA-Z0-9]*$", signupReq.getUsername())) {
+            throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_USERNAME);
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9!@#$%^*+=-]*$", signupReq.getPassword())) {
+            throw new IllegalArgumentException(ExceptionUtil.NOT_VALID_SIGNUP);
+        }
+
         if (Boolean.TRUE.equals(userRepository.existsByUsername(signupReq.getUsername()))) {
             throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
         }
@@ -111,11 +120,14 @@ public class UserService {
         return TokenRes.of(accessToken, refreshToken.getToken());
     }
 
-    public LoginRes getMyInfo(String username) {
+    public LoginRes getMyInfo(String username, TokenRes tokenRes) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND));
 
         return LoginRes.builder()
+                .grantType(tokenRes.getGrantType())
+                .accessToken(tokenRes.getAccessToken())
+                .refreshToken(tokenRes.getRefreshToken())
                 .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())

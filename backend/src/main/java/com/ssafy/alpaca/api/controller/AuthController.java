@@ -70,9 +70,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         TokenRes tokenRes = userService.login(loginReq);
-        LoginRes loginRes = userService.getMyInfo(loginReq.getUsername());
+        LoginRes loginRes = userService.getMyInfo(loginReq.getUsername(), tokenRes);
         problemService.refreshSolvedAc(loginReq.getUsername());
-        return ResponseEntity.ok(LoginRes.of(tokenRes, loginRes));
+        return ResponseEntity.ok(loginRes);
     }
 
     @PostMapping("/logout")
