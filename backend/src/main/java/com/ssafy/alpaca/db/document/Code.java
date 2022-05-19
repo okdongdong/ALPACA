@@ -29,7 +29,7 @@ public class Code {
 
     @Builder.Default
     @Field(targetType = FieldType.DATE_TIME)
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime submittedAt = LocalDateTime.now().plusHours(9);
 
     private String submittedCode;
 
