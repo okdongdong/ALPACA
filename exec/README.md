@@ -131,6 +131,30 @@ $ docker run -d --name redis-docker \
 
 ### Openvidu
 
+```sh
+$ sudo su
+$ cd /opt
+# install openvidu platform
+$ curl https://s3-eu-west-1.amazonaws.com/aws.openvidu.io/install_openvidu_latest.sh | bash
+$ cd openvidu
+$ nano .env
+
+# DOMAIN_OR_PUBLIC_IP : k6e106.p.ssafy.io
+# OPENVIDU_SECRET : alpaca
+# CERTIFICATE_TYPE : letsencrypt
+# LETSENCRYPT_EMAIL : paka34332@gmail.com
+# HTTP_PORT : 8442
+# HTTPS_PORT : 8443
+# openvidu 실행
+
+$ ./openvidu start
+
+# 인증서 발급 확인
+$ cd /opt/openvidu/certificates/live/도메인
+$ ls
+
+```
+
 
 
 ### Crontab
