@@ -4,6 +4,7 @@ import com.ssafy.alpaca.api.request.NotificationReq;
 import com.ssafy.alpaca.api.response.NotificationRes;
 import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.UserService;
+import com.ssafy.alpaca.db.entity.User;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,8 @@ public class NotificationController {
     )
     @GetMapping()
     public ResponseEntity<List<NotificationRes>> getNotification() {
-        String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(notificationService.getNotification(username));
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(notificationService.getNotification(user));
     }
 
     @ApiOperation(
@@ -39,7 +40,7 @@ public class NotificationController {
     )
     @PostMapping()
     public void deleteNotification(@RequestBody NotificationReq notificationReq) {
-        String username = userService.getCurrentUsername();
-        notificationService.deleteNotification(username, notificationReq);
+        User user = userService.getCurrentUser();
+        notificationService.deleteNotification(user, notificationReq);
     }
 }

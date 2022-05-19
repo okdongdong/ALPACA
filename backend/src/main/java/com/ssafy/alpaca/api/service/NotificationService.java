@@ -84,19 +84,11 @@ public class NotificationService {
         }
     }
 
-    public List<NotificationRes> getNotification(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public List<NotificationRes> getNotification(User user) {
         return NotificationRes.of(notificationRepository.findAllByUserId(user.getId()));
     }
 
-    public void deleteNotification(String username, NotificationReq notificationReq) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public void deleteNotification(User user, NotificationReq notificationReq) {
         Notification notification = notificationRepository.findById(notificationReq.getNotificationId()).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
         );
