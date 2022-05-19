@@ -34,7 +34,7 @@ public class ScheduleController {
     public ResponseEntity<BaseResponseBody> createSchedule(@RequestBody ScheduleReq scheduleReq)  {
         String username = userService.getCurrentUsername();
         Long scheduleId = scheduleService.createSchedule(username, scheduleReq);
-        notificationService.notifyAddScheduleEvent(scheduleId);
+        notificationService.createScheduleNotification(scheduleId);
         return ResponseEntity.ok(BaseResponseBody.of(200, scheduleId));
     }
 
