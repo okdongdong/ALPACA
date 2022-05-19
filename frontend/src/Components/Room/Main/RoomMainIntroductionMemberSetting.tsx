@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { setLoading } from '../../../Redux/commonReducer';
-import { Member, setIsRoomMaker } from '../../../Redux/roomReducer';
+import { changeRoomMaker, Member, setIsRoomMaker } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import CCrown from '../../Commons/CCrown';
 import CProfile from '../../Commons/CProfile';
@@ -45,7 +45,19 @@ function RoomMainIntroductionMemberSetting({
           memberId,
         },
       });
+
+      let prevIdx, nextIdx;
+      members.forEach((member: Member, idx: number) => {
+        if (member.userId === memberId) {
+          nextIdx = idx;
+        }
+        if (member.userId === userId) {
+          prevIdx = idx;
+        }
+      });
+
       dispatch(setLoading(false));
+      dispatch(changeRoomMaker({ prevIdx, nextIdx }));
       if (res.status === 200) return true;
     } catch (e: any) {
       console.log('error: ', e.response);

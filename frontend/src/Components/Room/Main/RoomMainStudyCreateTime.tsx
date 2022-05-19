@@ -35,31 +35,25 @@ function RoomMainStudyCreateTime() {
   const startedAt = useSelector((state: any) => state.room.startedAt);
   const finishedAt = useSelector((state: any) => state.room.finishedAt);
 
-  const [startedTime, setStartedTime] = useState<string>(dateToStringTimeSimple(new Date()));
-  const [finishedTime, setFinishedTime] = useState<string>(dateToStringTimeSimple(new Date()));
 
   const onChangeStartedAtHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const tempDate = new Date();
-    setStartedTime(event.target.value);
     const [hours, minutes] = event.target.value.split(':');
     tempDate.setHours(parseInt(hours), parseInt(minutes));
     if (!!finishedAt && tempDate.getTime() > finishedAt.getTime()) {
       // 시작시간을 종료시간보다 더 늦게 설정했을 때
       dispatch(setFinishedAt(new Date(tempDate)));
-      setFinishedTime(event.target.value);
     }
     dispatch(setStartedAt(new Date(tempDate)));
   };
 
   const onChangeFinishedAtHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const tempDate = new Date();
-    setFinishedTime(event.target.value);
     const [hours, minutes] = event.target.value.split(':');
     tempDate.setHours(parseInt(hours), parseInt(minutes));
     if (!!startedAt && tempDate.getTime() < startedAt.getTime()) {
       // 종료시간을 시작시간보다 더 빠르게 설정했을 때
       dispatch(setStartedAt(new Date(finishedAt)));
-      setStartedTime(event.target.value);
     }
     dispatch(setFinishedAt(new Date(tempDate)));
   };
@@ -70,7 +64,11 @@ function RoomMainStudyCreateTime() {
         <DateBox>일시: {dateToStringDate(selectedDay)}</DateBox>
         <Grid container alignItems="center">
           <Grid item xs={10} xl={5}>
-            <CustomInput type="time" value={startedTime} onChange={onChangeStartedAtHandler} />
+            <CustomInput
+              type="time"
+              value={dateToStringTimeSimple(startedAt)}
+              onChange={onChangeStartedAtHandler}
+            />
           </Grid>
           <Grid item xs={2} xl={0.5}></Grid>
           <Grid item xs={1.5} xl={1}>
@@ -78,7 +76,11 @@ function RoomMainStudyCreateTime() {
           </Grid>
           <Grid item xs={0.5} xl={0.5}></Grid>
           <Grid item xs={10} xl={5}>
-            <CustomInput type="time" value={finishedTime} onChange={onChangeFinishedAtHandler} />
+            <CustomInput
+              type="time"
+              value={dateToStringTimeSimple(finishedAt)}
+              onChange={onChangeFinishedAtHandler}
+            />
           </Grid>
         </Grid>
       </TimeContainer>

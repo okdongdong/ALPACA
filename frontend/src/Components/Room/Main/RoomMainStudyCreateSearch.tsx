@@ -1,6 +1,6 @@
 import { Add } from '@mui/icons-material';
-import { alpha, Box, Collapse, IconButton, styled, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import { alpha, Box, Collapse, IconButton, styled, useTheme, Stack } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { solvedAcAxios } from '../../../Lib/customAxios';
 import { Member, setProblemListRes } from '../../../Redux/roomReducer';
@@ -24,13 +24,13 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 
 const FilterBox = styled(Collapse)(({ theme }) => ({
   padding: theme.spacing(1),
-  marginBottom: theme.spacing(1.5),
+  marginBottom: theme.spacing(2),
   borderRadius: 10,
   backgroundColor: theme.palette.bg,
 }));
 
 const ProblemBox = styled('div')(({ theme }) => ({
-  height: '15vh',
+  height: '23vh',
   borderRadius: 10,
   backgroundColor: theme.palette.bg,
 }));
@@ -44,10 +44,15 @@ function RoomMainStudyCreateSearch({
   const dispatch = useDispatch();
   const problemListRes = useSelector((state: any) => state.room.problemListRes);
   const members = useSelector((state: any) => state.room.members);
+  const selectedDayIdx = useSelector((state: any) => state.room.selectedDayIdx);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isFilter, setIsFilter] = useState<boolean>(false);
   const [tierValue, setTierValue] = useState<number>(0);
+
+  useEffect(() => {
+    setProblemList([]);
+  }, [selectedDayIdx]);
 
   const addProblem = (idx: number) => {
     const tempProblemList = [...problemList];
@@ -90,6 +95,7 @@ function RoomMainStudyCreateSearch({
           });
         }
       });
+      setIsFilter(false);
       setProblemList(resProblems);
     } catch (e: any) {
       console.log(e.response);
@@ -101,7 +107,7 @@ function RoomMainStudyCreateSearch({
   };
 
   return (
-    <div style={{ height: '50%', position: 'relative', marginBottom: 24 }}>
+    <>
       <CSearchBar
         onChange={setSearchQuery}
         onSearch={searchProblem}
@@ -114,8 +120,24 @@ function RoomMainStudyCreateSearch({
         <RoomMainStudyCreateSearchFilter tierValue={tierValue} setTierValue={setTierValue} />
       </FilterBox>
 
-      <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
-        <Box sx={{ position: 'absolute', width: '100%' }}>
+      <ProblemBox className="scroll-box" sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative', width: '100%' }}>
+          {problemList.length === 0 && (
+            <Stack
+              padding={5}
+              spacing={5}
+              alignItems="center"
+              sx={{
+                backgroundColor: theme.palette.bg,
+                color: alpha(theme.palette.txt, 0.5),
+                width: '100%',
+                borderRadius: '10px',
+                marginTop: '8px',
+                display: 'flex',
+              }}>
+              <div>검색된 문제가 없습니다.</div>
+            </Stack>
+          )}
           {problemList.map((problem: ProblemRes, idx: number) => (
             <CProblem
               key={idx}
@@ -132,7 +154,7 @@ function RoomMainStudyCreateSearch({
           ))}
         </Box>
       </ProblemBox>
-    </div>
+    </>
   );
 }
 
