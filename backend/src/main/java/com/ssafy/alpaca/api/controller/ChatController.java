@@ -1,7 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
 import com.ssafy.alpaca.api.request.ChatReq;
-import com.ssafy.alpaca.api.response.ChatListRes;
 import com.ssafy.alpaca.api.response.ChatRes;
 import com.ssafy.alpaca.api.service.StudyService;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +33,6 @@ public class ChatController {
     @MessageMapping("/chat/study")
     // 처리를 마친 반환 값(message)를 반환할 곳
     public void createChat(ChatReq chatReq) {
-
         ChatRes chatRes = studyService.saveChat(chatReq);
         template.convertAndSend("/sub/chat/study/"+chatReq.getStudyId(),chatRes);
     }
@@ -44,7 +42,7 @@ public class ChatController {
             notes = "pageable에 해당하는 채팅을 20개단위로 조회한다."
     )
     @GetMapping("/chat/study/{id}")
-    public ResponseEntity<Slice<ChatListRes>> getChatListByStudy(@PathVariable Long id, @RequestParam String offsetId, @PageableDefault(size = 20, sort = "timeStamp", direction = Sort.Direction.DESC) Pageable pageable){
+    public ResponseEntity<Slice<ChatRes>> getChatListByStudy(@PathVariable Long id, @RequestParam String offsetId, @PageableDefault(size = 20, sort = "timeStamp", direction = Sort.Direction.DESC) Pageable pageable){
         return ResponseEntity.ok(studyService.getChatListByStudy(id,offsetId, pageable));
     }
 

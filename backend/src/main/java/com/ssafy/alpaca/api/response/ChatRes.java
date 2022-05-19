@@ -18,6 +18,5 @@ public class ChatRes {
     private String content;
 
     @ApiModelProperty( name = "timeStamp", example = "2022-04-12T10:32:44" )
-    @Builder.Default
-    private LocalDateTime timeStamp = LocalDateTime.now();
+    private LocalDateTime timeStamp;
 }

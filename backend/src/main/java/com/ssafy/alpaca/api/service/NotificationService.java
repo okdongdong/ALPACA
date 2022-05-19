@@ -6,7 +6,6 @@ import com.ssafy.alpaca.common.exception.UnAuthorizedException;
 import com.ssafy.alpaca.db.document.Notification;
 import com.ssafy.alpaca.common.util.ConvertUtil;
 import com.ssafy.alpaca.common.util.ExceptionUtil;
-import com.ssafy.alpaca.common.util.JwtTokenUtil;
 import com.ssafy.alpaca.db.entity.MyStudy;
 import com.ssafy.alpaca.db.entity.Schedule;
 import com.ssafy.alpaca.db.entity.Study;
@@ -15,13 +14,9 @@ import com.ssafy.alpaca.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ServerErrorException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +30,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ConvertUtil convertUtil;
 
-    public String createInviteNotification(String username, Long id, List<Long> studyMemberIdList) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public String createInviteNotification(User user, Long id, List<Long> studyMemberIdList) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -88,19 +79,11 @@ public class NotificationService {
         }
     }
 
-    public List<NotificationRes> getNotification(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public List<NotificationRes> getNotification(User user) {
         return NotificationRes.of(notificationRepository.findAllByUserId(user.getId()));
     }
 
-    public void deleteNotification(String username, NotificationReq notificationReq) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public void deleteNotification(User user, NotificationReq notificationReq) {
         Notification notification = notificationRepository.findById(notificationReq.getNotificationId()).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION)
         );

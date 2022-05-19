@@ -4,6 +4,7 @@ import com.ssafy.alpaca.db.document.Problem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +20,9 @@ public interface ProblemRepository extends MongoRepository<Problem,String> {
     List<Problem> findAllByClassLevel(Long classLevel);
 
     List<Problem> findAllByLevelGreaterThanEqual(Long classLevel);
+
+    List<Problem> findAllByClassLevelAndProblemNumberNotIn(Long classLevel, HashSet<Long> problemNumbers);
+
+    List<Problem> findAllByLevelGreaterThanEqualAndProblemNumberNotIn(Long level, HashSet<Long> problemNumbers);
 
 }
