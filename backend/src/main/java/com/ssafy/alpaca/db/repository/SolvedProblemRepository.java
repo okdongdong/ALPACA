@@ -16,13 +16,7 @@ public interface SolvedProblemRepository extends JpaRepository<SolvedProblem, Lo
 
     Boolean existsByUserAndProblemNumber(User user, Long problemNumber);
 
-    @EntityGraph(attributePaths = "user")
-    List<SolvedProblem> findAllByProblemNumber(Long problemNumber);
-
     List<SolvedProblem> findAllByUser(User user);
-
-    @Query(nativeQuery = true, value = "SELECT problem_number FROM solved_problem WHERE user_id = :userId")
-    List<Long> findProblemNumbersByUser(@Param("userId") Long userId);
 
     @Query(nativeQuery = true, value = "SELECT problem_number FROM solved_problem WHERE user_id = :userId")
     HashSet<Long> findProblemNumbersByUserId(@Param("userId")Long userId);

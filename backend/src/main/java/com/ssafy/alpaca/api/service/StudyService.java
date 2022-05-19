@@ -49,7 +49,7 @@ public class StudyService {
     private final ChatRepository chatRepository;
     private final NotificationRepository notificationRepository;
 
-    private Study checkStudyById(Long id) {
+    public Study getStudyById(Long id) {
         return studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
@@ -109,7 +109,7 @@ public class StudyService {
     }
 
     public void setPin(User user, Long id) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
         if (myStudy.getPinnedTime().getYear() == 1) {
             myStudy.setPinnedTime(LocalDateTime.now());
@@ -120,27 +120,8 @@ public class StudyService {
         }
     }
 
-    private String convertTimeToString(int number) {
-        return String.format("%02d", number);
-    }
-
-    private String getTime(Integer offset) {
-        if (offset == 0) {
-            return "Z";
-        } else {
-            StringBuilder ret = new StringBuilder(0 < offset ? "-" : "+");
-            int hour = Math.abs(offset/60);
-            int minute = Math.abs(offset%60);
-
-            ret.append(convertTimeToString(hour));
-            ret.append(":");
-            ret.append(convertTimeToString(minute));
-            return ret.toString();
-        }
-    }
-
     public StudyRes getStudy(User user, Long id, Integer offset){
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
 
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND);
@@ -150,7 +131,7 @@ public class StudyService {
         LocalDateTime today = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), 0, 0);
         LocalDateTime thisMonth = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), 1, 0, 0);
 
-        String offSet = getTime(offset);
+        String offSet = convertUtil.getTime(offset);
         OffsetDateTime offsetToday = OffsetDateTime.of(today, ZoneOffset.of(offSet));
         Optional<Schedule> schedule = scheduleRepository.findByStudyAndStartedAtBetween(
                 study, offsetToday, offsetToday.plusHours(24));
@@ -194,7 +175,7 @@ public class StudyService {
     }
 
     public List<ScheduleListRes> getScheduleList(User user, Integer year, Integer month, Integer day, Integer offset) {
-        String offSet = getTime(offset);
+        String offSet = convertUtil.getTime(offset);
         List<Object[]> objects;
         if (day == null) {
             OffsetDateTime offsetDateTime = OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneOffset.of(offSet));
@@ -220,7 +201,7 @@ public class StudyService {
     }
 
     public List<ProblemListRes> getStudyProblem(User user, Long id){
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         List<MyStudy> myStudy = myStudyRepository.findAllByStudy(study);
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
         List<ToSolveProblem> problemList = new ArrayList<>();
@@ -259,7 +240,7 @@ public class StudyService {
     }
 
     public void updateStudy(User user, Long id, StudyUpdateReq studyUpdateReq) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         checkRoomMaker(user, study);
 
         study.setTitle(studyUpdateReq.getTitle());
@@ -268,13 +249,13 @@ public class StudyService {
     }
 
     public void deleteStudy(User user, Long id) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         checkRoomMaker(user, study);
         studyRepository.delete(study);
     }
 
     public void checkMember(User user, Long userId, Long studyId) {
-        Study study = checkStudyById(studyId);
+        Study study = getStudyById(studyId);
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
         boolean flagA = false;
@@ -294,7 +275,7 @@ public class StudyService {
     }
 
     public void updateRoomMaker(User user, Long id, StudyMemberReq studyMemberReq) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         User member = checkUserById(studyMemberReq.getMemberId());
         if (user.getId().equals(member.getId())) {
             throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
@@ -313,7 +294,7 @@ public class StudyService {
     }
 
     public void deleteMember(User user, Long id, StudyMemberReq studyMemberReq) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         User member = checkUserById(studyMemberReq.getMemberId());
         checkRoomMaker(user, study);
 
@@ -325,7 +306,7 @@ public class StudyService {
     }
 
     public void deleteMeFromStudy(User user, Long id) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
 
         if (Boolean.TRUE.equals(myStudy.getIsRoomMaker())) {
@@ -336,7 +317,7 @@ public class StudyService {
     }
 
     public String createInviteCode(User user, Long id) {
-        Study study = checkStudyById(id);
+        Study study = getStudyById(id);
         checkRoomMaker(user, study);
 
         Optional<InviteCode> inviteCode = inviteCodeRedisRepository.findById(study.getId());
@@ -361,7 +342,7 @@ public class StudyService {
         StudyCode studyCode = studyCodeRedisRepository.findById(inviteCode).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
         );
-        Study study = checkStudyById(studyCode.getStudyId());
+        Study study = getStudyById(studyCode.getStudyId());
         MyStudy myStudy = myStudyRepository.findTopByStudyAndIsRoomMaker(study, true);
 
         return InviteInfoRes.builder()
@@ -376,7 +357,7 @@ public class StudyService {
         StudyCode studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode()).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
         );
-        Study study = checkStudyById(studyCode.getStudyId());
+        Study study = getStudyById(studyCode.getStudyId());
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
@@ -393,7 +374,7 @@ public class StudyService {
 
     public ChatRes saveChat(ChatReq chatReq) {
         User user = checkUserById(chatReq.getUserId());
-        Study study = checkStudyById(chatReq.getStudyId());
+        Study study = getStudyById(chatReq.getStudyId());
 
         Chat chat = chatRepository.save(Chat.builder()
                 .userId(user.getId())
@@ -424,7 +405,7 @@ public class StudyService {
         if (notification.isEmpty()) {
             throw  new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
         }
-        Study study = checkStudyById(notification.get().getStudyId());
+        Study study = getStudyById(notification.get().getStudyId());
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             notificationRepository.delete(notification.get());

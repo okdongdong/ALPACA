@@ -27,7 +27,6 @@ import java.util.*;
 public class ScheduleService {
 
     private final MyStudyRepository myStudyRepository;
-    private final StudyRepository studyRepository;
     private final ScheduleRepository scheduleRepository;
     private final ToSolveProblemRepository toSolveProblemRepository;
     private final SolvedProblemRepository solvedProblemRepository;
@@ -38,12 +37,6 @@ public class ScheduleService {
     private Schedule checkScheduleById(Long id) {
         return scheduleRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND)
-        );
-    }
-
-    private Study checkStudyById(Long id) {
-        return studyRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
     }
 
@@ -87,32 +80,29 @@ public class ScheduleService {
         return problemListResList;
     }
 
-    public Long createSchedule(User user, ScheduleReq scheduleReq) {
+    private void timeValidationCheck(OffsetDateTime a, OffsetDateTime b) {
         LocalDateTime finishedAt = LocalDateTime.of(
-                scheduleReq.getFinishedAt().getYear(),
-                scheduleReq.getFinishedAt().getMonth(),
-                scheduleReq.getFinishedAt().getDayOfMonth(),
-                scheduleReq.getFinishedAt().getHour(),
-                scheduleReq.getFinishedAt().getMinute()
+                a.getYear(), a.getMonth(), a.getDayOfMonth(), a.getHour(), a.getMinute()
         );
         LocalDateTime startedAt = LocalDateTime.of(
-                scheduleReq.getStartedAt().getYear(),
-                scheduleReq.getStartedAt().getMonth(),
-                scheduleReq.getStartedAt().getDayOfMonth(),
-                scheduleReq.getStartedAt().getHour(),
-                scheduleReq.getStartedAt().getMinute()
+                b.getYear(), b.getMonth(), b.getDayOfMonth(), b.getHour(), b.getMinute()
         );
         if (finishedAt.isBefore(startedAt)) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
         }
+    }
 
-        Study study = checkStudyById(scheduleReq.getStudyId());
+    private OffsetDateTime getThisMonth(OffsetDateTime a, String offset) {
+        return OffsetDateTime.of(LocalDateTime.of(
+                a.getYear(), a.getMonth(), a.getDayOfMonth(), 0, 0
+        ), ZoneOffset.of(offset));
+    }
+
+    public Long createSchedule(User user, Study study, ScheduleReq scheduleReq) {
+        timeValidationCheck(scheduleReq.getFinishedAt(), scheduleReq.getStartedAt());
         checkIsStudyMember(user, study);
+        OffsetDateTime offsetDateTime = getThisMonth(scheduleReq.getStartedAt(), "Z");
 
-        OffsetDateTime offsetDateTime = OffsetDateTime.of(LocalDateTime.of(
-                scheduleReq.getStartedAt().getYear(),
-                scheduleReq.getStartedAt().getMonth(),
-                scheduleReq.getStartedAt().getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
         if (Boolean.TRUE.equals(scheduleRepository.existsByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, offsetDateTime, offsetDateTime.plusDays(1)))
         ) {
@@ -121,8 +111,8 @@ public class ScheduleService {
 
         Schedule schedule = Schedule.builder()
                         .study(study)
-                        .startedAt(OffsetDateTime.of(startedAt, ZoneOffset.of("Z")))
-                        .finishedAt(OffsetDateTime.of(finishedAt, ZoneOffset.of("Z")))
+                        .startedAt(scheduleReq.getStartedAt())
+                        .finishedAt(scheduleReq.getFinishedAt())
                         .build();
         List<ToSolveProblem> toSolveProblems = new ArrayList<>();
         for (Long number : scheduleReq.getToSolveProblems()) {
@@ -139,15 +129,15 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public ScheduleRes getTodaySchedule(User user, Long studyId) {
-        Study study = checkStudyById(studyId);
+    public ScheduleRes getTodaySchedule(User user, Study study, Integer offset) {
         checkIsStudyMember(user, study);
+        String offSet = convertUtil.getTime(offset);
 
         LocalDateTime localDateTime = LocalDateTime.now();
         OffsetDateTime today = OffsetDateTime.of(LocalDateTime.of(
                 localDateTime.getYear(),
                 localDateTime.getMonth(),
-                localDateTime.getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
+                localDateTime.getDayOfMonth(), 0, 0), ZoneOffset.of(offSet));
         Optional<Schedule> todaySchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
                 study, today, today.plusDays(1));
 
@@ -167,43 +157,22 @@ public class ScheduleService {
     }
 
     public void updateSchedule(User user, Long id, ScheduleUpdateReq scheduleUpdateReq) {
-        OffsetDateTime finishedAt = OffsetDateTime.of(LocalDateTime.of(
-                scheduleUpdateReq.getFinishedAt().getYear(),
-                scheduleUpdateReq.getFinishedAt().getMonth(),
-                scheduleUpdateReq.getFinishedAt().getDayOfMonth(),
-                scheduleUpdateReq.getFinishedAt().getHour(),
-                scheduleUpdateReq.getFinishedAt().getMinute()
-        ), ZoneOffset.of("Z"));
-        OffsetDateTime startedAt = OffsetDateTime.of(LocalDateTime.of(
-                scheduleUpdateReq.getStartedAt().getYear(),
-                scheduleUpdateReq.getStartedAt().getMonth(),
-                scheduleUpdateReq.getStartedAt().getDayOfMonth(),
-                scheduleUpdateReq.getStartedAt().getHour(),
-                scheduleUpdateReq.getStartedAt().getMinute()
-        ), ZoneOffset.of("Z"));
-        if (finishedAt.isBefore(startedAt)) {
-            throw new IllegalArgumentException(ExceptionUtil.INVALID_DATE_VALUE);
-        }
-
+        timeValidationCheck(scheduleUpdateReq.getFinishedAt(), scheduleUpdateReq.getStartedAt());
         Schedule schedule = checkScheduleById(id);
         Study study = schedule.getStudy();
+        OffsetDateTime offsetDateTime = getThisMonth(scheduleUpdateReq.getStartedAt(), "Z");
 
-        OffsetDateTime localDateTime = OffsetDateTime.of(LocalDateTime.of(
-                scheduleUpdateReq.getStartedAt().getYear(),
-                scheduleUpdateReq.getStartedAt().getMonth(),
-                scheduleUpdateReq.getStartedAt().getDayOfMonth(), 0, 0), ZoneOffset.of("Z"));
         Optional<Schedule> checkSchedule = scheduleRepository.findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                study, localDateTime, localDateTime.plusDays(1));
+                study, offsetDateTime, offsetDateTime.plusDays(1));
 
         if (checkSchedule.isEmpty() || !schedule.getId().equals(checkSchedule.get().getId())) {
             throw new NoSuchElementException(ExceptionUtil.SCHEDULE_NOT_FOUND);
         }
 
-//      스터디원만 수정 가능
         checkIsStudyMember(user, study);
 
-        schedule.setStartedAt(startedAt);
-        schedule.setFinishedAt(finishedAt);
+        schedule.setStartedAt(scheduleUpdateReq.getStartedAt());
+        schedule.setFinishedAt(scheduleUpdateReq.getFinishedAt());
         scheduleRepository.save(schedule);
         HashSet<Long> originProblems = toSolveProblemRepository.findProblemNumbersByScheduleId(schedule.getId());
         HashSet<Long> newProblems = new HashSet<>(scheduleUpdateReq.getToSolveProblems());
@@ -245,8 +214,7 @@ public class ScheduleService {
                 .build();
     }
 
-    public List<ScheduleListRes> getScheduleList(User user, Long id, Integer year, Integer month, Integer day) {
-        Study study = checkStudyById(id);
+    public List<ScheduleListRes> getScheduleList(User user, Study study, Integer year, Integer month, Integer day) {
         checkIsStudyMember(user, study);
 
         if (day == null) {
