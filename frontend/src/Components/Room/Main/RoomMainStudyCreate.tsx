@@ -1,16 +1,11 @@
 import { Divider, Stack } from '@mui/material';
+import { Box } from '@mui/system';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
-import {
-  addSchedule,
-  resetProblemList,
-  setIsEdit,
-  setIsStudyExist,
-  setProblemListRes,
-} from '../../../Redux/roomReducer';
+import { addSchedule, setIsEdit, setIsStudyExist } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainStudyCreateAddList from './RoomMainStudyCreateAddList';
@@ -153,25 +148,41 @@ function RoomMainStudyCreate() {
 
   return (
     <RoomMainComponentContainer height="100%">
-      <Stack justifyContent="space-between" sx={{ padding: 2, height: '100%' }} spacing={2}>
-        <h2 style={{ textAlign: 'left' }}>{isEdit ? `스터디 일정변경` : `스터디 일정추가`}</h2>
-        <Divider variant="middle" />
-        <RoomMainStudyCreateTime />
-        <Divider variant="middle" />
-        <RoomMainStudyCreateSearch
-          problemList={searchProblemList}
-          setProblemList={setSearchProblemList}
-        />
-        <RoomMainStudyCreateAddList
-          problemList={searchProblemList}
-          setProblemList={setSearchProblemList}
-        />
-        <div style={{ width: '100%', justifyContent: 'end', display: 'flex' }}>
-          <CBtn width={130} height="100%" onClick={onClickHandler}>
-            {isEdit ? '스터디 수정' : '스터디 등록'}
-          </CBtn>
+      <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+        <Stack
+          justifyContent="space-between"
+          sx={{ padding: 2, height: 'fit-content', position: 'relative' }}
+          spacing={1}>
+          <div style={{ width: '100%', justifyContent: 'space-between', display: 'flex' }}>
+            <h2 style={{ textAlign: 'left' }}>{isEdit ? `스터디 일정변경` : `스터디 일정추가`}</h2>
+            <CBtn width={130} height="100%" onClick={onClickHandler}>
+              {isEdit ? '스터디 수정' : '스터디 등록'}
+            </CBtn>
+          </div>
+          <Divider variant="middle" />
+          <RoomMainStudyCreateTime />
+          <Divider variant="middle" />
+        </Stack>
+        <div
+          style={{ width: '100%', height: '63vh', flexGrow: 1, position: 'relative' }}
+          className="scroll-box">
+          <Box
+            sx={{ padding: 2 }}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}>
+            <RoomMainStudyCreateSearch
+              problemList={searchProblemList}
+              setProblemList={setSearchProblemList}
+            />
+            <RoomMainStudyCreateAddList
+              problemList={searchProblemList}
+              setProblemList={setSearchProblemList}
+            />
+          </Box>
         </div>
-      </Stack>
+      </div>
     </RoomMainComponentContainer>
   );
 }

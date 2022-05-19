@@ -163,6 +163,9 @@ function StudyLive() {
         subscriber?.on('streamPlaying', (e: any) => {
           checkSomeoneShareScreen();
         });
+        console.log(event);
+        newUser.setAudioActive(event.stream.audioActive);
+        newUser.setVideoActive(event.stream.videoActive);
         newUser.setStreamManager(subscriber);
         newUser.setConnectionId(event.stream.connection.connectionId);
         newUser.setType('remote');

@@ -20,7 +20,7 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const ProblemBox = styled('div')(({ theme }) => ({
-  height: '15vh',
+  height: '23vh',
   borderRadius: 10,
   backgroundColor: theme.palette.bg,
 }));
@@ -41,11 +41,11 @@ function RoomMainStudyCreateAddList({
     dispatch(setProblemListRes(tempAddedProblem));
   };
   return (
-    <Stack spacing={1} sx={{ height: '50%', my: 1 }}>
+    <Stack spacing={1} sx={{ my: 1, position: 'relative' }}>
       <h3>추가된 문제</h3>
       <Divider variant="middle" />
-      <ProblemBox className="scroll-box" sx={{ height: '80%', position: 'relative' }}>
-        <Box sx={{ position: 'absolute', width: '100%' }}>
+      <ProblemBox className="scroll-box" sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative', width: '100%' }}>
           {problemListRes.map((problem: ProblemRes, idx: number) => (
             <CProblem
               key={idx}

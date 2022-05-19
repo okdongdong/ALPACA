@@ -154,6 +154,7 @@ const roomSlice = createSlice({
     },
     setIsEdit: (state, action) => {
       state.isEdit = action.payload;
+      state.scheduleId = state.dateRange[state.selectedDayIdx]?.schedule?.id;
     },
     setStartedAt: (state, action) => {
       state.startedAt = action.payload;
@@ -184,9 +185,7 @@ const roomSlice = createSlice({
     memberQueryUncheck: (state) => {
       state.members.forEach((member) => (member.isQuery = false));
     },
-    resetProblemList: (state) => {
-      state.problemListRes = [];
-    },
+
     changeSelectedDay: (state, action) => {
       state.isEdit = false;
       state.problemListRes = [];
@@ -206,6 +205,10 @@ const roomSlice = createSlice({
     },
     setIsRoomMaker: (state, action) => {
       state.isRoomMaker = action.payload;
+    },
+    changeRoomMaker: (state, action) => {
+      state.members[action.payload.prevIdx].roomMaker = false;
+      state.members[action.payload.nextIdx].roomMaker = true;
     },
   },
 });
@@ -272,12 +275,12 @@ export const {
   settingOn,
   memberQueryCheck,
   memberQueryUncheck,
-  resetProblemList,
   changeSelectedDay,
   setDailySchedule,
   setWeeklySchedule,
   deleteSchedule,
   setIsRoomMaker,
+  changeRoomMaker,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

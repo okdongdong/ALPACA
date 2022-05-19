@@ -31,7 +31,7 @@ function MainIntroductionContent() {
   const userInfo = useSelector((state: any) => state.account);
   return (
     <>
-      <BrowserView>
+      <BrowserView style={{ width: '100%' }}>
         <Stack spacing={2}>
           <CustomContainer>
             <h4>닉네임</h4>

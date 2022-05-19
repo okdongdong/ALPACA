@@ -15,7 +15,11 @@ function MainIntroduction() {
   return (
     <>
       <BrowserView style={{ width: '100%' }}>
-        <MainIntroductionDiv spacing={3} justifyContent="center" alignItems="center">
+        <MainIntroductionDiv
+          sx={{ width: '100%' }}
+          spacing={3}
+          justifyContent="center"
+          alignItems="center">
           <MainIntroductionProfile />
           <MainIntroductionContent />
         </MainIntroductionDiv>

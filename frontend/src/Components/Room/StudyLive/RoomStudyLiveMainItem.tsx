@@ -35,6 +35,7 @@ function RoomStudyLiveMainItem({ user }: userPropsType) {
   useEffect(() => {
     if (!divRef.current) return;
     setHeight(divRef.current.getBoundingClientRect().width * 0.75);
+    console.log(12);
   }, [divRef.current?.getBoundingClientRect()]);
 
   useEffect(() => {
