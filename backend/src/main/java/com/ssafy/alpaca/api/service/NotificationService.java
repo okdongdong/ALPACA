@@ -165,4 +165,11 @@ public class NotificationService {
 //        notificationRepository.deleteAll(notifications);
 //    }
 
+    public void getNotification(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
+        );
+
+        List<Notification> notifications = notificationRepository.findAllByUserId(user.getId());
+    }
 }

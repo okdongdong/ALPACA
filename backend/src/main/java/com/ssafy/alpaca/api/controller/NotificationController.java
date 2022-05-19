@@ -27,4 +27,13 @@ public class NotificationController {
 //        return notificationService.subscribe(token);
 //    }
 
+    @ApiOperation(
+            value = "알람 받기",
+            notes = "처리되지 않은 모든 알람을 가져온다."
+    )
+    @GetMapping()
+    public void getNotification() {
+        String username = userService.getCurrentUsername();
+        notificationService.getNotification(username);
+    }
 }
