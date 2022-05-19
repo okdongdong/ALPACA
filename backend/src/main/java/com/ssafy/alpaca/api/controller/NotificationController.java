@@ -11,19 +11,20 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @RequiredArgsConstructor
-@Slf4j
+@RequestMapping("notification")
 @RestController
 public class NotificationController {
 
     private final NotificationService notificationService;
     private final UserService userService;
 
-    @ApiOperation(
-            value="서버 연결",
-            notes="sse와 연결한다."
-    )
-    @GetMapping(value = "/sub/notice", consumes = MediaType.ALL_VALUE)
-    public SseEmitter subscribe(@RequestParam String token){
-        return notificationService.subscribe(token);
-    }
+//    @ApiOperation(
+//            value="서버 연결",
+//            notes="sse와 연결한다."
+//    )
+//    @GetMapping(value = "/sub/notice", consumes = MediaType.ALL_VALUE)
+//    public SseEmitter subscribe(@RequestParam String token){
+//        return notificationService.subscribe(token);
+//    }
+
 }
