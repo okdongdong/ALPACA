@@ -175,8 +175,22 @@ function RoomMain() {
                 <Grid item xs={12} md={12} lg={7}>
                   <RoomMainCalendar />
                 </Grid>
-                <Grid item xs={12} md={12} lg={5} sx={{ paddingBottom: 4 }}>
-                  <Stack spacing={3} sx={{ height: '100%' }}>
+                <Grid
+                  item
+                  xs={12}
+                  md={12}
+                  lg={5}
+                  sx={{
+                    paddingBottom: 4,
+                  }}>
+                  <Stack
+                    spacing={3}
+                    sx={{
+                      height: '100%',
+                      [theme.breakpoints.down('lg')]: {
+                        height: '50vh',
+                      },
+                    }}>
                     {isStudyExist && !isEdit ? <RoomMainStudyDetail /> : <RoomMainStudyCreate />}
                   </Stack>
                 </Grid>
