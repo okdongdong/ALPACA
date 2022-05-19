@@ -51,7 +51,7 @@ function RecommendProblem(props: { problem: RecommendProblemType }) {
         width: '100%',
         background: theme.palette.main,
       }}>
-      <div style={{ position: 'absolute', top: -25 }}>
+      <div style={{ position: 'absolute', top: -25, zIndex: 1 }}>
         <CClassBadge width={50} height={50} level={classLevel} />
       </div>
       <div
@@ -88,6 +88,7 @@ function RecommendProblem(props: { problem: RecommendProblemType }) {
         <div
           className="align_center"
           style={{
+            top: 0,
             borderRadius: '10px',
             height: '100%',
             width: '100%',

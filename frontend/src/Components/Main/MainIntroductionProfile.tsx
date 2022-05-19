@@ -16,7 +16,7 @@ const ProfileDiv = styled('div')({
 const CIconButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   bottom: 0,
-  right: 0,
+  right: -16,
   minHeight: 48,
   justifyContent: 'center',
   alignItems: 'center',

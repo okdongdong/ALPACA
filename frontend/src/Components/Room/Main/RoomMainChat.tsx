@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import RoomMainComponentContainer from './RoomMainComponentContainer';
 import RoomMainChatBar from './RoomMainChatBar';
-import { Box, Divider, Stack, styled, useTheme, alpha } from '@mui/material';
+import { Box, Divider, Stack, styled, useTheme, alpha, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { customAxios } from '../../../Lib/customAxios';
 import { dateToStringDate, dateToStringTime } from '../../../Lib/dateToString';
@@ -23,7 +23,7 @@ const MessageBox = styled('div')(({ theme }) => ({
   width: '100%',
 }));
 const ChatScreen = styled('div')(({ theme }) => ({
-  backgroundColor: alpha(theme.palette.txt, 0.8),
+  backgroundColor: alpha(theme.palette.txt, 0.3),
   color: theme.palette.bg,
   display: 'flex',
   justifyContent: 'center',
@@ -300,20 +300,28 @@ function RoomMainChat() {
                       nickname={memberDict[chat.userId]?.nickname}
                       profileImg={memberDict[chat.userId]?.profileImg}
                     />
-                    <span style={{ fontSize: 12, color: '#888888', textAlign: 'right' }}>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: '#888888',
+                        textAlign: 'right',
+                        paddingRight: '12px',
+                      }}>
                       {calDateTime(new Date(chat.timeStamp))}
                     </span>
                   </div>
                   <Box sx={{ margin: 1 }}>
-                    <span
+                    <p
                       style={{
                         backgroundColor: theme.palette.bg,
                         padding: 4,
                         marginLeft: 40,
+                        marginRight: 8,
                         borderRadius: 10,
+                        width: 'fit-content',
                       }}>
                       {chat.content}
-                    </span>
+                    </p>
                   </Box>
                 </MessageBox>
               ))}
@@ -332,12 +340,13 @@ function RoomMainChat() {
               justifyContent="center"
               alignItems="center"
               sx={{ textAlign: 'center' }}>
-              <Box>
+              <CircularProgress sx={{ color: theme.palette.main }} />
+              {/* <Box>
                 <div>서버와 연결이 원활하지 않습니다.</div>
               </Box>
               <CBtn onClick={reconnectHandler} height="100%">
                 다시연결
-              </CBtn>
+              </CBtn> */}
             </Stack>
           </ChatScreen>
         )}
