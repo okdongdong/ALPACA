@@ -1,5 +1,6 @@
 package com.ssafy.alpaca.api.controller;
 
+import com.ssafy.alpaca.api.request.NotificationReq;
 import com.ssafy.alpaca.api.service.NotificationService;
 import com.ssafy.alpaca.api.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -35,5 +36,15 @@ public class NotificationController {
     public void getNotification() {
         String username = userService.getCurrentUsername();
         notificationService.getNotification(username);
+    }
+
+    @ApiOperation(
+            value = "알람 처리하기",
+            notes = "특정 알람에 대한 수락/거절 요청을 처리한다."
+    )
+    @PostMapping()
+    public void deleteNotification(@RequestBody NotificationReq notificationReq) {
+        String username = userService.getCurrentUsername();
+        notificationService.deleteNotification(username, notificationReq);
     }
 }
