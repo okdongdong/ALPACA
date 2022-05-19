@@ -74,10 +74,10 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
   const dispatch = useDispatch();
   const monaco = useMonaco();
   const ydoc = new Y.Doc();
-  const provider = new WebsocketProvider(process.env.REACT_APP_YJS_DOCS || '', roomId || '1', ydoc);
   const ytext = ydoc.getText('monaco');
   const theme = useTheme();
   const editorRef = useRef<any>(null);
+  const providerRef = useRef<any>(null);
   const [language, setLanguage] = useState('python');
   const [openCompile, setOpenCompile] = useState<boolean>(false);
   const [compileTooltipOpen, setCompileTooltipOpen] = useState<boolean>(false);
@@ -137,13 +137,24 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
       ytext,
       /** @type {monaco.editor.ITextModel} */ editor.getModel(),
       new Set([editor]),
-      provider.awareness,
+      providerRef.current.awareness,
     );
 
     // provider.awareness.on('update', (e) => {
     //   console.log(e);
     // });
   };
+
+  useEffect(() => {
+    providerRef.current = new WebsocketProvider(
+      process.env.REACT_APP_YJS_DOCS || '',
+      roomId || '1',
+      ydoc,
+    );
+    return () => {
+      providerRef.current?.disconnect();
+    };
+  }, []);
 
   return (
     <div className="h_100 align_center" style={{ position: 'relative' }}>
