@@ -33,7 +33,7 @@ public class StudyController {
     public ResponseEntity<StudyListRes> createStudy(@RequestBody StudyReq studyReq) {
         String username = userService.getCurrentUsername();
         StudyListRes studyListRes = studyService.createStudy(username, studyReq);
-        notificationService.notifyAddStudyEvent(username, studyListRes.getId(), studyReq.getMemberIdList());
+        notificationService.createInviteNotification(username, studyListRes.getId(), studyReq.getMemberIdList());
         return ResponseEntity.ok(studyListRes);
     }
 
@@ -219,7 +219,7 @@ public class StudyController {
     @PostMapping("/{id}/invite")
     public ResponseEntity<BaseResponseBody> inviteUser(@PathVariable Long id, @RequestBody StudyMemberListReq studyMemberListReq) {
         String username = userService.getCurrentUsername();
-        notificationService.notifyAddStudyEvent(username, id, studyMemberListReq.getMemberIdList());
+        notificationService.createInviteNotification(username, id, studyMemberListReq.getMemberIdList());
         return ResponseEntity.ok(BaseResponseBody.of(200,"OK"));
     }
 
@@ -227,20 +227,20 @@ public class StudyController {
             value = "스터디 초대 수락",
             notes = "초대받은 스터디를 수락하여 스터디에 가입한다."
     )
-    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = String.class )
     @PostMapping("/{id}/join")
-    public ResponseEntity<StudyListRes> joinStudy(@PathVariable Long id, @RequestBody NotificationIsLiveReq notificationIsLiveReq) {
+    public ResponseEntity<StudyListRes> joinStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
-        return ResponseEntity.ok(studyService.joinStudy(username, id, notificationIsLiveReq));
+        return ResponseEntity.ok(studyService.joinStudy(username, id));
     }
 
     @ApiOperation(
             value = "스터디 초대 거절",
             notes = "초대받은 스터디를 거절한다."
     )
-    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = Long.class )
+    @ApiImplicitParam( name = "id", value = "가입할 스터디 id", dataTypeClass = String.class )
     @PostMapping("/{id}/reject")
-    public ResponseEntity<BaseResponseBody> rejectStudy(@PathVariable Long id) {
+    public ResponseEntity<BaseResponseBody> rejectStudy(@PathVariable String id) {
         String username = userService.getCurrentUsername();
         studyService.rejectStudy(username, id);
         return ResponseEntity.ok(BaseResponseBody.of(200, "OK"));

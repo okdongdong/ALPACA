@@ -7,8 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotificationIsLiveReq {
+public class NotificationReq {
 
-    private Boolean isLive;
+    private String notificationId;
 
 }
