@@ -159,9 +159,6 @@ function StudyCreate(props: StudyCreateProps) {
 
   const handleClose = () => {
     createData();
-    setStudyName('');
-    setStudyIntro('');
-    setMemberList([]);
   };
 
   const cancleClose = () => {
@@ -176,6 +173,14 @@ function StudyCreate(props: StudyCreateProps) {
   };
 
   const createData = async () => {
+    if (!studyname) {
+      setNameMessage('스터디 이름을 입력해주세요.');
+      return;
+    }
+    if (!studyintro) {
+      setIntroMessage('스터디 소개를 입력해주세요.');
+      return;
+    }
     const sendList = memberList.map((data) => data.id);
     try {
       const res = await customAxios({
@@ -200,6 +205,9 @@ function StudyCreate(props: StudyCreateProps) {
         timer: 1500,
       });
       onClose();
+      setStudyName('');
+      setStudyIntro('');
+      setMemberList([]);
     } catch (e: any) {
       cAlert.fire({
         title: '생성 실패!',
@@ -213,6 +221,8 @@ function StudyCreate(props: StudyCreateProps) {
   };
 
   const userSearch = async () => {
+    if (!searchNickname) return;
+
     try {
       const res = await customAxios({
         method: 'get',
@@ -229,7 +239,7 @@ function StudyCreate(props: StudyCreateProps) {
   return (
     <Dialog onClose={cancleClose} open={open} fullScreen={isMobile}>
       <CDialogTitle>
-        <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디 개설</div>
+        <div style={{ fontSize: 24, fontWeight: 'bold' }}>스터디 생성</div>
         <Close onClick={cancleClose} />
       </CDialogTitle>
       <CustomContent>

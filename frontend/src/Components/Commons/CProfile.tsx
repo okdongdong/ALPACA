@@ -3,7 +3,7 @@ import alpaca from '../../Assets/Img/alpaca.png';
 import { Avatar } from '@mui/material';
 
 type profileProps = {
-  nickname: string;
+  nickname?: string;
   profileImg?: string;
 };
 
@@ -13,7 +13,7 @@ function CProfile({ nickname, profileImg }: profileProps) {
       <Avatar
         alt={nickname}
         src={profileImg || alpaca}
-        sx={{ mx: '10px', width: 35, height: 35 }}
+        sx={{ mx: '10px', width: 35, height: 35, backgroundColor: 'rgba(123,123,123,0.5)' }}
       />
       <span>{nickname}</span>
     </div>

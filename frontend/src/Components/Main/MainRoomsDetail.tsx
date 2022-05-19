@@ -1,4 +1,4 @@
-import { Button, Grid, styled, useTheme } from '@mui/material';
+import { Avatar, Button, Grid, IconButton, styled, useTheme } from '@mui/material';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import styles from './MainRoomsDetail.module.css';
 import alpaca from '../../Assets/Img/alpaca.png';
@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setStudies } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
+import CProfile from '../Commons/CProfile';
 
 export interface StudyCreateProps {
   detail: any;
@@ -32,15 +33,14 @@ const MNameLabel = styled('label')(({ theme }) => ({
 }));
 
 const CButton = styled(Button)(({ theme }) => ({
-  minHeight: 48,
-  display: 'Grid',
-  justifyContent: 'center',
-  alignItems: 'center',
   margin: '10px',
   borderRadius: '10px',
+  display: 'flex',
+  alignItems: 'start',
+  paddingTop: '25px',
   background: theme.palette.main,
-  height: '165px',
-  width: '165px',
+  height: '150px',
+  width: '150px',
   position: 'relative',
   '&:hover': {
     background: theme.palette.main + '90',
@@ -74,15 +74,15 @@ function MainRoomsDetail(props: StudyCreateProps) {
       const temp = [...userStudy];
       let deleteTemp = temp.splice(findStudy, 1);
       const tmp = { ...deleteTemp[0] };
-      if (tmp.pinnedTime === '0001-01-01T06:00:00') {
+      if (tmp.pinnedTime.split('-')[0] === '0001') {
         tmp.pinnedTime = new Date().toISOString();
         temp.unshift(tmp);
         props.callback(1);
       } else {
         tmp.pinnedTime = '0001-01-01T06:00:00';
         var minId = 101;
-        temp.map((item: any, index: number) => {
-          if (item.pinnedTime === '0001-01-01T06:00:00') {
+        temp.forEach((item: any, index: number) => {
+          if (item.pinnedTime.split('-')[0] === '0001') {
             if (item.id > tmp.id) {
               minId = Math.min(item.id, minId);
               return minId;
@@ -110,14 +110,13 @@ function MainRoomsDetail(props: StudyCreateProps) {
     <>
       <BrowserView>
         <div style={{ position: 'relative' }}>
-          <PushPinIcon
+          <IconButton
             sx={{
               position: 'absolute',
               top: 6,
               left: 12,
               color:
-                props.detail.pinnedTime === '0001-01-01T06:00:00' ||
-                props.detail.pinnedTime === null
+                props.detail.pinnedTime.split('-')[0] === '0001' || props.detail.pinnedTime === null
                   ? theme.palette.bg
                   : theme.palette.component_accent,
               margin: 0,
@@ -129,16 +128,27 @@ function MainRoomsDetail(props: StudyCreateProps) {
                 color: theme.palette.accent,
               },
             }}
-            onClick={pinStudy}></PushPinIcon>
+            onClick={pinStudy}>
+            <PushPinIcon></PushPinIcon>
+          </IconButton>
+
           <CButton onClick={goStudy}>
-            <Grid container sx={{ padding: 2 }}>
-              {props.detail.profileImgList.slice(0, 4).map((item: string, i: number) => {
-                return (
-                  <Grid item xs={6} key={i} sx={{ padding: 0 }}>
-                    <img src={!!item ? item : alpaca} className={styles.profileimg_mini} alt="" />
-                  </Grid>
-                );
-              })}
+            <Grid container alignItems="start" spacing={1} sx={{ paddingBottom: 1 }}>
+              {props.detail.profileImgList.slice(0, 4).map((profileImg: string, i: number) => (
+                <Grid item xs={6} key={i}>
+                  <div className="align_center">
+                    <Avatar
+                      src={profileImg || alpaca}
+                      alt="profileImg"
+                      sx={{
+                        width: '50px',
+                        height: '50px',
+                        backgroundColor: 'rgba(123,123,123,0.5)',
+                      }}
+                    />
+                  </div>
+                </Grid>
+              ))}
             </Grid>
           </CButton>
           <NameLabel sx={{ px: '8px' }}>{props.detail.title}</NameLabel>
@@ -152,8 +162,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
               top: 10,
               left: 5,
               color:
-                props.detail.pinnedTime === '0001-01-01T06:00:00' ||
-                props.detail.pinnedTime === null
+                props.detail.pinnedTime.split('-')[0] === '0001' || props.detail.pinnedTime === null
                   ? theme.palette.bg
                   : theme.palette.component_accent,
               margin: 0,

@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { Input } from '@mui/material';
+import { Divider, Input, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { BrowserView, MobileView } from 'react-device-detect';
 
@@ -36,20 +36,18 @@ function MainIntroductionContent() {
   return (
     <>
       <BrowserView>
-        <IntroductionDiv>
-          <div>
-            <Clabel htmlFor="">닉네임</Clabel>
-          </div>
+        <Stack spacing={2}>
           <CustomContainer>
-            <TInput sx={{ width: 500, marginBottom: '5px' }} value={userInfo.nickname}></TInput>
+            <h4>닉네임</h4>
+            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+            <p>{userInfo.nickname}</p>
           </CustomContainer>
-          <div>
-            <Clabel htmlFor="">자기소개</Clabel>
-          </div>
           <CustomContainer>
-            <TInput sx={{ width: 500 }} value={userInfo.info} multiline maxRows={4}></TInput>
+            <h4>자기소개</h4>
+            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+            <p>{userInfo.info}</p>
           </CustomContainer>
-        </IntroductionDiv>
+        </Stack>
       </BrowserView>
       <MobileView>
         <IntroductionDiv sx={{ marginRight: '10px' }}>

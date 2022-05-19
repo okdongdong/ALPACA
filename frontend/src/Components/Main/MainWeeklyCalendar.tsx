@@ -146,11 +146,32 @@ function MainWeeklyCalendar() {
           <ArrowBackIosNew />
         </IconButton>
         <div style={{ textAlign: 'center' }}>
-          <span>{nowDay.getFullYear()}년</span>
-          <h3>
-            {nowDay.getMonth() + 1}월 {Math.floor((nowDay.getDate() + (7 - nowDay.getDay())) / 7)}
-            번째 주
-          </h3>
+          <div
+            style={{
+              height: 40,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              position: 'relative',
+              textAlign: 'center',
+              fontWeight: '600',
+              fontSize: '1.2rem',
+              alignItems: 'center',
+            }}>
+            {weeklyDateRange.some(
+              (dailySchedule: MainDailySchedule) =>
+                dailySchedule.day.toLocaleDateString() === new Date().toLocaleDateString(),
+            ) ? (
+              <span style={{ alignSelf: 'center' }}>이번주 스터디 일정</span>
+            ) : (
+              <span>
+                {new Date().getFullYear() === nowDay.getFullYear() || `${nowDay.getFullYear()}년`}{' '}
+                {nowDay.getMonth() + 1}월{' '}
+                {Math.ceil((nowDay.getDate() + (7 - nowDay.getDay() - 1)) / 7)}
+                번째 주 스터디 일정
+              </span>
+            )}
+          </div>
         </div>
         <IconButton
           size="large"

@@ -1,6 +1,7 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { alpha, Collapse, IconButton, Stack, useTheme } from '@mui/material';
 import React, { useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router-dom';
 import CBtn from '../../Commons/CBtn';
 import CProblem from '../../Commons/CProblem';
@@ -43,8 +44,8 @@ function RoomMainStudyDetailProblemItem({
         isSolved={isSolved}
         button={
           <>
-            <CBtn onClick={() => navigate(`/compile/${problemId}`)}>코드 제출</CBtn>
-            <IconButton onClick={() => setOpen((prev) => !prev)} sx={{ width: 'fit-content' }}>
+            {isMobile || <CBtn onClick={() => navigate(`/compile/${problemId}`)}>코드 제출</CBtn>}
+            <IconButton onClick={() => {}} sx={{ width: 'fit-content' }}>
               {open ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </>
@@ -52,7 +53,7 @@ function RoomMainStudyDetailProblemItem({
       />
 
       <Collapse in={open}>
-        {!members && (
+        {(!members || members?.length === 0) && (
           <Stack
             padding={2}
             spacing={1}
@@ -70,9 +71,11 @@ function RoomMainStudyDetailProblemItem({
             <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
               {`문제 보러 가기 >`}
             </CBtn>
-            <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
-              {`코드 제출하러 가기 >`}
-            </CBtn>
+            {isMobile || (
+              <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
+                {`코드 제출하러 가기 >`}
+              </CBtn>
+            )}
           </Stack>
         )}
         <Stack
