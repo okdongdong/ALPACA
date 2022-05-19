@@ -406,11 +406,11 @@ public class StudyService {
                 .build();
     }
 
-    public Slice<ChatListRes> getChatListByStudy(Long studyId, String offsetId, Pageable pageable) {
+    public Slice<ChatRes> getChatListByStudy(Long studyId, String offsetId, Pageable pageable) {
         ObjectId objectId = new ObjectId(offsetId);
         Slice<Chat> chats = chatRepository.findPartByStudyId(objectId, studyId, pageable);
 
-        return chats.map(chat -> ChatListRes.builder()
+        return chats.map(chat -> ChatRes.builder()
                 .userId(chat.getUserId())
                 .content(chat.getContent())
                 .timeStamp(chat.getTimeStamp())
