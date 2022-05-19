@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@mui/material';
-import { Close, ContactPageOutlined } from '@mui/icons-material';
-import CBtn from '../Commons/CBtn';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Close } from '@mui/icons-material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { customAxios } from '../../Lib/customAxios';
+import { isMobile } from 'react-device-detect';
+import useAlert from '../../Hooks/useAlert';
 
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
@@ -12,16 +13,19 @@ type NotificationDialogType = {
 };
 
 type NotificationDataType = {
-  type: 'invite' | 'schedule';
+  id: string;
+  isInvitation: boolean;
+  roomMaker: string;
+  roomMakerProfileImg: string;
+  scheduleId: number;
+  scheduleStartedAt: string;
   studyId: number;
-  title: string;
+  studyTitle: string;
+  userId: number;
 };
 
 type NotificationItemType = {
-  index: number;
-  type: 'invite' | 'schedule';
-  studyId: number;
-  title: string;
+  notification: NotificationDataType;
   deleteNoti: Function;
 };
 
@@ -32,7 +36,7 @@ const CustomPopover = styled(Popover)(({ theme }) => ({
   },
 }));
 const NotiPaper = styled(Paper)(({ theme }) => ({
-  maxWidth: '20vw',
+  maxWidth: isMobile ? '80vw' : '20vw',
   background: theme.palette.main,
   color: theme.palette.txt,
   margin: '10px',
@@ -56,38 +60,117 @@ const CustomBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
-function NotificationItem({ type, studyId, title, deleteNoti, index }: NotificationItemType) {
+function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
+  const cAlert = useAlert();
   const navigate = useNavigate();
   const theme = useTheme();
+  const { id, isInvitation, studyId, studyTitle, scheduleStartedAt } = notification;
+  const joinStudy = async () => {
+    deleteNoti(id);
+    try {
+      const res = await customAxios({
+        method: 'post',
+        url: `/study/${id}/join`,
+      });
+      cAlert
+        .fire({
+          title: '가입완료',
+          text: `${studyTitle}에 가입되었습니다.\n 스터디로 이동하시겠습니까?`,
+          icon: 'success',
+          confirmButtonText: '이동',
+        })
+        .then((res) => {
+          if (res.isConfirmed) {
+            navigate(`/room/${studyId}`);
+          } else {
+            navigate('/');
+          }
+        });
+    } catch (e: any) {
+      if (e.response.status === 400) {
+        cAlert.fire({
+          title: '가입 실패',
+          text: '잘못된 접근입니다.',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else if (e.response.status === 409) {
+        cAlert.fire({
+          title: '가입 실패',
+          text: '이미 가입되어있는 스터디입니다.',
+          icon: 'error',
+          showCancelButton: false,
+          timer: 1500,
+        });
+      }
+    }
+  };
+
+  const rejectStudy = async () => {
+    try {
+      await customAxios({
+        method: 'post',
+        url: `/study/${id}/reject`,
+      });
+      deleteNoti(id);
+      cAlert.fire({
+        title: '거절 완료',
+        text: '스터디 초대 거절을 완료했습니다.',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (e) {}
+  };
+
   return (
     <NotiPaper>
-      <div style={{ marginBottom: '10px', padding: '0 10px 10px 10px', minWidth: '15vw' }}>
+      <div
+        style={{
+          marginBottom: '10px',
+          padding: '0 10px 10px 10px',
+          minWidth: '15vw',
+          width: '100%',
+        }}>
         <div style={{ display: 'flex', justifyContent: 'end' }}>
           <IconButton
             size="small"
             onClick={() => {
-              deleteNoti(index);
+              deleteNoti(id);
             }}>
             <Close />
           </IconButton>
         </div>
-        {type === 'invite' ? (
+        {isInvitation ? (
           <>
             <div
               style={{
                 textAlign: 'center',
                 marginBottom: '2px',
-              }}>{`${title} 스터디에 초대되었습니다`}</div>
+              }}>{`${studyTitle} 스터디에 초대되었습니다`}</div>
             <div style={{ textAlign: 'center' }}>수락하시겠습니까?</div>
           </>
         ) : (
-          `${title} 스터디에 일정이 추가되었습니다.`
+          <>
+            <div
+              style={{
+                textAlign: 'center',
+              }}>{`${studyTitle} 스터디에 일정이 추가되었습니다.`}</div>
+            <div style={{ textAlign: 'center', marginTop: '2px' }}>
+              {scheduleStartedAt && '스터디 일정 : ' + scheduleStartedAt.split('T')[0]}
+            </div>
+          </>
         )}
       </div>
       <div className="align_center">
-        {type === 'invite' ? (
+        {isInvitation ? (
           <>
-            <CustomBtn size="small" onClick={() => {}}>
+            <CustomBtn
+              size="small"
+              onClick={() => {
+                joinStudy();
+              }}>
               수락
             </CustomBtn>
             <Divider
@@ -95,7 +178,11 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
               orientation="vertical"
               variant="middle"
               flexItem></Divider>
-            <CustomBtn size="small" onClick={() => {}}>
+            <CustomBtn
+              size="small"
+              onClick={() => {
+                rejectStudy();
+              }}>
               거절
             </CustomBtn>
           </>
@@ -103,7 +190,7 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
           <CustomBtn
             size="small"
             onClick={() => {
-              deleteNoti(index);
+              deleteNoti(id);
               navigate(`/room/${studyId}`);
             }}>
             이동
@@ -115,97 +202,45 @@ function NotificationItem({ type, studyId, title, deleteNoti, index }: Notificat
 }
 
 function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: NotificationDialogType) {
+  const location = useLocation();
   const [notificationList, setNotificationList] = useState<NotificationDataType[]>([]);
-  const eventSource = useRef<EventSource | null>(null);
 
-  useEffect(() => {
-    connectNotification();
-    return () => {
-      disconnectNotification();
-    };
-  }, []);
-
-  const addInitialNotification = (event: MessageEvent) => {
-    console.log('addInitialNotification', event);
-    if (!!!anchorEl) {
-      setNewNotiCount((prev: number) => prev + 1);
-    }
-    const data = JSON.parse(event.data);
-    setNotificationList((notifications) => {
-      if (data?.scheduleStartedAt) {
-        return [
-          { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
-          ...notifications,
-        ];
-      }
-      return [{ type: 'invite', studyId: data.studyId, title: data.studyTitle }, ...notifications];
-    });
-  };
-
-  const addSchedule = (event: MessageEvent) => {
-    console.log('addSchedule', event.data);
-    console.log(!!!anchorEl, anchorEl);
-    if (!!!anchorEl) {
-      setNewNotiCount((prev: number) => prev + 1);
-    }
-    const data = JSON.parse(event.data);
-    setNotificationList((notifications) => {
-      return [
-        { type: 'schedule', studyId: data.studyId, title: data.studyTitle },
-        ...notifications,
-      ];
-    });
-  };
-  const addInviteStudy = (event: MessageEvent) => {
-    console.log('addInviteStudy', event);
-    if (!!!anchorEl) {
-      setNewNotiCount((prev: number) => prev + 1);
-    }
-    const data = JSON.parse(event.data);
-    setNotificationList((notifications) => {
-      return [{ type: 'invite', studyId: data.studyId, title: data.studyTitle }, ...notifications];
-    });
-  };
-
-  const closeEventsource = () => {
-    if (eventSource.current) {
-      eventSource.current.close();
-    }
-  };
-
-  const connectNotification = () => {
-    const subscribeUrl = `${process.env.REACT_APP_BASE_URL}/api/v1/sub/notice`;
-    const jwtToken = localStorage.getItem('accessToken')?.split(' ')[1];
-    eventSource.current = new EventSource(`${subscribeUrl}?token=${jwtToken}`);
-
-    eventSource.current.addEventListener('initialNotification', addInitialNotification);
-    eventSource.current.addEventListener('addSchedule', addSchedule);
-    eventSource.current.addEventListener('inviteStudy', addInviteStudy);
-    eventSource.current.addEventListener('error', closeEventsource);
-  };
-
-  const disconnectNotification = () => {
-    eventSource.current?.close();
-    // if (eventSource.current) {
-    //   eventSource.current.removeEventListener('initialNotification', addInitialNotification);
-    //   eventSource.current.removeEventListener('addSchedule', addSchedule);
-    //   eventSource.current.removeEventListener('inviteStudy', addInviteStudy);
-    //   eventSource.current.removeEventListener('error', closeEventsource);
-    // }
-    eventSource.current = null;
-  };
-  const deleteNotification = (index: number) => {
-    setNotificationList((notifications) => {
-      return notifications.filter((notification, idx) => {
-        console.log(index, idx);
-        return idx !== index;
+  const getNotifications = async () => {
+    try {
+      const res = await customAxios({
+        method: 'get',
+        url: '/notification',
       });
-    });
+      console.log(res.data);
+      setNotificationList(res.data);
+      setNewNotiCount(res.data.length);
+    } catch (e) {}
+  };
+
+  const deleteNotifications = (id: string) => {
+    try {
+      customAxios({
+        method: 'post',
+        url: '/notification',
+        data: {
+          notificationId: id,
+        },
+      });
+      setNewNotiCount((prev: number) => prev - 1);
+      setNotificationList((notifications) => {
+        return notifications.filter((notification, idx) => {
+          return notification.id !== id;
+        });
+      });
+    } catch (e) {}
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    getNotifications();
+  }, [location.pathname]);
   return (
     <CustomPopover
       anchorOrigin={{
@@ -224,11 +259,8 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
           return (
             <NotificationItem
               key={`noti-${index}`}
-              title={noti.title}
-              type={noti.type}
-              studyId={noti.studyId}
-              index={index}
-              deleteNoti={deleteNotification}
+              notification={noti}
+              deleteNoti={deleteNotifications}
             />
           );
         })
