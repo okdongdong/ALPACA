@@ -75,12 +75,13 @@ const CustomIconButton = styled(IconButton)(({ theme }) => ({
 const MemberArray = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'left',
-  flexWrap: 'wrap',
+  // flexWrap: 'wrap',
+  overflowX: 'scroll',
   listStyle: 'none',
   padding: 0.5,
   marginTop: theme.spacing(3),
   marginBottom: theme.spacing(3),
-  height: theme.spacing(5),
+  height: theme.spacing(8),
 }));
 
 function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
