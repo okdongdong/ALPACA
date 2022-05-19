@@ -61,12 +61,6 @@ public class StudyService {
         );
     }
 
-    private User checkUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-    }
-
     private MyStudy checkMyStudyByUserAndStudy(User user, Study study) {
         return myStudyRepository.findByUserAndStudy(user, study).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
@@ -80,9 +74,7 @@ public class StudyService {
         throw new UnAuthorizedException(ExceptionUtil.UNAUTHORIZED_USER);
     }
 
-    public StudyListRes createStudy(String username, StudyReq studyReq) {
-        User user = checkUserByUsername(username);
-
+    public StudyListRes createStudy(User user, StudyReq studyReq) {
         if (99 < myStudyRepository.countAllByUser(user)) {
             throw new IllegalArgumentException(ExceptionUtil.TOO_MANY_STUDIES);
         }
@@ -116,8 +108,7 @@ public class StudyService {
                 .build();
     }
 
-    public void setPin(String username, Long id) {
-        User user = checkUserByUsername(username);
+    public void setPin(User user, Long id) {
         Study study = checkStudyById(id);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
         if (myStudy.getPinnedTime().getYear() == 1) {
@@ -146,9 +137,8 @@ public class StudyService {
         }
     }
 
-    public StudyRes getStudy(String username, Long id, Integer offset){
+    public StudyRes getStudy(User user, Long id, Integer offset){
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
 
         if (Boolean.TRUE.equals(!myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND);
@@ -189,9 +179,7 @@ public class StudyService {
                 .build();
     }
 
-    public List<StudyListRes> getStudyList(String username) {
-        User user = checkUserByUsername(username);
-
+    public List<StudyListRes> getStudyList(User user) {
         return myStudyRepository.findAllByUserOrderByPinnedTimeDesc(user)
                 .stream().map(myStudy -> StudyListRes.builder()
                         .id(myStudy.getStudy().getId())
@@ -203,8 +191,7 @@ public class StudyService {
                         .build()).collect(Collectors.toList());
     }
 
-    public List<ScheduleListRes> getScheduleList(String username, Integer year, Integer month, Integer day, Integer offset) {
-        User user = checkUserByUsername(username);
+    public List<ScheduleListRes> getScheduleList(User user, Integer year, Integer month, Integer day, Integer offset) {
         String offSet = getTime(offset);
         List<Object[]> objects;
         if (day == null) {
@@ -230,8 +217,7 @@ public class StudyService {
                 .build()).collect(Collectors.toList());
     }
 
-    public List<ProblemListRes> getStudyProblem(String username, Long id){
-        User user = checkUserByUsername(username);
+    public List<ProblemListRes> getStudyProblem(User user, Long id){
         Study study = checkStudyById(id);
         List<MyStudy> myStudy = myStudyRepository.findAllByStudy(study);
         List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
@@ -270,9 +256,8 @@ public class StudyService {
         return problemListRes;
     }
 
-    public void updateStudy(String username, Long id, StudyUpdateReq studyUpdateReq) {
+    public void updateStudy(User user, Long id, StudyUpdateReq studyUpdateReq) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
 
         study.setTitle(studyUpdateReq.getTitle());
@@ -280,16 +265,14 @@ public class StudyService {
         studyRepository.save(study);
     }
 
-    public void deleteStudy(String username, Long id) {
+    public void deleteStudy(User user, Long id) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
         studyRepository.delete(study);
     }
 
-    public void checkMember(String username, Long userId, Long studyId) {
+    public void checkMember(User user, Long userId, Long studyId) {
         Study study = checkStudyById(studyId);
-        User user = checkUserByUsername(username);
         List<MyStudy> myStudies = myStudyRepository.findAllByStudy(study);
 
         boolean flagA = false;
@@ -308,9 +291,8 @@ public class StudyService {
         throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND_IN_STUDY);
     }
 
-    public void updateRoomMaker(String username, Long id, StudyMemberReq studyMemberReq) {
+    public void updateRoomMaker(User user, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
         if (user.getId().equals(member.getId())) {
             throw new NullPointerException(ExceptionUtil.USER_ID_DUPLICATE);
@@ -328,9 +310,8 @@ public class StudyService {
         myStudyRepository.save(memberStudy);
     }
 
-    public void deleteMember(String username, Long id, StudyMemberReq studyMemberReq) {
+    public void deleteMember(User user, Long id, StudyMemberReq studyMemberReq) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         User member = checkUserById(studyMemberReq.getMemberId());
         checkRoomMaker(user, study);
 
@@ -341,9 +322,8 @@ public class StudyService {
         myStudyRepository.delete(memberStudy);
     }
 
-    public void deleteMeFromStudy(String username, Long id) {
+    public void deleteMeFromStudy(User user, Long id) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         MyStudy myStudy = checkMyStudyByUserAndStudy(user, study);
 
         if (Boolean.TRUE.equals(myStudy.getIsRoomMaker())) {
@@ -353,9 +333,8 @@ public class StudyService {
         myStudyRepository.delete(myStudy);
     }
 
-    public String createInviteCode(String username, Long id) {
+    public String createInviteCode(User user, Long id) {
         Study study = checkStudyById(id);
-        User user = checkUserByUsername(username);
         checkRoomMaker(user, study);
 
         Optional<InviteCode> inviteCode = inviteCodeRedisRepository.findById(study.getId());
@@ -391,12 +370,11 @@ public class StudyService {
                 .build();
     }
 
-    public void inviteUserCode(String username, StudyInviteReq studyInviteReq) {
+    public void inviteUserCode(User user, StudyInviteReq studyInviteReq) {
         StudyCode studyCode = studyCodeRedisRepository.findById(studyInviteReq.getInviteCode()).orElseThrow(
                 () -> new IllegalArgumentException(ExceptionUtil.INVITE_CODE_NOT_EXISTS)
         );
         Study study = checkStudyById(studyCode.getStudyId());
-        User user = checkUserByUsername(username);
 
         if (Boolean.TRUE.equals(myStudyRepository.existsByUserAndStudy(user, study))) {
             throw new NullPointerException(ExceptionUtil.USER_STUDY_DUPLICATE);
@@ -439,8 +417,7 @@ public class StudyService {
                 .build());
     }
 
-    public StudyListRes joinStudy(String username, String id) {
-        User user = checkUserByUsername(username);
+    public StudyListRes joinStudy(User user, String id) {
         Optional<Notification> notification = notificationRepository.findById(id);
         if (notification.isEmpty()) {
             throw  new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);
@@ -468,8 +445,7 @@ public class StudyService {
         }
     }
 
-    public void rejectStudy(String username, String id) {
-        User user = checkUserByUsername(username);
+    public void rejectStudy(User user, String id) {
         Optional<Notification> notification = notificationRepository.findById(id);
         if (notification.isEmpty()) {
             throw new IllegalArgumentException(ExceptionUtil.INVALID_INVITATION);

@@ -35,11 +35,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ConvertUtil convertUtil;
 
-    public String createInviteNotification(String username, Long id, List<Long> studyMemberIdList) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public String createInviteNotification(User user, Long id, List<Long> studyMemberIdList) {
         Study study = studyRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.STUDY_NOT_FOUND)
         );
