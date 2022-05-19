@@ -191,75 +191,77 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
             onMount={handleEditorDidMount}
           />
         )}
-        <div style={{ height: openCompile ? '40vh' : 0, position: 'relative' }}>
-          <IconButton
-            onMouseEnter={() => {
-              setCompileTooltipOpen(true);
-            }}
-            onMouseLeave={() => {
-              setCompileTooltipOpen(false);
-            }}
-            onClick={() => {
-              setOpenCompile((prev) => !prev);
-              setCompileTooltipOpen(false);
-            }}
-            sx={{ position: 'absolute', left: '50%', top: -10, transform: 'translate(0, -50%)' }}>
-            {openCompile ? (
-              <Tooltip open={compileTooltipOpen} title="컴파일창 닫기">
-                <KeyboardArrowDownOutlined />
-              </Tooltip>
-            ) : (
-              <Tooltip open={compileTooltipOpen} title="컴파일창 열기">
-                <KeyboardArrowUpOutlined />
-              </Tooltip>
-            )}
-          </IconButton>
-          <div>
-            <RoomCompileSelectLanguageBtn selectLanguage={setLanguage} />
-          </div>
-          <div className="align_center">
-            <FormControl
-              variant="standard"
-              sx={{ margin: '15px', width: `calc(${width} / 2 - 2vw)` }}>
-              <CustomLabel shrink htmlFor="compile-input">
-                Input
-              </CustomLabel>
-              <CustomInput
-                placeholder="input 값을 입력해주세요"
-                rows={7}
-                multiline
-                id="compile-input"
-                value={input}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl
-              variant="standard"
-              sx={{ margin: '15px', width: `calc(${width} / 2 - 2vw)` }}>
-              <CustomLabel shrink htmlFor="compile-output">
-                Output
-              </CustomLabel>
-              <CustomInput
-                inputProps={{
-                  readOnly: true,
-                }}
-                placeholder="실행결과가 출력됩니다."
-                value={output}
-                rows={7}
-                multiline
-                id="compile-output"
-              />
-            </FormControl>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'end' }}>
-            <CBtn
+        {openYjsDocs && (
+          <div style={{ height: openCompile ? '40vh' : 0, position: 'relative' }}>
+            <IconButton
+              onMouseEnter={() => {
+                setCompileTooltipOpen(true);
+              }}
+              onMouseLeave={() => {
+                setCompileTooltipOpen(false);
+              }}
               onClick={() => {
-                submitCode();
-              }}>
-              코드실행
-            </CBtn>
+                setOpenCompile((prev) => !prev);
+                setCompileTooltipOpen(false);
+              }}
+              sx={{ position: 'absolute', left: '50%', top: -10, transform: 'translate(0, -50%)' }}>
+              {openCompile ? (
+                <Tooltip open={compileTooltipOpen} title="컴파일창 닫기">
+                  <KeyboardArrowDownOutlined />
+                </Tooltip>
+              ) : (
+                <Tooltip open={compileTooltipOpen} title="컴파일창 열기">
+                  <KeyboardArrowUpOutlined />
+                </Tooltip>
+              )}
+            </IconButton>
+            <div>
+              <RoomCompileSelectLanguageBtn selectLanguage={setLanguage} />
+            </div>
+            <div className="align_center">
+              <FormControl
+                variant="standard"
+                sx={{ margin: '15px', width: `calc(${width} / 2 - 2vw)` }}>
+                <CustomLabel shrink htmlFor="compile-input">
+                  Input
+                </CustomLabel>
+                <CustomInput
+                  placeholder="input 값을 입력해주세요"
+                  rows={7}
+                  multiline
+                  id="compile-input"
+                  value={input}
+                  onChange={handleChange}
+                />
+              </FormControl>
+              <FormControl
+                variant="standard"
+                sx={{ margin: '15px', width: `calc(${width} / 2 - 2vw)` }}>
+                <CustomLabel shrink htmlFor="compile-output">
+                  Output
+                </CustomLabel>
+                <CustomInput
+                  inputProps={{
+                    readOnly: true,
+                  }}
+                  placeholder="실행결과가 출력됩니다."
+                  value={output}
+                  rows={7}
+                  multiline
+                  id="compile-output"
+                />
+              </FormControl>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'end' }}>
+              <CBtn
+                onClick={() => {
+                  submitCode();
+                }}>
+                코드실행
+              </CBtn>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
