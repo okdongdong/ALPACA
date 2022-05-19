@@ -108,10 +108,11 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
     if (!editorRef.current) return;
     const code = editorRef.current?.getValue();
     const returnCode = code.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+    const returnInput = input.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
     const data = {
       code: returnCode,
       language: language === 'python' ? 'python3' : language,
-      input,
+      input: returnInput,
     };
     dispatch(setLoading(true));
     dispatch(setLoadingMessage('코드실행중입니다'));
