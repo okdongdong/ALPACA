@@ -45,6 +45,14 @@ const CButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.main + '90',
   },
+  [theme.breakpoints.up(1600)]: {
+    height: '175px',
+    width: '175px',
+  },
+  [theme.breakpoints.up(1800)]: {
+    height: '200px',
+    width: '200px',
+  },
 }));
 const MButton = styled(Button)(({ theme }) => ({
   minHeight: 48,
@@ -115,6 +123,12 @@ function MainRoomsDetail(props: StudyCreateProps) {
               position: 'absolute',
               top: 6,
               left: 'calc(50% - 70px)',
+              [theme.breakpoints.up(1600)]: {
+                left: 'calc(50% - 80px)',
+              },
+              [theme.breakpoints.up(1800)]: {
+                left: 'calc(50% - 90px)',
+              },
               color:
                 props.detail.pinnedTime.split('-')[0] === '0001' || props.detail.pinnedTime === null
                   ? theme.palette.bg
@@ -144,6 +158,14 @@ function MainRoomsDetail(props: StudyCreateProps) {
                         width: '50px',
                         height: '50px',
                         backgroundColor: 'rgba(123,123,123,0.5)',
+                        [theme.breakpoints.up(1600)]: {
+                          height: '60px',
+                          width: '60px',
+                        },
+                        [theme.breakpoints.up(1800)]: {
+                          height: '70px',
+                          width: '70px',
+                        },
                       }}
                     />
                   </div>

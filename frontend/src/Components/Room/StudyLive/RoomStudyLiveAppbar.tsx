@@ -51,6 +51,9 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
       const res = await customAxios({
         method: 'get',
         url: `schedule/${roomId}/today`,
+        params: {
+          offset: new Date().getTimezoneOffset(),
+        },
       });
       setProblemList(
         res.data.problemListRes.map((problem: any) => {

@@ -238,7 +238,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
     cAlert
       .fire({
         title: '회원 탈퇴',
-        text: '탈퇴 시 회원정보는 모두 삭제되며, 삭제된 데이터는 복구되지 않습니다.',
+        html: '탈퇴 시 회원정보는 모두 삭제되며, <br/><br/> 삭제된 데이터는 복구되지 않습니다.',
         icon: 'warning',
         showConfirmButton: true,
         showCancelButton: true,

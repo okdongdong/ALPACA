@@ -12,8 +12,7 @@ const CustomContainer = styled('div')(({ theme }) => ({
   color: theme.palette.txt,
   borderRadius: 10,
   padding: theme.spacing(1),
-  marginTop: '3px',
-  marginBottom: '3px',
+  marginTop: '16px',
 }));
 
 const TInput = styled(Input)(({ theme }) => ({
@@ -39,6 +38,11 @@ function MainIntroductionContent() {
             <p>{userInfo.nickname}</p>
           </CustomContainer>
           <CustomContainer>
+            <h4>Boj ID</h4>
+            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+            <p>{userInfo.bojId}</p>
+          </CustomContainer>
+          <CustomContainer>
             <h4>자기소개</h4>
             <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
             <p>{userInfo.info}</p>
@@ -52,6 +56,12 @@ function MainIntroductionContent() {
           </div>
           <CustomContainer sx={{ marginBottom: '1vh' }}>
             <TInput sx={{ width: '100%' }} value={userInfo.nickname}></TInput>
+          </CustomContainer>
+          <div style={{ marginTop: '1vh' }}>
+            <Clabel htmlFor="">Boj ID</Clabel>
+          </div>
+          <CustomContainer sx={{ marginBottom: '1vh' }}>
+            <TInput sx={{ width: '100%' }} value={userInfo.bojId}></TInput>
           </CustomContainer>
           <div>
             <Clabel htmlFor="">자기소개</Clabel>
