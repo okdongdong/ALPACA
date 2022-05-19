@@ -54,20 +54,12 @@ public class CodeService {
         }
     }
 
-    public CodeCompileRes compileCode(String username, CodeCompileWithInputReq codeCompileWithInputReq) {
-        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
-
+    public CodeCompileRes compileCode(CodeCompileWithInputReq codeCompileWithInputReq) {
         return doodleCompile(codeCompileWithInputReq.getCode(), codeCompileWithInputReq.getLanguage(),
                 compileVersion(codeCompileWithInputReq.getLanguage()), codeCompileWithInputReq.getInput());
     }
 
-    public List<CodeCompileRes> compileBojCode(String username, CodeCompileReq codeCompileReq) {
-        if (Boolean.TRUE.equals(!userRepository.existsByUsername(username))) {
-            throw new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND);
-        }
-
+    public List<CodeCompileRes> compileBojCode(CodeCompileReq codeCompileReq) {
         Problem problem = problemRepository.findByProblemNumber(codeCompileReq.getProblemNumber()).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND));
 
@@ -88,11 +80,7 @@ public class CodeService {
         return codeCompileResList;
     }
 
-    public void createCode(String username, CodeReq codeReq) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
-
+    public void createCode(User user, CodeReq codeReq) {
         if (Boolean.TRUE.equals(!problemRepository.existsByProblemNumber(codeReq.getProblemNumber()))) {
             throw new NoSuchElementException(ExceptionUtil.PROBLEM_NOT_FOUND);
         }
@@ -110,11 +98,7 @@ public class CodeService {
                         .build());
     }
 
-    public CodeRes getCode(String username, Long studyId, Long userId, Long problemNumber) {
-        // 같은 스터디원인지 확인하는 검증코드 필요할 것 같음
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
-        );
+    public CodeRes getCode(User user, Long studyId, Long userId, Long problemNumber) {
         User member = userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException(ExceptionUtil.USER_NOT_FOUND)
         );

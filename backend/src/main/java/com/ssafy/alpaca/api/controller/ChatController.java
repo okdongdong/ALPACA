@@ -34,7 +34,6 @@ public class ChatController {
     @MessageMapping("/chat/study")
     // 처리를 마친 반환 값(message)를 반환할 곳
     public void createChat(ChatReq chatReq) {
-
         ChatRes chatRes = studyService.saveChat(chatReq);
         template.convertAndSend("/sub/chat/study/"+chatReq.getStudyId(),chatRes);
     }
