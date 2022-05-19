@@ -18,17 +18,13 @@ const CustomContainer = styled('div')(({ theme }) => ({
 
 const TInput = styled(Input)(({ theme }) => ({
   color: theme.palette.txt,
-  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
+  '&:before': { borderBottom: `0px solid ${theme.palette.txt}` },
   '&:after': {
     borderBottom: `2px solid ${theme.palette.accent}`,
   },
 }));
 
-const IntroductionDiv = styled('div')({
-  display: 'Grid',
-  justifyContent: 'center',
-  alignItems: 'flex-end',
-});
+const IntroductionDiv = styled(Stack)({ width: '100%', paddingRight: '16px' });
 
 function MainIntroductionContent() {
   const theme = useTheme();
@@ -49,8 +45,8 @@ function MainIntroductionContent() {
           </CustomContainer>
         </Stack>
       </BrowserView>
-      <MobileView>
-        <IntroductionDiv sx={{ marginRight: '10px' }}>
+      <MobileView style={{ width: '100%' }}>
+        <IntroductionDiv>
           <div style={{ marginTop: '1vh' }}>
             <Clabel htmlFor="">닉네임</Clabel>
           </div>

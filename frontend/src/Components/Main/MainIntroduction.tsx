@@ -7,10 +7,8 @@ const MainIntroductionDiv = styled(Stack)({
   paddingRight: 24,
 });
 
-const MMainIntroductionDiv = styled('div')({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
+const MMainIntroductionDiv = styled(Stack)({
+  paddingTop: 16,
 });
 
 function MainIntroduction() {
@@ -24,7 +22,7 @@ function MainIntroduction() {
       </BrowserView>
 
       <MobileView>
-        <MMainIntroductionDiv>
+        <MMainIntroductionDiv direction="row" alignItems="center">
           <MainIntroductionProfile />
           <MainIntroductionContent />
         </MMainIntroductionDiv>

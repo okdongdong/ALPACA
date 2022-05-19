@@ -72,9 +72,11 @@ function MainIntroductionProfile() {
             className={styles.profileimg}
             alt=""
             style={{
-              height: '12vh',
-              width: '12vh',
-              marginLeft: '35px',
+              height: '30vw',
+              width: '30vw',
+              maxHeight: '200px',
+              maxWidth: '200px',
+              marginLeft: '16px',
               backgroundColor: 'rgba(123,123,123,0.5)',
             }}
           />
