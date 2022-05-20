@@ -63,6 +63,8 @@
 
 - 아키텍처
 
+  ![image-20220520090734383](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20220520090734383.png)
+
 ### 설치
 
 #### 개발 환경
