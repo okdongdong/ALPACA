@@ -76,7 +76,7 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
         url: `/study/${id}/join`,
       });
 
-      console.log('joinStudy: ', res);
+      // console.log('joinStudy: ', res);
       dispatch(joinAndAddStudy(res.data));
 
       cAlert
@@ -218,7 +218,7 @@ function NotificationDialog({ anchorEl, setAnchorEl, setNewNotiCount }: Notifica
         method: 'get',
         url: '/notification',
       });
-      console.log(res.data);
+      // console.log(res.data);
       setNotificationList(res.data);
       setNewNotiCount(res.data.length);
     } catch (e) {}

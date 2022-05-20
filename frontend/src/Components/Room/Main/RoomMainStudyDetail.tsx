@@ -66,12 +66,12 @@ function RoomMainStudyDetail() {
         method: 'get',
         url: `/schedule/${scheduleId}`,
       });
-      console.log('getScheduleProblems: ', res);
+      // console.log('getScheduleProblems: ', res);
       dispatch(setStartedAt(new Date(res.data.startedAt)));
       dispatch(setFinishedAt(new Date(res.data.finishedAt)));
       dispatch(setProblemListRes(res.data.problemListRes));
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 
@@ -90,7 +90,7 @@ function RoomMainStudyDetail() {
         timer: 1500,
       });
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
       dispatch(setLoading(false));
       cAlert.fire({
         title: '삭제 실패!',
@@ -117,7 +117,7 @@ function RoomMainStudyDetail() {
   };
 
   useEffect(() => {
-    console.log('selectedDay: ', dateRange[selectedDayIdx]?.day);
+    // console.log('selectedDay: ', dateRange[selectedDayIdx]?.day);
     getScheduleProblems();
   }, [scheduleId]);
 

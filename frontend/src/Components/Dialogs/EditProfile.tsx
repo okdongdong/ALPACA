@@ -143,7 +143,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
   };
 
   const editProfileImg = async (profileData: string) => {
-    console.log(frm.get('file'));
+    // console.log(frm.get('file'));
     try {
       await customAxios({
         method: 'post',
@@ -201,11 +201,11 @@ function EditProfile({ onClose, open }: EditProfileProps) {
       resUserInfo.nickname = newNickname;
       resUserInfo.info = introduction;
       resUserInfo.preferredLanguage = stacks;
-      console.log('수정 테마', themeSelect);
+      // console.log('수정 테마', themeSelect);
       dispatch(setTheme(themeSelect));
       dispatch(setUserInfo(resUserInfo));
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -263,7 +263,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
     }
     dispatch(setLoading(true));
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'get',
         url: `/auth/duplicated/nickname`,
         params: { nickname: newNickname },
@@ -277,7 +277,7 @@ function EditProfile({ onClose, open }: EditProfileProps) {
         setNicknameMessage(e.response.data.message);
       } else {
         setNicknameMessage('이미 존재하는 닉네임 입니다.');
-        console.log(e);
+        // console.log(e);
       }
     }
 

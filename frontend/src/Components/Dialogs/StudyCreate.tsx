@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  Input,
-  DialogTitle,
-  FormHelperText,
-  FormControl,
-  Stack,
-  alpha,
-  Box,
-} from '@mui/material';
+import { Dialog, DialogTitle, Stack, alpha, Box } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import Grid from '@mui/material/Grid';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
 import Avatar from '@mui/material/Avatar';
 import CBtn from '../Commons/CBtn';
 import Chip from '@mui/material/Chip';
@@ -45,22 +31,6 @@ interface Member {
   profileImg?: string;
 }
 
-interface userData {
-  id: number;
-  nickname: string;
-  profileImg: string;
-}
-const Clabel = styled('label')(({ theme }) => ({
-  color: theme.palette.txt,
-}));
-const TInput = styled(Input)(({ theme }) => ({
-  color: theme.palette.txt,
-  '&:before': { borderBottom: `1px solid ${theme.palette.txt}` },
-  '&:after': {
-    borderBottom: `2px solid ${theme.palette.accent}`,
-  },
-}));
-
 const SearchResultBox = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.component,
   position: 'relative',
@@ -84,11 +54,6 @@ const CustomContent = styled(Stack)(({ theme }) => ({
   minWidth: isMobile ? 300 : 450,
 }));
 
-const MContent = styled('div')(({ theme }) => ({
-  backgroundColor: theme.palette.bg,
-  width: '100%',
-  height: '100%',
-}));
 const MemberArray = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'left',
@@ -108,10 +73,6 @@ const ListChip = styled('li')(({ theme }) => ({
 const CChip = styled(Chip)(({ theme }) => ({
   backgroundColor: theme.palette.main,
   color: theme.palette.txt,
-}));
-
-const Demo = styled('div')(({ theme }) => ({
-  backgroundColor: theme.palette.component,
 }));
 
 function StudyCreate(props: StudyCreateProps) {
@@ -217,7 +178,7 @@ function StudyCreate(props: StudyCreateProps) {
         showConfirmButton: false,
         timer: 1500,
       });
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 
@@ -231,9 +192,9 @@ function StudyCreate(props: StudyCreateProps) {
         params: { nickname: searchNickname },
       });
       setgetUser(res.data);
-      console.log('getUserList: ', res);
+      // console.log('getUserList: ', res);
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 

@@ -15,7 +15,7 @@ import {
   Badge,
 } from '@mui/material';
 import Logo_White from '../../Assets/Img/Logo_White.png';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { settingOn } from '../../Redux/roomReducer';
 import {
   Menu,
@@ -29,7 +29,6 @@ import {
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import useLogout from '../../Hooks/useLogout';
 import RoomMainIntroduction from '../Room/Main/RoomMainIntroduction';
-import MemberInvite from '../Dialogs/MemberInvite';
 import NotificationDialog from '../Dialogs/NotificationDialog';
 
 type iconObjType = {
@@ -70,20 +69,13 @@ const MBox = styled(Box)(({ theme }) => ({
   marginLeft: '5px',
   marginRight: '5px',
 }));
-const MBtn = styled(Button)(({ theme }) => ({
-  background: theme.palette.component,
-  color: theme.palette.txt,
-  marginTop: '24px',
-}));
 
 function NavBar() {
   const theme = useTheme();
   const params = useParams();
-  const { roomId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const myTheme = useSelector((state: any) => state.theme.themeType);
   const logout = useLogout();
 
   const [newNotiCount, setNewNotiCount] = useState<number>(0);
@@ -91,8 +83,6 @@ function NavBar() {
   const [leftOpen, setLeftOpen] = useState<boolean>(false);
   const [rightOpen, setRightOpen] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<'left' | 'right'>('right');
-
-  const [open, setOpen] = useState<boolean>(false);
 
   const clickHome = () => {
     if (params.roomId !== undefined) {

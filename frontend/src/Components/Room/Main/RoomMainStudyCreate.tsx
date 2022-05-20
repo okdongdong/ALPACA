@@ -1,5 +1,4 @@
-import { Divider, Stack } from '@mui/material';
-import { Box } from '@mui/system';
+import { Divider, Stack, Box, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -23,6 +22,7 @@ interface AddStudyData {
 
 function RoomMainStudyCreate() {
   const { roomId } = useParams();
+  const theme = useTheme();
   const cAlert = useAlert();
   const dispatch = useDispatch();
 
@@ -50,7 +50,7 @@ function RoomMainStudyCreate() {
         toSolveProblems: [],
       };
 
-      console.log(data);
+      // console.log(data);
 
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
@@ -61,7 +61,7 @@ function RoomMainStudyCreate() {
         url: '/schedule',
         data: data,
       });
-      console.log('added:', res);
+      // console.log('added:', res);
 
       const idx = selectedDayIdx;
       const schedule = {
@@ -87,7 +87,7 @@ function RoomMainStudyCreate() {
         showConfirmButton: false,
         timer: 1500,
       });
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 
@@ -106,18 +106,18 @@ function RoomMainStudyCreate() {
         toSolveProblems: [],
       };
 
-      console.log(data);
+      // console.log(data);
 
       problemListRes.forEach((problem: ProblemRes) => {
         data.toSolveProblems.push(problem.problemNumber);
       });
 
-      const res = await customAxios({
+      await customAxios({
         method: 'put',
         url: `/schedule/${scheduleId}`,
         data: data,
       });
-      console.log('updated:', res);
+      // console.log('updated:', res);
       dispatch(setIsEdit(false));
       cAlert.fire({
         title: '변경 성공!',
@@ -134,7 +134,7 @@ function RoomMainStudyCreate() {
         showConfirmButton: false,
         timer: 1500,
       });
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 
@@ -163,8 +163,16 @@ function RoomMainStudyCreate() {
           <RoomMainStudyCreateTime />
           <Divider variant="middle" />
         </Stack>
-        <div
-          style={{ width: '100%', height: '63vh', flexGrow: 1, position: 'relative' }}
+        <Box
+          sx={{
+            width: '100%',
+            height: '63vh',
+            flexGrow: 1,
+            position: 'relative',
+            [theme.breakpoints.down('lg')]: {
+              height: '20vh',
+            },
+          }}
           className="scroll-box">
           <Box
             sx={{ padding: 2 }}
@@ -181,7 +189,7 @@ function RoomMainStudyCreate() {
               setProblemList={setSearchProblemList}
             />
           </Box>
-        </div>
+        </Box>
       </div>
     </RoomMainComponentContainer>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RoomStudyLiveCamListItem from './RoomStudyLiveCamListItem';
 import UserModel from './user-model';
-import { Grid } from '@mui/material';
 type usersPropsType = {
   users: UserModel[];
 };

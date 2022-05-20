@@ -163,7 +163,7 @@ function StudyLive() {
         subscriber?.on('streamPlaying', (e: any) => {
           checkSomeoneShareScreen();
         });
-        console.log(event);
+        // console.log(event);
         newUser.setAudioActive(event.stream.audioActive);
         newUser.setVideoActive(event.stream.videoActive);
         newUser.setStreamManager(subscriber);

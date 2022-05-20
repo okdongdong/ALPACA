@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { Client } from '@stomp/stompjs';
 import useReissue from '../../../Hooks/useReissue';
-import CBtn from '../../Commons/CBtn';
 
 interface ReceiveMessage {
   userId: number;
@@ -73,7 +72,7 @@ function RoomMainChat() {
   const [isGetPrevChat, setIsGetPrevChat] = useState<boolean>(false);
 
   const connect = () => {
-    console.log('-----------소켓연결시도-----------');
+    // console.log('-----------소켓연결시도-----------');
     const token = localStorage.getItem('accessToken') || '';
     const header = {
       Authorization: token,
@@ -83,40 +82,40 @@ function RoomMainChat() {
       brokerURL: `${process.env.REACT_APP_BASE_URL?.replace('http', 'ws')}/api/v1/ch/websocket`, // 웹소켓 서버로 직접 접속
       connectHeaders: header,
       debug: function (str: any) {
-        console.log(str);
+        // console.log(str);
       },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: () => {
-        console.log('-----------연결성공!!-----------');
+        // console.log('-----------연결성공!!-----------');
         subscribe();
         setIsConnected(true);
         setConnectAttemptCnt(0);
         scrollRef?.current?.scrollTo(0, 987654321);
       },
       onStompError: (frame: any) => {
-        console.log('-----------연결실패!!-----------');
+        // console.log('-----------연결실패!!-----------');
         console.error(frame);
         reissue();
         client?.deactivate();
-        console.log('retry count: ', connectAttemptCnt);
+        // console.log('retry count: ', connectAttemptCnt);
         setIsConnected(false);
         setConnectAttemptCnt((prev) => prev + 1);
         if (connectAttemptCnt < 20) connect();
       },
       onWebSocketError: (event: any) => {
-        console.log('-----------websocket error!!-----------');
-        console.log(event);
-        console.log('retry count: ', connectAttemptCnt);
+        // console.log('-----------websocket error!!-----------');
+        // console.log(event);
+        // console.log('retry count: ', connectAttemptCnt);
         setIsConnected(false);
         setConnectAttemptCnt((prev) => prev + 1);
         if (connectAttemptCnt > 20) client?.deactivate();
       },
       onWebSocketClose: (event: any) => {
-        console.log('-----------websocket close!!-----------');
-        console.log(event);
-        console.log('retry count: ', connectAttemptCnt);
+        // console.log('-----------websocket close!!-----------');
+        // console.log(event);
+        // console.log('retry count: ', connectAttemptCnt);
         setIsConnected(false);
         setConnectAttemptCnt((prev) => prev + 1);
         if (connectAttemptCnt > 20) client?.deactivate();
@@ -124,16 +123,16 @@ function RoomMainChat() {
     });
 
     client.activate();
-    console.log('client: ', client);
+    // console.log('client: ', client);
   };
 
   const disconnect = () => {
-    console.log('--------------disconnect', client);
+    // console.log('--------------disconnect', client);
     client?.deactivate();
   };
 
   const subscribe = () => {
-    console.log('--------------subscribe', client);
+    // console.log('--------------subscribe', client);
     client?.subscribe(`/sub/chat/study/${roomId}`, (res: any) => {
       const newMessage = JSON.parse(res.body);
       setChatList((prev) => [...prev, newMessage]);
@@ -144,7 +143,7 @@ function RoomMainChat() {
     if (!message) return;
     if (!client?.connected) return;
 
-    console.log('Send message:' + message);
+    // console.log('Send message:' + message);
     const temp = { userId, studyId: roomId, content: message };
     client?.publish({
       destination: '/pub/chat/study',
@@ -154,20 +153,20 @@ function RoomMainChat() {
     setMessage('');
   };
 
-  const reconnectHandler = () => {
-    if (client?.active) return;
+  // const reconnectHandler = () => {
+  //   if (client?.active) return;
 
-    connect();
-  };
+  //   connect();
+  // };
 
   const onSendMessageHandler = () => {
     setIsGetPrevChat(false);
     sendMessage();
-    console.log('scrollRef: ', scrollRef);
+    // console.log('scrollRef: ', scrollRef);
   };
 
   const getPrevChat = async () => {
-    console.log('isFinished: ', isFinished, ' / isLoading: ', isLoading, ' / offsetId: ', offsetId);
+    // console.log('isFinished: ', isFinished, ' / isLoading: ', isLoading, ' / offsetId: ', offsetId);
     if (isFinished || isLoading) return;
     if (!offsetId) return;
     setIsLoading(true);
@@ -183,24 +182,24 @@ function RoomMainChat() {
       if (res.data.last) {
         setIsFinished(true);
       }
-      console.log('scrollRef: ', scrollRef);
+      // console.log('scrollRef: ', scrollRef);
       const nowScrollHeight = scrollRef.current?.scrollHeight;
-      console.log('scrollHeight: ', nowScrollHeight, chatHeight);
+      // console.log('scrollHeight: ', nowScrollHeight, chatHeight);
       if (!!nowScrollHeight) {
         scrollRef.current.scrollTo(0, nowScrollHeight - chatHeight);
       }
       setChatHeight(nowScrollHeight || 1000);
-      console.log('page: ', page, ' / offsetId: ', offsetId);
-      console.log(res);
+      // console.log('page: ', page, ' / offsetId: ', offsetId);
+      // console.log(res);
     } catch (e: any) {
       setIsError(true);
-      console.log(e);
+      // console.log(e);
     }
     setIsLoading(false);
   };
 
   const getInitChat = async () => {
-    console.log('=================채팅조회');
+    // console.log('=================채팅조회');
     await getPrevChat();
     scrollRef?.current?.scrollTo(0, 987654321);
   };
@@ -225,7 +224,7 @@ function RoomMainChat() {
     if (isLoading || isFinished || !offsetId) return;
     const target = entries[0];
     if (target.isIntersecting) {
-      console.log('is InterSecting');
+      // console.log('is InterSecting');
       getPrevChat();
     }
   };
