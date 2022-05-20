@@ -71,7 +71,8 @@
     "studyId": Int64,
     "studyTitle": String,
     "scheduleId": Int64,
-    "scheduleStartedAt": Date
+    "scheduleStartedAt": Date,
+    "isInvitation": Boolean
 }
 ```
 

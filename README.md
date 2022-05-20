@@ -112,7 +112,13 @@
 
 - [Redis](https://github.com/microsoftarchive/redis/releases) 3.0.504 설치
 
-- frontend
+- frontend (`node 16.13.2` / `react: 18.0.0`)
+
+  > node 16.13.2
+  >
+  > react 18.0.0
+  >
+  > visual studio code 1.63.2
 
   ```bash
   # root/frontend
@@ -121,6 +127,12 @@
   ```
 
 - backend
+
+  > OpenJDK 11.0.13
+  >
+  > Spring-boot 2.6.6
+  >
+  > IntelliJ IDEA 2021.3.2
 
   ```
   build by gradle

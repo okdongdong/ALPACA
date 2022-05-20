@@ -1,20 +1,20 @@
 # 배포 환경
 
-#### 계정 정보
+#### 계정 및 버전 정보
 
-> Jenkins
+> **Jenkins**
 >
 > username : alpaca
 >
 > password : didaudrbs
 
-> MySQL
+> **MySQL**
 >
 > username : alpaca
 >
 > password : didaudrbs
 
-> MongoDB
+> **MongoDB**
 >
 > Authentication Method : Username/Password
 >
@@ -25,6 +25,14 @@
 > Authentication Database : alpaca
 >
 > Authentication Mechanism : SCRAM-SHA-1
+
+> **Frontend**
+>
+> `node 16.3.0` `react latest(18.0.0)`
+>
+> **Backend**
+>
+> `Openjdk 11.0.13` `spring-boot 2.6.6`
 
 ### Docker
 
@@ -77,10 +85,18 @@ $ docker run
 	-v /var/run/docker.sock:/var/run/docker.sock
 	jenkins/jenkins:lts
 
-$ docker exec -it jenkins(컨테이너 이름) bash
+$ docker exec -it jenkins-with-docker bash
 ```
 
 ##### jenkins docker-compose 설치
+
+```sh
+$ docker exec -it jenkins bash
+
+$ curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+$ chmod +x /usr/local/bin/docker-compose
+```
 
 
 
@@ -113,6 +129,8 @@ CREATE user `alpaca`@`%` IDENTIFIED BY 'didaudrbs';
 GRANT ALL PRIVILEGES ON `alpaca`.* TO `alpaca`@`%`
 FLUSH PRIVILEGES
 ```
+
+
 
 ### MongoDB
 
@@ -194,6 +212,8 @@ $ docker run -d --name redis-docker \
 	redis:alpine --appendonly yes
 ```
 
+
+
 ### Openvidu
 
 ```sh
@@ -228,6 +248,9 @@ $ ls
 crontab -l
 crontab -e
 systemctl status cron
-0 3 * * * python3 /home/ubuntu/updated_boj.py
+0 3 * * * python3 /home/ubuntu/server_update.py
 ```
 
+- `problem_crowl.py` : [BOJ](https://www.acmicpc.net/)의 문제를 가져오는 크롤링 파일
+- `class_crowl.py` : (solved.ac)[https://solved.ac/]에서 제공하는 class 레벨을 가져오는 크롤링 파일
+- `server_update.py` : 추가되는 문제를 지속적으로 추적하여 가져오는 파일
