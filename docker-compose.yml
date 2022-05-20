@@ -1,0 +1,27 @@
+version: '3'
+
+services: 
+  frontend:
+    image: frontend
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" 
+      - "443:443"
+    volumes:
+      - /home/ubuntu/docker-volume/ssl:/var/www/html
+    container_name: "frontend"
+  
+  backend:
+    image: backend
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - /home/ubuntu/docker-volume/ssl:/root
+    container_name: "backend"
+
+
