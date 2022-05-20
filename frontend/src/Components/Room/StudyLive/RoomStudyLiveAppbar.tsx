@@ -50,7 +50,7 @@ function RoomStudyLiveAppbar({ exitStudyLive }: LiveAppbarType) {
     try {
       const res = await customAxios({
         method: 'get',
-        url: `schedule/${roomId}/today`,
+        url: `/schedule/${roomId}/today`,
         params: {
           offset: new Date().getTimezoneOffset(),
         },
