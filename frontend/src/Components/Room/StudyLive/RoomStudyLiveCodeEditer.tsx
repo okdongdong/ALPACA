@@ -140,7 +140,7 @@ function RoomStudyLiveCodeEditer({ openYjsDocs, setOpenYjsDocs, width }: codeEdi
     );
 
     // provider.awareness.on('update', (e) => {
-    //   console.log(e);
+    // console.log(e);
     // });
   };
 

@@ -6,6 +6,6 @@ app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname, 'index.html'));
 });
 function handleListenLog() {
-  console.log('Server Starting...');
+  // console.log('Server Starting...');
 }
 app.listen(3000, handleListenLog);

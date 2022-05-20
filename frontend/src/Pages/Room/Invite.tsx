@@ -42,9 +42,9 @@ function Invite() {
         params: { inviteCode },
       });
       setInviteInfo(res.data);
-      console.log(res);
+      // console.log(res);
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
 
     dispatch(setLoading(false));
@@ -59,17 +59,17 @@ function Invite() {
         url: '/study/inviteCode',
         data: { inviteCode },
       });
-      console.log(res);
+      // console.log(res);
       navigate('/');
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
 
     dispatch(setLoading(false));
   };
 
   useEffect(() => {
-    console.log(pathname);
+    // console.log(pathname);
     getInviteInfo();
   }, []);
 

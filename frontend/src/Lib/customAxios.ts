@@ -47,7 +47,7 @@ const failureResponse = async (error: any) => {
     error.response.data.message === '토큰이 만료되었습니다.' &&
     !originalRequest._retry
   ) {
-    console.log('-----------Reissue');
+    // console.log('-----------Reissue');
 
     originalRequest._retry = true;
     return unauthorizedError(error);

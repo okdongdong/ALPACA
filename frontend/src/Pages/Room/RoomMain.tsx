@@ -96,7 +96,7 @@ function RoomMain() {
         },
       });
 
-      console.log('roomInfo: ', res);
+      // console.log('roomInfo: ', res);
       dispatch(setRoomInfo(res.data));
 
       if (res.data.members.some((member: Member) => member.userId === userId && member.roomMaker)) {
@@ -118,10 +118,10 @@ function RoomMain() {
         tempDict[member.userId] = { nickname: member.nickname, profileImg: member.profileImg };
       });
       dispatch(setMemberDict(tempDict));
-      console.log('userDict:', tempDict);
+      // console.log('userDict:', tempDict);
     } catch (e: any) {
-      console.log(e.response);
-      console.log(e);
+      // console.log(e.response);
+      // console.log(e);
     }
   };
 

@@ -352,7 +352,7 @@ function ProblemManage() {
       const rowdata: GridRowsProp = res.data;
       setData(rowdata);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -381,7 +381,7 @@ function ProblemManage() {
       });
       problemsData();
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 

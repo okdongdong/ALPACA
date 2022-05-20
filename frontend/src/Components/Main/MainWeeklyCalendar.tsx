@@ -3,7 +3,7 @@ import { Grid, IconButton, Stack, styled, useTheme, Popover } from '@mui/materia
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { customAxios } from '../../Lib/customAxios';
 import { isMobile } from 'react-device-detect';
 import { dateToStringTimeSimple } from '../../Lib/dateToString';

@@ -1,4 +1,4 @@
-import { Stack, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,7 +6,6 @@ import useAlert from '../../../Hooks/useAlert';
 import { customAxios } from '../../../Lib/customAxios';
 import { deleteStudyUserInfo } from '../../../Redux/accountReducer';
 import { setLoading } from '../../../Redux/commonReducer';
-import { Member } from '../../../Redux/roomReducer';
 import CBtn from '../../Commons/CBtn';
 
 interface RoomMainSettingProps {
@@ -21,8 +20,6 @@ function RoomMainSetting(props: RoomMainSettingProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const userId = useSelector((state: any) => state.account.userId);
-  const members = useSelector((state: any) => state.room.members);
   const isRoomMaker = useSelector((state: any) => state.room.isRoomMaker);
 
   const deleteStudy = async () => {
@@ -33,7 +30,7 @@ function RoomMainSetting(props: RoomMainSettingProps) {
       dispatch(deleteStudyUserInfo(roomId));
       if (res.status === 200) return true;
     } catch (e: any) {
-      console.log('error: ', e.response);
+      // console.log('error: ', e.response);
     }
 
     dispatch(setLoading(false));
@@ -48,7 +45,7 @@ function RoomMainSetting(props: RoomMainSettingProps) {
       dispatch(deleteStudyUserInfo(roomId));
       if (res.status === 200) return true;
     } catch (e: any) {
-      console.log('error: ', e.response);
+      // console.log('error: ', e.response);
     }
     dispatch(setLoading(false));
     return false;
