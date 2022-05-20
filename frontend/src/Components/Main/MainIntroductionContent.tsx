@@ -26,7 +26,6 @@ const TInput = styled(Input)(({ theme }) => ({
 const IntroductionDiv = styled(Stack)({ width: '100%', paddingRight: '16px' });
 
 function MainIntroductionContent() {
-  const theme = useTheme();
   const userInfo = useSelector((state: any) => state.account);
   return (
     <>

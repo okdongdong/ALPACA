@@ -5,7 +5,7 @@ import useAlert from './useAlert';
 
 function useLogout() {
   const dispatch = useDispatch();
-  const cAlert = useAlert();
+  // const cAlert = useAlert();
 
   const clickLogout = async () => {
     try {

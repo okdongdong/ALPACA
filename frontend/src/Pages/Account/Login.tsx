@@ -50,7 +50,7 @@ function Login(props: any) {
     }, 8500);
     try {
       const res = await customAxios({ method: 'post', url: `/auth/login`, data: userInfo });
-      console.log('loginRes: ', res);
+      // console.log('loginRes: ', res);
 
       // 토큰 저장
       localStorage.setItem('accessToken', res.data.grantType + res.data.accessToken);
@@ -68,7 +68,7 @@ function Login(props: any) {
         isLogin: true,
       };
 
-      console.log(resUserInfo);
+      // console.log(resUserInfo);
 
       await cAlert.fire({
         title: '로그인 성공!',
@@ -100,7 +100,7 @@ function Login(props: any) {
         });
       }, 1000);
 
-      console.log('loginError:', e.response);
+      // console.log('loginError:', e.response);
     }
   };
 

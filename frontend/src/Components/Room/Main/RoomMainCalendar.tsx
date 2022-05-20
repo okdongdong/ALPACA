@@ -79,7 +79,7 @@ function RoomMainCalendar() {
         url: `/schedule/${roomId}/span`,
         params: { month: nowDay.getMonth() + 1, year: nowDay.getFullYear() },
       });
-      console.log('change month: ', res);
+      // console.log('change month: ', res);
       const tempSchedules: Schedule[] = [];
       res.data.forEach((schedule: Schedule) => {
         const startedAt = new Date(schedule.startedAt);
@@ -90,7 +90,7 @@ function RoomMainCalendar() {
 
       dispatch(setSchedules([...tempSchedules]));
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 

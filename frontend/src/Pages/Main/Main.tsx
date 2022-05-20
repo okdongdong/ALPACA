@@ -19,11 +19,11 @@ function Main() {
       <BrowserView style={{ height: '100%', width: '100%', paddingTop: 40 }}>
         <CBox>
           <Grid container sx={{ width: '100%' }}>
-            <Grid xs={12} lg={1.5}></Grid>
-            <Grid xs={12} lg={2} sx={{ width: '100%', pt: 5 }}>
+            <Grid item xs={12} lg={1.5}></Grid>
+            <Grid item xs={12} lg={2} sx={{ width: '100%', pt: 5 }}>
               <MainIntroduction />
             </Grid>
-            <Grid xs={12} lg={6} sx={{ height: '100%', width: '100%', minWidth: 700 }}>
+            <Grid item xs={12} lg={6} sx={{ height: '100%', width: '100%', minWidth: 700 }}>
               <Stack spacing={3} justifyContent="center">
                 <MainWeeklyCalendar />
                 <MainRecommendProblem />

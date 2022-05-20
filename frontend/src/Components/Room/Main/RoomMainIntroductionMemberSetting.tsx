@@ -60,7 +60,7 @@ function RoomMainIntroductionMemberSetting({
       dispatch(changeRoomMaker({ prevIdx, nextIdx }));
       if (res.status === 200) return true;
     } catch (e: any) {
-      console.log('error: ', e.response);
+      // console.log('error: ', e.response);
       setErrorMessage(e.response.data.message);
     }
     dispatch(setLoading(false));
@@ -81,7 +81,7 @@ function RoomMainIntroductionMemberSetting({
       dispatch(setLoading(false));
       if (res.status === 200) return true;
     } catch (e: any) {
-      console.log('error: ', e.response);
+      // console.log('error: ', e.response);
       setErrorMessage(e.response.data.message);
     }
     dispatch(setLoading(false));
