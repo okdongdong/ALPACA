@@ -72,7 +72,10 @@ function RoomMainStudyDetailProblemItem({
               {`문제 보러 가기 >`}
             </CBtn>
             {isMobile || (
-              <CBtn height="100%" onClick={onClickHandler} backgroundColor="rgba(0,0,0,0)">
+              <CBtn
+                height="100%"
+                onClick={() => navigate(`/compile/${problemId}`)}
+                backgroundColor="rgba(0,0,0,0)">
                 {`코드 제출하러 가기 >`}
               </CBtn>
             )}
