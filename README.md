@@ -5,6 +5,7 @@
 ### 소개
 
 알고리즘 실력 향상을 위한 스터디 서비스
+<br>
 스터디 일정 관리, 스터디 문제 관리, 공동 문서편집 기능을 통한 소스코드 첨삭 기능을 추가한 알고리즘 스터디 플랫폼
 
 1. solved.ac (https://solvedac.github.io/unofficial-documentation/#/) 비공식 문서 api 사용
@@ -19,11 +20,13 @@
   ![코드리뷰](https://lab.ssafy.com/s06-final/S06P31E106/uploads/d8e82c1b2b78f7a0c0d26ec31a01ea06/코드리뷰.gif)
 
 <br>
+
 - 화상스터디 & 화면공유 & 타이머
 
 ![스터디_라이브](https://lab.ssafy.com/s06-final/S06P31E106/uploads/61454321500b63df2e564e6201f85e65/스터디_라이브.gif)
 
 <br>
+
 - 코드 컴파일
 
 ![컴파일](https://lab.ssafy.com/s06-final/S06P31E106/uploads/d0aff504437dd5c0f4022a78b31d5593/컴파일.gif)
@@ -35,21 +38,25 @@
   ![전체_스터디_주_단위_관리](https://lab.ssafy.com/s06-final/S06P31E106/uploads/c70892357bf25184296d982613063f7c/전체_스터디_주_단위_관리.gif)
 
 <br>
+
 - 스터디 일정 관리
 
 ![월별_스터디_일정_관리](https://lab.ssafy.com/s06-final/S06P31E106/uploads/b00e03589bffffdc3b8b60bda84cca36/월별_스터디_일정_관리.gif)
 
 <br>
+
 - 오늘의 문제 추천
 
 ![데일리_문제추천](https://lab.ssafy.com/s06-final/S06P31E106/uploads/ec97ba9e3629a211c971a2d2f6e75985/데일리_문제추천.gif)
 
 <br>
+
 - 채팅
 
 ![채팅](https://lab.ssafy.com/s06-final/S06P31E106/uploads/8b79d21b8104aac2710a9b7b3c35972f/채팅.gif)
 
 <br>
+
 - 문제 관리 및 스터디 멤버의 코드확인
 
 ![문제관리](https://lab.ssafy.com/s06-final/S06P31E106/uploads/23a7149f43c5e063dee5d81a0ad39403/문제관리.gif)
@@ -63,6 +70,7 @@
   ![Spring](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=SpringBoot&logoColor=ffffff) ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=flat&logo=Gradle&logoColor=white) ![mysql](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=ffffff) ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white&style=flat-square) ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white&style=flat-square) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white) ![Jenkins](https://img.shields.io/badge/jenkins-%232C5263.svg?style=flat&logo=jenkins&logoColor=white)
 
 <br>
+
 - 아키텍처
 
 ![아키텍처](https://lab.ssafy.com/s06-final/S06P31E106/uploads/e36f6c7dd069f8176bb64dbf3733bdf1/아키텍처.jpg)
