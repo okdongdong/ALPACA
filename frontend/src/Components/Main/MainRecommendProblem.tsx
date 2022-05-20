@@ -112,7 +112,7 @@ function MainRecommendProblem() {
         method: 'get',
         url: '/problem/recommend',
       });
-      console.log(res);
+      // console.log(res);
       setRecommendProblems(
         res.data.map((problem: any) => {
           return {
@@ -125,7 +125,7 @@ function MainRecommendProblem() {
         }),
       );
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 

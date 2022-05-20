@@ -71,7 +71,7 @@ function Signup() {
         setUsernameMessage(e.response.data.message);
       } else {
         setUsernameMessage('아이디 중복검사에 실패했습니다.');
-        console.log(e);
+        // console.log(e);
       }
     }
 
@@ -106,7 +106,7 @@ function Signup() {
         setNicknameMessage(e.response.data.message);
       } else {
         setNicknameMessage('닉네임 중복검사에 실패했습니다.');
-        console.log(e);
+        // console.log(e);
       }
     }
 

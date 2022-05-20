@@ -63,7 +63,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
       const resInfoList: BojUserInfo[] = [];
 
       // 필요한 정보만 추출
-      res.data.items.map((item: any) => {
+      res.data.items.forEach((item: any) => {
         const userInfo: BojUserInfo = {
           bojId: item.handle,
           tier: item.tier,
@@ -76,7 +76,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
 
       setIdList(resInfoList);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
 
     dispatch(setLoading(false));
@@ -92,12 +92,12 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
 
     // 중복 x
     try {
-      const res = await customAxios({
+      await customAxios({
         method: 'get',
         url: '/auth/duplicated/bojId',
         params: { bojId },
       });
-      console.log(res);
+      // console.log(res);
       dispatch(setLoading(false));
 
       const result = await cAlert.fire({
@@ -117,7 +117,7 @@ function BojIdSearch({ open, setOpen, setBojId }: BojIdSearchProps) {
 
       // 중복 o
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
       dispatch(setLoading(false));
       if (e.response.status === 409) {
         const result = await cAlert.fire({

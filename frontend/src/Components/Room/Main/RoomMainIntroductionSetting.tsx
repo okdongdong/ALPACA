@@ -35,7 +35,7 @@ function RoomMainIntroductionSetting() {
         url: `/study/${roomId}`,
         data: { title, info },
       });
-      console.log('Edit: ', res);
+      // console.log('Edit: ', res);
       dispatch(setRoomIntroduction({ title, info }));
       cAlert.fire({
         title: '수정 성공!',

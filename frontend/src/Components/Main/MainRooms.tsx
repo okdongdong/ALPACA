@@ -1,24 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Grid, Pagination, Stack, IconButton } from '@mui/material';
+import { Box, Grid, Pagination, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MainRoomsDetail from './MainRoomsDetail';
 import StudyCreate from '../Dialogs/StudyCreate';
 import { styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserView, isMobile, MobileView } from 'react-device-detect';
+import { BrowserView, MobileView } from 'react-device-detect';
 import { customAxios } from '../../Lib/customAxios';
 import useAlert from '../../Hooks/useAlert';
 import { setStudies } from '../../Redux/accountReducer';
 import CBtn from '../Commons/CBtn';
-
-const CIconButton = styled(IconButton)(({ theme }) => ({
-  margin: '10px',
-  padding: 2.5,
-  borderRadius: '100px',
-  background: theme.palette.main,
-  height: 32,
-  width: 32,
-}));
 
 const StudiesBox = styled('div')(({ theme }) => ({
   margin: theme.spacing(1, 0),
@@ -27,12 +18,6 @@ const StudiesBox = styled('div')(({ theme }) => ({
   color: theme.palette.txt,
   height: 'fit-content',
   width: '100%',
-}));
-
-const MIconButton = styled('div')(({ theme }) => ({
-  display: 'inline-block',
-  background: 'none',
-  marginLeft: 'auto',
 }));
 
 const PER_PAGE = 4;
@@ -81,9 +66,9 @@ function MainRooms() {
       });
       dispatch(setStudies(res.data));
 
-      console.log('getStudiesInfo: ', res);
+      // console.log('getStudiesInfo: ', res);
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
       cAlert.fire({
         title: '스터디 조회 실패!',
         text: e.response.data.message || '스터디 정보를 불러오는데 실패했습니다..',
@@ -150,7 +135,7 @@ function MainRooms() {
             )}
             <Grid container sx={{ p: 1, width: '100%' }}>
               {studies?.slice((page - 1) * 4, page * 4).map((study: any, i: number) => (
-                <Grid item xs={3}>
+                <Grid item xs={3} key={i}>
                   <MainRoomsDetail detail={study} page={page} callback={pinData} />
                 </Grid>
               ))}

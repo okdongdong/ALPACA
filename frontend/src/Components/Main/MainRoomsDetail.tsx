@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux';
 import { setStudies } from '../../Redux/accountReducer';
 import { useNavigate } from 'react-router-dom';
 import { BrowserView, MobileView } from 'react-device-detect';
-import CProfile from '../Commons/CProfile';
 
 export interface StudyCreateProps {
   detail: any;
@@ -106,7 +105,7 @@ function MainRoomsDetail(props: StudyCreateProps) {
       }
       dispatch(setStudies(temp));
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 

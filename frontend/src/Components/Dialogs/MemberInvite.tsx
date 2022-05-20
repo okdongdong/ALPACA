@@ -117,7 +117,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         timer: 1500,
       });
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -130,10 +130,10 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         method: 'get',
         url: `/study/${roomId}/inviteCode`,
       });
-      console.log('inviteCode: ', res.data.message);
+      // console.log('inviteCode: ', res.data.message);
       setInviteCode(res.data.message);
     } catch (e: any) {
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -144,7 +144,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
       navigator.clipboard
         .writeText(`${process.env.REACT_APP_BASE_URL}/invite/${inviteCode}`)
         .then(() => {
-          console.log('초대코드를 복사하는데 성공했습니다.');
+          // console.log('초대코드를 복사하는데 성공했습니다.');
           cAlert.fire({
             title: '복사 성공',
             text: '초대코드를 복사하는데 성공했습니다.',
@@ -155,7 +155,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         })
 
         .catch(() => {
-          console.log('초대코드를 복사하는데 실패했습니다.');
+          // console.log('초대코드를 복사하는데 실패했습니다.');
           cAlert.fire({
             title: '복사 실패',
             text: '잠시 후 다시 시도해주세요..',
@@ -186,7 +186,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
         url: `/user/search`,
         params: { nickname },
       });
-      console.log(res);
+      // console.log(res);
       const tempList: UserInfo[] = [];
 
       // 검색결과 중 선택된 유저리스트에 이미 있는 유저는 추가하지 않음
@@ -202,7 +202,7 @@ function MemberInvite({ roomId, open, setOpen }: MemberInviteProps) {
 
       setUserList(tempList);
     } catch (e: any) {
-      console.log(e);
+      // console.log(e);
     }
 
     dispatch(setLoading(false));

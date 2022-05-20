@@ -72,14 +72,14 @@ function RoomMainStudyCreateSearch({
     });
     if (tierValue > 0) query += ` *${tierValue}..${tierValue + 4}`;
 
-    console.log(query);
+    // console.log(query);
     try {
       const res = await solvedAcAxios({
         method: 'get',
         url: '/search/problem',
         params: { query },
       });
-      console.log(res);
+      // console.log(res);
 
       const resProblems: ProblemRes[] = [];
 
@@ -98,7 +98,7 @@ function RoomMainStudyCreateSearch({
       setIsFilter(false);
       setProblemList(resProblems);
     } catch (e: any) {
-      console.log(e.response);
+      // console.log(e.response);
     }
   };
 
