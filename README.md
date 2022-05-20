@@ -63,11 +63,11 @@
 
 - 아키텍처
 
-  ![image-20220520090734383](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20220520090734383.png)
+  ![아키텍처](https://lab.ssafy.com/s06-final/S06P31E106/uploads/e36f6c7dd069f8176bb64dbf3733bdf1/아키텍처.jpg)
 
 ### 코드 정적분석 결과
 
-![image-20220520091426534](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20220520091426534.png)
+![sonarqube](https://lab.ssafy.com/s06-final/S06P31E106/uploads/26ab620b7841693950fdf6e792b5eb47/sonarqube.jpg)
 
 ### 설치
 
