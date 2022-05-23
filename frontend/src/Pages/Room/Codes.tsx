@@ -73,6 +73,7 @@ function Codes() {
     if (!problemId) return;
 
     try {
+      console.log(studyId);
       const params = studyId
         ? {
             problemNumber: parseInt(problemId),
