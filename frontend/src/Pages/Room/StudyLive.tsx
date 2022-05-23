@@ -275,8 +275,8 @@ function StudyLive() {
       '',
       {
         videoSource: videoSource,
-        publishAudio: publisher.isAudioActive(),
-        publishVideo: publisher.isVideoActive(),
+        publishAudio: false,
+        publishVideo: true,
         mirror: false,
       },
       // (error: any) => {
