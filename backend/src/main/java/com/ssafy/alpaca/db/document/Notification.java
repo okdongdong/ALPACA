@@ -40,4 +40,8 @@ public class Notification {
     @Field(targetType = FieldType.BOOLEAN)
     private Boolean isInvitation;
 
+    @Builder.Default
+    @Field(targetType = FieldType.DATE_TIME)
+    private LocalDateTime createdAt = LocalDateTime.now().plusHours(9);
+
 }

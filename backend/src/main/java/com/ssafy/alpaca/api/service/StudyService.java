@@ -203,7 +203,7 @@ public class StudyService {
     public List<ProblemListRes> getStudyProblem(User user, Long id){
         Study study = getStudyById(id);
         List<MyStudy> myStudy = myStudyRepository.findAllByStudy(study);
-        List<Schedule> scheduleList = scheduleRepository.findAllByStudyId(id);
+        List<Schedule> scheduleList = scheduleRepository.findAllByStudyIdOrderByStartedAtDesc(id);
         List<ToSolveProblem> problemList = new ArrayList<>();
         for(Schedule schedule:scheduleList){
             problemList.addAll(schedule.getToSolveProblems());
