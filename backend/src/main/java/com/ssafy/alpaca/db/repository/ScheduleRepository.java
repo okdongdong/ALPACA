@@ -17,7 +17,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtAsc(Study study, OffsetDateTime a, OffsetDateTime b);
 
     @EntityGraph(attributePaths = "toSolveProblems")
-    List<Schedule> findAllByStudyId(Long studyId);
+    List<Schedule> findAllByStudyIdOrderByStartedAtDesc(Long studyId);
 
     Optional<Schedule> findByStudyAndStartedAtGreaterThanEqualAndStartedAtLessThan(Study study, OffsetDateTime a, OffsetDateTime b);
 
