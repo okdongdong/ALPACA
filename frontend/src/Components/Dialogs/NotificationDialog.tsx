@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Popover, styled, Paper, Divider, useTheme, Button, IconButton } from '@mui/material';
+import {
+  Popover,
+  styled,
+  Paper,
+  Divider,
+  useTheme,
+  Button,
+  IconButton,
+  alpha,
+} from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { customAxios } from '../../Lib/customAxios';
@@ -7,6 +16,11 @@ import { isMobile } from 'react-device-detect';
 import useAlert from '../../Hooks/useAlert';
 import { useDispatch } from 'react-redux';
 import { joinAndAddStudy } from '../../Redux/accountReducer';
+import dateToString, {
+  dateToStringDate,
+  dateToStringTime,
+  dateToStringTimeSimple,
+} from '../../Lib/dateToString';
 
 type NotificationDialogType = {
   anchorEl: HTMLElement | null;
@@ -24,6 +38,7 @@ type NotificationDataType = {
   studyId: number;
   studyTitle: string;
   userId: number;
+  createdAt: string;
 };
 
 type NotificationItemType = {
@@ -32,9 +47,11 @@ type NotificationItemType = {
 };
 
 const CustomPopover = styled(Popover)(({ theme }) => ({
-  maxHeight: '50vh',
+  maxHeight: '60vh',
   '.MuiPopover-paper': {
     padding: '10px',
+    margin: 10,
+    backgroundColor: theme.palette.component,
   },
 }));
 const NotiPaper = styled(Paper)(({ theme }) => ({
@@ -56,7 +73,8 @@ const CustomBtn = styled(Button)(({ theme }) => ({
   color: theme.palette.txt,
   marginLeft: '5px',
   marginRight: '5px',
-  borderRadius: '20px',
+  padding: 5,
+  borderRadius: '10px',
   '&:hover': {
     background: theme.palette.bg + '90',
   },
@@ -67,7 +85,7 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { id, isInvitation, studyId, studyTitle, scheduleStartedAt } = notification;
+  const { id, isInvitation, studyId, studyTitle, scheduleStartedAt, createdAt } = notification;
   const joinStudy = async () => {
     deleteNoti(id);
     try {
@@ -140,15 +158,40 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
           minWidth: '15vw',
           width: '100%',
         }}>
-        <div style={{ display: 'flex', justifyContent: 'end' }}>
-          <IconButton
-            size="small"
-            onClick={() => {
-              deleteNoti(id);
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: 18, fontWeight: 'bold' }}>
+            {isInvitation ? `스터디 초대` : `스터디 일정 추가`}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: 14,
+              color: alpha(theme.palette.txt, 0.5),
             }}>
-            <Close />
-          </IconButton>
+            {new Date(createdAt).toLocaleDateString() === new Date().toLocaleDateString() ? (
+              <span>
+                <div>
+                  {dateToStringDate(
+                    new Date(createdAt),
+                    new Date(createdAt).getFullYear() !== new Date().getFullYear(),
+                  )}{' '}
+                  {dateToStringTimeSimple(new Date(createdAt))}
+                </div>
+              </span>
+            ) : (
+              <span>{dateToStringTime(new Date(createdAt))}</span>
+            )}
+            <IconButton
+              size="small"
+              onClick={() => {
+                deleteNoti(id);
+              }}>
+              <Close />
+            </IconButton>
+          </div>
         </div>
+        <Divider variant="middle" sx={{ margin: '10px 0' }} />
         {isInvitation ? (
           <>
             <div
@@ -165,7 +208,8 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
                 textAlign: 'center',
               }}>{`${studyTitle} 스터디에 일정이 추가되었습니다.`}</div>
             <div style={{ textAlign: 'center', marginTop: '2px' }}>
-              {scheduleStartedAt && '스터디 일정 : ' + scheduleStartedAt.split('T')[0]}
+              {scheduleStartedAt &&
+                '스터디 일정 : ' + dateToStringDate(new Date(scheduleStartedAt))}
             </div>
           </>
         )}
