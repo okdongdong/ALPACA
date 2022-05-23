@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RoomStudyLiveMainItem from './RoomStudyLiveMainItem';
 import RoomStudyLiveCodeEditer from './RoomStudyLiveCodeEditer';
 import { styled, useTheme } from '@mui/material/styles';
@@ -24,10 +24,22 @@ function RoomStudyLiveMain({ mainStreamManager, openYjsDocs, setOpenYjsDocs }: m
   const handleDrag = (e: React.DragEvent) => {
     // 1920 기준 500
     const innerWidth = e.currentTarget.parentElement?.getBoundingClientRect().left;
-    if (innerWidth && window.innerWidth * 0.95 > e.clientX && e.clientX > 500) {
+    if (
+      innerWidth &&
+      (!!mainStreamManager ? window.innerWidth * 0.85 : window.innerWidth * 0.9) > e.clientX &&
+      e.clientX > 500
+    ) {
       setWidth(`${e.clientX - innerWidth}px`);
     }
   };
+
+  useEffect(() => {
+    if (!!!mainStreamManager) {
+      setWidth('82vw');
+    } else {
+      setWidth('60vw');
+    }
+  }, [!!mainStreamManager]);
   return (
     <>
       <div style={{ height: '100%', width: openYjsDocs ? width : '2vw' }} className="align_center">
