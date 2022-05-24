@@ -169,7 +169,7 @@ function NotificationItem({ notification, deleteNoti }: NotificationItemType) {
               fontSize: 14,
               color: alpha(theme.palette.txt, 0.5),
             }}>
-            {new Date(createdAt).toLocaleDateString() === new Date().toLocaleDateString() ? (
+            {new Date(createdAt).toLocaleDateString() !== new Date().toLocaleDateString() ? (
               <span>
                 <div>
                   {dateToStringDate(
