@@ -32,6 +32,8 @@ public class NotificationRes {
 
     private Boolean isInvitation;
 
+    private LocalDateTime createdAt;
+
     public static List<NotificationRes> of(List<Notification> notifications) {
         return notifications.stream().map(
                 notification -> NotificationRes.builder()
@@ -44,6 +46,7 @@ public class NotificationRes {
                         .scheduleId(notification.getScheduleId())
                         .scheduleStartedAt(notification.getScheduleStartedAt())
                         .isInvitation(notification.getIsInvitation())
+                        .createdAt(notification.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
     }

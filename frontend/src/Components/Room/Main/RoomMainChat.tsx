@@ -135,6 +135,7 @@ function RoomMainChat() {
     // console.log('--------------subscribe', client);
     client?.subscribe(`/sub/chat/study/${roomId}`, (res: any) => {
       const newMessage = JSON.parse(res.body);
+      setIsGetPrevChat(false);
       setChatList((prev) => [...prev, newMessage]);
     });
   };
@@ -160,7 +161,7 @@ function RoomMainChat() {
   // };
 
   const onSendMessageHandler = () => {
-    setIsGetPrevChat(false);
+    // setIsGetPrevChat(false);
     sendMessage();
     // console.log('scrollRef: ', scrollRef);
   };
@@ -175,7 +176,7 @@ function RoomMainChat() {
       const res = await customAxios({
         method: 'get',
         url: `/chat/study/${roomId}`,
-        params: { offsetId, page, size: 5 },
+        params: { offsetId, page, size: 10 },
       });
       setChatList((prev) => [...res.data.content.reverse(), ...prev]);
       setPage((prev) => prev + 1);
@@ -238,9 +239,9 @@ function RoomMainChat() {
     return () => observer.disconnect();
   }, [infiniteHandler]);
 
-  // 이전 채팅 조회시 스크롤 보정
+  // 새로운 채팅 수신시 스크롤 보정
   useEffect(() => {
-    if (!isGetPrevChat) {
+    if (!isGetPrevChat || page < 2) {
       scrollRef?.current?.scrollTo(0, scrollRef.current.scrollHeight);
     }
   }, [chatList.length]);

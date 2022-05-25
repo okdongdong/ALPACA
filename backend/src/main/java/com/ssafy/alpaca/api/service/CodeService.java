@@ -73,7 +73,7 @@ public class CodeService {
             CodeCompileRes codeCompileRes = doodleCompile(codeCompileReq.getCode(), codeCompileReq.getLanguage(),
                     compileVersion(codeCompileReq.getLanguage()), problem.getInputs().get(i));
             codeCompileRes.setAnswer(problem.getOutputs().get(i).stripTrailing());
-            codeCompileRes.setIsCorrect(Boolean.TRUE.equals(codeCompileRes.getAnswer().equals(codeCompileRes.getOutput())));
+            codeCompileRes.setIsCorrect(Boolean.TRUE.equals(codeCompileRes.getAnswer().replace("\r\n", "\n").equals(codeCompileRes.getOutput())));
             codeCompileResList.add(codeCompileRes);
         }
 

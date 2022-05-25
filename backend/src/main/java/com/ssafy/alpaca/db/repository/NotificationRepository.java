@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends MongoRepository<Notification,String> {
 
-    List<Notification> findAllByUserId(Long userId);
+    List<Notification> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
 }

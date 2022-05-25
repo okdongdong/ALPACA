@@ -80,7 +80,7 @@ public class NotificationService {
     }
 
     public List<NotificationRes> getNotification(User user) {
-        return NotificationRes.of(notificationRepository.findAllByUserId(user.getId()));
+        return NotificationRes.of(notificationRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()));
     }
 
     public void deleteNotification(User user, NotificationReq notificationReq) {
